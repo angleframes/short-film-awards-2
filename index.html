@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sharankrishna Short Film Awards - Entry Portal</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-color: #e2b047; /* Elegant Gold */
+            --accent-hover: #c69733;
+            --input-bg: #0f172a;
+            --border-color: #334155;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 100px 20px 40px 20px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Top Sticky Navigation Menu */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .navbar a:hover, 
+        .navbar a.active {
+            color: var(--accent-color);
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(226, 176, 71, 0.1);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .logo-container {
+            max-width: 320px;
+            margin: 0 auto 15px auto;
+            padding: 0;
+            filter: invert(1) brightness(2) contrast(1.2); 
+        }
+
+        .logo-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .info-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(226, 176, 71, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 0.95rem;
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .page-view {
+            display: none;
+        }
+        .page-view.active {
+            display: block;
+        }
+
+        /* Story Page Layout */
+        .story-page-content {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .story-block {
+            background-color: rgba(15, 23, 42, 0.4);
+            border-left: 4px solid var(--accent-color);
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .story-block h3 {
+            color: var(--accent-color);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+        }
+
+        .story-block p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            text-align: justify;
+            line-height: 1.7;
+        }
+
+        /* Horizontal Scroll Gallery Container */
+        .gallery-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 10px 5px 25px 5px;
+            margin-bottom: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) var(--input-bg);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .gallery-wrapper::-webkit-scrollbar { height: 8px; }
+        .gallery-wrapper::-webkit-scrollbar-track { background: var(--input-bg); border-radius: 10px; }
+        .gallery-wrapper::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; border: 1px solid var(--input-bg); }
+
+        .gallery-scroll-container { display: inline-flex; gap: 20px; }
+        .gallery-item {
+            width: 280px;
+            display: inline-block;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            white-space: normal;
+        }
+        .gallery-item:hover { transform: translateY(-4px); border-color: var(--accent-color); }
+        .gallery-img-box {
+            width: 100%;
+            height: 190px;
+            background-color: #1e293b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        .gallery-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .gallery-item:hover .gallery-img-box img { transform: scale(1.05); }
+        .gallery-caption { padding: 12px; font-size: 0.85rem; color: var(--text-muted); font-weight: 500; text-align: center; background-color: rgba(30, 41, 59, 0.5); }
+
+        h2.section-title {
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            margin: 10px 0 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+        h2.section-title::after { content: ""; flex: 1; margin-left: 10px; height: 1px; background: var(--border-color); }
+
+        .form-group { margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+        @media (max-width: 650px) {
+            .form-grid { grid-template-columns: 1fr; gap: 0; }
+            .info-panel { grid-template-columns: 1fr; gap: 12px; }
+            .navbar { gap: 12px; padding: 12px 5px; }
+            .navbar a { font-size: 0.78rem; letter-spacing: 0.5px; }
+        }
+
+        label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-color); font-weight: 500; }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        select option { background-color: var(--card-bg); color: var(--text-color); }
+        input:focus, select:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(226, 176, 71, 0.15); }
+
+        .optional-tag { font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-left: 5px; }
+        .payment-view { background-color: rgba(15, 23, 42, 0.4); padding: 25px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 25px; }
+
+        .qr-wrapper { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 15px; }
+        .qr-box {
+            width: 240px;
+            height: 240px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 3px solid var(--accent-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .qr-box img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+        .file-upload-wrapper {
+            position: relative;
+            border: 2px dashed var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            background-color: var(--input-bg);
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+        .file-upload-wrapper:hover { border-color: var(--accent-color); }
+        .file-upload-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .file-upload-text { color: var(--text-muted); font-size: 0.9rem; }
+        .file-uploaded-name { display: none; margin-top: 8px; font-size: 0.85rem; color: var(--success-color); font-weight: 500; }
+
+        .support-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; font-size: 0.85rem; color: var(--text-muted); line-height: 1.8; }
+        .support-footer a { color: var(--accent-color); text-decoration: none; font-weight: 500; }
+
+        .button-group { display: flex; gap: 15px; margin-top: 25px; }
+        button { width: 100%; padding: 14px; border: none; border-radius: 6px; font-size: 1rem; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: background-color 0.3s ease, transform 0.1s ease; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-primary { background-color: var(--accent-color); color: #000; }
+        .btn-primary:hover:not(:disabled) { background-color: var(--accent-hover); }
+        .btn-secondary { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-muted); max-width: 150px; }
+        .btn-secondary:hover { background-color: rgba(255, 255, 255, 0.05); color: var(--text-color); }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a id="navHome" class="active" onclick="handleNav('home')">Home</a>
+        <a id="navStory" onclick="handleNav('story')">About Awards</a>
+        <a id="navGallery" onclick="handleNav('gallery')">Gallery</a>
+        <a id="navPayment" onclick="handleNav('payment')">Payment</a>
+    </nav>
+
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <img src="file:///Users/analchandranp/PC/Sharankrishna short film logo New-02/Sharankrishna short film logo New-01.png" alt="Sharankrishna Short Film Awards Logo">
+            </div>
+            <div class="info-panel">
+                <div class="info-item">
+                    <span class="info-label">Registration Fee</span>
+                    <span class="info-value">₹ 1,000</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Submission Deadline</span>
+                    <span class="info-value">Dec 31, 2026</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Event Program Date</span>
+                    <span class="info-value">Feb 12, 2027</span>
+                </div>
+            </div>
+        </header>
+
+        <div id="pageStory" class="page-view">
+            <div class="story-page-content">
+                <div class="story-block">
+                    <h3>Who is Sharankrishna?</h3>
+                    <p>
+                        Sharankrishna was a vibrant creative spirit whose life was anchored deeply in the world of independent filmmaking and visual storytelling. To him, cinema was not merely a medium of entertainment, but an absolute passion, a canvas for honest thoughts, and an arena for boundless raw expression. Known for his profound artistic perspective and supportive nature toward fellow creators, he dreamed of elevating stories that resonated directly from the heart.
+                    </p>
+                </div>
+                
+                <div class="story-block">
+                    <h3>The Story Behind Our Logo</h3>
+                    <p>
+                        The core visual structure of the Sharankrishna insignia integrates a gold-toned camera aperture frame enclosing geometric perspectives. This layout is deeply symbolic: the closing aperture signifies pinning down a transient slice of time into a permanent timeline—capturing life precisely as Sharankrishna loved to do. The surrounding gold crown and star hierarchy honor his memory, establishing a golden standard meant to continuously spark, recognize, and sustain the hidden cinematic spark within independent campus and general filmmakers.
+                    </p>
+                </div>
+
+                <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="handleNav('home')">Go To Application Form</button>
+            </div>
+        </div>
+
+        <div id="pageGallery" class="page-view">
+            <h2 class="section-title">Event Gallery</h2>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px; margin-top:-5px;">← Swipe or scroll horizontally to browse all snapshots →</p>
+            
+            <div class="gallery-wrapper">
+                <div class="gallery-scroll-container">
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="file:///Users/analchandranp/PC/Sharankrishna short film logo New-02/MRC01340.JPG.jpeg" alt="Gallery Snapshot"></div><div class="gallery-caption">Event Highlight 01</div></div>
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="file:///Users/analchandranp/PC/Sharankrishna short film logo New-02/MRC00885.JPG.jpeg" alt="Gallery Snapshot"></div><div class="gallery-caption">Event Highlight 02</div></div>
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="file:///Users/analchandranp/PC/Sharankrishna short film logo New-02/MRC00845.JPG.jpeg" alt="Gallery Snapshot"></div><div class="gallery-caption">Event Highlight 03</div></div>
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="file:///Users/analchandranp/PC/Sharankrishna short film logo New-02/MRC01340.JPG.jpeg" alt="Gallery Snapshot"></div><div class="gallery-caption">Event Highlight 04</div></div>
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="file:///Users/analchandranp/PC/Sharankrishna short film logo New-02/MRC00885.JPG.jpeg" alt="Gallery Snapshot"></div><div class="gallery-caption">Event Highlight 05</div></div>
+                </div>
+            </div>
+            <button type="button" class="btn-primary" onclick="handleNav('home')">Go To Application Form</button>
+        </div>
+
+        <form id="submissionForm" onsubmit="handleFinalSubmit(event)">
+            
+            <div id="pageHome" class="page-view active">
+                <h2 class="section-title">Applicant Details</h2>
+                
+                <div class="form-group">
+                    <label for="applicantName">Applicant Name *</label>
+                    <input type="text" id="applicantName" required placeholder="Enter your full name">
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" required placeholder="e.g., +91 98765 43210">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" required placeholder="name@example.com">
+                    </div>
+                </div>
+
+                <h2 class="section-title">Film & Crew Details</h2>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="filmName">Short Film Name *</label>
+                        <input type="text" id="filmName" required placeholder="Title of the short film">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" required>
+                            <option value="" disabled selected>Select film category</option>
+                            <option value="General">General</option>
+                            <option value="Campus">Campus</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="director">Director Name *</label>
+                        <input type="text" id="director" required placeholder="Director's name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="duration">Duration (Minutes) *</label>
+                        <input type="number" id="duration" required min="1" max="30" placeholder="Max 30 minutes">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="producer">Producer Name *</label>
+                        <input type="text" id="producer" required placeholder="Producer's name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="writer">Writer & Screenplay *</label>
+                        <input type="text" id="writer" required placeholder="Screenwriter's name">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="cinematographer">Cinematographer *</label>
+                        <input type="text" id="cinematographer" required placeholder="DoP's name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editor">Editor *</label>
+                        <input type="text" id="editor" required placeholder="Editor's name">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="musicDirector">Music Director *</label>
+                    <input type="text" id="musicDirector" required placeholder="Composer's name">
+                </div>
+
+                <h2 class="section-title">Cast Credits</h2>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="actor">Lead Actor *</label>
+                        <input type="text" id="actor" required placeholder="Main Actor">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="actress">Lead Actress *</label>
+                        <input type="text" id="actress" required placeholder="Main Actress">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="childArtist">Child Artist <span class="optional-tag">(Optional)</span></label>
+                    <input type="text" id="childArtist" placeholder="Name of child artist, if any">
+                </div>
+
+                <button type="button" class="btn-primary" style="margin-top:20px;" onclick="handleNav('payment')">Proceed to Payment</button>
+            </div>
+
+            <div id="pagePayment" class="page-view">
+                <h2 class="section-title">Entry Fee Payment</h2>
+                
+                <div id="viewQr" class="payment-view">
+                    <div class="qr-wrapper">
+                        <p style="font-size: 0.95rem; margin-bottom: 5px;">Scan the QR layout graphic below to transfer the fixed registration fee of <strong>₹1,000</strong>.</p>
+                        
+                        <div class="qr-box">
+                            <img src="file:///Users/analchandranp/PC/Sharankrishna short film logo New-02/angle.jpg" alt="Payment QR Code">
+                        </div>
+                        
+                        <p style="font-size:0.85rem; color: var(--text-muted);">Official Merchant ID: <strong>9745640896kgb@cnrb</strong></p>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 10px;">
+                    <label for="transactionId">Transaction Reference ID / UTR *</label>
+                    <input type="text" id="transactionId" placeholder="Enter reference number for tracking confirmation">
+                </div>
+
+                <div class="form-group">
+                    <label>Upload Payment Receipt or Screenshot *</label>
+                    <div class="file-upload-wrapper">
+                        <div class="file-upload-text" id="uploadPlaceholder">
+                            Drag & drop or <strong>browse computer</strong> to attach verification receipt
+                        </div>
+                        <input type="file" id="paymentScreenshot" accept="image/*,application/pdf" onchange="handleFileChange(this)">
+                        <div class="file-uploaded-name" id="fileNameDisplay"></div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-secondary" onclick="handleNav('home')">Back</button>
+                    <button type="submit" id="submitBtn" class="btn-primary">Submit Entry</button>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="support-footer">
+            Need help or have registration inquiries? Contact us at: <br>
+            <strong><a href="tel:+917902959564">+91 7902959564</a></strong> &nbsp;|&nbsp; <strong><a href="tel:+919745640896">+91 9745640896</a></strong> <br>
+            Email: <strong><a href="mailto:angleframes.contact@gmail.com">angleframes.contact@gmail.com</a></strong>
+        </div>
+    </div>
+
+    <script>
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbyq-GcuOf1-r5B_26q-Qmz9y0Ydu-RlPT_KOJv10vl47Eyoaj_xCxKTzY3OMIuNC7YV/exec";
+
+        function handleNav(targetSection) {
+            if (targetSection === 'payment') {
+                if (!validateFirstPageFields()) {
+                    setActiveNavbarLink('home');
+                    return; 
+                }
+            }
+
+            document.querySelectorAll('.page-view').forEach(view => {
+                view.classList.remove('active');
+            });
+
+            if (targetSection === 'home') {
+                document.getElementById('pageHome').classList.add('active');
+                setActiveNavbarLink('home');
+            } else if (targetSection === 'story') {
+                document.getElementById('pageStory').classList.add('active');
+                setActiveNavbarLink('story');
+            } else if (targetSection === 'gallery') {
+                document.getElementById('pageGallery').classList.add('active');
+                setActiveNavbarLink('gallery');
+            } else if (targetSection === 'payment') {
+                document.getElementById('transactionId').required = true;
+                document.getElementById('paymentScreenshot').required = true;
+                
+                document.getElementById('pagePayment').classList.add('active');
+                setActiveNavbarLink('payment');
+            }
+            window.scrollTo(0, 0);
+        }
+
+        function setActiveNavbarLink(id) {
+            document.getElementById('navHome').classList.remove('active');
+            document.getElementById('navStory').classList.remove('active');
+            document.getElementById('navGallery').classList.remove('active');
+            document.getElementById('navPayment').classList.remove('active');
+
+            if (id === 'home') document.getElementById('navHome').classList.add('active');
+            if (id === 'story') document.getElementById('navStory').classList.add('active');
+            if (id === 'gallery') document.getElementById('navGallery').classList.add('active');
+            if (id === 'payment') document.getElementById('navPayment').classList.add('active');
+        }
+
+        function validateFirstPageFields() {
+            const homePage = document.getElementById('pageHome');
+            const requiredFields = homePage.querySelectorAll('input[required], select[required]');
+            let formIsValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    formIsValid = false;
+                    field.reportValidity();
+                }
+                if (field.id === 'duration') {
+                    const durationVal = parseInt(field.value, 10);
+                    if (durationVal > 30 || durationVal < 1) {
+                        formIsValid = false;
+                        field.setCustomValidity("The short film duration cannot exceed 30 minutes.");
+                        field.reportValidity();
+                    } else {
+                        field.setCustomValidity(""); 
+                    }
+                }
+            });
+            return formIsValid;
+        }
+
+        function handleFileChange(input) {
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+            const placeholder = document.getElementById('uploadPlaceholder');
+            
+            if (input.files && input.files.length > 0) {
+                placeholder.style.display = 'none';
+                fileNameDisplay.textContent = '✓ ' + input.files[0].name;
+                fileNameDisplay.style.display = 'block';
+            } else {
+                placeholder.style.display = 'block';
+                fileNameDisplay.style.display = 'none';
+            }
+        }
+
+        function handleFinalSubmit(event) {
+            event.preventDefault();
+
+            const txId = document.getElementById('transactionId').value.trim();
+            const fileInput = document.getElementById('paymentScreenshot');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (!txId || fileInput.files.length === 0) {
+                alert("Please provide the Transaction ID and upload the payment receipt to complete submission.");
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Submitting... Please Wait";
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const fileDataString = e.target.result;
+
+                const formData = {
+                    applicantName: document.getElementById('applicantName').value,
+                    phone: document.getElementById('phone').value,
+                    email: document.getElementById('email').value,
+                    filmName: document.getElementById('filmName').value,
+                    category: document.getElementById('category').value,
+                    director: document.getElementById('director').value,
+                    duration: document.getElementById('duration').value,
+                    producer: document.getElementById('producer').value,
+                    writer: document.getElementById('writer').value,
+                    cinematographer: document.getElementById('cinematographer').value,
+                    editor: document.getElementById('editor').value,
+                    musicDirector: document.getElementById('musicDirector').value,
+                    actor: document.getElementById('actor').value,
+                    actress: document.getElementById('actress').value,
+                    childArtist: document.getElementById('childArtist').value || "None",
+                    transactionId: txId,
+                    fileData: fileDataString, 
+                    fileName: file.name
+                };
+
+                fetch(webAppUrl, {
+                    method: "POST",
+                    mode: "no-cors", 
+                    cache: "no-cache",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData)
+                })
+                .then(() => {
+                    alert("Thank you! Your entry profile data and payment records have been uploaded successfully.");
+                    
+                    document.getElementById("submissionForm").reset();
+                    document.getElementById('uploadPlaceholder').style.display = 'block';
+                    document.getElementById('fileNameDisplay').style.display = 'none';
+                    
+                    document.getElementById('transactionId').required = false;
+                    document.getElementById('paymentScreenshot').required = false;
+                    
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Submit Entry";
+                    
+                    handleNav('home'); 
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Submission error. Please check backend verification configurations.");
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Submit Entry";
+                });
+            };
+
+            reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html>
