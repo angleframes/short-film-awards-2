@@ -17,6 +17,7 @@
             --success-color: #10b981;
             --danger-color: #ef4444;
             --danger-hover: #dc2626;
+            --warning-bg: rgba(239, 68, 68, 0.1);
         }
 
         * {
@@ -280,6 +281,41 @@
         .file-upload-text { color: var(--text-muted); font-size: 0.9rem; }
         .file-uploaded-name { display: none; margin-top: 8px; font-size: 0.85rem; color: var(--success-color); font-weight: 500; }
 
+        /* Elegant Success Screen State styling rules */
+        .success-screen {
+            text-align: center;
+            padding: 30px 10px;
+        }
+        .success-icon {
+            font-size: 3.5rem;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+        .success-heading {
+            font-size: 1.6rem;
+            color: #fff;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .success-text {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        .spam-alert-box {
+            background-color: var(--warning-bg);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: justify;
+            line-height: 1.5;
+        }
+
         .support-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; font-size: 0.85rem; color: var(--text-muted); line-height: 1.8; }
         .support-footer a { color: var(--accent-color); text-decoration: none; font-weight: 500; }
 
@@ -303,208 +339,225 @@
     </nav>
 
     <div class="container">
-        <header>
-            <div class="logo-container">
-                <img src="Sharankrishna short film logo New-01.png" data-fallback="logo.png" data-fallback-folder="images/Sharankrishna short film logo New-01.png" alt="Sharankrishna Short Film Awards Logo" class="auto-img">
-            </div>
-            <div class="info-panel">
-                <div class="info-item">
-                    <span class="info-label">Registration Fee</span>
-                    <span class="info-value">₹ 1,000</span>
+        <div id="formContainer">
+            <header>
+                <div class="logo-container">
+                    <img src="Sharankrishna short film logo New-01.png" data-fallback="logo.png" data-fallback-folder="images/Sharankrishna short film logo New-01.png" alt="Sharankrishna Short Film Awards Logo" class="auto-img">
                 </div>
-                <div class="info-item">
-                    <span class="info-label">Submission Deadline</span>
-                    <span class="info-value">Dec 31, 2026</span>
+                <div class="info-panel">
+                    <div class="info-item">
+                        <span class="info-label">Registration Fee</span>
+                        <span class="info-value">₹ 1,000</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Submission Deadline</span>
+                        <span class="info-value">Dec 31, 2026</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Event Program Date</span>
+                        <span class="info-value">Feb 12, 2027</span>
+                    </div>
                 </div>
-                <div class="info-item">
-                    <span class="info-label">Event Program Date</span>
-                    <span class="info-value">Feb 12, 2027</span>
-                </div>
-            </div>
-        </header>
+            </header>
 
-        <div id="pageStory" class="page-view">
-            <div class="story-page-content">
-                <div class="story-block">
-                    <h3>Who is Sharankrishna?</h3>
-                    <p>
-                        Sharankrishna was a vibrant creative spirit whose life was anchored deeply in the world of independent filmmaking and visual storytelling. To him, cinema was not merely a medium of entertainment, but an absolute passion, a canvas for honest thoughts, and an arena for boundless raw expression. Known for his profound artistic perspective and supportive nature toward fellow creators, he dreamed of elevating stories that resonated directly from the heart.
-                    </p>
-                </div>
-                
-                <div class="story-block">
-                    <h3>The Story Behind Our Logo</h3>
-                    <p>
-                        The core visual structure of the Sharankrishna insignia integrates a gold-toned camera aperture frame enclosing geometric perspectives. This layout is deeply symbolic: the closing aperture signifies pinning down a transient slice of time into a permanent timeline—capturing life precisely as Sharankrishna loved to do. The surrounding gold crown and star hierarchy honor his memory, establishing a golden standard meant to continuously spark, recognize, and sustain the hidden cinematic spark within independent campus and general filmmakers.
-                    </p>
-                </div>
-
-                <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="handleNav('home')">Go To Application Form</button>
-            </div>
-        </div>
-
-        <div id="pageGallery" class="page-view">
-            <h2 class="section-title">Event Gallery</h2>
-            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px; margin-top:-5px;">&larr; Swipe or scroll horizontally to browse all snapshots &rarr;</p>
-            
-            <div class="gallery-wrapper">
-                <div class="gallery-scroll-container">
-                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" data-fallback-folder="images/MRC01340.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 01</div></div>
-                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" data-fallback-folder="images/MRC00885.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 02</div></div>
-                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00845.JPG.jpeg" data-fallback="MRC00845.jpeg" data-fallback-folder="images/MRC00845.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 03</div></div>
-                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 04</div></div>
-                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 05</div></div>
-                </div>
-            </div>
-            <button type="button" class="btn-primary" onclick="handleNav('home')">Go To Application Form</button>
-        </div>
-
-        <form id="submissionForm" onsubmit="handleFinalSubmit(event)">
-            
-            <div id="pageHome" class="page-view active">
-                <h2 class="section-title">Applicant Details</h2>
-                
-                <div class="form-group">
-                    <label for="applicantName">Applicant Name *</label>
-                    <input type="text" id="applicantName" required placeholder="Enter your full name">
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="phone">Phone Number *</label>
-                        <input type="tel" id="phone" required placeholder="e.g., +91 98765 43210">
+            <div id="pageStory" class="page-view">
+                <div class="story-page-content">
+                    <div class="story-block">
+                        <h3>Who is Sharankrishna?</h3>
+                        <p>
+                            Sharankrishna was a vibrant creative spirit whose life was anchored deeply in the world of independent filmmaking and visual storytelling. To him, cinema was not merely a medium of entertainment, but an absolute passion, a canvas for honest thoughts, and an arena for boundless raw expression. Known for his profound artistic perspective and supportive nature toward fellow creators, he dreamed of elevating stories that resonated directly from the heart.
+                        </p>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="email">Email Address *</label>
-                        <input type="email" id="email" required placeholder="name@example.com">
+                    <div class="story-block">
+                        <h3>The Story Behind Our Logo</h3>
+                        <p>
+                            The core visual structure of the Sharankrishna insignia integrates a gold-toned camera aperture frame enclosing geometric perspectives. This layout is deeply symbolic: the closing aperture signifies pinning down a transient slice of time into a permanent timeline—capturing life precisely as Sharankrishna loved to do. The surrounding gold crown and star hierarchy honor his memory, establishing a golden standard meant to continuously spark, recognize, and sustain the hidden cinematic spark within independent campus and general filmmakers.
+                        </p>
+                    </div>
+
+                    <button type="button" class="btn-primary" style="margin-top: 10px;" onclick="handleNav('home')">Go To Application Form</button>
+                </div>
+            </div>
+
+            <div id="pageGallery" class="page-view">
+                <h2 class="section-title">Event Gallery</h2>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px; margin-top:-5px;">&larr; Swipe or scroll horizontally to browse all snapshots &rarr;</p>
+                
+                <div class="gallery-wrapper">
+                    <div class="gallery-scroll-container">
+                        <div class="gallery-item"><div class="gallery-img-box"><img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" data-fallback-folder="images/MRC01340.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 01</div></div>
+                        <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" data-fallback-folder="images/MRC00885.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 02</div></div>
+                        <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00845.JPG.jpeg" data-fallback="MRC00845.jpeg" data-fallback-folder="images/MRC00845.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 03</div></div>
+                        <div class="gallery-item"><div class="gallery-img-box"><img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 04</div></div>
+                        <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 05</div></div>
                     </div>
                 </div>
+                <button type="button" class="btn-primary" onclick="handleNav('home')">Go To Application Form</button>
+            </div>
 
-                <h2 class="section-title">Film & Crew Details</h2>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="filmName">Short Film Name *</label>
-                        <input type="text" id="filmName" required placeholder="Title of the short film">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="category">Category *</label>
-                        <select id="category" required>
-                            <option value="" disabled selected>Select film category</option>
-                            <option value="General">General</option>
-                            <option value="Campus">Campus</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="filmLink">Short Film Link (YouTube / Google Drive) *</label>
-                    <input type="url" id="filmLink" required placeholder="https://youtube.com/... or https://drive.google.com/...">
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="director">Director Name *</label>
-                        <input type="text" id="director" required placeholder="Director's name">
-                    </div>
+            <form id="submissionForm" onsubmit="handleFinalSubmit(event)">
+                
+                <div id="pageHome" class="page-view active">
+                    <h2 class="section-title">Applicant Details</h2>
                     
                     <div class="form-group">
-                        <label for="duration">Duration (Minutes) *</label>
-                        <input type="number" id="duration" required min="1" max="30" placeholder="Max 30 minutes">
-                    </div>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="producer">Producer Name *</label>
-                        <input type="text" id="producer" required placeholder="Producer's name">
+                        <label for="applicantName">Applicant Name *</label>
+                        <input type="text" id="applicantName" required placeholder="Enter your full name">
                     </div>
 
-                    <div class="form-group">
-                        <label for="writer">Writer & Screenplay *</label>
-                        <input type="text" id="writer" required placeholder="Screenwriter's name">
-                    </div>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="cinematographer">Cinematographer *</label>
-                        <input type="text" id="cinematographer" required placeholder="DoP's name">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="editor">Editor *</label>
-                        <input type="text" id="editor" required placeholder="Editor's name">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="musicDirector">Music Director *</label>
-                    <input type="text" id="musicDirector" required placeholder="Composer's name">
-                </div>
-
-                <h2 class="section-title">Cast Credits</h2>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="actor">Lead Actor *</label>
-                        <input type="text" id="actor" required placeholder="Main Actor">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="actress">Lead Actress *</label>
-                        <input type="text" id="actress" required placeholder="Main Actress">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="childArtist">Child Artist <span class="optional-tag">(Optional)</span></label>
-                    <input type="text" id="childArtist" placeholder="Name of child artist, if any">
-                </div>
-
-                <button type="button" class="btn-primary" style="margin-top:20px;" onclick="handleNav('payment')">Proceed to Payment</button>
-            </div>
-
-            <div id="pagePayment" class="page-view">
-                <h2 class="section-title">Entry Fee Payment</h2>
-                
-                <div id="viewQr" class="payment-view">
-                    <div class="qr-wrapper">
-                        <p style="font-size: 0.95rem; margin-bottom: 5px;">Scan the QR layout graphic below to transfer the fixed registration fee of <strong>₹1,000</strong>.</p>
-                        
-                        <div class="qr-box">
-                            <img src="angle.jpg" data-fallback="angle.png" data-fallback-folder="images/angle.jpg" alt="Payment QR Code" class="auto-img">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" required placeholder="e.g., +91 98765 43210">
                         </div>
                         
-                        <p style="font-size:0.85rem; color: var(--text-muted);">Official Merchant ID: <strong>9745640896kgb@cnrb</strong></p>
-                    </div>
-                </div>
-
-                <div class="form-group" style="margin-top: 10px;">
-                    <label for="transactionId">Transaction Reference ID / UTR *</label>
-                    <input type="text" id="transactionId" placeholder="Enter reference number for tracking confirmation">
-                </div>
-
-                <div class="form-group">
-                    <label>Upload Payment Receipt or Screenshot *</label>
-                    <div class="file-upload-wrapper">
-                        <div class="file-upload-text" id="uploadPlaceholder">
-                            Drag & drop or <strong>browse computer</strong> to attach verification receipt
+                        <div class="form-group">
+                            <label for="email">Email Address *</label>
+                            <input type="email" id="email" required placeholder="name@example.com">
                         </div>
-                        <input type="file" id="paymentScreenshot" accept="image/*,application/pdf" onchange="handleFileChange(this)">
-                        <div class="file-uploaded-name" id="fileNameDisplay"></div>
+                    </div>
+
+                    <h2 class="section-title">Film & Crew Details</h2>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="filmName">Short Film Name *</label>
+                            <input type="text" id="filmName" required placeholder="Title of the short film">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="category">Category *</label>
+                            <select id="category" required>
+                                <option value="" disabled selected>Select film category</option>
+                                <option value="General">General</option>
+                                <option value="Campus">Campus</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="filmLink">Short Film Link (YouTube / Google Drive) *</label>
+                        <input type="url" id="filmLink" required placeholder="https://youtube.com/... or https://drive.google.com/...">
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="director">Director Name *</label>
+                            <input type="text" id="director" required placeholder="Director's name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="duration">Duration (Minutes) *</label>
+                            <input type="number" id="duration" required min="1" max="30" placeholder="Max 30 minutes">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="producer">Producer Name *</label>
+                            <input type="text" id="producer" required placeholder="Producer's name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="writer">Writer & Screenplay *</label>
+                            <input type="text" id="writer" required placeholder="Screenwriter's name">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="cinematographer">Cinematographer *</label>
+                            <input type="text" id="cinematographer" required placeholder="DoP's name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editor">Editor *</label>
+                            <input type="text" id="editor" required placeholder="Editor's name">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="musicDirector">Music Director *</label>
+                        <input type="text" id="musicDirector" required placeholder="Composer's name">
+                    </div>
+
+                    <h2 class="section-title">Cast Credits</h2>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="actor">Lead Actor *</label>
+                            <input type="text" id="actor" required placeholder="Main Actor">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="actress">Lead Actress *</label>
+                            <input type="text" id="actress" required placeholder="Main Actress">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="childArtist">Child Artist <span class="optional-tag">(Optional)</span></label>
+                        <input type="text" id="childArtist" placeholder="Name of child artist, if any">
+                    </div>
+
+                    <button type="button" class="btn-primary" style="margin-top:20px;" onclick="handleNav('payment')">Proceed to Payment</button>
+                </div>
+
+                <div id="pagePayment" class="page-view">
+                    <h2 class="section-title">Entry Fee Payment</h2>
+                    
+                    <div id="viewQr" class="payment-view">
+                        <div class="qr-wrapper">
+                            <p style="font-size: 0.95rem; margin-bottom: 5px;">Scan the QR layout graphic below to transfer the fixed registration fee of <strong>₹1,000</strong>.</p>
+                            
+                            <div class="qr-box">
+                                <img src="angle.jpg" data-fallback="angle.png" data-fallback-folder="images/angle.jpg" alt="Payment QR Code" class="auto-img">
+                            </div>
+                            
+                            <p style="font-size:0.85rem; color: var(--text-muted);">Official Merchant ID: <strong>9745640896kgb@cnrb</strong></p>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 10px;">
+                        <label for="transactionId">Transaction Reference ID / UTR *</label>
+                        <input type="text" id="transactionId" placeholder="Enter reference number for tracking confirmation">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Upload Payment Receipt or Screenshot *</label>
+                        <div class="file-upload-wrapper">
+                            <div class="file-upload-text" id="uploadPlaceholder">
+                                Drag & drop or <strong>browse computer</strong> to attach verification receipt
+                            </div>
+                            <input type="file" id="paymentScreenshot" accept="image/*,application/pdf" onchange="handleFileChange(this)">
+                            <div class="file-uploaded-name" id="fileNameDisplay"></div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn-secondary" onclick="handleNav('home')">Back</button>
+                        <button type="submit" id="submitBtn" class="btn-primary">Submit Entry</button>
                     </div>
                 </div>
 
-                <div class="button-group">
-                    <button type="button" class="btn-secondary" onclick="handleNav('home')">Back</button>
-                    <button type="submit" id="submitBtn" class="btn-primary">Submit Entry</button>
-                </div>
+            </form>
+        </div>
+
+        <div id="successScreen" class="page-view success-screen">
+            <div class="success-icon">🏆</div>
+            <h2 class="success-heading">Submission Completed Successfully!</h2>
+            <p class="success-text">
+                Your film profile configuration and data entry tracking lines have been verified. <br>
+                <strong>You have successfully entered into the Sharankrishna Short Film Awards program!</strong>
+            </p>
+            
+            <div class="spam-alert-box">
+                <strong>⚠️ Verification Note:</strong> A digital submission receipt has been transmitted over to your registered email address. If you do not observe the message in your primary inbox folder within a few minutes, please check your <strong>Spam or Junk email folder</strong> and mark it as "Not Spam".
             </div>
 
-        </form>
+            <button type="button" class="btn-primary" style="max-width: 250px; margin: 20px auto 0 auto;" onclick="resetPortalView()">Submit Another Entry</button>
+        </div>
 
         <div class="support-footer">
             Need help or have registration inquiries? Contact us at: <br>
@@ -532,12 +585,17 @@
         });
 
         function handleNav(targetSection) {
+            // Block navigation to payment if form details are broken
             if (targetSection === 'payment') {
                 if (!validateFirstPageFields()) {
                     setActiveNavbarLink('home');
                     return; 
                 }
             }
+
+            // Ensure the main form container is visible if navigating standard pages
+            document.getElementById('formContainer').style.display = 'block';
+            document.getElementById('successScreen').classList.remove('active');
 
             document.querySelectorAll('.page-view').forEach(view => {
                 view.classList.remove('active');
@@ -663,19 +721,22 @@
                     body: JSON.stringify(formData)
                 })
                 .then(() => {
-                    alert("Thank you! Your entry profile data and payment records have been uploaded successfully.");
+                    // Hides form layout view and opens clean confirmation dashboard status pane
+                    document.getElementById('formContainer').style.display = 'none';
                     
+                    document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
+                    document.getElementById('successScreen').classList.add('active');
+                    
+                    // Resets submission form parameters cleanly behind the scenes
                     document.getElementById("submissionForm").reset();
                     document.getElementById('uploadPlaceholder').style.display = 'block';
                     document.getElementById('fileNameDisplay').style.display = 'none';
-                    
                     document.getElementById('transactionId').required = false;
                     document.getElementById('paymentScreenshot').required = false;
                     
                     submitBtn.disabled = false;
                     submitBtn.textContent = "Submit Entry";
-                    
-                    handleNav('home'); 
+                    window.scrollTo(0, 0);
                 })
                 .catch(err => {
                     console.error(err);
@@ -686,6 +747,10 @@
             };
 
             reader.readAsDataURL(file);
+        }
+
+        function resetPortalView() {
+            handleNav('home');
         }
     </script>
 </body>
