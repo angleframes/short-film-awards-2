@@ -168,85 +168,6 @@
             line-height: 1.7;
         }
 
-        /* Table Dashboard Styles */
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto;
-            margin-top: 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            background-color: var(--input-bg);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.9rem;
-        }
-
-        th {
-            background-color: rgba(226, 176, 71, 0.1);
-            color: var(--accent-color);
-            padding: 12px 15px;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 0.5px;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-color);
-            white-space: nowrap;
-        }
-
-        tr:hover {
-            background-color: rgba(255, 255, 255, 0.02);
-        }
-
-        .badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        .badge-general { background-color: rgba(226, 176, 71, 0.2); color: var(--accent-color); }
-        .badge-campus { background-color: rgba(16, 185, 129, 0.2); color: var(--success-color); }
-
-        .btn-link {
-            color: var(--accent-color);
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .btn-link:hover { text-decoration: underline; }
-
-        .loading-state {
-            text-align: center;
-            padding: 30px;
-            color: var(--text-muted);
-            font-style: italic;
-        }
-
-        .admin-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 10px;
-        }
-        .btn-danger {
-            background-color: var(--danger-color);
-            color: #fff;
-            padding: 8px 16px;
-            font-size: 0.85rem;
-            max-width: 220px;
-        }
-        .btn-danger:hover:not(:disabled) {
-            background-color: var(--danger-hover);
-        }
-
         /* Horizontal Scroll Gallery Container */
         .gallery-wrapper {
             width: 100%;
@@ -312,7 +233,7 @@
         }
 
         label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-color); font-weight: 500; }
-        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select {
+        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="url"], select {
             width: 100%;
             padding: 12px;
             background-color: var(--input-bg);
@@ -378,16 +299,13 @@
         <a id="navHome" class="active" onclick="handleNav('home')">Home</a>
         <a id="navStory" onclick="handleNav('story')">About Awards</a>
         <a id="navGallery" onclick="handleNav('gallery')">Gallery</a>
-        <a id="navEntries" onclick="handleNav('entries')">View Entries</a>
         <a id="navPayment" onclick="handleNav('payment')">Payment</a>
     </nav>
-
-    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
 
     <div class="container">
         <header>
             <div class="logo-container">
-                <img src="images/logo.png" alt="Sharankrishna Short Film Awards Logo">
+                <img src="Sharankrishna short film logo New-01.png" alt="Sharankrishna Short Film Awards Logo">
             </div>
             <div class="info-panel">
                 <div class="info-item">
@@ -427,50 +345,18 @@
 
         <div id="pageGallery" class="page-view">
             <h2 class="section-title">Event Gallery</h2>
-            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px; margin-top:-5px;">← Swipe or scroll horizontally to browse all snapshots →</p>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px; margin-top:-5px;">&larr; Swipe or scroll horizontally to browse all snapshots &rarr;</p>
             
             <div class="gallery-wrapper">
                 <div class="gallery-scroll-container">
-                    <div class="gallery-item"><div class="gallery-img-box"><img src="images/event1.jpg" alt="Gallery Snapshot"></div><div class="gallery-caption">Event Highlight 01</div></div>
-                    <div class="gallery-item"><div class="gallery-img-box"><img src="images/event2.jpg" alt="Gallery Snapshot"></div><div class="gallery-caption">Event Highlight 02</div></div>
-                    <div class="gallery-item"><div class="gallery-img-box"><img src="images/event3.jpg" alt="Gallery Snapshot"></div><div class="gallery-caption">Event Highlight 03</div></div>
-                    <div class="gallery-item"><div class="gallery-img-box"><img src="images/event1.jpg" alt="Gallery Snapshot"></div><div class="gallery-caption">Event Highlight 04</div></div>
-                    <div class="gallery-item"><div class="gallery-img-box"><img src="images/event2.jpg" alt="Gallery Snapshot"></div><div class="gallery-caption">Event Highlight 05</div></div>
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC01340.JPG.jpeg" alt="Gallery Snapshot"></div><div class="gallery-caption">Event Highlight 01</div></div>
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00885.JPG.jpeg" alt="Gallery Snapshot"></div><div class="gallery-caption">Event Highlight 02</div></div>
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00845.JPG.jpeg" alt="Gallery Snapshot"></div><div class="gallery-caption">Event Highlight 03</div></div>
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC01340.JPG.jpeg" alt="Gallery Snapshot"></div><div class="gallery-caption">Event Highlight 04</div></div>
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00885.JPG.jpeg" alt="Gallery Snapshot"></div><div class="gallery-caption">Event Highlight 05</div></div>
                 </div>
             </div>
             <button type="button" class="btn-primary" onclick="handleNav('home')">Go To Application Form</button>
-        </div>
-
-        <div id="pageEntries" class="page-view">
-            <h2 class="section-title">Live Film Entries</h2>
-            
-            <div class="admin-actions">
-                <form id="adminClearForm" method="POST" target="hidden_iframe" style="display:none;">
-                    <input type="hidden" name="action" value="clear_all_entries">
-                    <input type="hidden" name="pin" id="adminFormPin">
-                </form>
-                <button type="button" id="clearDatabaseBtn" class="btn-danger" onclick="triggerAdminClear()">Wipe All Entries (Admin)</button>
-            </div>
-            
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date & Time</th>
-                            <th>Short Film Name</th>
-                            <th>Category</th>
-                            <th>Director</th>
-                            <th>Applicant Name</th>
-                            <th>Receipt</th>
-                        </tr>
-                    </thead>
-                    <tbody id="entriesTableBody">
-                        <tr>
-                            <td colspan="6" class="loading-state">Loading registered records...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
         </div>
 
         <form id="submissionForm" onsubmit="handleFinalSubmit(event)">
@@ -480,18 +366,18 @@
                 
                 <div class="form-group">
                     <label for="applicantName">Applicant Name *</label>
-                    <input type="text" id="applicantName" name="applicantName" required placeholder="Enter your full name">
+                    <input type="text" id="applicantName" required placeholder="Enter your full name">
                 </div>
 
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="phone">Phone Number *</label>
-                        <input type="tel" id="phone" name="phone" required placeholder="e.g., +91 98765 43210">
+                        <input type="tel" id="phone" required placeholder="e.g., +91 98765 43210">
                     </div>
                     
                     <div class="form-group">
                         <label for="email">Email Address *</label>
-                        <input type="email" id="email" name="email" required placeholder="name@example.com">
+                        <input type="email" id="email" required placeholder="name@example.com">
                     </div>
                 </div>
 
@@ -500,12 +386,12 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="filmName">Short Film Name *</label>
-                        <input type="text" id="filmName" name="filmName" required placeholder="Title of the short film">
+                        <input type="text" id="filmName" required placeholder="Title of the short film">
                     </div>
 
                     <div class="form-group">
                         <label for="category">Category *</label>
-                        <select id="category" name="category" required>
+                        <select id="category" required>
                             <option value="" disabled selected>Select film category</option>
                             <option value="General">General</option>
                             <option value="Campus">Campus</option>
@@ -513,45 +399,50 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label for="filmLink">Short Film Link (YouTube / Google Drive) *</label>
+                    <input type="url" id="filmLink" required placeholder="https://youtube.com/... or https://drive.google.com/...">
+                </div>
+
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="director">Director Name *</label>
-                        <input type="text" id="director" name="director" required placeholder="Director's name">
+                        <input type="text" id="director" required placeholder="Director's name">
                     </div>
                     
                     <div class="form-group">
                         <label for="duration">Duration (Minutes) *</label>
-                        <input type="number" id="duration" name="duration" required min="1" max="30" placeholder="Max 30 minutes">
+                        <input type="number" id="duration" required min="1" max="30" placeholder="Max 30 minutes">
                     </div>
                 </div>
 
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="producer">Producer Name *</label>
-                        <input type="text" id="producer" name="producer" required placeholder="Producer's name">
+                        <input type="text" id="producer" required placeholder="Producer's name">
                     </div>
 
                     <div class="form-group">
                         <label for="writer">Writer & Screenplay *</label>
-                        <input type="text" id="writer" name="writer" required placeholder="Screenwriter's name">
+                        <input type="text" id="writer" required placeholder="Screenwriter's name">
                     </div>
                 </div>
 
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="cinematographer">Cinematographer *</label>
-                        <input type="text" id="cinematographer" name="cinematographer" required placeholder="DoP's name">
+                        <input type="text" id="cinematographer" required placeholder="DoP's name">
                     </div>
 
                     <div class="form-group">
                         <label for="editor">Editor *</label>
-                        <input type="text" id="editor" name="editor" required placeholder="Editor's name">
+                        <input type="text" id="editor" required placeholder="Editor's name">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="musicDirector">Music Director *</label>
-                    <input type="text" id="musicDirector" name="musicDirector" required placeholder="Composer's name">
+                    <input type="text" id="musicDirector" required placeholder="Composer's name">
                 </div>
 
                 <h2 class="section-title">Cast Credits</h2>
@@ -559,18 +450,18 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="actor">Lead Actor *</label>
-                        <input type="text" id="actor" name="actor" required placeholder="Main Actor">
+                        <input type="text" id="actor" required placeholder="Main Actor">
                     </div>
 
                     <div class="form-group">
                         <label for="actress">Lead Actress *</label>
-                        <input type="text" id="actress" name="actress" required placeholder="Main Actress">
+                        <input type="text" id="actress" required placeholder="Main Actress">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="childArtist">Child Artist <span class="optional-tag">(Optional)</span></label>
-                    <input type="text" id="childArtist" name="childArtist" placeholder="Name of child artist, if any">
+                    <input type="text" id="childArtist" placeholder="Name of child artist, if any">
                 </div>
 
                 <button type="button" class="btn-primary" style="margin-top:20px;" onclick="handleNav('payment')">Proceed to Payment</button>
@@ -584,7 +475,7 @@
                         <p style="font-size: 0.95rem; margin-bottom: 5px;">Scan the QR layout graphic below to transfer the fixed registration fee of <strong>₹1,000</strong>.</p>
                         
                         <div class="qr-box">
-                            <img src="images/qr-code.jpg" alt="Payment QR Code">
+                            <img src="angle.jpg" alt="Payment QR Code">
                         </div>
                         
                         <p style="font-size:0.85rem; color: var(--text-muted);">Official Merchant ID: <strong>9745640896kgb@cnrb</strong></p>
@@ -593,7 +484,7 @@
 
                 <div class="form-group" style="margin-top: 10px;">
                     <label for="transactionId">Transaction Reference ID / UTR *</label>
-                    <input type="text" id="transactionId" name="transactionId" placeholder="Enter reference number for tracking confirmation">
+                    <input type="text" id="transactionId" placeholder="Enter reference number for tracking confirmation">
                 </div>
 
                 <div class="form-group">
@@ -602,7 +493,7 @@
                         <div class="file-upload-text" id="uploadPlaceholder">
                             Drag & drop or <strong>browse computer</strong> to attach verification receipt
                         </div>
-                        <input type="file" id="paymentScreenshot" name="paymentScreenshot" accept="image/*,application/pdf" onchange="handleFileChange(this)">
+                        <input type="file" id="paymentScreenshot" accept="image/*,application/pdf" onchange="handleFileChange(this)">
                         <div class="file-uploaded-name" id="fileNameDisplay"></div>
                     </div>
                 </div>
@@ -623,7 +514,7 @@
     </div>
 
     <script>
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbyq-GcuOf1-r5B_26q-Qmz9y0Ydu-RlPT_KOJv10vl47Eyoaj_xCxKTzY3OMIuNC7YV/exec";
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbzV7LIEE5Vj-mghVpBQlM012hFnKziDQb-FHt8eGx1WaoWW4mOYRnWduMCPMTzvLhAhiA/exec";
 
         function handleNav(targetSection) {
             if (targetSection === 'payment') {
@@ -646,10 +537,6 @@
             } else if (targetSection === 'gallery') {
                 document.getElementById('pageGallery').classList.add('active');
                 setActiveNavbarLink('gallery');
-            } else if (targetSection === 'entries') {
-                document.getElementById('pageEntries').classList.add('active');
-                setActiveNavbarLink('entries');
-                fetchSubmissions(); 
             } else if (targetSection === 'payment') {
                 document.getElementById('transactionId').required = true;
                 document.getElementById('paymentScreenshot').required = true;
@@ -664,83 +551,12 @@
             document.getElementById('navHome').classList.remove('active');
             document.getElementById('navStory').classList.remove('active');
             document.getElementById('navGallery').classList.remove('active');
-            document.getElementById('navEntries').classList.remove('active');
             document.getElementById('navPayment').classList.remove('active');
 
             if (id === 'home') document.getElementById('navHome').classList.add('active');
             if (id === 'story') document.getElementById('navStory').classList.add('active');
             if (id === 'gallery') document.getElementById('navGallery').classList.add('active');
-            if (id === 'entries') document.getElementById('navEntries').classList.add('active');
             if (id === 'payment') document.getElementById('navPayment').classList.add('active');
-        }
-
-        function fetchSubmissions() {
-            const tableBody = document.getElementById('entriesTableBody');
-            tableBody.innerHTML = '<tr><td colspan="6" class="loading-state">Syncing live server submissions database...</td></tr>';
-
-            const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-            
-            window[callbackName] = function(data) {
-                tableBody.innerHTML = '';
-                delete window[callbackName]; 
-                const existingScript = document.getElementById(callbackName + '_script');
-                if(existingScript) existingScript.remove();
-
-                if (!data || data.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="6" class="loading-state">No submissions logged yet. Be the first!</td></tr>';
-                    return;
-                }
-
-                data.forEach(item => {
-                    const row = document.createElement('tr');
-                    const catClass = item.category.toLowerCase() === 'campus' ? 'badge-campus' : 'badge-general';
-                    
-                    row.innerHTML = `
-                        <td>${item.timestamp}</td>
-                        <td style="font-weight:600; color:var(--accent-color);">${item.filmName}</td>
-                        <td><span class="badge ${catClass}">${item.category}</span></td>
-                        <td>${item.director}</td>
-                        <td>${item.applicantName}</td>
-                        <td><a href="${item.fileLink}" target="_blank" class="btn-link">View File</a></td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            };
-
-            const script = document.createElement('script');
-            script.id = callbackName + '_script';
-            script.src = webAppUrl + (webAppUrl.includes('?') ? '&' : '?') + 'callback=' + callbackName;
-            script.onerror = function() {
-                tableBody.innerHTML = '<tr><td colspan="6" class="loading-state" style="color:#ef4444;">Failed to sync records from server container memory. Ensure web app is deployed to "Anyone".</td></tr>';
-            };
-            document.body.appendChild(script);
-        }
-
-        function triggerAdminClear() {
-            const pin = prompt("Enter Secret Admin PIN Code to clear table database memory:");
-            if (pin === null) return; 
-
-            if (!pin.trim()) {
-                alert("PIN cannot be blank.");
-                return;
-            }
-
-            const clearBtn = document.getElementById('clearDatabaseBtn');
-            clearBtn.disabled = true;
-            clearBtn.textContent = "Clearing Memory...";
-
-            const clearForm = document.getElementById('adminClearForm');
-            clearForm.action = webAppUrl;
-            document.getElementById('adminFormPin').value = pin;
-
-            clearForm.submit();
-
-            setTimeout(() => {
-                alert("Clear command successfully executed. Reloading list log panel...");
-                clearBtn.disabled = false;
-                clearBtn.textContent = "Wipe All Entries (Admin)";
-                fetchSubmissions(); 
-            }, 2500);
         }
 
         function validateFirstPageFields() {
@@ -808,6 +624,7 @@
                     email: document.getElementById('email').value,
                     filmName: document.getElementById('filmName').value,
                     category: document.getElementById('category').value,
+                    filmLink: document.getElementById('filmLink').value,
                     director: document.getElementById('director').value,
                     duration: document.getElementById('duration').value,
                     producer: document.getElementById('producer').value,
@@ -843,7 +660,7 @@
                     submitBtn.disabled = false;
                     submitBtn.textContent = "Submit Entry";
                     
-                    handleNav('entries'); 
+                    handleNav('home'); 
                 })
                 .catch(err => {
                     console.error(err);
