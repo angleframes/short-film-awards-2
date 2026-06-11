@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="icon" type="image/png" href="Sharankrishna short film logo New-01.png">
+
     <title>Sharankrishna Short Film Awards - Entry Portal</title>
     <style>
         :root {
@@ -281,7 +284,7 @@
         .file-upload-text { color: var(--text-muted); font-size: 0.9rem; }
         .file-uploaded-name { display: none; margin-top: 8px; font-size: 0.85rem; color: var(--success-color); font-weight: 500; }
 
-        /* Elegant Success Screen State styling rules */
+        /* Dynamic Program Success Screen Overlay Layout */
         .success-screen {
             text-align: center;
             padding: 30px 10px;
@@ -567,8 +570,8 @@
     </div>
 
     <script>
-        // Production Web App Endpoint Configuration Target URL Link
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbw_KIcAvGdv47I0P_oTNIhHAOPL3tA8ShzpE-1-wh7ayqYrRax-cX3QCYklNtVfjqf7/exec";
+        // Production Web App Target Endpoint Script URL Link
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbw88SNthxklEcY5PdmUVdfLYdQKRWUvo9GE4Uqa3-V1cgRCFZvFeYyhmxRAuZkc9nA88A/exec";
 
         // Automated path correction loop logic for handling strict GitHub asset routes
         document.querySelectorAll('.auto-img').forEach(img => {
@@ -585,7 +588,6 @@
         });
 
         function handleNav(targetSection) {
-            // Block navigation to payment if form details are broken
             if (targetSection === 'payment') {
                 if (!validateFirstPageFields()) {
                     setActiveNavbarLink('home');
@@ -593,7 +595,6 @@
                 }
             }
 
-            // Ensure the main form container is visible if navigating standard pages
             document.getElementById('formContainer').style.display = 'block';
             document.getElementById('successScreen').classList.remove('active');
 
@@ -721,16 +722,14 @@
                     body: JSON.stringify(formData)
                 })
                 .then(() => {
-                    // Hides form layout view and opens clean confirmation dashboard status pane
                     document.getElementById('formContainer').style.display = 'none';
-                    
                     document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
                     document.getElementById('successScreen').classList.add('active');
                     
-                    // Resets submission form parameters cleanly behind the scenes
                     document.getElementById("submissionForm").reset();
                     document.getElementById('uploadPlaceholder').style.display = 'block';
                     document.getElementById('fileNameDisplay').style.display = 'none';
+                    
                     document.getElementById('transactionId').required = false;
                     document.getElementById('paymentScreenshot').required = false;
                     
