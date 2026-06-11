@@ -16,6 +16,7 @@
             --border-color: #334155;
             --success-color: #10b981;
             --danger-color: #ef4444;
+            --danger-hover: #dc2626;
         }
 
         * {
@@ -87,24 +88,8 @@
             padding-bottom: 15px;
         }
 
-        /* TOP FEATURED BANNER STYLE */
-        .top-banner-container {
-            width: 100%;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 25px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        .top-banner-container img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
-
         .logo-container {
-            max-width: 260px;
+            max-width: 320px;
             margin: 0 auto 15px auto;
             padding: 0;
             filter: invert(1) brightness(2) contrast(1.2); 
@@ -183,59 +168,48 @@
             line-height: 1.7;
         }
 
-        /* UNLIMITED AUTO-WRAPPING GRID LAYOUT */
-        .unlimited-gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-            padding: 5px 0;
+        /* Horizontal Scroll Gallery Container */
+        .gallery-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 10px 5px 25px 5px;
+            margin-bottom: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-color) var(--input-bg);
+            -webkit-overflow-scrolling: touch;
         }
 
+        .gallery-wrapper::-webkit-scrollbar { height: 8px; }
+        .gallery-wrapper::-webkit-scrollbar-track { background: var(--input-bg); border-radius: 10px; }
+        .gallery-wrapper::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; border: 1px solid var(--input-bg); }
+
+        .gallery-scroll-container { display: inline-flex; gap: 20px; }
         .gallery-item {
+            width: 280px;
+            display: inline-block;
             background-color: var(--input-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             transition: transform 0.3s ease, border-color 0.3s ease;
+            white-space: normal;
         }
-
-        .gallery-item:hover {
-            transform: translateY(-4px);
-            border-color: var(--accent-color);
-        }
-
+        .gallery-item:hover { transform: translateY(-4px); border-color: var(--accent-color); }
         .gallery-img-box {
             width: 100%;
-            height: 160px;
+            height: 190px;
             background-color: #1e293b;
-            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
+            overflow: hidden;
         }
-
-        .gallery-img-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .gallery-item:hover .gallery-img-box img {
-            transform: scale(1.05);
-        }
-
-        .gallery-caption {
-            padding: 10px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            font-weight: 500;
-            text-align: center;
-            background-color: rgba(30, 41, 59, 0.5);
-        }
+        .gallery-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .gallery-item:hover .gallery-img-box img { transform: scale(1.05); }
+        .gallery-caption { padding: 12px; font-size: 0.85rem; color: var(--text-muted); font-weight: 500; text-align: center; background-color: rgba(30, 41, 59, 0.5); }
 
         h2.section-title {
             font-size: 1.1rem;
@@ -256,7 +230,6 @@
             .info-panel { grid-template-columns: 1fr; gap: 12px; }
             .navbar { gap: 12px; padding: 12px 5px; }
             .navbar a { font-size: 0.78rem; letter-spacing: 0.5px; }
-            .unlimited-gallery-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
         }
 
         label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-color); font-weight: 500; }
@@ -330,11 +303,6 @@
     </nav>
 
     <div class="container">
-        
-        <div class="top-banner-container">
-            <img src="angle.jpg" data-fallback="images/angle.jpg" data-fallback-folder="angle.png" alt="Featured Awards Event Banner" class="auto-img">
-        </div>
-
         <header>
             <div class="logo-container">
                 <img src="Sharankrishna short film logo New-01.png" data-fallback="logo.png" data-fallback-folder="images/Sharankrishna short film logo New-01.png" alt="Sharankrishna Short Film Awards Logo" class="auto-img">
@@ -377,15 +345,19 @@
 
         <div id="pageGallery" class="page-view">
             <h2 class="section-title">Event Gallery</h2>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px; margin-top:-5px;">&larr; Swipe or scroll horizontally to browse all snapshots &rarr;</p>
             
-            <div class="unlimited-gallery-grid">
-                <div class="gallery-item"><div class="gallery-img-box"><img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" data-fallback-folder="images/MRC01340.jpeg" alt="Event Image" class="auto-img"></div><div class="gallery-caption">Event Highlight 01</div></div>
-                <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" data-fallback-folder="images/MRC00885.jpeg" alt="Event Image" class="auto-img"></div><div class="gallery-caption">Event Highlight 02</div></div>
-                <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00845.JPG.jpeg" data-fallback="MRC00845.jpeg" data-fallback-folder="images/MRC00845.jpeg" alt="Event Image" class="auto-img"></div><div class="gallery-caption">Event Highlight 03</div></div>
-                <div class="gallery-item"><div class="gallery-img-box"><img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" alt="Event Image" class="auto-img"></div><div class="gallery-caption">Event Highlight 04</div></div>
-                <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" alt="Event Image" class="auto-img"></div><div class="gallery-caption">Event Highlight 05</div></div>
+            <div class="gallery-wrapper">
+                <div class="gallery-scroll-container">
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" data-fallback-folder="images/MRC01340.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 01</div></div>
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" data-fallback-folder="images/MRC00885.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 02</div></div>
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00845.JPG.jpeg" data-fallback="MRC00845.jpeg" data-fallback-folder="images/MRC00845.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 03</div></div>
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC01340.JPG.jpeg" data-fallback="MRC00606.jpeg" data-fallback-folder="images/MRC00606.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 03</div></div>
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00614.JPG.jpeg" data-fallback="MRC00614.jpeg" data-fallback-folder="images/MRC00614.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 03</div></div>
+                    <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00617.JPG.jpeg" data-fallback="MRC00617.jpeg" data-fallback-folder="images/MRC00614.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 03</div></div>
+
                 </div>
-            
+            </div>
             <button type="button" class="btn-primary" onclick="handleNav('home')">Go To Application Form</button>
         </div>
 
@@ -544,9 +516,10 @@
     </div>
 
     <script>
+        // Updated Production Web App Endpoint Configuration Target URL Link
         const webAppUrl = "https://script.google.com/macros/s/AKfycbw88SNthxklEcY5PdmUVdfLYdQKRWUvo9GE4Uqa3-V1cgRCFZvFeYyhmxRAuZkc9nA88A/exec";
 
-        // Automated multi-path file fallback checker for handling GitHub routes
+        // Automated path correction loop logic for handling strict GitHub asset routes
         document.querySelectorAll('.auto-img').forEach(img => {
             img.addEventListener('error', function() {
                 const step1 = this.getAttribute('data-fallback');
