@@ -4,113 +4,132 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <!-- Custom Browser Tab Icon (Favicon) -->
     <link rel="icon" type="image/png" href="Sharankrishna short film logo New-01.png">
 
     <title>Sharankrishna Short Film Awards - Entry Portal</title>
     <style>
         :root {
-            /* Base Colors reimagined for high-contrast glowing glass contrast */
-            --bg-gradient: linear-gradient(135deg, #070b19 0%, #0f172a 50%, #1e1b4b 100%);
-            --glass-bg: rgba(30, 41, 59, 0.45); /* Liquid glass foundation */
-            --glass-border: rgba(226, 176, 71, 0.25); /* Polished golden tint rim */
-            --input-glass-bg: rgba(15, 23, 42, 0.55);
-            --input-glass-focus: rgba(226, 176, 71, 0.12);
+            /* Premium iOS/macOS Liquid Glassmorphism Theme Architecture */
+            --site-bg: linear-gradient(135deg, #09090b 0%, #111115 30%, #1a102f 65%, #051622 100%);
             
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-color: #e2b047; /* Elegant Gold */
-            --accent-hover: #c69733;
-            --border-color: rgba(255, 255, 255, 0.08);
-            --success-color: #10b981;
-            --danger-color: #ef4444;
+            /* Glass Sheet Foundation: Translucent base + saturation boost */
+            --glass-bg: rgba(255, 255, 255, 0.05); 
+            
+            /* High-fidelity Specular Highlight */
+            --glass-border: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.03) 100%);
+            --inner-glow: inset 0 1px 1px rgba(255, 255, 255, 0.15), inset 0 -1px 1px rgba(0, 0, 0, 0.4);
+            
+            /* Form Control Fluid Glass Variables */
+            --input-glass: rgba(255, 255, 255, 0.03);
+            --input-glass-alt: rgba(255, 255, 255, 0.06);
+            --input-glass-focus: rgba(255, 255, 255, 0.12);
+            
+            /* Premium Typography Spectrum */
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --accent-color: #ffffff;
+            --danger-color: #ff453a; 
+            
+            /* Ultimate Hardware Acceleration Filter Rules */
+            --ios-blur: blur(35px) saturate(175%);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
             scroll-behavior: smooth;
         }
 
         body {
-            background: var(--bg-gradient);
+            background: var(--site-bg);
             background-attachment: fixed;
-            color: var(--text-color);
-            line-height: 1.6;
-            padding: 120px 20px 40px 20px; 
+            color: var(--text-main);
+            line-height: 1.5;
+            padding: 0; 
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Top Sticky Navigation Menu with Glass Effect */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* Top Header Wrapper — Extends seamlessly as part of the site */
+        .site-header-wrapper {
             width: 100%;
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(14px) saturate(180%);
-            -webkit-backdrop-filter: blur(14px) saturate(180%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-            z-index: 1000;
-            padding: 18px 20px;
+            max-width: 850px;
+            padding: 30px 20px 10px 20px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
             gap: 25px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Top Navigation Bar — Square stroke line completely removed */
+        .navbar {
+            width: 100%;
+            max-width: 650px;
+            background: rgba(20, 20, 25, 0.4);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            border-radius: 30px;
+            padding: 12px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), var(--inner-glow);
         }
 
         .navbar a {
             color: var(--text-muted);
             text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: color 0.3s ease, text-shadow 0.3s ease;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
             cursor: pointer;
+            padding: 6px 16px;
+            border-radius: 20px;
         }
 
-        .navbar a:hover, 
+        .navbar a:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
         .navbar a.active {
-            color: var(--accent-color);
-            text-shadow: 0 0 10px rgba(226, 176, 71, 0.5);
+            color: #000000;
+            background: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.25);
         }
 
-        /* LIQUID GLASS MAIN CONTAINER */
-        .container {
+        /* Main Structural Dynamic Workspace Area */
+        .main-layout-content {
             max-width: 850px;
             width: 100%;
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px) saturate(190%);
-            -webkit-backdrop-filter: blur(16px) saturate(190%);
-            padding: 45px 40px;
-            border-radius: 24px;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 
-                        inset 0 1px 2px rgba(255, 255, 255, 0.15);
-            transition: all 0.4s ease;
+            padding: 10px 20px 60px 20px;
+            display: flex;
+            flex-direction: column;
         }
 
         header {
+            width: 100%;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 25px;
-            transition: all 0.4s ease;
+            padding-bottom: 30px;
+            background: none !important;
         }
 
-        /* Dynamic Logo Setup */
         .logo-container {
-            max-width: 320px;
-            margin: 0 auto 15px auto;
-            padding: 0;
-            filter: invert(1) brightness(2) contrast(1.2); 
-            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            max-width: 260px;
+            margin: 0 auto 20px auto;
+            filter: drop-shadow(0 4px 15px rgba(255, 255, 255, 0.1));
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .logo-container img {
@@ -119,258 +138,273 @@
             display: block;
         }
 
-        /* Alternate Layout Styles when entering other sub-pages */
         header.corner-mode {
             text-align: left;
             padding-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
         header.corner-mode .logo-container {
             margin: 0;
-            max-width: 150px;
+            max-width: 130px;
         }
 
-        /* Dynamic visibility toggle layout for info metrics panel */
+        /* Metrics Horizontal Panel — Dynamic Glass Layer */
         .info-panel {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 12px;
-            background: rgba(15, 23, 42, 0.4);
-            border: 1px solid rgba(226, 176, 71, 0.15);
-            border-radius: 14px;
-            padding: 14px;
-            margin-top: 20px;
+            gap: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 25px;
             text-align: center;
         }
 
         header.corner-mode .info-panel {
-            display: none; /* Completely hidden on other tabs */
-        }
-
-        .info-item {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .info-label {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .info-value {
-            font-size: 0.95rem;
-            color: var(--accent-color);
-            font-weight: 600;
-        }
-
-        .page-view {
             display: none;
         }
-        .page-view.active {
-            display: block;
+
+        .info-item { display: flex; flex-direction: column; justify-content: center; }
+        .info-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 500; margin-bottom: 2px; }
+        .info-value { font-size: 0.95rem; color: var(--text-main); font-weight: 600; letter-spacing: -0.2px; }
+
+        .page-view { display: none; }
+        .page-view.active { display: block; animation: iosSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        @keyframes iosSlideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* LIQUID GLASS FIELD ELEMENTS */
-        .form-group { margin-bottom: 22px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        /* FORM MANAGEMENT STRUCTURAL GRIDS */
+        .form-group { margin-bottom: 24px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 
         label { 
             display: block; 
-            margin-bottom: 9px; 
-            font-size: 0.9rem; 
-            color: var(--text-color); 
-            font-weight: 500; 
-            letter-spacing: 0.5px;
+            margin-bottom: 8px; 
+            font-size: 0.82rem; 
+            color: var(--text-muted); 
+            font-weight: 500;
+            letter-spacing: 0.3px;
         }
 
-        input[type="text"], input[type="email"], input[type="tel"], input[type="number"], input[type="url"], select {
+        /* Continuous Fluid Glass Fields */
+        input[type="text"], 
+        input[type="email"], 
+        input[type="tel"], 
+        input[type="number"], 
+        input[type="url"], 
+        select {
             width: 100%;
-            padding: 14px;
-            background: var(--input-glass-bg);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 16px;
+            background: var(--input-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
-            color: var(--text-color);
+            color: var(--text-main);
             font-size: 0.95rem;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-grid .form-group:nth-child(even) input,
+        .form-grid .form-group:nth-child(even) select,
+        .form-group:nth-of-type(even) input {
+            background: var(--input-glass-alt);
         }
 
         select option { 
-            background-color: #121826; /* Keeps native options readable against transparent UI */
-            color: var(--text-color); 
+            background-color: #1c1c1e; 
+            color: var(--text-main); 
         }
 
         input:focus, select:focus { 
-            outline: none; 
-            border-color: var(--accent-color); 
-            background: var(--input-glass-focus);
-            box-shadow: 0 0 15px rgba(226, 176, 71, 0.25), 
-                        inset 0 1px 2px rgba(255, 255, 255, 0.1);
+            background: var(--input-glass-focus) !important;
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.1);
         }
 
-        /* Glassmorphic File Upload Frame */
+        /* File Dropping Glass Frame */
         .file-upload-wrapper {
             position: relative;
-            border: 2px dashed rgba(226, 176, 71, 0.3);
-            border-radius: 14px;
-            padding: 25px;
+            border: 1.5px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 28px;
             text-align: center;
-            background: rgba(15, 23, 42, 0.3);
+            background: rgba(255, 255, 255, 0.01);
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
         .file-upload-wrapper:hover { 
-            border-color: var(--accent-color);
-            background: rgba(226, 176, 71, 0.05);
-            box-shadow: 0 0 12px rgba(226, 176, 71, 0.15);
+            background: var(--input-glass-alt);
+            border-color: rgba(255, 255, 255, 0.4);
         }
         .file-upload-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-        .file-upload-text { color: var(--text-muted); font-size: 0.9rem; }
-        .file-uploaded-name { display: none; margin-top: 8px; font-size: 0.85rem; color: var(--success-color); font-weight: 500; }
+        .file-upload-text { color: var(--text-muted); font-size: 0.88rem; }
+        .file-upload-text strong { color: var(--text-main); font-weight: 500; }
+        .file-uploaded-name { display: none; margin-top: 8px; font-size: 0.85rem; color: #30d158; font-weight: 600; }
 
-        /* Elegant Subsection Titles */
+        /* iOS Thin Section Split Bars */
         h2.section-title {
-            font-size: 1.05rem;
-            color: var(--accent-color);
-            margin: 30px 0 18px 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 40px 0 20px 0;
             text-transform: uppercase;
             letter-spacing: 1px;
             display: flex;
             align-items: center;
-            text-shadow: 0 0 8px rgba(226, 176, 71, 0.2);
+            font-weight: 600;
         }
-        h2.section-title.first { margin-top: 10px; }
-        h2.section-title::after { content: ""; flex: 1; margin-left: 12px; height: 1px; background: rgba(255, 255, 255, 0.1); }
+        h2.section-title.first { margin-top: 15px; }
+        h2.section-title::after { content: ""; flex: 1; margin-left: 15px; height: 1px; background: rgba(255, 255, 255, 0.08); }
 
-        /* Story Page Content Layering */
-        .story-page-content { display: flex; flex-direction: column; gap: 25px; }
+        /* Descriptive Glass Panels */
+        .story-page-content { display: flex; flex-direction: column; gap: 24px; }
         .story-block {
-            background: rgba(15, 23, 42, 0.3);
-            border-left: 4px solid var(--accent-color);
-            padding: 22px;
-            border-radius: 0 14px 14px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
-        .story-block h3 { color: var(--accent-color); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-        .story-block p { font-size: 0.95rem; color: var(--text-muted); text-align: justify; line-height: 1.7; }
+        .story-block h3 { color: var(--text-main); font-size: 1.05rem; letter-spacing: -0.2px; margin-bottom: 10px; font-weight: 600; }
+        .story-block p { font-size: 0.92rem; color: var(--text-muted); text-align: justify; line-height: 1.6; }
 
-        /* Featured Winners Presentation Grid */
-        .winners-showcase { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 35px; }
+        /* Showcase Cards — Layered Holographic Frames */
+        .winners-showcase { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px; }
         .winner-card {
             position: relative;
-            border-radius: 16px;
+            border-radius: 20px;
             overflow: hidden;
-            border: 1px solid rgba(226, 176, 71, 0.4);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-            background-color: var(--input-glass-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
             cursor: pointer;
-            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .winner-card img { width: 100%; height: 260px; object-fit: cover; display: block; transition: transform 0.5s ease; }
+        .winner-card img { width: 100%; height: 280px; object-fit: cover; display: block; filter: grayscale(0.3); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .winner-badge {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            padding: 14px;
+            background: rgba(20, 20, 25, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 16px;
             text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .winner-category { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .winner-title { font-size: 1.1rem; font-weight: 700; color: var(--accent-color); text-transform: uppercase; letter-spacing: 0.5px; }
-        .winner-card:hover { transform: translateY(-6px); box-shadow: 0 15px 35px rgba(226, 176, 71, 0.3); }
-        .winner-card:hover img { transform: scale(1.04); }
+        .winner-category { font-size: 0.72rem; font-weight: 500; color: #ffd60a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+        .winner-title { font-size: 1.15rem; font-weight: 600; color: var(--text-main); letter-spacing: -0.3px; }
+        .winner-card:hover { transform: scale(1.02) translateY(-4px); border-color: rgba(255, 255, 255, 0.25); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .winner-card:hover img { filter: grayscale(0); transform: scale(1.04); }
 
-        /* Gallery Layout Configuration */
+        /* Unified Media Exhibition Units */
         .gallery-masonry { columns: 3; column-gap: 16px; margin-bottom: 30px; }
         .ceremony-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 30px; }
         .gallery-item {
-            break-inside: avoid; margin-bottom: 16px; position: relative; border-radius: 12px; overflow: hidden;
-            background-color: rgba(15, 23, 42, 0.3); border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); cursor: pointer; transition: all 0.4s ease;
+            break-inside: avoid; margin-bottom: 16px; position: relative; border-radius: 14px; overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(0, 0, 0, 0.2);
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .gallery-item img { width: 100%; height: auto; display: block; transition: transform 0.5s ease; }
+        .gallery-item img { width: 100%; height: auto; display: block; filter: brightness(0.9); transition: all 0.3s ease; }
         .ceremony-grid .gallery-item { margin-bottom: 0; }
         .ceremony-grid .gallery-item img { height: 140px; object-fit: cover; }
-        .gallery-item:hover { transform: translateY(-4px); border-color: var(--accent-color); box-shadow: 0 12px 24px rgba(226, 176, 71, 0.15); }
-        .gallery-item:hover img { transform: scale(1.04); }
+        .gallery-item:hover { border-color: rgba(255, 255, 255, 0.25); transform: translateY(-3px); }
+        .gallery-item:hover img { filter: brightness(1); }
 
-        /* Glassmorphic Payment Container */
-        .payment-view { background: rgba(15, 23, 42, 0.3); padding: 25px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.06); margin-bottom: 25px; }
-        .qr-wrapper { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 15px; }
+        /* Transparent Processing View Sheet */
+        .payment-view { 
+            background: rgba(255, 255, 255, 0.03); 
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            padding: 30px; 
+            border-radius: 16px; 
+            border: 1px solid rgba(255, 255, 255, 0.06); 
+            margin-bottom: 25px; 
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.05);
+        }
+        .qr-wrapper { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 18px; }
         .qr-box {
-            width: 240px; height: 240px; background-color: #ffffff; border-radius: 14px; padding: 8px;
-            display: flex; justify-content: center; align-items: center; border: 2px solid var(--accent-color);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); overflow: hidden;
+            width: 230px; height: 230px; background-color: #ffffff; padding: 14px;
+            border-radius: 18px; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4); overflow: hidden;
         }
         .qr-box img { width: 100%; height: 100%; object-fit: contain; display: block; }
 
-        /* Action Controls Buttons */
-        .button-group { display: flex; gap: 15px; margin-top: 25px; }
+        /* Pure Opaque Buttons */
+        .button-group { display: flex; gap: 16px; margin-top: 30px; }
         button { 
             width: 100%; 
-            padding: 15px; 
-            border: none; 
-            border-radius: 12px; 
-            font-size: 0.95rem; 
-            font-weight: bold; 
+            padding: 16px; 
+            border-radius: 14px; 
+            font-size: 0.92rem; 
+            font-weight: 600; 
             cursor: pointer; 
-            text-transform: uppercase; 
-            letter-spacing: 1px; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            outline: none;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
         }
-        button:disabled { opacity: 0.4; cursor: not-allowed; }
+        button:disabled { opacity: 0.25; cursor: not-allowed; }
+        
         .btn-primary { 
-            background: linear-gradient(135deg, var(--accent-color) 0%, #c69733 100%); 
-            color: #070b19; 
-            box-shadow: 0 4px 15px rgba(226, 176, 71, 0.3);
+            background: #ffffff;
+            border: 1px solid #ffffff;
+            color: #000000; 
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.15);
         }
         .btn-primary:hover:not(:disabled) { 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(226, 176, 71, 0.45);
+            background-color: rgba(255, 255, 255, 0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 12px 30px rgba(255, 255, 255, 0.25);
         }
+        
         .btn-secondary { 
-            background: rgba(255, 255, 255, 0.05); 
+            background: rgba(255, 255, 255, 0.04); 
             border: 1px solid rgba(255, 255, 255, 0.1); 
-            color: var(--text-muted); 
+            color: var(--text-main); 
             max-width: 150px; 
         }
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); color: var(--text-color); }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
 
-        /* Status Success Layout Screen */
-        .success-screen { text-align: center; padding: 40px 20px; }
-        .success-icon-wrap { width: 80px; height: 80px; margin: 0 auto 20px auto; border-radius: 50%; background: rgba(226, 176, 71, 0.1); border: 1px solid rgba(226, 176, 71, 0.3); display: flex; justify-content: center; align-items: center; font-size: 2.2rem; color: var(--accent-color); }
-        .success-heading { font-size: 1.8rem; color: var(--text-color); margin-bottom: 12px; font-weight: 600; }
-        .success-text { font-size: 1rem; color: var(--text-muted); max-width: 580px; margin: 0 auto 30px auto; }
-        .success-divider { height: 1px; background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent); margin: 25px 0; }
+        /* Success Layer Configurations */
+        .success-screen { text-align: center; padding: 50px 20px; }
+        .success-icon-wrap { width: 74px; height: 74px; margin: 0 auto 24px auto; border-radius: 50%; background: rgba(48, 209, 88, 0.1); border: 1px solid rgba(48, 209, 88, 0.3); display: flex; justify-content: center; align-items: center; font-size: 2.2rem; color: #30d158; }
+        .success-heading { font-size: 1.8rem; color: var(--text-main); margin-bottom: 14px; font-weight: 700; letter-spacing: -0.5px; }
+        .success-text { font-size: 0.98rem; color: var(--text-muted); max-width: 560px; margin: 0 auto 30px auto; line-height: 1.6; }
+        .success-divider { height: 1px; background: rgba(255, 255, 255, 0.08); margin: 30px 0; }
         .spam-notice-text { font-size: 0.88rem; color: var(--text-muted); max-width: 520px; margin: 0 auto; }
-        .spam-notice-text strong { color: var(--accent-color); font-weight: 500; }
+        .spam-notice-text strong { color: var(--text-main); font-weight: 500; }
 
-        .support-footer { margin-top: 40px; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.08); text-align: center; font-size: 0.85rem; color: var(--text-muted); line-height: 1.8; }
-        .support-footer a { color: var(--accent-color); text-decoration: none; font-weight: 500; }
-        .optional-tag { font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-left: 5px; }
+        .support-footer { margin-top: 45px; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.08); text-align: center; font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; letter-spacing: 0.2px; }
+        .support-footer a { color: var(--text-main); text-decoration: none; font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.2); transition: border 0.2s ease; }
+        .support-footer a:hover { border-bottom-color: var(--text-main); }
+        .optional-tag { font-size: 0.78rem; color: var(--text-muted); font-weight: normal; margin-left: 4px; opacity: 0.7; }
 
-        /* Mobile Breakpoint Adjustments */
         @media (max-width: 768px) {
-            .container { padding: 30px 20px; border-radius: 18px; }
+            .site-header-wrapper { padding-top: 15px; }
+            .navbar { width: 100%; padding: 10px 18px; }
+            .navbar a { font-size: 0.8rem; padding: 5px 10px; }
+            .main-layout-content { padding: 10px 16px 40px 16px; }
             .form-grid { grid-template-columns: 1fr; gap: 0; }
-            .winners-showcase { grid-template-columns: 1fr; gap: 16px; }
-            .winner-card img { height: 220px; }
+            .winners-showcase { grid-template-columns: 1fr; gap: 20px; }
+            .winner-card img { height: 230px; }
             .gallery-masonry { columns: 2; column-gap: 12px; }
             .ceremony-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .info-panel { grid-template-columns: 1fr; gap: 12px; }
-            .navbar { gap: 12px; padding: 14px 5px; }
-            .navbar a { font-size: 0.78rem; letter-spacing: 0.5px; }
-            header.corner-mode { text-align: center; }
+            .info-panel { grid-template-columns: 1fr; gap: 12px; border-radius: 12px; }
+            header.corner-mode { flex-direction: column; text-align: center; gap: 10px; }
             header.corner-mode .logo-container { margin: 0 auto; }
         }
         @media (max-width: 480px) {
@@ -381,19 +415,20 @@
 </head>
 <body>
 
-    <nav class="navbar">
-        <a id="navHome" class="active" onclick="handleNav('home')">Home</a>
-        <a id="navStory" onclick="handleNav('story')">About Awards</a>
-        <a id="navGallery" onclick="handleNav('gallery')">Gallery</a>
-        <a id="navPayment" onclick="handleNav('payment')">Payment</a>
-    </nav>
+    <!-- PERSISTENT INTEGRATED APP HEADER & NAVIGATION BAR -->
+    <div class="site-header-wrapper">
+        <nav class="navbar">
+            <a id="navHome" class="active" onclick="handleNav('home')">Home</a>
+            <a id="navStory" onclick="handleNav('story')">About</a>
+            <a id="navGallery" onclick="handleNav('gallery')">Gallery</a>
+            <a id="navPayment" onclick="handleNav('payment')">Payment</a>
+        </nav>
 
-    <div class="container">
-        
         <header id="appHeader">
             <div class="logo-container">
                 <img id="mainLogo" src="" alt="Sharankrishna Short Film Awards Logo">
             </div>
+            <!-- Glass Infographic Panel -->
             <div class="info-panel" id="metricsPanel">
                 <div class="info-item">
                     <span class="info-label">Registration Fee</span>
@@ -409,15 +444,19 @@
                 </div>
             </div>
         </header>
+    </div>
 
+    <!-- MAIN APP FLOW LAYOUT CANVAS -->
+    <div class="main-layout-content">
         <div id="formContainer">
 
+            <!-- ABOUT/STORY VIEW -->
             <div id="pageStory" class="page-view">
                 <div class="story-page-content">
                     <div class="story-block">
                         <h3>Who is Sharankrishna?</h3>
                         <p>
-                            Sharankrishna was a vibrant creative spirit whose life was anchored deeply in the world of independent filmmaking and visual storytelling. To him, cinema was not merely a medium of entertainment, but an absolute passion, a canvas for honest thoughts, and an arena for boundless raw expression. Known for his profound artistic perspective and supportive nature toward fellow creators, he dreamed of elevating stories that resonated directly from the heart.
+                            Sharankrishna was a vibrant creative spirit whose life was anchored deeply in the world of independent filmmaking and visual storytelling. Cinema was an absolute passion, a canvas for honest thoughts, and an arena for boundless raw expression. Known for his profound artistic perspective and supportive nature toward fellow creators, he dreamed of elevating stories that resonated directly from the heart.
                         </p>
                     </div>
                     
@@ -432,6 +471,7 @@
                 </div>
             </div>
 
+            <!-- GALLERY VIEW -->
             <div id="pageGallery" class="page-view">
                 <h2 class="section-title first">Featured Winners</h2>
                 <div class="winners-showcase">
@@ -461,8 +501,10 @@
                 <button type="button" class="btn-primary" onclick="handleNav('home')">Go To Application Form</button>
             </div>
 
+            <!-- SUBMISSION APPLICATION FORM -->
             <form id="submissionForm" onsubmit="handleFinalSubmit(event)">
                 
+                <!-- HOME FORM VIEW COLUMNS -->
                 <div id="pageHome" class="page-view active">
                     <h2 class="section-title">Applicant Details</h2>
                     
@@ -569,18 +611,19 @@
                     <button type="button" class="btn-primary" style="margin-top:20px;" onclick="handleNav('payment')">Proceed to Payment</button>
                 </div>
 
+                <!-- PAYMENT VERIFICATION VIEW -->
                 <div id="pagePayment" class="page-view">
                     <h2 class="section-title">Entry Fee Payment</h2>
                     
                     <div id="viewQr" class="payment-view">
                         <div class="qr-wrapper">
-                            <p style="font-size: 0.95rem; margin-bottom: 5px;">Scan the QR code layout below to transfer the fixed registration fee of <strong>₹1,000</strong>.</p>
+                            <p style="font-size: 0.95rem; margin-bottom: 5px; font-weight: 500;">Scan the QR code layout below to transfer the fixed registration fee of <strong>₹1,000</strong>.</p>
                             
                             <div class="qr-box">
                                 <img id="paymentQrImg" src="" alt="Payment QR Code">
                             </div>
                             
-                            <p style="font-size:0.85rem; color: var(--text-muted);">Official Merchant ID: <strong>9745640896kgb@cnrb</strong></p>
+                            <p style="font-size:0.85rem; color: var(--text-muted);">Official Merchant ID: <strong style="color:var(--text-main)">9745640896kgb@cnrb</strong></p>
                         </div>
                     </div>
 
@@ -609,8 +652,9 @@
             </form>
         </div>
 
+        <!-- SUCCESS SCREEN VIEW -->
         <div id="successScreen" class="page-view success-screen">
-            <div class="success-icon-wrap">🏆</div>
+            <div class="success-icon-wrap">✓</div>
             <h2 class="success-heading">Submission Completed</h2>
             <p class="success-text">
                 Thank you for your submission. Your film profile configurations have been recorded, and your entry into the Sharankrishna Short Film Awards is official.
@@ -619,7 +663,7 @@
             <p class="spam-notice-text">
                 Your official entry confirmation certificate has been generated and emailed to you. If it does not arrive shortly, please check your <strong>Spam or Updates tab</strong>.
             </p>
-            <button type="button" class="btn-primary" style="max-width: 240px; margin: 35px auto 0 auto;" onclick="resetPortalView()">Submit Another Entry</button>
+            <button type="button" class="btn-primary" style="max-width: 260px; margin: 35px auto 0 auto;" onclick="resetPortalView()">Submit Another Entry</button>
         </div>
 
         <div class="support-footer">
