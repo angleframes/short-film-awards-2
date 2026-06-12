@@ -128,7 +128,7 @@
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
+            }
 
         .info-value {
             font-size: 0.95rem;
@@ -174,92 +174,133 @@
         }
 
         /* -------------------------------------------
-           REWORKED DYNAMIC EYE-CATCHY GALLERY DESIGN
+           FEATURED HIGHLIGHTED WINNERS SECTION
         ------------------------------------------- */
-        .gallery-grid {
+        .winners-showcase {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .winner-card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--accent-color);
+            box-shadow: 0 8px 25px rgba(226, 176, 71, 0.25);
+            background-color: var(--input-bg);
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s ease;
+        }
+
+        .winner-card img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .winner-badge {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(6px);
+            padding: 12px;
+            text-align: center;
+            border-top: 1px solid rgba(226, 176, 71, 0.3);
+        }
+
+        .winner-category {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .winner-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .winner-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 35px rgba(226, 176, 71, 0.4);
+        }
+
+        .winner-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* -------------------------------------------
+           PINTEREST-STYLE PHOTO GALLERY GRID
+        ------------------------------------------- */
+        .gallery-masonry {
+            columns: 3;
+            column-gap: 16px;
             margin-bottom: 30px;
         }
 
-        .gallery-card {
+        .gallery-item {
+            break-inside: avoid;
+            margin-bottom: 16px;
             position: relative;
-            border-radius: 10px;
+            border-radius: 8px;
             overflow: hidden;
             background-color: var(--input-bg);
             border: 1px solid var(--border-color);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-            aspect-ratio: 4 / 3;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             cursor: pointer;
             transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.4s ease, box-shadow 0.4s ease;
         }
 
-        .gallery-card img {
+        .gallery-item img {
             width: 100%;
-            height: 100%;
+            height: auto;
             object-fit: cover;
             display: block;
-            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        /* Interactive Overlay Reveal */
-        .gallery-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.4) 60%, transparent 100%);
-            display: flex;
-            align-items: flex-end;
-            padding: 16px;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        }
-
-        .gallery-text {
-            color: var(--text-color);
-            font-size: 0.9rem;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            transform: translateY(5px);
-            transition: transform 0.4s ease;
-            border-left: 2px solid var(--accent-color);
-            padding-left: 8px;
-        }
-
-        /* Hover States */
-        .gallery-card:hover {
-            transform: scale(1.03);
+        .gallery-item:hover {
+            transform: translateY(-4px);
             border-color: var(--accent-color);
-            box-shadow: 0 15px 30px rgba(226, 176, 71, 0.15);
+            box-shadow: 0 12px 24px rgba(226, 176, 71, 0.2);
         }
 
-        .gallery-card:hover img {
-            transform: scale(1.08);
+        .gallery-item:hover img {
+            transform: scale(1.04);
         }
 
-        .gallery-card:hover .gallery-overlay {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .gallery-card:hover .gallery-text {
-            transform: translateY(0);
-        }
-
-        @media (max-width: 580px) {
-            .gallery-grid {
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-                gap: 12px;
+        /* Responsive Breakpoints */
+        @media (max-width: 768px) {
+            .winners-showcase {
+                grid-template-columns: 1fr;
+                gap: 16px;
             }
-            .gallery-overlay {
-                opacity: 1;
-                transform: translateY(0);
-                background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.2) 70%);
+            .winner-card img {
+                height: 220px;
             }
-            .gallery-text {
-                transform: translateY(0);
-                font-size: 0.8rem;
+            .gallery-masonry {
+                columns: 2;
+                column-gap: 12px;
+            }
+            .gallery-item {
+                margin-bottom: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gallery-masonry {
+                columns: 1;
             }
         }
         /* ------------------------------------------- */
@@ -267,12 +308,13 @@
         h2.section-title {
             font-size: 1.1rem;
             color: var(--accent-color);
-            margin: 10px 0 15px 0;
+            margin: 25px 0 15px 0;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             display: flex;
             align-items: center;
         }
+        h2.section-title.first { margin-top: 10px; }
         h2.section-title::after { content: ""; flex: 1; margin-left: 10px; height: 1px; background: var(--border-color); }
 
         .form-group { margin-bottom: 20px; }
@@ -446,52 +488,58 @@
                 </div>
             </div>
 
-            <!-- REWORKED HIGHLY VISUAL GALLERY CONTAINER -->
+            <!-- PREMIUM GALLERY WITH FEATURED WINNERS -->
             <div id="pageGallery" class="page-view">
-                <h2 class="section-title">Event Highlights</h2>
                 
-                <div class="gallery-grid">
-                    <!-- Photo 01 -->
-                    <div class="gallery-card">
-                        <img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" data-fallback-folder="images/MRC01340.jpeg" alt="Event Highlight 01" class="auto-img">
-                        <div class="gallery-overlay">
-                            <div class="gallery-text">Grand Stage Ceremony</div>
+                <!-- FEATURED HIGHLIGHTS (WINNERS) -->
+                <h2 class="section-title first">Featured Winners</h2>
+                <div class="winners-showcase">
+                    <!-- General Category Winner: BUG -->
+                    <div class="winner-card">
+                        <img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" alt="General Category Winner - BUG" class="auto-img">
+                        <div class="winner-badge">
+                            <div class="winner-category">🏆 General Category Winner</div>
+                            <div class="winner-title">BUG</div>
                         </div>
+                    </div>
+                    
+                    <!-- Campus Category Winner: TIMELESS -->
+                    <div class="winner-card">
+                        <img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" alt="Campus Category Winner - TIMELESS" class="auto-img">
+                        <div class="winner-badge">
+                            <div class="winner-category">🎓 Campus Category Winner</div>
+                            <div class="winner-title">TIMELESS</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EVENT HIGHLIGHTS GRID -->
+                <h2 class="section-title">Event Highlights</h2>
+                <div class="gallery-masonry">
+                    <!-- Photo 01 -->
+                    <div class="gallery-item">
+                        <img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" data-fallback-folder="images/MRC01340.jpeg" alt="Event Highlight" class="auto-img">
                     </div>
                     
                     <!-- Photo 02 -->
-                    <div class="gallery-card">
-                        <img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" data-fallback-folder="images/MRC00885.jpeg" alt="Event Highlight 02" class="auto-img">
-                        <div class="gallery-overlay">
-                            <div class="gallery-text">Filmmaker Honoring Segment</div>
-                        </div>
+                    <div class="gallery-item">
+                        <img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" data-fallback-folder="images/MRC00885.jpeg" alt="Event Highlight" class="auto-img">
                     </div>
                     
                     <!-- Photo 03 -->
-                    <div class="gallery-card">
-                        <img src="MRC00845.JPG.jpeg" data-fallback="MRC00845.jpeg" data-fallback-folder="images/MRC00845.jpeg" alt="Event Highlight 03" class="auto-img">
-                        <div class="gallery-overlay">
-                            <div class="gallery-text">Jury Review Keynote</div>
-                        </div>
+                    <div class="gallery-item">
+                        <img src="MRC00845.JPG.jpeg" data-fallback="MRC00845.jpeg" data-fallback-folder="images/MRC00845.jpeg" alt="Event Highlight" class="auto-img">
                     </div>
                     
                     <!-- Photo 04 -->
-                    <div class="gallery-card">
-                        <img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" alt="Event Highlight 04" class="auto-img">
-                        <div class="gallery-overlay">
-                            <div class="gallery-text">Audience Screenings Layout</div>
-                        </div>
+                    <div class="gallery-item">
+                        <img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" alt="Event Highlight" class="auto-img">
                     </div>
                     
                     <!-- Photo 05 -->
-                    <div class="gallery-card">
-                        <img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" alt="Event Highlight 05" class="auto-img">
-                        <div class="gallery-overlay">
-                            <div class="gallery-text">Closing Interactive Panel</div>
-                        </div>
+                    <div class="gallery-item">
+                        <img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" alt="Event Highlight" class="auto-img">
                     </div>
-
-                    <!-- TIP FOR FUTURE: To add more images later, simply copy one of the "gallery-card" blocks above, paste it right here, and update the img src! -->
                 </div>
                 
                 <button type="button" class="btn-primary" onclick="handleNav('home')">Go To Application Form</button>
@@ -670,7 +718,6 @@
     </div>
 
     <script>
-        // Production Web App Target Endpoint Script URL Link
         const webAppUrl = "https://script.google.com/macros/s/AKfycbzTfiL56zKjqcZhLm1Mk0rNp5Vm9yQutdfqRMavbdSMIyN-bYpE5_KYQFkbRHNOSKk/exec";
 
         document.querySelectorAll('.auto-img').forEach(img => {
@@ -816,7 +863,6 @@
                     fileName: file.name
                 };
 
-                // Secure cross-origin modern fetch loop tracking response arrays
                 fetch(webAppUrl, {
                     method: "POST",
                     body: JSON.stringify(formData)
