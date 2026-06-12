@@ -173,48 +173,96 @@
             line-height: 1.7;
         }
 
-        /* Horizontal Scroll Gallery Container */
-        .gallery-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            white-space: nowrap;
-            padding: 10px 5px 25px 5px;
-            margin-bottom: 15px;
-            scrollbar-width: thin;
-            scrollbar-color: var(--accent-color) var(--input-bg);
-            -webkit-overflow-scrolling: touch;
+        /* -------------------------------------------
+           REWORKED DYNAMIC EYE-CATCHY GALLERY DESIGN
+        ------------------------------------------- */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
-        .gallery-wrapper::-webkit-scrollbar { height: 8px; }
-        .gallery-wrapper::-webkit-scrollbar-track { background: var(--input-bg); border-radius: 10px; }
-        .gallery-wrapper::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; border: 1px solid var(--input-bg); }
-
-        .gallery-scroll-container { display: inline-flex; gap: 20px; }
-        .gallery-item {
-            width: 280px;
-            display: inline-block;
+        .gallery-card {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
             background-color: var(--input-bg);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transition: transform 0.3s ease, border-color 0.3s ease;
-            white-space: normal;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            aspect-ratio: 4 / 3;
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.4s ease, box-shadow 0.4s ease;
         }
-        .gallery-item:hover { transform: translateY(-4px); border-color: var(--accent-color); }
-        .gallery-img-box {
+
+        .gallery-card img {
             width: 100%;
-            height: 190px;
-            background-color: #1e293b;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            overflow: hidden;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
-        .gallery-img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-        .gallery-item:hover .gallery-img-box img { transform: scale(1.05); }
-        .gallery-caption { padding: 12px; font-size: 0.85rem; color: var(--text-muted); font-weight: 500; text-align: center; background-color: rgba(30, 41, 59, 0.5); }
+
+        /* Interactive Overlay Reveal */
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.4) 60%, transparent 100%);
+            display: flex;
+            align-items: flex-end;
+            padding: 16px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .gallery-text {
+            color: var(--text-color);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transform: translateY(5px);
+            transition: transform 0.4s ease;
+            border-left: 2px solid var(--accent-color);
+            padding-left: 8px;
+        }
+
+        /* Hover States */
+        .gallery-card:hover {
+            transform: scale(1.03);
+            border-color: var(--accent-color);
+            box-shadow: 0 15px 30px rgba(226, 176, 71, 0.15);
+        }
+
+        .gallery-card:hover img {
+            transform: scale(1.08);
+        }
+
+        .gallery-card:hover .gallery-overlay {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .gallery-card:hover .gallery-text {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 580px) {
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+                gap: 12px;
+            }
+            .gallery-overlay {
+                opacity: 1;
+                transform: translateY(0);
+                background: linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.2) 70%);
+            }
+            .gallery-text {
+                transform: translateY(0);
+                font-size: 0.8rem;
+            }
+        }
+        /* ------------------------------------------- */
 
         h2.section-title {
             font-size: 1.1rem;
@@ -398,19 +446,54 @@
                 </div>
             </div>
 
+            <!-- REWORKED HIGHLY VISUAL GALLERY CONTAINER -->
             <div id="pageGallery" class="page-view">
-                <h2 class="section-title">Event Gallery</h2>
-                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px; margin-top:-5px;">&larr; Swipe or scroll horizontally to browse all snapshots &rarr;</p>
+                <h2 class="section-title">Event Highlights</h2>
                 
-                <div class="gallery-wrapper">
-                    <div class="gallery-scroll-container">
-                        <div class="gallery-item"><div class="gallery-img-box"><img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" data-fallback-folder="images/MRC01340.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 01</div></div>
-                        <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" data-fallback-folder="images/MRC00885.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 02</div></div>
-                        <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00845.JPG.jpeg" data-fallback="MRC00845.jpeg" data-fallback-folder="images/MRC00845.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 03</div></div>
-                        <div class="gallery-item"><div class="gallery-img-box"><img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 04</div></div>
-                        <div class="gallery-item"><div class="gallery-img-box"><img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" alt="Gallery Snapshot" class="auto-img"></div><div class="gallery-caption">Event Highlight 05</div></div>
+                <div class="gallery-grid">
+                    <!-- Photo 01 -->
+                    <div class="gallery-card">
+                        <img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" data-fallback-folder="images/MRC01340.jpeg" alt="Event Highlight 01" class="auto-img">
+                        <div class="gallery-overlay">
+                            <div class="gallery-text">Grand Stage Ceremony</div>
+                        </div>
                     </div>
+                    
+                    <!-- Photo 02 -->
+                    <div class="gallery-card">
+                        <img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" data-fallback-folder="images/MRC00885.jpeg" alt="Event Highlight 02" class="auto-img">
+                        <div class="gallery-overlay">
+                            <div class="gallery-text">Filmmaker Honoring Segment</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Photo 03 -->
+                    <div class="gallery-card">
+                        <img src="MRC00845.JPG.jpeg" data-fallback="MRC00845.jpeg" data-fallback-folder="images/MRC00845.jpeg" alt="Event Highlight 03" class="auto-img">
+                        <div class="gallery-overlay">
+                            <div class="gallery-text">Jury Review Keynote</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Photo 04 -->
+                    <div class="gallery-card">
+                        <img src="MRC01340.JPG.jpeg" data-fallback="MRC01340.jpeg" alt="Event Highlight 04" class="auto-img">
+                        <div class="gallery-overlay">
+                            <div class="gallery-text">Audience Screenings Layout</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Photo 05 -->
+                    <div class="gallery-card">
+                        <img src="MRC00885.JPG.jpeg" data-fallback="MRC00885.jpeg" alt="Event Highlight 05" class="auto-img">
+                        <div class="gallery-overlay">
+                            <div class="gallery-text">Closing Interactive Panel</div>
+                        </div>
+                    </div>
+
+                    <!-- TIP FOR FUTURE: To add more images later, simply copy one of the "gallery-card" blocks above, paste it right here, and update the img src! -->
                 </div>
+                
                 <button type="button" class="btn-primary" onclick="handleNav('home')">Go To Application Form</button>
             </div>
 
@@ -588,7 +671,7 @@
 
     <script>
         // Production Web App Target Endpoint Script URL Link
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbzenWEtOiaz8_IxSMz05QokBJ3kehAp87VmsSg67kUcivk-YTQO4gtJlqSbvjMQzf_e8g/exec";
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbzTfiL56zKjqcZhLm1Mk0rNp5Vm9yQutdfqRMavbdSMIyN-bYpE5_KYQFkbRHNOSKk/exec";
 
         document.querySelectorAll('.auto-img').forEach(img => {
             img.addEventListener('error', function() {
