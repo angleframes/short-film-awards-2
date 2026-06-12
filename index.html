@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <!-- Custom Browser Tab Icon (Favicon) -->
     <link rel="icon" type="image/png" href="Sharankrishna short film logo New-01.png">
 
     <title>Sharankrishna Short Film Awards - Entry Portal</title>
@@ -89,14 +90,17 @@
             text-align: center;
             margin-bottom: 25px;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 15px;
+            padding-bottom: 20px;
+            transition: all 0.4s ease;
         }
 
+        /* Dynamic Logo Setup */
         .logo-container {
             max-width: 320px;
             margin: 0 auto 15px auto;
             padding: 0;
             filter: invert(1) brightness(2) contrast(1.2); 
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .logo-container img {
@@ -105,6 +109,18 @@
             display: block;
         }
 
+        /* Alternate Layout Styles when entering other sub-pages */
+        header.corner-mode {
+            text-align: left;
+            padding-bottom: 12px;
+        }
+
+        header.corner-mode .logo-container {
+            margin: 0;
+            max-width: 150px; /* Refined clean side-profile logo scaling */
+        }
+
+        /* Dynamic visibility toggle layout for info metrics panel */
         .info-panel {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -115,6 +131,11 @@
             padding: 12px;
             margin-top: 15px;
             text-align: center;
+            transition: opacity 0.3s ease, max-height 0.3s ease;
+        }
+
+        header.corner-mode .info-panel {
+            display: none; /* Completely hidden on other tabs */
         }
 
         .info-item {
@@ -127,7 +148,7 @@
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            }
+        }
 
         .info-value {
             font-size: 0.95rem;
@@ -237,7 +258,7 @@
             transform: scale(1.05);
         }
 
-        /* PINTEREST-STYLE PHOTO GALLERY GRID & CEREMONY ROWS */
+        /* GALLERY GRID & CEREMONY ROWS */
         .gallery-masonry {
             columns: 3;
             column-gap: 16px;
@@ -272,7 +293,6 @@
             transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        /* Fixed height crop for Ceremony grid to keep it aligned nicely */
         .ceremony-grid .gallery-item {
             margin-bottom: 0;
         }
@@ -341,6 +361,8 @@
             .info-panel { grid-template-columns: 1fr; gap: 12px; }
             .navbar { gap: 12px; padding: 12px 5px; }
             .navbar a { font-size: 0.78rem; letter-spacing: 0.5px; }
+            header.corner-mode { align-items: center; text-align: center; }
+            header.corner-mode .logo-container { margin: 0 auto; }
         }
 
         label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-color); font-weight: 500; }
@@ -391,11 +413,7 @@
         .file-upload-text { color: var(--text-muted); font-size: 0.9rem; }
         .file-uploaded-name { display: none; margin-top: 8px; font-size: 0.85rem; color: var(--success-color); font-weight: 500; }
 
-        /* Elegant Success Screen Styles */
-        .success-screen {
-            text-align: center;
-            padding: 40px 20px;
-        }
+        .success-screen { text-align: center; padding: 40px 20px; }
         .success-icon-wrap {
             width: 80px;
             height: 80px;
@@ -409,36 +427,11 @@
             font-size: 2.2rem;
             color: var(--accent-color);
         }
-        .success-heading {
-            font-size: 1.8rem;
-            color: var(--text-color);
-            margin-bottom: 12px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-        .success-text {
-            font-size: 1rem;
-            color: var(--text-muted);
-            max-width: 580px;
-            margin: 0 auto 30px auto;
-            line-height: 1.6;
-        }
-        .success-divider {
-            height: 1px;
-            background: linear-gradient(to right, transparent, var(--border-color), transparent);
-            margin: 25px 0;
-        }
-        .spam-notice-text {
-            font-size: 0.88rem;
-            color: var(--text-muted);
-            max-width: 520px;
-            margin: 0 auto;
-            line-height: 1.5;
-        }
-        .spam-notice-text strong {
-            color: var(--accent-color);
-            font-weight: 500;
-        }
+        .success-heading { font-size: 1.8rem; color: var(--text-color); margin-bottom: 12px; font-weight: 600; letter-spacing: 0.5px; }
+        .success-text { font-size: 1rem; color: var(--text-muted); max-width: 580px; margin: 0 auto 30px auto; line-height: 1.6; }
+        .success-divider { height: 1px; background: linear-gradient(to right, transparent, var(--border-color), transparent); margin: 25px 0; }
+        .spam-notice-text { font-size: 0.88rem; color: var(--text-muted); max-width: 520px; margin: 0 auto; line-height: 1.5; }
+        .spam-notice-text strong { color: var(--accent-color); font-weight: 500; }
 
         .support-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; font-size: 0.85rem; color: var(--text-muted); line-height: 1.8; }
         .support-footer a { color: var(--accent-color); text-decoration: none; font-weight: 500; }
@@ -463,27 +456,32 @@
     </nav>
 
     <div class="container">
-        <div id="formContainer">
-            <header>
-                <div class="logo-container">
-                    <img id="mainLogo" src="" alt="Sharankrishna Short Film Awards Logo">
+        
+        <!-- PERSISTENT APP HEADER -->
+        <header id="appHeader">
+            <div class="logo-container">
+                <img id="mainLogo" src="" alt="Sharankrishna Short Film Awards Logo">
+            </div>
+            <!-- Fee/Dates Panel - Only displayed when home navigation view is running -->
+            <div class="info-panel" id="metricsPanel">
+                <div class="info-item">
+                    <span class="info-label">Registration Fee</span>
+                    <span class="info-value">₹ 1,000</span>
                 </div>
-                <div class="info-panel">
-                    <div class="info-item">
-                        <span class="info-label">Registration Fee</span>
-                        <span class="info-value">₹ 1,000</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Submission Deadline</span>
-                        <span class="info-value">Dec 31, 2026</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Event Program Date</span>
-                        <span class="info-value">Feb 12, 2027</span>
-                    </div>
+                <div class="info-item">
+                    <span class="info-label">Submission Deadline</span>
+                    <span class="info-value">Dec 31, 2026</span>
                 </div>
-            </header>
+                <div class="info-item">
+                    <span class="info-label">Event Program Date</span>
+                    <span class="info-value">Feb 12, 2027</span>
+                </div>
+            </div>
+        </header>
 
+        <div id="formContainer">
+
+            <!-- ABOUT/STORY VIEW -->
             <div id="pageStory" class="page-view">
                 <div class="story-page-content">
                     <div class="story-block">
@@ -504,8 +502,10 @@
                 </div>
             </div>
 
+            <!-- PREMIUM GALLERY WITH FEATURED WINNERS -->
             <div id="pageGallery" class="page-view">
                 
+                <!-- FEATURED HIGHLIGHTS (WINNERS) -->
                 <h2 class="section-title first">Featured Winners</h2>
                 <div class="winners-showcase">
                     <div class="winner-card">
@@ -525,19 +525,21 @@
                     </div>
                 </div>
 
+                <!-- INAUGURATION CEREMONY SECTION -->
                 <h2 class="section-title">Inauguration Ceremony</h2>
-                <div class="ceremony-grid" id="ceremonyGrid">
-                    </div>
+                <div class="ceremony-grid" id="ceremonyGrid"></div>
 
+                <!-- EVENT HIGHLIGHTS GRID -->
                 <h2 class="section-title">Event Highlights</h2>
-                <div class="gallery-masonry" id="eventGalleryGrid">
-                    </div>
+                <div class="gallery-masonry" id="eventGalleryGrid"></div>
                 
                 <button type="button" class="btn-primary" onclick="handleNav('home')">Go To Application Form</button>
             </div>
 
+            <!-- SUBMISSION ENTRY FORMS -->
             <form id="submissionForm" onsubmit="handleFinalSubmit(event)">
                 
+                <!-- MAIN FORM HOME VIEW -->
                 <div id="pageHome" class="page-view active">
                     <h2 class="section-title">Applicant Details</h2>
                     
@@ -644,6 +646,7 @@
                     <button type="button" class="btn-primary" style="margin-top:20px;" onclick="handleNav('payment')">Proceed to Payment</button>
                 </div>
 
+                <!-- ENTRY PAYMENT VIEW -->
                 <div id="pagePayment" class="page-view">
                     <h2 class="section-title">Entry Fee Payment</h2>
                     
@@ -684,19 +687,17 @@
             </form>
         </div>
 
+        <!-- Success Screen -->
         <div id="successScreen" class="page-view success-screen">
             <div class="success-icon-wrap">🏆</div>
             <h2 class="success-heading">Submission Completed</h2>
             <p class="success-text">
                 Thank you for your submission. Your film profile configurations have been recorded, and your entry into the Sharankrishna Short Film Awards is official.
             </p>
-            
             <div class="success-divider"></div>
-            
             <p class="spam-notice-text">
                 A digital receipt has been dispatched to your email address. If it does not arrive shortly, please check your <strong>Spam or Updates tab</strong> to confirm receipt.
             </p>
-
             <button type="button" class="btn-primary" style="max-width: 240px; margin: 35px auto 0 auto;" onclick="resetPortalView()">Submit Another Entry</button>
         </div>
 
@@ -712,55 +713,46 @@
            🔧 THE EASY CONFIGURATION ZONE - CHANGE YOUR IMAGES & TITLES HERE!
            ========================================================================== */
         const APP_CONFIG = {
-            // 1. Google Web App URL for Form Submissions
             googleWebAppUrl: "https://script.google.com/macros/s/AKfycbzTfiL56zKjqcZhLm1Mk0rNp5Vm9yQutdfqRMavbdSMIyN-bYpE5_KYQFkbRHNOSKk/exec",
 
-            // 2. Core Images
             logoImage: "Sharankrishna short film logo New-01.png",
             qrCodeImage: "angle.jpg",
 
-            // 3. Featured Winners Section
             winnerGeneralTitle: "BUG",
-            winnerGeneralImage: "MRC01071.JPG.jpeg", 
+            winnerGeneralImage: "MRC01340.JPG.jpeg", 
 
             winnerCampusTitle: "TIMELESS",
-            winnerCampusImage: "MRC01028.JPG.jpeg",  
+            winnerCampusImage: "MRC00885.JPG.jpeg",  
 
-            // 4. NEW! Inauguration Ceremony Gallery Column (Add up to 4 image filenames here!)
             inaugurationImages: [
                 "MRC01340.JPG.jpeg",
                 "MRC00885.JPG.jpeg",
                 "MRC00845.JPG.jpeg",
-                "MRC00629.JPG.jpeg"
+                "MRC01340.JPG.jpeg"
             ],
 
-            // 5. Event Highlights Gallery Grid (To add MORE photos in the future, just keep typing new filenames here!)
             galleryImages: [
                 "MRC01340.JPG.jpeg",
                 "MRC00885.JPG.jpeg",
                 "MRC00845.JPG.jpeg",
-                "MRC00629.JPG.jpeg",
-                "MRC00617.JPG.jpeg",
-                "MRC00614.JPG.jpeg"
+                "MRC01340.JPG.jpeg",
+                "MRC00885.JPG.jpeg"
             ]
         };
         /* ==========================================================================
            🏁 END OF CONFIGURATION ZONE - DO NOT EDIT BELOW THIS LINE
            ========================================================================== */
 
-        // Apply Configurations automatically on load
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('mainLogo').src = APP_CONFIG.logoImage;
             document.getElementById('paymentQrImg').src = APP_CONFIG.qrCodeImage;
             
-            // Set Winners
             document.getElementById('titleBug').textContent = APP_CONFIG.winnerGeneralTitle;
             document.getElementById('imgBug').src = APP_CONFIG.winnerGeneralImage;
             
             document.getElementById('titleTimeless').textContent = APP_CONFIG.winnerCampusTitle;
             document.getElementById('imgTimeless').src = APP_CONFIG.winnerCampusImage;
 
-            // Generate Inauguration Gallery Grid items
             const ceremonyGrid = document.getElementById('ceremonyGrid');
             ceremonyGrid.innerHTML = ''; 
             APP_CONFIG.inaugurationImages.forEach(imgSrc => {
@@ -770,7 +762,6 @@
                 ceremonyGrid.appendChild(itemDiv);
             });
 
-            // Generate Event Highlights Gallery Grid items
             const galleryGrid = document.getElementById('eventGalleryGrid');
             galleryGrid.innerHTML = ''; 
             APP_CONFIG.galleryImages.forEach(imgSrc => {
@@ -791,6 +782,14 @@
 
             document.getElementById('formContainer').style.display = 'block';
             document.getElementById('successScreen').classList.remove('active');
+
+            // Manage Header view modes & toggle Info Panel state smoothly
+            const appHeader = document.getElementById('appHeader');
+            if (targetSection === 'home') {
+                appHeader.classList.remove('corner-mode');
+            } else {
+                appHeader.classList.add('corner-mode');
+            }
 
             document.querySelectorAll('.page-view').forEach(view => {
                 view.classList.remove('active');
