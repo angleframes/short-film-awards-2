@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <link rel="icon" type="image/png" href="Sharankrishna short film logo New-02.jpg">
+    <!-- Custom Browser Tab Icon (Favicon) -->
+    <link rel="icon" type="image/png" href="Sharankrishna short film logo New-01.png">
 
     <title>Sharankrishna Short Film Awards - Entry Portal</title>
     <style>
@@ -284,39 +285,53 @@
         .file-upload-text { color: var(--text-muted); font-size: 0.9rem; }
         .file-uploaded-name { display: none; margin-top: 8px; font-size: 0.85rem; color: var(--success-color); font-weight: 500; }
 
-        /* Dynamic Program Success Screen Overlay Layout */
+        /* Elegant Success Screen Styles */
         .success-screen {
             text-align: center;
-            padding: 30px 10px;
+            padding: 40px 20px;
         }
-        .success-icon {
-            font-size: 3.5rem;
+        .success-icon-wrap {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            background: rgba(226, 176, 71, 0.1);
+            border: 1px solid rgba(226, 176, 71, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.2rem;
             color: var(--accent-color);
-            margin-bottom: 15px;
         }
         .success-heading {
-            font-size: 1.6rem;
-            color: #fff;
-            margin-bottom: 10px;
+            font-size: 1.8rem;
+            color: var(--text-color);
+            margin-bottom: 12px;
             font-weight: 600;
+            letter-spacing: 0.5px;
         }
         .success-text {
             font-size: 1rem;
             color: var(--text-muted);
-            margin-bottom: 25px;
+            max-width: 580px;
+            margin: 0 auto 30px auto;
             line-height: 1.6;
         }
-        .spam-alert-box {
-            background-color: var(--warning-bg);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #fca5a5;
-            padding: 15px 20px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            margin: 20px auto;
-            max-width: 600px;
-            text-align: justify;
+        .success-divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--border-color), transparent);
+            margin: 25px 0;
+        }
+        .spam-notice-text {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            max-width: 520px;
+            margin: 0 auto;
             line-height: 1.5;
+        }
+        .spam-notice-text strong {
+            color: var(--accent-color);
+            font-weight: 500;
         }
 
         .support-footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: center; font-size: 0.85rem; color: var(--text-muted); line-height: 1.8; }
@@ -547,19 +562,21 @@
             </form>
         </div>
 
+        <!-- Redesigned Elegant Success Screen -->
         <div id="successScreen" class="page-view success-screen">
-            <div class="success-icon">🏆</div>
-            <h2 class="success-heading">Submission Completed Successfully!</h2>
+            <div class="success-icon-wrap">🏆</div>
+            <h2 class="success-heading">Submission Completed</h2>
             <p class="success-text">
-                Your film profile configuration and data entry tracking lines have been verified. <br>
-                <strong>You have successfully entered into the Sharankrishna Short Film Awards program!</strong>
+                Thank you for your submission. Your film profile configurations have been recorded, and your entry into the Sharankrishna Short Film Awards is official.
             </p>
             
-            <div class="spam-alert-box">
-                <strong>⚠️ Verification Note:</strong> A digital submission receipt has been transmitted over to your registered email address. If you do not observe the message in your primary inbox folder within a few minutes, please check your <strong>Spam or Junk email folder</strong> and mark it as "Not Spam".
-            </div>
+            <div class="success-divider"></div>
+            
+            <p class="spam-notice-text">
+                A digital receipt has been dispatched to your email address. If it does not arrive shortly, please check your <strong>Spam or Updates tab</strong> to confirm receipt.
+            </p>
 
-            <button type="button" class="btn-primary" style="max-width: 250px; margin: 20px auto 0 auto;" onclick="resetPortalView()">Submit Another Entry</button>
+            <button type="button" class="btn-primary" style="max-width: 240px; margin: 35px auto 0 auto;" onclick="resetPortalView()">Submit Another Entry</button>
         </div>
 
         <div class="support-footer">
@@ -570,10 +587,8 @@
     </div>
 
     <script>
-        // Production Web App Target Endpoint Script URL Link
         const webAppUrl = "https://script.google.com/macros/s/AKfycbw88SNthxklEcY5PdmUVdfLYdQKRWUvo9GE4Uqa3-V1cgRCFZvFeYyhmxRAuZkc9nA88A/exec";
 
-        // Automated path correction loop logic for handling strict GitHub asset routes
         document.querySelectorAll('.auto-img').forEach(img => {
             img.addEventListener('error', function() {
                 const step1 = this.getAttribute('data-fallback');
@@ -662,6 +677,9 @@
             const placeholder = document.getElementById('uploadPlaceholder');
             
             if (input.files && input.files.length > 0) {
+                if (input.files[0].size > 3.5 * 1024 * 1024) {
+                    alert("⚠️ This file is quite large. Mobile transfers work best with compressed images under 2MB. If submission fails, try taking a smaller screenshot!");
+                }
                 placeholder.style.display = 'none';
                 fileNameDisplay.textContent = '✓ ' + input.files[0].name;
                 fileNameDisplay.style.display = 'block';
@@ -695,7 +713,7 @@
                 const formData = {
                     applicantName: document.getElementById('applicantName').value,
                     phone: document.getElementById('phone').value,
-                    email: document.getElementById('email').value,
+                    email: document.getElementById('email').value.trim(),
                     filmName: document.getElementById('filmName').value,
                     category: document.getElementById('category').value,
                     filmLink: document.getElementById('filmLink').value,
@@ -716,12 +734,9 @@
 
                 fetch(webAppUrl, {
                     method: "POST",
-                    mode: "no-cors", 
-                    cache: "no-cache",
-                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(formData)
                 })
-                .then(() => {
+                .then(res => {
                     document.getElementById('formContainer').style.display = 'none';
                     document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
                     document.getElementById('successScreen').classList.add('active');
@@ -739,7 +754,7 @@
                 })
                 .catch(err => {
                     console.error(err);
-                    alert("Submission error. Please check backend verification configurations.");
+                    alert("Submission encountered a network interrupt. Please verify your mobile connection profile and try with a compressed receipt snapshot.");
                     submitBtn.disabled = false;
                     submitBtn.textContent = "Submit Entry";
                 });
