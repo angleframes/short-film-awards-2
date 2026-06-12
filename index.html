@@ -587,7 +587,8 @@
     </div>
 
     <script>
-        const webAppUrl = "https://script.google.com/macros/s/AKfycbw88SNthxklEcY5PdmUVdfLYdQKRWUvo9GE4Uqa3-V1cgRCFZvFeYyhmxRAuZkc9nA88A/exec";
+        // Production Web App Target Endpoint Script URL Link
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbzenWEtOiaz8_IxSMz05QokBJ3kehAp87VmsSg67kUcivk-YTQO4gtJlqSbvjMQzf_e8g/exec";
 
         document.querySelectorAll('.auto-img').forEach(img => {
             img.addEventListener('error', function() {
@@ -732,29 +733,37 @@
                     fileName: file.name
                 };
 
+                // Secure cross-origin modern fetch loop tracking response arrays
                 fetch(webAppUrl, {
                     method: "POST",
                     body: JSON.stringify(formData)
                 })
-                .then(res => {
-                    document.getElementById('formContainer').style.display = 'none';
-                    document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
-                    document.getElementById('successScreen').classList.add('active');
-                    
-                    document.getElementById("submissionForm").reset();
-                    document.getElementById('uploadPlaceholder').style.display = 'block';
-                    document.getElementById('fileNameDisplay').style.display = 'none';
-                    
-                    document.getElementById('transactionId').required = false;
-                    document.getElementById('paymentScreenshot').required = false;
-                    
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = "Submit Entry";
-                    window.scrollTo(0, 0);
+                .then(res => res.json())
+                .then(response => {
+                    if (response.status === "success") {
+                        document.getElementById('formContainer').style.display = 'none';
+                        document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
+                        document.getElementById('successScreen').classList.add('active');
+                        
+                        document.getElementById("submissionForm").reset();
+                        document.getElementById('uploadPlaceholder').style.display = 'block';
+                        document.getElementById('fileNameDisplay').style.display = 'none';
+                        
+                        document.getElementById('transactionId').required = false;
+                        document.getElementById('paymentScreenshot').required = false;
+                        
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = "Submit Entry";
+                        window.scrollTo(0, 0);
+                    } else {
+                        alert("Backend Script Configuration Interrupt: " + response.message);
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = "Submit Entry";
+                    }
                 })
                 .catch(err => {
                     console.error(err);
-                    alert("Submission encountered a network interrupt. Please verify your mobile connection profile and try with a compressed receipt snapshot.");
+                    alert("Submission encountered a network interrupt. Please verify your connection profile and try with a compressed receipt snapshot.");
                     submitBtn.disabled = false;
                     submitBtn.textContent = "Submit Entry";
                 });
