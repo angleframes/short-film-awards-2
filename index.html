@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <link rel="icon" type="image/png" href="Sharankrishna short film logo New-05.png">
+    <link rel="icon" type="image/png" href="Favicon.png">
 
     <title>Sharankrishna Short Film Awards - Entry Portal</title>
     <style>
@@ -143,9 +143,9 @@
             flex-direction: column;
             justify-content: space-between;
             padding: 60px 8% 40px 8%;
-            background: radial-gradient(circle at 85% 40%, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0) 50%),
-                        linear-gradient(to right, #0b0b0d 45%, rgba(11,11,13,0.8) 70%, rgba(11,11,13,0.4) 100%),
-                        url('MRC01340.JPG.jpeg') no-repeat center right;
+            /* Note: Background image is now set dynamically via JavaScript */
+            background-position: center right;
+            background-repeat: no-repeat;
             background-size: cover;
         }
 
@@ -201,6 +201,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .hero-tagline {
@@ -512,7 +513,7 @@
         }
 
         /* ==========================================
-           PREMIUM SCREENSHOT REPLICATED GALLERY
+           PREMIUM GALLERY STYLE
            ========================================== */
         .gallery-outer-card {
             max-width: 680px;
@@ -584,7 +585,7 @@
         .gallery-photo-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: 20px;
             width: 100%;
             margin-bottom: 30px;
         }
@@ -595,21 +596,20 @@
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
             overflow: hidden;
-            aspect-ratio: 4 / 3;
             position: relative;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, opacity 0.3s ease;
-            opacity: 1;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
         
-        .gallery-photo-frame.hidden {
-            display: none;
-            opacity: 0;
+        .gallery-image-container {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            overflow: hidden;
+            background: rgba(255,255,255,0.02);
+            position: relative;
         }
 
-        .gallery-photo-frame:hover {
-            transform: translateY(-2px);
-            border-color: rgba(255, 255, 255, 0.25);
-        }
         .gallery-photo-frame img {
             width: 100%;
             height: 100%;
@@ -619,6 +619,49 @@
         }
         .gallery-photo-frame:hover img {
             opacity: 0.9;
+        }
+
+        /* Title Card Details overlay under image */
+        .gallery-photo-details {
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .gallery-photo-title {
+            font-size: 0.85rem;
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .gallery-photo-sub {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Placeholder graphic asset for upcoming empty states */
+        .placeholder-empty-graphic {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.15);
+            font-size: 2.2rem;
+            border: 2px dashed rgba(255,255,255,0.05);
+            border-radius: 8px;
+        }
+        .placeholder-empty-graphic span {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+            color: var(--text-muted);
+            opacity: 0.6;
         }
 
         /* View More Action Link Style */
@@ -906,11 +949,11 @@
         }
 
         .contact-channel-row {
-            margin: 25px 0;
+            margin: 20px 0;
             padding: 15px;
-            background: rgba(255,255,255,0.01);
+            background: rgba(255, 255, 255, 0.01);
             border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.04);
+            border: 1px solid rgba(255, 255, 255, 0.04);
         }
 
         .contact-channel-row p {
@@ -922,6 +965,39 @@
         .contact-channel-row a {
             color: #ffffff;
             text-decoration: none;
+        }
+
+        .contact-address-text {
+            font-size: 0.92rem;
+            color: #ffffff;
+            line-height: 1.5;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        /* Pure Icon Link Container Settings */
+        .social-links-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            margin-top: 15px;
+        }
+
+        .social-link-icon-anchor {
+            display: inline-block;
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .social-link-icon-anchor:hover {
+            transform: scale(1.15);
+        }
+
+        .social-link-icon-anchor img {
+            width: 38px;
+            height: 38px;
+            object-fit: contain;
+            display: block;
         }
 
         /* HELPERS */
@@ -942,13 +1018,13 @@
         .qr-box img { width: 100%; height: 100%; object-fit: contain; }
         .story-page-content { display: flex; flex-direction: column; gap: 24px; padding: 20px; max-width: 800px; margin: 40px auto; }
         .story-block { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 16px;}
-        .story-block h3 { margin-bottom: 12px; font-size: 1.1rem; }
+        .story-block h3 { margin-bottom: 12px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.5px; }
         .story-block p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
         .success-screen { text-align: center; padding: 60px 20px; max-width: 600px; margin: 60px auto; }
         .success-icon { width: 64px; height: 64px; background: rgba(48, 209, 88, 0.1); border: 1px solid #30d158; color: #30d158; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 1.8rem; }
 
         .support-footer {
-            padding: 30px 20px;
+            padding: 40px 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
             background: rgba(11, 11, 13, 0.5);
             text-align: center;
@@ -961,32 +1037,95 @@
             display: flex;
             justify-content: center;
             gap: 20px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
         .support-footer-links a {
             color: var(--text-muted);
             text-decoration: none;
             transition: color 0.2s ease;
             cursor: pointer;
+            font-size: 0.8rem;
         }
         .support-footer-links a:hover { color: #ffffff; }
 
+        .footer-address-block {
+            margin: 12px 0;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
+        }
+
+        /* ==========================================
+           RESPONSIVE REFINEMENTS & MOBILE OVERRIDES
+           ========================================== */
         @media (max-width: 992px) {
-            .hero-section { background-image: none; background: #0b0b0d; padding-top: 40px; }
+            .hero-section { background-image: none !important; background: #0b0b0d; padding-top: 40px; }
             .hero-metric-ribbon { grid-template-columns: repeat(2, 1fr); }
             .categories-grid-matrix { grid-template-columns: repeat(2, 1fr); }
         }
 
         @media (max-width: 768px) {
             .site-header-wrapper { padding: 15px 20px; }
-            .navbar { display: none; }
+            
+            /* Optimized Mobile-only Premium Navigation Tab Ribbon */
+            .navbar { 
+                display: flex; 
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: rgba(18, 18, 21, 0.95);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border-top: 1px solid rgba(255, 255, 255, 0.08);
+                padding: 10px 5px;
+                justify-content: space-around;
+                gap: 0;
+                z-index: 1001;
+            }
+            .navbar a {
+                font-size: 0.6rem;
+                padding: 6px 8px;
+                letter-spacing: 0.5px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .navbar a.active::after {
+                bottom: -2px;
+                left: 8px;
+                right: 8px;
+            }
+
+            /* Main padding adjustment so mobile tab bar doesn't overlap content */
+            .main-layout-content {
+                margin-top: 85px;
+                padding-bottom: 70px; 
+            }
+
             .form-grid { grid-template-columns: 1fr; gap: 0; }
-            .hero-metric-ribbon { grid-template-columns: 1fr; }
+            
+            /* Retain compact dual grids where readable instead of flat lists */
+            .hero-metric-ribbon { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
+            .categories-grid-matrix { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .gallery-photo-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            
             .hero-main-title { font-size: 2.2rem; }
             .portal-glass-card { padding: 24px; }
             .step-pipeline-container { display: none; }
+            .social-links-grid { gap: 20px; }
+            
+            /* Clean up spacing inside form wizards on mobile */
+            .btn-wizard-action { padding: 14px; font-size: 0.8rem; }
+            .gallery-outer-card { padding: 16px; width: 95%; }
+        }
+
+        /* Super Micro Screen Optimization (Small Phones) */
+        @media (max-width: 480px) {
+            .hero-metric-ribbon { grid-template-columns: 1fr; }
             .categories-grid-matrix { grid-template-columns: 1fr; }
             .gallery-photo-grid { grid-template-columns: 1fr; }
+            .navbar a { font-size: 0.55rem; padding: 6px 4px; }
         }
     </style>
 </head>
@@ -1009,7 +1148,7 @@
     <div class="main-layout-content">
 
         <div id="pageHome" class="page-view active">
-            <div class="hero-section">
+            <div id="heroBgTarget" class="hero-section">
                 <div class="hero-main-body">
                     <p class="hero-presenter-tag">Angle Frames Presents</p>
                     <h1 class="hero-main-title">Sharankrishna <strong>Short Film Awards</strong></h1>
@@ -1018,7 +1157,7 @@
                         <span class="association-tag">In Association With</span>
                         <div class="association-logo-box">
                             <span style="font-size:0.85rem; font-weight:700; letter-spacing:1px;">JAIN UNIVERSITY</span>
-                            <span style="font-size:0.65rem; color:var(--text-muted);">KOCHI</span>
+                            <span style="font-size:0.65rem; color:var(--text-muted); font-weight: 500; letter-spacing: 0.5px;">KOCHI CAMPUS</span>
                         </div>
                     </div>
 
@@ -1068,6 +1207,18 @@
 
         <div id="pageStory" class="page-view">
             <div class="story-page-content">
+                <div class="story-block">
+                    <h3>About Angle Frames</h3>
+                    <p>
+                        Angle Frames stands as a premier creative collective and platform committed to fueling the fires of independent filmmaking. Founded with a vision to build bridges for raw, unadulterated storytelling, Angle Frames discovers, nurtures, and highlights ground-breaking visual concepts. By organizing top-tier competitive arenas, masterclasses, and project distributions, we give voice to young digital visionaries across the region.
+                    </p>
+                </div>
+                <div class="story-block">
+                    <h3>About Jain University</h3>
+                    <p>
+                        Ranked consistently among India’s top educational institutions, JAIN (Deemed-to-be University) acts as a powerful catalyst for human development and progressive learning. The Kochi Campus emphasizes creative exploration and technical mastery, specifically within its creative and media programs. Through its collaboration on the Sharankrishna Short Film Awards, Jain University reinforces its institutional drive toward nurturing industry-ready artistic talents.
+                    </p>
+                </div>
                 <div class="story-block">
                     <h3>Who is Sharankrishna?</h3>
                     <p>
@@ -1171,51 +1322,14 @@
                 <h2 class="gallery-main-title">Gallery</h2>
 
                 <div class="gallery-filter-row">
-                    <button class="btn-gallery-pill active" onclick="filterGallery('all', this)">All</button>
-                    <button class="btn-gallery-pill" onclick="filterGallery('winners', this)">Winners</button>
-                    <button class="btn-gallery-pill" onclick="filterGallery('events', this)">Events</button>
-                    <button class="btn-gallery-pill" onclick="filterGallery('bts', this)">Behind The Scenes</button>
+                    <button id="pillWinners2025" class="btn-gallery-pill active" onclick="filterGallery('winners2025', this)">Winners 2025</button>
+                    <button id="pillWinners2026" class="btn-gallery-pill" onclick="filterGallery('winners2026', this)">Winners 2026</button>
+                    <button id="pillWinners2027" class="btn-gallery-pill" onclick="filterGallery('winners2027', this)">Winners 2027</button>
+                    <button id="pillEvents" class="btn-gallery-pill" onclick="filterGallery('events', this)">Events</button>
                 </div>
 
                 <div class="gallery-photo-grid" id="galleryPhotoGrid">
-                    
-                    <div class="gallery-photo-frame" data-category="winners">
-                        <img src="https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=600&auto=format&fit=crop" alt="Winners Trophy Feature">
                     </div>
-                    <div class="gallery-photo-frame" data-category="winners">
-                        <img src="https://images.unsplash.com/photo-1531058020387-3be344559be6?q=80&w=600&auto=format&fit=crop" alt="Award Ceremony Winners Celebration">
-                    </div>
-                    <div class="gallery-photo-frame" data-category="winners">
-                        <img src="https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?q=80&w=600&auto=format&fit=crop" alt="Golden Laurel Award Closeup">
-                    </div>
-
-                    <div class="gallery-photo-frame" data-category="events">
-                        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=600&auto=format&fit=crop" alt="Festival Panel Event">
-                    </div>
-                    <div class="gallery-photo-frame" data-category="events">
-                        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=600&auto=format&fit=crop" alt="Audience Hall Cinematic Screening">
-                    </div>
-                    <div class="gallery-photo-frame" data-category="events">
-                        <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop" alt="Stage Lineup Presentation">
-                    </div>
-                    <div class="gallery-photo-frame" data-category="events">
-                        <img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?q=80&w=600&auto=format&fit=crop" alt="Grand Awards Ceremony Stage">
-                    </div>
-
-                    <div class="gallery-photo-frame" data-category="bts">
-                        <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=600&auto=format&fit=crop" alt="Behind the Scenes Camera Setup">
-                    </div>
-                    <div class="gallery-photo-frame" data-category="bts">
-                        <img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=600&auto=format&fit=crop" alt="Director Clapper Board Production">
-                    </div>
-                    <div class="gallery-photo-frame" data-category="bts">
-                        <img src="https://images.unsplash.com/photo-1601506521937-0121a7fc2a6b?q=80&w=600&auto=format&fit=crop" alt="Cinematographer Set Rig Lighting">
-                    </div>
-                    <div class="gallery-photo-frame" data-category="bts">
-                        <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600&auto=format&fit=crop" alt="Editing Suite Studio Monitors">
-                    </div>
-
-                </div>
 
                 <button class="btn-gallery-more">
                     <span>View More Photos</span>
@@ -1429,6 +1543,30 @@
                         <label>Official Inquiry Mailbox</label>
                         <p><a href="mailto:angleframes.contact@gmail.com">angleframes.contact@gmail.com</a></p>
                     </div>
+
+                    <div class="contact-channel-row">
+                        <label>Headquarters Office Address</label>
+                        <div class="contact-address-text">
+                            Angle frames 12/399,<br>
+                            Krishnalayam Thenhippalam<br>
+                            Malappuram, Kerala - 673636
+                        </div>
+                    </div>
+
+                    <div class="contact-channel-row" style="margin-bottom:0;">
+                        <label style="margin-bottom: 12px;">Connect & Follow Us</label>
+                        <div class="social-links-grid">
+                            <a href="https://www.instagram.com/sharankrishna_shortfilm_awards/" target="_blank" class="social-link-icon-anchor">
+                                <img id="socialIconInstagram" src="" alt="Instagram">
+                            </a>
+                            <a href="https://www.youtube.com/@ANGLEFRAMES" target="_blank" class="social-link-icon-anchor">
+                                <img id="socialIconYoutube" src="" alt="YouTube">
+                            </a>
+                            <a href="https://www.facebook.com/share/1BRDQLmtVp/" target="_blank" class="social-link-icon-anchor">
+                                <img id="socialIconFacebook" src="" alt="Facebook">
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1448,22 +1586,110 @@
                 <a onclick="handleNav('gallery')">Gallery</a> · 
                 <a onclick="handleNav('contact')">Contact</a>
             </div>
+            
+            <div class="footer-address-block">
+                <strong>Angle frames</strong> 12/399, Krishnalayam Thenhippalam Malappuram, Kerala - 673636
+            </div>
+
             <p>&copy; 2026 Angle Frames Presents Sharankrishna Short Film Awards. All Rights Reserved.</p>
         </div>
     </div>
 
     <script>
+        /*****************************************************************
+         * 🖼️ IMAGE CONTROL PANEL
+         * Edit all values inside this block to easily update your website images!
+         *****************************************************************/
+        const SITE_IMAGES = {
+            // Main Branding Assets
+            mainLogo: "Sharankrishna short film logo New-05.png",
+            paymentQrCode: "angle.jpg",
+            heroBackground: "MRC01340.JPG.jpeg",
+
+            // Social Media Icons
+            socialInstagram: "—Pngtree—instagram icon vector_8704817.png",
+            socialYoutube: "—Pngtree—youtube social media 3d stereo_8704808",
+            socialFacebook: "—Pngtree—facebook icon facebook logo_3584837"
+        };
+
+        /* Easy Gallery Config Data Matrix */
+        const GALLERY_IMAGES = [
+            // WINNERS 2025
+            { 
+                category: "winners2025", 
+                src: "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=600&auto=format&fit=crop", 
+                title: "Best Short Film: 'Bug'", 
+                sub: "Winner 2025" 
+            },
+            { 
+                category: "winners2025", 
+                src: "https://images.unsplash.com/photo-1531058020387-3be344559be6?q=80&w=600&auto=format&fit=crop", 
+                title: "Campus Category: 'Timeless'", 
+                sub: "Winner 2025" 
+            },
+            // WINNERS 2026 
+            { 
+                category: "winners2026", 
+                src: "", // Leave blank to display the upcoming placeholder default graphic
+                title: "To Be Announced", 
+                sub: "Coming Soon" 
+            },
+            // WINNERS 2027
+            { 
+                category: "winners2027", 
+                src: "", 
+                title: "To Be Announced", 
+                sub: "Coming Soon" 
+            },
+            // EVENTS PHOTOS
+            { 
+                category: "events", 
+                src: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=600&auto=format&fit=crop", 
+                title: "Festival Panel Event", 
+                sub: "Live Screening" 
+            },
+            { 
+                category: "events", 
+                src: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=600&auto=format&fit=crop", 
+                title: "Audience Hall Screening", 
+                sub: "Cinema Hall" 
+            },
+            { 
+                category: "events", 
+                src: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop", 
+                title: "Stage Lineup Presentation", 
+                sub: "Main Stage" 
+            }
+        ];
+
+        /*****************************************************************
+         * END OF IMAGE CONTROL PANEL
+         *****************************************************************/
+
         const APP_CONFIG = {
-            googleWebAppUrl: "https://script.google.com/macros/s/AKfycbzTfiL56zKjqcZhLm1Mk0rNp5Vm9yQutdfqRMavbdSMIyN-bYpE5_KYQFkbRHNOSKk/exec",
-            logoImage: "Sharankrishna short film logo New-05.png",
-            qrCodeImage: "angle.jpg"
+            googleWebAppUrl: "https://script.google.com/macros/s/AKfycbzTfiL56zKjqcZhLm1Mk0rNp5Vm9yQutdfqRMavbdSMIyN-bYpE5_KYQFkbRHNOSKk/exec"
         };
 
         let currentWizardStep = 1;
 
         document.addEventListener("DOMContentLoaded", () => {
-            document.getElementById('mainLogo').src = APP_CONFIG.logoImage;
-            document.getElementById('paymentQrImg').src = APP_CONFIG.qrCodeImage;
+            // Assign branding assets automatically from control panel configuration
+            document.getElementById('mainLogo').src = SITE_IMAGES.mainLogo;
+            document.getElementById('paymentQrImg').src = SITE_IMAGES.paymentQrCode;
+            
+            // Assign social media icon assets automatically
+            document.getElementById('socialIconInstagram').src = SITE_IMAGES.socialInstagram;
+            document.getElementById('socialIconYoutube').src = SITE_IMAGES.socialYoutube;
+            document.getElementById('socialIconFacebook').src = SITE_IMAGES.socialFacebook;
+
+            // Apply dynamic hero premium background inline template setup
+            document.getElementById('heroBgTarget').style.backgroundImage = `
+                radial-gradient(circle at 85% 40%, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0) 50%),
+                linear-gradient(to right, #0b0b0d 45%, rgba(11,11,13,0.8) 70%, rgba(11,11,13,0.4) 100%),
+                url('${SITE_IMAGES.heroBackground}')
+            `;
+
+            renderGallery('winners2025');
         });
 
         function handleNav(targetSection) {
@@ -1485,26 +1711,46 @@
             if (targetLink) targetLink.classList.add('active');
         }
 
-        /* LIVE DYNAMIC FILTER CONFIGURATION ENGINE */
         function filterGallery(category, contextPill) {
-            // Update selected navigation visual structure
             document.querySelectorAll('.gallery-filter-row .btn-gallery-pill').forEach(pill => {
                 pill.classList.remove('active');
             });
             contextPill.classList.add('active');
+            renderGallery(category);
+        }
 
-            // Toggle frames according to custom categorization parameters
-            const frames = document.querySelectorAll('#galleryPhotoGrid .gallery-photo-frame');
-            frames.forEach(frame => {
-                if (category === 'all' || frame.getAttribute('data-category') === category) {
-                    frame.classList.remove('hidden');
-                } else {
-                    frame.classList.add('hidden');
+        function renderGallery(category) {
+            const gridMatrix = document.getElementById('galleryPhotoGrid');
+            gridMatrix.innerHTML = ''; 
+            
+            GALLERY_IMAGES.forEach(photo => {
+                if(photo.category === category) {
+                    const frame = document.createElement('div');
+                    frame.className = 'gallery-photo-frame';
+                    
+                    let mediaSourceElement = `<div class="gallery-image-container"><img src="${photo.src}" alt="${photo.title}"></div>`;
+                    if(!photo.src || photo.src.trim() === "") {
+                        mediaSourceElement = `
+                        <div class="gallery-image-container">
+                            <div class="placeholder-empty-graphic">
+                                🎬
+                                <span>Upcoming Winner</span>
+                            </div>
+                        </div>`;
+                    }
+
+                    frame.innerHTML = `
+                        ${mediaSourceElement}
+                        <div class="gallery-photo-details">
+                            <div class="gallery-photo-title">${photo.title}</div>
+                            <div class="gallery-photo-sub">${photo.sub}</div>
+                        </div>
+                    `;
+                    gridMatrix.appendChild(frame);
                 }
             });
         }
 
-        /* TOGGLE POPUP RULES MODAL WINDOW FUNCTION */
         function toggleRulesModal(show) {
             const modal = document.getElementById('rulesModal');
             if (show) {
@@ -1514,7 +1760,6 @@
             }
         }
 
-        /* WIZARD ENGINE MANAGEMENT SCHEME */
         function goToWizardStep(stepNumber) {
             if (stepNumber > currentWizardStep) {
                 if (!validateStepInputs(currentWizardStep)) return;
