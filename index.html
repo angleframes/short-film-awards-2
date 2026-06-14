@@ -33,7 +33,6 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
-            scroll-behavior: smooth;
         }
 
         body {
@@ -50,10 +49,10 @@
         /* Full Width Header & Navigation */
         .site-header-wrapper {
             width: 100%;
-            background: rgba(11, 11, 13, 0.7);
+            background: rgba(11, 11, 13, 0.4); 
             backdrop-filter: var(--ios-blur);
             -webkit-backdrop-filter: var(--ios-blur);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             position: fixed;
             top: 0;
             left: 0;
@@ -113,48 +112,74 @@
             border-radius: 2px;
         }
 
-        /* Main Workspace Canvas Container */
+        /* Workspace Canvas Panel Switcher Screens Container */
         .main-layout-content {
-            margin-top: 95px;
+            margin-top: 110px; 
             flex: 1;
             width: 100%;
             display: flex;
             flex-direction: column;
         }
 
-        /* PAGE VIEWS MANAGEMENT */
+        /* TAB VIEWS STATES */
         .page-view {
             display: none;
             width: 100%;
+            animation: tabFadeIn 0.4s ease;
         }
 
         .page-view.active {
             display: block;
-            animation: fadeIn 0.5s ease-out;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+        @keyframes tabFadeIn {
+            from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Hero Layout Canvas Base */
+        /* ======================================================= */
+        /* SPLIT ASSET HERO VIEW LAYOUT (MATCHING IMAGE LAYOUT) */
+        /* ======================================================= */
         .hero-section {
-            min-height: calc(100vh - 95px);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            min-height: calc(100vh - 110px);
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr; /* Splits space into text column and asset column */
             padding: 40px 8% 40px 8%;
-            background-position: center right;
-            background-repeat: no-repeat;
-            background-size: cover;
+            position: relative;
+            overflow: hidden;
+            align-items: center;
+            gap: 40px;
         }
 
         .hero-main-body {
-            max-width: 600px;
-            margin-top: auto;
-            margin-bottom: auto;
+            z-index: 3;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Feature Artwork Container (Right-side display) */
+        .hero-artwork-column {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .hero-artwork-frame {
+            width: 100%;
+            height: 100%;
+            max-height: 550px;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: contain; /* Keeps trophy presentation uncropped */
+            transition: transform 0.5s ease;
         }
 
         .hero-presenter-tag {
@@ -167,11 +192,11 @@
         }
 
         .hero-main-title {
-            font-size: 3rem;
+            font-size: 3.5rem;
             font-weight: 400;
-            line-height: 1.15;
+            line-height: 1.1;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             margin-bottom: 25px;
         }
 
@@ -189,6 +214,7 @@
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             padding: 12px 0;
+            max-width: max-content;
         }
 
         .association-tag {
@@ -207,8 +233,8 @@
         }
 
         .hero-tagline {
-            font-size: 0.95rem;
-            color: var(--text-muted);
+            font-size: 1rem;
+            color: #e4e4e7;
             line-height: 1.6;
             margin-bottom: 35px;
         }
@@ -275,7 +301,8 @@
         }
 
         .countdown-card-block {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 12px;
             padding: 15px 20px;
@@ -315,18 +342,20 @@
             letter-spacing: 0.5px;
         }
 
-        /* Metric Ribbon */
+        /* Metric Ribbon (Spans across bottom of dynamic hero block) */
         .hero-metric-ribbon {
+            grid-column: span 2;
             width: 100%;
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(10px);
+            background: rgba(11, 11, 13, 0.5);
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 12px;
             padding: 20px 30px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
-            margin-top: auto;
+            margin-top: 30px;
+            z-index: 3;
         }
 
         .ribbon-item {
@@ -368,7 +397,7 @@
         .categories-viewport-wrapper {
             max-width: 680px;
             width: 100%;
-            margin: 60px auto;
+            margin: 40px auto 40px auto;
             padding: 0 24px;
             text-align: center;
         }
@@ -568,7 +597,7 @@
         .gallery-outer-card {
             max-width: 680px;
             width: 92%;
-            margin: 50px auto;
+            margin: 40px auto;
             padding: 30px;
             background: linear-gradient(145deg, #121214, #0b0b0d);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -987,7 +1016,7 @@
         .contact-glass-wrapper {
             max-width: 550px;
             width: 100%;
-            margin: 60px auto;
+            margin: 40px auto;
             padding: 0 20px;
         }
 
@@ -1068,10 +1097,10 @@
         .qr-box { width: 160px; height: 160px; background: #fff; padding: 8px; margin: 15px auto; border-radius: 10px; }
         .qr-box img { width: 100%; height: 100%; object-fit: contain; }
         .story-page-content { display: flex; flex-direction: column; gap: 24px; padding: 20px; max-width: 800px; margin: 40px auto; }
-        .story-block { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 16px;}
+        .story-block { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 166px;}
         .story-block h3 { margin-bottom: 12px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.5px; }
         .story-block p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
-        .success-screen { text-align: center; padding: 60px 20px; max-width: 600px; margin: 60px auto; }
+        .success-screen { text-align: center; padding: 60px 20px; max-width: 600px; margin: 40px auto; }
         .success-icon { width: 64px; height: 64px; background: rgba(48, 209, 88, 0.1); border: 1px solid #30d158; color: #30d158; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 1.8rem; }
 
         .support-footer {
@@ -1106,11 +1135,20 @@
             letter-spacing: 0.3px;
         }
 
-        /* RESPONSIVE REFINEMENTS & MOBILE OVERRIDES */
+        /* MOBILE OVERRIDES */
         @media (max-width: 992px) {
-            .hero-section { background-image: none !important; background: #0b0b0d; padding-top: 40px; }
-            .hero-metric-ribbon { grid-template-columns: repeat(2, 1fr); }
-            .categories-grid-matrix { grid-template-columns: repeat(2, 1fr); }
+            .hero-section {
+                grid-template-columns: 1fr; /* Drop split view down to stacked layout on mid-size blocks */
+                gap: 20px;
+                padding-top: 20px;
+            }
+            .hero-artwork-column {
+                min-height: 350px;
+                order: -1; /* Place trophy back over copy text blocks on mobile viewports */
+            }
+            .hero-metric-ribbon {
+                grid-column: span 1;
+            }
         }
 
         @media (max-width: 768px) {
@@ -1135,9 +1173,6 @@
                 font-size: 0.6rem;
                 padding: 6px 8px;
                 letter-spacing: 0.5px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
             }
             .navbar a.active::after {
                 bottom: -2px;
@@ -1146,7 +1181,7 @@
             }
 
             .main-layout-content {
-                margin-top: 85px;
+                margin-top: 90px;
                 padding-bottom: 70px; 
             }
 
@@ -1176,27 +1211,29 @@
 </head>
 <body>
 
-    <!-- PERSISTENT APP HEADER & NAVIGATION LAYER -->
+    <!-- PERSISTENT NAVIGATION LAYER -->
     <div class="site-header-wrapper">
         <div class="brand-logo-area">
             <img id="mainLogo" src="" alt="Angle Frames Logo">
         </div>
         <nav class="navbar">
-            <a id="navHome" class="active" onclick="handleNav('home')">Home</a>
-            <a id="navStory" onclick="handleNav('story')">About</a>
-            <a id="navCategories" onclick="handleNav('categories')">Categories</a>
-            <a id="navGallery" onclick="handleNav('gallery')">Gallery</a>
-            <a id="navRegistration" onclick="handleNav('registration')">Registration</a>
-            <a id="navContact" onclick="handleNav('contact')">Contact Us</a>
+            <a id="navHome" class="active" onclick="switchViewTab('pageHome', this)">Home</a>
+            <a id="navStory" onclick="switchViewTab('pageStory', this)">About</a>
+            <a id="navCategories" onclick="switchViewTab('pageCategories', this)">Categories</a>
+            <a id="navGallery" onclick="switchViewTab('pageGallery', this)">Gallery</a>
+            <a id="navRegistration" onclick="switchViewTab('pageRegistration', this)">Registration</a>
+            <a id="navContact" onclick="switchViewTab('pageContact', this)">Contact Us</a>
         </nav>
     </div>
 
-    <!-- MAIN DYNAMIC CONTENT SPACE CONTAINER -->
+    <!-- MAIN DYNAMIC CONTENT SWITCHER LAYOUT SPACE -->
     <div class="main-layout-content">
 
-        <!-- DYNAMIC LAYER 1: CINEMATIC HERO LANDING WINDOW -->
+        <!-- TAB SCREEN 1: LANDING WINDOW (UPDATED SPLIT GRID LAYOUT) -->
         <div id="pageHome" class="page-view active">
-            <div id="heroBgTarget" class="hero-section">
+            <div class="hero-section">
+                
+                <!-- Left Column Content Section -->
                 <div class="hero-main-body">
                     <p class="hero-presenter-tag">Angle Frames Presents</p>
                     <h1 class="hero-main-title">Sharankrishna <strong>Short Film Awards</strong></h1>
@@ -1209,7 +1246,7 @@
                         </div>
                     </div>
 
-                    <!-- Dual Countdown Display Component Layer Box -->
+                    <!-- Dual Countdown Display Component -->
                     <div class="countdown-dashboard-container">
                         <div class="countdown-card-block">
                             <div class="countdown-title-tag">Submission Deadline Countdown</div>
@@ -1237,11 +1274,17 @@
                     </p>
 
                     <div class="hero-action-row">
-                        <button id="heroSubmitBtn" class="btn-action-primary" onclick="handleNav('registration')">Submit Your Film &rarr;</button>
-                        <button class="btn-action-secondary" onclick="handleNav('categories')">View Categories &rarr;</button>
+                        <button type="button" id="heroSubmitBtn" class="btn-action-primary" onclick="switchViewTab('pageRegistration', document.getElementById('navRegistration'))">Submit Your Film &rarr;</button>
+                        <button type="button" class="btn-action-secondary" onclick="switchViewTab('pageCategories', document.getElementById('navCategories'))">View Categories &rarr;</button>
                     </div>
                 </div>
 
+                <!-- Right Column Placeholder (Matches the trophy framing from ChatGPT Image Jun 14, 2026, 11_46_16 AM.png) -->
+                <div class="hero-artwork-column">
+                    <div id="heroBgTarget" class="hero-artwork-frame"></div>
+                </div>
+
+                <!-- Bottom Metric Dashboard Grid Frame Ribbon Section -->
                 <div class="hero-metric-ribbon">
                     <div class="ribbon-item">
                         <span class="ribbon-icon">📅</span>
@@ -1275,7 +1318,7 @@
             </div>
         </div>
 
-        <!-- DYNAMIC LAYER 2: ABOUT / STORY INDEX -->
+        <!-- TAB SCREEN 2: ABOUT / STORY INDEX -->
         <div id="pageStory" class="page-view">
             <div class="story-page-content">
                 <div class="story-block">
@@ -1305,7 +1348,7 @@
             </div>
         </div>
 
-        <!-- DYNAMIC LAYER 3: AWARDS CATEGORIES GRID VIEW -->
+        <!-- TAB SCREEN 3: AWARDS CATEGORIES GRID VIEW -->
         <div id="pageCategories" class="page-view">
             <div class="categories-viewport-wrapper">
                 <div class="categories-header-block">
@@ -1316,7 +1359,6 @@
                 </div>
 
                 <div class="categories-grid-matrix">
-                    <!-- Row 1 -->
                     <div class="category-asset-card">
                         <div class="icon-placeholder">🎬</div>
                         <p>Best<br>Short Film</p>
@@ -1333,8 +1375,6 @@
                         <div class="icon-placeholder">🧍‍♀️</div>
                         <p>Best<br>Actress</p>
                     </div>
-
-                    <!-- Row 2 -->
                     <div class="category-asset-card">
                         <div class="icon-placeholder">📷</div>
                         <p>Best<br>Cinematography</p>
@@ -1391,7 +1431,7 @@
             </div>
         </div>
 
-        <!-- DYNAMIC LAYER 4: GALLERY -->
+        <!-- TAB SCREEN 4: GALLERY OVERVIEW Grid MATRIX -->
         <div id="pageGallery" class="page-view">
             <div class="gallery-outer-card">
                 
@@ -1405,7 +1445,7 @@
                 </div>
 
                 <div class="gallery-photo-grid" id="galleryPhotoGrid">
-                    <!-- Loaded dynamically from configuration matrix arrays -->
+                    <!-- Loaded dynamically from config dynamic matrices -->
                 </div>
 
                 <button class="btn-gallery-more">
@@ -1416,12 +1456,11 @@
             </div>
         </div>
 
-        <!-- DYNAMIC LAYER 5: STEP WIZARD PORTAL INTERFACE DESIGN -->
+        <!-- TAB SCREEN 5: STEP WIZARD PORTAL INTERFACE DESIGN -->
         <div id="pageRegistration" class="page-view">
             <div class="portal-form-wrapper">
                 <div class="portal-glass-card" id="registrationCardContent">
                     
-                    <!-- DYNAMIC REGISTRATION CONTENT (Form or Closed State Template) -->
                     <div id="activeFormContainer">
                         <h2 class="portal-main-heading">Registration</h2>
 
@@ -1453,7 +1492,7 @@
 
                         <form id="submissionForm" onsubmit="handleFinalSubmit(event)">
                             
-                            <!-- STEP PANEL 1: APPLICANT DETAILS -->
+                            <!-- STEP PANEL 1: APPLICANT CONFIGS -->
                             <div class="wizard-step-panel active" id="wizardStep1">
                                 <h3 class="wizard-step-subheading">Applicant Details</h3>
                                 <div class="form-group">
@@ -1479,7 +1518,7 @@
                                 </div>
                             </div>
 
-                            <!-- STEP PANEL 2: FILM ENTRIES DETAILS -->
+                            <!-- STEP PANEL 2: FILM ENTRIES METRICS -->
                             <div class="wizard-step-panel" id="wizardStep2">
                                 <h3 class="wizard-step-subheading">Film Details</h3>
                                 <div class="form-grid">
@@ -1510,7 +1549,7 @@
                                 </div>
                             </div>
 
-                            <!-- STEP PANEL 3: CREW & PRODUCTION CREDITS -->
+                            <!-- STEP PANEL 3: CREW DECK DIRECTORY -->
                             <div class="wizard-step-panel" id="wizardStep3">
                                 <h3 class="wizard-step-subheading">Cast & Crew Details</h3>
                                 <div class="form-grid">
@@ -1593,13 +1632,13 @@
                                 </div>
                             </div>
 
-                            <!-- STEP PANEL 5: SUMMARY & DISPATCH REVIEW LOG -->
+                            <!-- STEP PANEL 5: SUMMARY SUMMARY TRANSMIT LOG -->
                             <div class="wizard-step-panel" id="wizardStep5">
                                 <h3 class="wizard-step-subheading">Review & Submit</h3>
                                 <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Please inspect field data points metrics prior to transmitting onto the main application server core ledger.</p>
                                 
                                 <div class="review-data-matrix" id="reviewSummaryMatrix">
-                                    <!-- Dynamically generated via JavaScript review build -->
+                                    <!-- Populated build elements metrics strings securely via JavaScript -->
                                 </div>
 
                                 <div class="wizard-nav-row">
@@ -1614,7 +1653,7 @@
             </div>
         </div>
 
-        <!-- DYNAMIC LAYER 6: CONTACT -->
+        <!-- TAB SCREEN 6: CONTACT INFORMATION ARCHIVE -->
         <div id="pageContact" class="page-view">
             <div class="contact-glass-wrapper">
                 <div class="contact-card-body">
@@ -1670,11 +1709,11 @@
         <!-- PERSISTENT FOOTER MAP MATRIX -->
         <div class="support-footer">
             <div class="support-footer-links">
-                <a onclick="handleNav('home')">Home</a> · 
-                <a onclick="handleNav('story')">About</a> · 
-                <a onclick="handleNav('categories')">Categories</a> · 
-                <a onclick="handleNav('gallery')">Gallery</a> · 
-                <a onclick="handleNav('contact')">Contact</a>
+                <a onclick="switchViewTab('pageHome', document.getElementById('navHome'))">Home</a> · 
+                <a onclick="switchViewTab('pageStory', document.getElementById('navStory'))">About</a> · 
+                <a onclick="switchViewTab('pageCategories', document.getElementById('navCategories'))">Categories</a> · 
+                <a onclick="switchViewTab('pageGallery', document.getElementById('navGallery'))">Gallery</a> · 
+                <a onclick="switchViewTab('pageContact', document.getElementById('navContact'))">Contact</a>
             </div>
             
             <div class="footer-address-block">
@@ -1698,8 +1737,6 @@
             // Use standard format: "Month DD, YYYY HH:MM:SS"
             submissionDeadline: "December 31, 2026 23:59:59",
             awardsEventDate: "February 12, 2027 18:00:00",
-
-            // Text labels that show in the info ribbons
             deadlineLabelText: "31 Dec 2026",
             eventLabelText: "12 Feb 2027"
         };
@@ -1707,7 +1744,7 @@
         const SITE_IMAGES = {
             mainLogo: "Sharankrishna short film logo New-05.png",
             paymentQrCode: "angle.jpg",
-            heroBackground: "MRC01340.JPG.jpeg",
+            heroBackground: "hero.png", /* Your centerpiece trophy artwork file loads directly here */
             socialInstagram: "—Pngtree—instagram icon vector_8704817.png",
             socialYoutube: "—Pngtree—youtube social media 3d stereo_8704808",
             socialFacebook: "—Pngtree—facebook icon facebook logo_3584837"
@@ -1745,21 +1782,37 @@
             document.getElementById('labelDeadlineDate').textContent = PORTAL_TIMELINES.deadlineLabelText;
             document.getElementById('labelEventDate').textContent = PORTAL_TIMELINES.eventLabelText;
 
-            // Apply dynamic hero background template layout style setup
-            document.getElementById('heroBgTarget').style.backgroundImage = `
-                radial-gradient(circle at 85% 40%, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0) 50%),
-                linear-gradient(to right, #0b0b0d 45%, rgba(11,11,13,0.8) 70%, rgba(11,11,13,0.4) 100%),
-                url('${SITE_IMAGES.heroBackground}')
-            `;
+            // Centers image file inside right-hand view frame column
+            document.getElementById('heroBgTarget').style.backgroundImage = `url('${SITE_IMAGES.heroBackground}')`;
 
-            // Setup System Gate Controls State Check
             evaluateRegistrationGateState();
-
-            // Run Live Countdown Mechanics
             initiateTimersEngine();
-
             renderGallery('winners2025');
         });
+
+        function switchViewTab(targetTabId, sourceAnchorElement) {
+            // Hide all views cleanly
+            document.querySelectorAll('.page-view').forEach(view => {
+                view.classList.remove('active');
+            });
+            
+            // Remove active style from nav paths links
+            document.querySelectorAll('.navbar a').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Activate specific panel target layout elements
+            const targetedPanel = document.getElementById(targetTabId);
+            if (targetedPanel) {
+                targetedPanel.classList.add('active');
+            }
+            if (sourceAnchorElement) {
+                sourceAnchorElement.classList.add('active');
+            }
+
+            // Scroll browser window back to exact apex point dynamically
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        }
 
         function evaluateRegistrationGateState() {
             const browserTitleEl = document.getElementById('browserTabTitle');
@@ -1768,24 +1821,18 @@
             const formContainer = document.getElementById('registrationCardContent');
 
             if (!REGISTRATION_GATE.isOpen) {
-                // Change the browser tab text directly
                 if (browserTitleEl) {
                     browserTitleEl.textContent = "Entries Closed | Sharankrishna Short Film Awards";
                 }
-                
-                // Keep the Nav menu clean as requested ("Registration")
-                if(navRegLink) navRegLink.textContent = "Registration";
-                
-                // Modify Home Screen main landing call to action buttons status look 
+                if(navRegLink) navRegLink.textContent = "Entries Closed";
                 if(heroSubmitBtn) {
                     heroSubmitBtn.textContent = "Registrations Closed";
                     heroSubmitBtn.style.background = "rgba(255,255,255,0.05)";
                     heroSubmitBtn.style.color = "var(--text-muted)";
                     heroSubmitBtn.style.border = "1px solid rgba(255,255,255,0.08)";
                     heroSubmitBtn.style.boxShadow = "none";
+                    heroSubmitBtn.disabled = true;
                 }
-
-                // Replace wizard form structural box inside page layout element with premium elegant closed interface card banner
                 if(formContainer) {
                     formContainer.innerHTML = `
                         <div class="closed-state-card">
@@ -1808,11 +1855,9 @@
         function initiateTimersEngine() {
             function updateClocks() {
                 const now = new Date().getTime();
-                
                 const distanceDeadline = new Date(PORTAL_TIMELINES.submissionDeadline).getTime() - now;
                 const distanceEvent = new Date(PORTAL_TIMELINES.awardsEventDate).getTime() - now;
 
-                // 1. Calculate and update Deadline Countdown Elements
                 if (distanceDeadline > 0) {
                     document.getElementById("d-days").textContent = String(Math.floor(distanceDeadline / (1000 * 60 * 60 * 24))).padStart(2, '0');
                     document.getElementById("d-hours").textContent = String(Math.floor((distanceDeadline % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
@@ -1822,7 +1867,6 @@
                     document.getElementById("deadlineCountdown").innerHTML = `<span style="font-size:0.85rem; color:#ff453a; font-weight:600; letter-spacing:0.5px;">SUBMISSIONS CLOSED</span>`;
                 }
 
-                // 2. Calculate and update Grand Event Countdown Elements
                 if (distanceEvent > 0) {
                     document.getElementById("e-days").textContent = String(Math.floor(distanceEvent / (1000 * 60 * 60 * 24))).padStart(2, '0');
                     document.getElementById("e-hours").textContent = String(Math.floor((distanceEvent % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
@@ -1832,28 +1876,8 @@
                     document.getElementById("eventCountdown").innerHTML = `<span style="font-size:0.85rem; color:#30d158; font-weight:600; letter-spacing:0.5px;">EVENT LIVE / COMPLETED</span>`;
                 }
             }
-
             updateClocks();
             setInterval(updateClocks, 1000);
-        }
-
-        function handleNav(targetSection) {
-            document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
-            const targetElement = document.getElementById('page' + targetSection.charAt(0).toUpperCase() + targetSection.slice(1));
-            if(targetElement) targetElement.classList.add('active');
-            
-            setActiveNavbarLink(targetSection);
-            window.scrollTo(0, 0);
-
-            if(targetSection === 'registration' && REGISTRATION_GATE.isOpen) {
-                goToWizardStep(1);
-            }
-        }
-
-        function setActiveNavbarLink(id) {
-            document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
-            const targetLink = document.getElementById('nav' + id.charAt(0).toUpperCase() + id.slice(1));
-            if (targetLink) targetLink.classList.add('active');
         }
 
         function filterGallery(category, contextPill) {
@@ -2041,11 +2065,11 @@
                 .then(res => res.json())
                 .then(response => {
                     if (response.status === "success") {
-                        document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
-                        document.getElementById('successScreen').classList.add('active');
-                        document.getElementById("submissionForm").reset();
-                        document.getElementById('uploadPlaceholder').style.display = 'block';
-                        document.getElementById('fileNameDisplay').style.display = 'none';
+                        // Switch over to success pane directly
+                        const formContainer = document.getElementById('activeFormContainer');
+                        const successScr = document.getElementById('successScreen');
+                        if (formContainer) formContainer.style.display = 'none';
+                        if (successScr) successScr.classList.add('active');
                     } else {
                         alert("Submission terminal rejection: " + response.message);
                     }
@@ -2062,7 +2086,7 @@
         }
 
         function resetPortalView() {
-            handleNav('home');
+            location.reload(); 
         }
     </script>
 </body>
