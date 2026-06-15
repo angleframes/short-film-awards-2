@@ -13,19 +13,18 @@
     <style>
         :root {
             /* Premium Cinematic Dark Theme Palette */
-            --site-bg: #0b0b0d;
-            --glass-bg: rgba(255, 255, 255, 0.02); 
-            --glass-border: rgba(255, 255, 255, 0.06);
-            --inner-glow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            --site-bg: #060608;
+            --glass-bg: rgba(18, 18, 22, 0.65); 
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --inner-glow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
             
             /* Form Control Fluid Glass Variables */
-            --input-glass: rgba(255, 255, 255, 0.02);
-            --input-glass-alt: rgba(255, 255, 255, 0.04);
-            --input-glass-focus: rgba(255, 255, 255, 0.1);
+            --input-glass: rgba(0, 0, 0, 0.5);
+            --input-glass-focus: rgba(255, 255, 255, 0.08);
             
             --text-main: #ffffff;
-            --text-muted: #a1a1aa;
-            --ios-blur: blur(30px) saturate(160%);
+            --text-muted: #e4e4e7;
+            --ios-blur: blur(20px) saturate(140%);
         }
 
         html {
@@ -48,15 +47,44 @@
             -webkit-font-smoothing: antialiased;
             display: flex;
             flex-direction: column;
+            position: relative;
+        }
+
+        /* --- Global Fixed Background Framework --- */
+        /* Fixed, unblurred beautiful background using hero.png across all tabs */
+        .global-background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('hero.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -2;
+        }
+
+        /* Dark overlay gradient to ensure text readability without blurring the artwork */
+        .vignette-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(6, 6, 8, 0.5) 0%, rgba(6, 6, 8, 0.75) 100%),
+                        radial-gradient(circle at center, transparent 10%, rgba(0, 0, 0, 0.8) 100%);
+            z-index: -1;
+            pointer-events: none;
         }
 
         /* Full Width Header & Navigation */
         .site-header-wrapper {
             width: 100%;
-            background: rgba(11, 11, 13, 0.4); 
+            background: rgba(6, 6, 8, 0.7); 
             backdrop-filter: var(--ios-blur);
             -webkit-backdrop-filter: var(--ios-blur);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: fixed;
             top: 0;
             left: 0;
@@ -73,7 +101,7 @@
         }
 
         .brand-logo-area img {
-            height: 65px;
+            height: 55px;
             width: auto;
         }
 
@@ -84,10 +112,10 @@
         }
 
         .navbar a {
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             font-size: 0.75rem;
-            font-weight: 500;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1.5px;
             transition: all 0.3s ease;
@@ -99,10 +127,12 @@
 
         .navbar a:hover {
             color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .navbar a.active {
             color: var(--text-main);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .navbar a.active::after {
@@ -137,23 +167,18 @@
 
         /* Hero View Layout */
         .hero-section {
-            min-height: calc(100vh - 110px);
+            min-height: calc(100vh - 150px);
             width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between; 
-            padding: 60px 8% 40px 8%;
+            padding: 20px 8% 40px 8%;
             position: relative;
-            overflow: hidden;
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
-            background-attachment: fixed; 
         }
 
         .hero-main-body {
             z-index: 3;
-            max-width: 700px; 
+            max-width: 650px; 
             width: 100%;
             margin-bottom: 40px;
         }
@@ -163,17 +188,18 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 3px;
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.8);
             margin-bottom: 12px;
         }
 
         .hero-main-title {
-            font-size: 3.5rem;
+            font-size: 3.2rem;
             font-weight: 400;
             line-height: 1.1;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 25px;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
         .hero-main-title strong {
@@ -187,8 +213,8 @@
             align-items: center;
             gap: 15px;
             margin-bottom: 25px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
             padding: 12px 0;
             max-width: max-content;
         }
@@ -196,7 +222,7 @@
         .association-tag {
             font-size: 0.65rem;
             text-transform: uppercase;
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.7);
             letter-spacing: 1.5px;
             white-space: nowrap;
         }
@@ -209,10 +235,11 @@
         }
 
         .hero-tagline {
-            font-size: 1rem;
-            color: #e4e4e7;
+            font-size: 1.05rem;
+            color: #ffffff;
             line-height: 1.6;
             margin-bottom: 35px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.6);
         }
 
         /* Action Buttons Row */
@@ -236,7 +263,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.15);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -246,9 +273,10 @@
         }
 
         .btn-action-secondary {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(0, 0, 0, 0.4);
             color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
             padding: 16px 32px;
             font-size: 0.85rem;
             font-weight: 600;
@@ -263,8 +291,8 @@
         }
 
         .btn-action-secondary:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.5);
         }
 
         /* Dual Countdown Display Dashboard Component */
@@ -277,17 +305,17 @@
         }
 
         .countdown-card-block {
-            background: rgba(0, 0, 0, 0.6); 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(6, 6, 8, 0.75); 
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
             padding: 15px 20px;
         }
 
         .countdown-title-tag {
             font-size: 0.65rem;
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.7);
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 8px;
@@ -314,7 +342,7 @@
 
         .time-label {
             font-size: 0.55rem;
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.6);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -322,10 +350,10 @@
         /* Metric Ribbon */
         .hero-metric-ribbon {
             width: 100%;
-            background: rgba(11, 11, 13, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(6, 6, 8, 0.8);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
             padding: 20px 30px;
             display: grid;
@@ -339,7 +367,7 @@
             display: flex;
             align-items: center;
             gap: 14px;
-            border-right: 1px solid rgba(255, 255, 255, 0.06);
+            border-right: 1px solid rgba(255, 255, 255, 0.12);
         }
 
         .ribbon-item:last-child {
@@ -348,7 +376,6 @@
 
         .ribbon-icon {
             font-size: 1.4rem;
-            opacity: 0.8;
         }
 
         .ribbon-text {
@@ -359,7 +386,7 @@
         .ribbon-label {
             font-size: 0.65rem;
             text-transform: uppercase;
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.7);
             letter-spacing: 1px;
             margin-bottom: 2px;
         }
@@ -372,9 +399,9 @@
 
         /* AWARDS CATEGORIES SECTION */
         .categories-viewport-wrapper {
-            max-width: 680px;
+            max-width: 1000px;
             width: 100%;
-            margin: 40px auto 40px auto;
+            margin: 20px auto 40px auto;
             padding: 0 24px;
             text-align: center;
         }
@@ -384,12 +411,13 @@
         }
 
         .categories-header-block h2 {
-            font-size: 1.35rem;
-            font-weight: 500;
+            font-size: 1.8rem;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 2px;
             color: #ffffff;
             margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
         .categories-star-divider {
@@ -397,7 +425,7 @@
             align-items: center;
             justify-content: center;
             gap: 15px;
-            color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.5);
         }
 
         .categories-star-divider::before,
@@ -405,24 +433,26 @@
             content: '';
             width: 40px;
             height: 1px;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .categories-star-divider span {
             font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.9);
         }
 
         .categories-grid-matrix {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(5, 1fr);
             gap: 16px;
             margin-bottom: 40px;
         }
 
         .category-asset-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(6, 6, 8, 0.75);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
             padding: 24px 12px;
             display: flex;
@@ -434,25 +464,36 @@
         }
 
         .category-asset-card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(6, 6, 8, 0.9);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
         }
 
         .category-asset-card .icon-placeholder {
-            font-size: 1.8rem;
+            width: 45px;
+            height: 45px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ffffff;
-            opacity: 0.9;
+        }
+
+        .category-asset-card .category-icon-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .category-asset-card .category-emoji {
+            font-size: 1.8rem;
         }
 
         .category-asset-card p {
             font-size: 0.78rem;
-            font-weight: 500;
-            color: var(--text-muted);
+            font-weight: 600;
+            color: #ffffff;
             line-height: 1.3;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         .rules-guidelines-trigger-row {
@@ -462,9 +503,10 @@
         }
 
         .btn-rules-guidelines {
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(6, 6, 8, 0.8);
+            backdrop-filter: blur(10px);
             color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             padding: 14px 28px;
             font-size: 0.75rem;
             font-weight: 600;
@@ -479,8 +521,8 @@
         }
 
         .btn-rules-guidelines:hover {
-            background: rgba(255, 255, 255, 0.07);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.5);
         }
 
         /* RULES AND REGULATION OVERLAY MODAL */
@@ -508,7 +550,7 @@
 
         .rules-modal-container {
             background: #121215;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             max-width: 550px;
             width: 90%;
             max-height: 80vh;
@@ -531,7 +573,7 @@
             right: 20px;
             background: transparent;
             border: none;
-            color: var(--text-muted);
+            color: rgba(255,255,255,0.6);
             font-size: 1.5rem;
             cursor: pointer;
             line-height: 1;
@@ -546,7 +588,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            border-bottom: 1px solid rgba(255,255,255,0.15);
             padding-bottom: 10px;
         }
 
@@ -566,20 +608,22 @@
 
         .rule-item-box p {
             font-size: 0.85rem;
-            color: var(--text-muted);
+            color: #e4e4e7;
             line-height: 1.5;
         }
 
         /* GALLERY STYLE */
         .gallery-outer-card {
-            max-width: 680px;
+            max-width: 750px;
             width: 92%;
-            margin: 40px auto;
+            margin: 20px auto 40px auto;
             padding: 30px;
-            background: linear-gradient(145deg, #121214, #0b0b0d);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--glass-bg);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            border: 1px solid var(--glass-border);
             border-radius: 20px;
-            box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.03), 0px 25px 55px rgba(0,0,0,0.6);
+            box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.05), 0px 25px 55px rgba(0,0,0,0.6);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -587,8 +631,8 @@
 
         .gallery-main-title {
             color: #ffffff;
-            font-size: 1.1rem;
-            font-weight: 500;
+            font-size: 1.4rem;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 3px;
             margin-bottom: 24px;
@@ -608,9 +652,9 @@
         .gallery-filter-row { -ms-overflow-style: none; scrollbar-width: none; }
 
         .btn-gallery-pill {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #a1a1aa;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #e4e4e7;
             padding: 8px 20px;
             border-radius: 30px;
             font-size: 0.65rem;
@@ -622,9 +666,9 @@
             white-space: nowrap;
         }
         .btn-gallery-pill:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.1);
             color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.4);
         }
         .btn-gallery-pill.active {
             background: #ffffff !important;
@@ -643,8 +687,8 @@
         }
 
         .gallery-photo-frame {
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(6, 6, 8, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 12px;
             overflow: hidden;
             position: relative;
@@ -657,7 +701,7 @@
             width: 100%;
             aspect-ratio: 4 / 3;
             overflow: hidden;
-            background: rgba(255,255,255,0.02);
+            background: rgba(0,0,0,0.3);
             position: relative;
         }
 
@@ -666,16 +710,16 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            transition: opacity 0.3s ease;
+            transition: transform 0.3s ease;
         }
         .gallery-photo-frame:hover img {
-            opacity: 0.9;
+            transform: scale(1.03);
         }
 
         .gallery-photo-details {
             padding: 14px;
-            background: rgba(255, 255, 255, 0.02);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(6, 6, 8, 0.8);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .gallery-photo-title {
@@ -687,7 +731,7 @@
 
         .gallery-photo-sub {
             font-size: 0.72rem;
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.7);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
@@ -699,24 +743,24 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.2);
             font-size: 2.2rem;
-            border: 2px dashed rgba(255,255,255,0.05);
+            border: 2px dashed rgba(255,255,255,0.1);
             border-radius: 8px;
+            margin: 0;
         }
         .placeholder-empty-graphic span {
             font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-top: 8px;
-            color: var(--text-muted);
-            opacity: 0.6;
+            color: rgba(255,255,255,0.6);
         }
 
         .btn-gallery-more {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #d1d1d6;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
             width: 100%;
             max-width: 280px;
             padding: 14px;
@@ -733,9 +777,8 @@
             transition: all 0.3s ease;
         }
         .btn-gallery-more:hover {
-            background: rgba(255, 255, 255, 0.06);
-            color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
         }
 
         /* CLOSED REGISTRATION BLOCK STATE STYLE */
@@ -746,31 +789,30 @@
         .closed-state-icon {
             font-size: 3.5rem;
             margin-bottom: 15px;
-            opacity: 0.8;
         }
 
         /* REGISTRATION FORM SECTION */
         .portal-form-wrapper {
-            max-width: 600px;
+            max-width: 650px;
             width: 100%;
-            margin: 40px auto 80px auto;
+            margin: 20px auto 80px auto;
             padding: 0 20px;
         }
 
         .portal-glass-card {
-            background: rgba(255, 255, 255, 0.02);
+            background: var(--glass-bg);
             backdrop-filter: var(--ios-blur);
             -webkit-backdrop-filter: var(--ios-blur);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--glass-border);
             border-radius: 20px;
             padding: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
         }
 
         .portal-main-heading {
             text-align: center;
-            font-size: 1.5rem;
-            font-weight: 500;
+            font-size: 1.6rem;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-bottom: 35px;
@@ -793,7 +835,7 @@
             left: 30px;
             right: 30px;
             height: 1px;
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.2);
             z-index: 1;
         }
 
@@ -821,8 +863,8 @@
             height: 32px;
             border-radius: 50%;
             background: #0b0b0d;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: var(--text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: rgba(255,255,255,0.6);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -840,14 +882,14 @@
         }
 
         .pipeline-node.completed .node-circle {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.2);
             border-color: #ffffff;
             color: #ffffff;
         }
 
         .node-label {
             font-size: 0.65rem;
-            color: var(--text-muted);
+            color: rgba(255,255,255,0.7);
             text-align: center;
             line-height: 1.2;
             text-transform: uppercase;
@@ -857,7 +899,7 @@
 
         .pipeline-node.active .node-label {
             color: #ffffff;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         /* MULTI-STEP PANELS */
@@ -876,12 +918,14 @@
         }
 
         .wizard-step-subheading {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: #ffffff;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 25px;
             font-weight: 600;
+            border-left: 3px solid #ffffff;
+            padding-left: 10px;
         }
 
         /* INPUT CONFIGURATIONS */
@@ -892,7 +936,7 @@
             display: block; 
             margin-bottom: 8px; 
             font-size: 0.82rem; 
-            color: var(--text-muted); 
+            color: #ffffff; 
             font-weight: 500;
         }
 
@@ -904,8 +948,8 @@
         select {
             width: 100%;
             padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(6, 6, 8, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             color: var(--text-main);
             font-size: 0.95rem;
@@ -915,8 +959,8 @@
 
         select option { background-color: #121214; color: var(--text-main); }
         input:focus, select:focus { 
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: #000000;
+            border-color: rgba(255, 255, 255, 0.6);
         }
 
         /* CONTROLS BUTTONS */
@@ -944,35 +988,34 @@
         }
 
         .btn-wizard-action.continue {
-            background: rgba(255, 255, 255, 0.05);
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #ffffff;
+            color: #000000;
         }
 
         .btn-wizard-action.continue:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.9);
         }
 
         .btn-wizard-action.back {
-            background: transparent;
-            color: var(--text-muted);
-            border: 1px solid transparent;
+            background: rgba(0, 0, 0, 0.4);
+            color: #ffffff;
+            border: 1px solid rgba(255,255,255,0.3);
             max-width: 120px;
         }
 
         .btn-wizard-action.back:hover {
-            color: #ffffff;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255,255,255,0.5);
         }
 
         .review-data-matrix {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            background: rgba(255,255,255,0.01);
+            background: rgba(0,0,0,0.4);
             padding: 20px;
             border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
             max-height: 300px;
             overflow-y: auto;
             margin-bottom: 20px;
@@ -983,35 +1026,44 @@
             justify-content: space-between;
             font-size: 0.88rem;
             padding-bottom: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
         }
 
-        .review-row span:first-child { color: var(--text-muted); }
+        .review-row span:first-child { color: rgba(255,255,255,0.7); }
         .review-row span:last-child { color: #ffffff; font-weight: 500; }
 
         /* CONTACT LAYOUT */
         .contact-glass-wrapper {
             max-width: 550px;
             width: 100%;
-            margin: 40px auto;
+            margin: 20px auto 40px auto;
             padding: 0 20px;
         }
 
         .contact-card-body {
             background: var(--glass-bg);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
             border: 1px solid var(--glass-border);
             padding: 40px;
             border-radius: 20px;
             text-align: center;
-            box-shadow: 0 20px 45px rgba(0,0,0,0.4);
+            box-shadow: 0 20px 45px rgba(0,0,0,0.6);
         }
 
         .contact-channel-row {
             margin: 20px 0;
             padding: 15px;
-            background: rgba(255, 255, 255, 0.01);
+            background: rgba(6, 6, 8, 0.6);
             border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .contact-channel-row label {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .contact-channel-row p {
@@ -1060,33 +1112,36 @@
         /* HELPERS */
         .file-upload-wrapper {
             position: relative;
-            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border: 1px dashed rgba(255, 255, 255, 0.3);
             border-radius: 8px;
             padding: 24px;
             text-align: center;
-            background: rgba(255, 255, 255, 0.01);
+            background: rgba(0, 0, 0, 0.4);
             cursor: pointer;
         }
         .file-upload-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-        .file-upload-text { color: var(--text-muted); font-size: 0.85rem; }
+        .file-upload-text { color: rgba(255,255,255,0.8); font-size: 0.85rem; }
         .file-uploaded-name { display: none; margin-top: 8px; font-size: 0.85rem; color: #30d158; font-weight: 600; }
-        .payment-view { background: rgba(255, 255, 255, 0.01); padding: 20px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.05); text-align: center; }
+        .payment-view { background: rgba(0, 0, 0, 0.4); padding: 20px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.12); text-align: center; }
         .qr-box { width: 160px; height: 160px; background: #fff; padding: 8px; margin: 15px auto; border-radius: 10px; }
         .qr-box img { width: 100%; height: 100%; object-fit: contain; }
-        .story-page-content { display: flex; flex-direction: column; gap: 24px; padding: 20px; max-width: 800px; margin: 40px auto; }
-        .story-block { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 12px;}
-        .story-block h3 { margin-bottom: 12px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        .story-block p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+        
+        .story-page-content { display: flex; flex-direction: column; gap: 24px; padding: 0 20px; max-width: 800px; margin: 20px auto 40px auto; }
+        .story-block { background: var(--glass-bg); backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur); border: 1px solid var(--glass-border); padding: 30px; border-radius: 12px;}
+        .story-block h3 { margin-bottom: 12px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 6px; }
+        .story-block p { color: #ffffff; font-size: 0.95rem; line-height: 1.6; }
+        
         .success-screen { text-align: center; padding: 60px 20px; max-width: 600px; margin: 40px auto; }
         .success-icon { width: 64px; height: 64px; background: rgba(48, 209, 88, 0.1); border: 1px solid #30d158; color: #30d158; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 1.8rem; }
 
         .support-footer {
             padding: 40px 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(11, 11, 13, 0.5);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(6, 6, 8, 0.85);
+            backdrop-filter: blur(10px);
             text-align: center;
             font-size: 0.8rem;
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.7);
             line-height: 1.6;
             margin-top: auto;
         }
@@ -1097,7 +1152,7 @@
             margin-bottom: 15px;
         }
         .support-footer-links a {
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             transition: color 0.2s ease;
             cursor: pointer;
@@ -1108,50 +1163,61 @@
         .footer-address-block {
             margin: 12px 0;
             font-size: 0.78rem;
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.6);
             letter-spacing: 0.3px;
         }
 
-        /* RESPONSIVE LAYOUT BREAKPOINTS */
+        /* --- RESPONSIVE MOBILE & PC VIEWPORT CONFIGURATIONS --- */
         @media (max-width: 992px) {
             .hero-section {
-                padding: 40px 6% 30px 6%;
+                padding: 20px 6% 30px 6%;
                 min-height: auto;
             }
+            .categories-grid-matrix { grid-template-columns: repeat(3, 1fr); }
         }
 
         @media (max-width: 768px) {
-            .site-header-wrapper { padding: 15px 20px; }
+            .site-header-wrapper { 
+                padding: 12px 20px; 
+                justify-content: center;
+            }
             
+            /* Bottom Native-App Bar Configuration on Screen Devices */
             .navbar { 
                 display: flex; 
                 position: fixed;
                 bottom: 0;
                 left: 0;
                 width: 100%;
-                background: rgba(18, 18, 21, 0.95);
-                backdrop-filter: blur(20px);
-                -webkit-backdrop-filter: blur(20px);
-                border-top: 1px solid rgba(255, 255, 255, 0.08);
-                padding: 10px 5px;
+                background: rgba(10, 10, 12, 0.95);
+                backdrop-filter: blur(25px);
+                -webkit-backdrop-filter: blur(25px);
+                border-top: 1px solid rgba(255, 255, 255, 0.15);
+                padding: 8px 4px;
                 justify-content: space-around;
                 gap: 0;
-                z-index: 101;
+                z-index: 1000;
+                overflow-x: auto;
+                scrollbar-width: none;
             }
+            .navbar::-webkit-scrollbar { display: none; }
+            
             .navbar a {
-                font-size: 0.6rem;
-                padding: 6px 8px;
+                font-size: 0.62rem;
+                padding: 8px 10px;
                 letter-spacing: 0.5px;
+                flex-shrink: 0;
+                color: rgba(255,255,255,0.6);
             }
             .navbar a.active::after {
                 bottom: -2px;
-                left: 8px;
-                right: 8px;
+                left: 10px;
+                right: 10px;
             }
 
             .main-layout-content {
                 margin-top: 90px;
-                padding-bottom: 70px; 
+                padding-bottom: 75px; 
             }
 
             .form-grid { grid-template-columns: 1fr; gap: 0; }
@@ -1174,11 +1240,15 @@
             .hero-metric-ribbon { grid-template-columns: 1fr; }
             .categories-grid-matrix { grid-template-columns: 1fr; }
             .gallery-photo-grid { grid-template-columns: 1fr; }
-            .navbar a { font-size: 0.55rem; padding: 6px 4px; }
+            .navbar a { font-size: 0.58rem; padding: 6px 6px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- PERSISTENT LAYER FIXED BACKGROUND FRAMEWORK -->
+    <div class="global-background-overlay"></div>
+    <div class="vignette-overlay"></div>
 
     <!-- PERSISTENT APP HEADER / BAR MENU LAYER -->
     <div class="site-header-wrapper">
@@ -1198,11 +1268,10 @@
     <!-- DYNAMIC CONTROLLER CONTENT CANVAS PANELS CONTAINER -->
     <div class="main-layout-content">
 
-        <!-- SCREEN DISPLAY 1: FULL SCREEN BG HERO HOMEPAGE DISPLAY -->
+        <!-- SCREEN DISPLAY 1: HOME PAGE -->
         <div id="pageHome" class="page-view active">
             <div class="hero-section">
                 
-                <!-- Text / Dashboard metrics cluster overlay -->
                 <div class="hero-main-body">
                     <p class="hero-presenter-tag">Angle Frames Presents</p>
                     <h1 class="hero-main-title">Sharankrishna <strong>Short Film Awards</strong></h1>
@@ -1211,7 +1280,7 @@
                         <span class="association-tag">In Association With</span>
                         <div class="association-logo-box">
                             <span style="font-size:0.85rem; font-weight:700; letter-spacing:1px;">JAIN UNIVERSITY</span>
-                            <span style="font-size:0.65rem; color:var(--text-muted); font-weight: 500; letter-spacing: 0.5px;">KOCHI CAMPUS</span>
+                            <span style="font-size:0.65rem; color:rgba(255,255,255,0.7); font-weight: 500; letter-spacing: 0.5px;">KOCHI CAMPUS</span>
                         </div>
                     </div>
 
@@ -1288,7 +1357,7 @@
                 <div class="story-block">
                     <h3>About Angle Frames</h3>
                     <p>
-                        Angle Frames stands as a premier creative collective and platform committed to fueling the fires of independent filmmaking. Founded with a vision to build bridges for raw, unadulterated storytelling, Angle Frames discovers, nurtures, and highlights ground-breaking visual concepts. By organizing top-tier competitive arenas, masterclasses, and project distributions, we give voice to young digital visionaries across the region.
+                        Angle Frames stands as a premier creative collective and platform committed to fueling the fires of independent filmmaking. Founded with a vision to build bridges for raw, unadulterated storytelling, Angle Frames discovers, highlights, and honors ground-breaking visual concepts. By organizing top-tier competitive arenas, masterclasses, and project distributions, we give voice to young digital visionaries across the region.
                     </p>
                 </div>
                 <div class="story-block">
@@ -1322,40 +1391,8 @@
                     </div>
                 </div>
 
-                <div class="categories-grid-matrix">
-                    <div class="category-asset-card">
-                        <div class="icon-placeholder">🎬</div>
-                        <p>Best<br>Short Film</p>
-                    </div>
-                    <div class="category-asset-card">
-                        <div class="icon-placeholder">👥</div>
-                        <p>Best<br>Director</p>
-                    </div>
-                    <div class="category-asset-card">
-                        <div class="icon-placeholder">🧍</div>
-                        <p>Best<br>Actor</p>
-                    </div>
-                    <div class="category-asset-card">
-                        <div class="icon-placeholder">🧍‍♀️</div>
-                        <p>Best<br>Actress</p>
-                    </div>
-                    <div class="category-asset-card">
-                        <div class="icon-placeholder">📷</div>
-                        <p>Best<br>Cinematography</p>
-                    </div>
-                    <div class="category-asset-card">
-                        <div class="icon-placeholder">📅</div>
-                        <p>Best<br>Editing</p>
-                    </div>
-                    <div class="category-asset-card">
-                        <div class="icon-placeholder">🎵</div>
-                        <p>Best<br>Music</p>
-                    </div>
-                    <div class="category-asset-card">
-                        <div class="icon-placeholder">🎓</div>
-                        <p>Campus<br>Category</p>
-                    </div>
-                </div>
+                <!-- Dynamic array mapping outputs structural cards here -->
+                <div class="categories-grid-matrix" id="categoriesGridContainer"></div>
 
                 <div class="rules-guidelines-trigger-row">
                     <button class="btn-rules-guidelines" onclick="toggleRulesModal(true)">
@@ -1455,7 +1492,7 @@
 
                         <form id="submissionForm" onsubmit="handleFinalSubmit(event)">
                             
-                            <!-- DATA FRAME SECTOR PANEL 1: CONTACT APPLICANTS PATHS -->
+                            <!-- DATA FRAME SECTOR PANEL 1: APPLICANT DETAILS -->
                             <div class="wizard-step-panel active" id="wizardStep1">
                                 <h3 class="wizard-step-subheading">Applicant Details</h3>
                                 <div class="form-group">
@@ -1481,7 +1518,7 @@
                                 </div>
                             </div>
 
-                            <!-- DATA FRAME SECTOR PANEL 2: CINEMATIC ASSETS SPECS -->
+                            <!-- DATA FRAME SECTOR PANEL 2: FILM DETAILS -->
                             <div class="wizard-step-panel" id="wizardStep2">
                                 <h3 class="wizard-step-subheading">Film Details</h3>
                                 <div class="form-grid">
@@ -1512,7 +1549,7 @@
                                 </div>
                             </div>
 
-                            <!-- DATA FRAME SECTOR PANEL 3: CAST CREW ATTRIBUTIONS INDEXING -->
+                            <!-- DATA FRAME SECTOR PANEL 3: CAST & CREW DETAILS -->
                             <div class="wizard-step-panel" id="wizardStep3">
                                 <h3 class="wizard-step-subheading">Cast & Crew Details</h3>
                                 <div class="form-grid">
@@ -1565,7 +1602,7 @@
                                 </div>
                             </div>
 
-                            <!-- DATA FRAME SECTOR PANEL 4: TRANSACTION GATEWAY LEDGER SNAPSHOTS -->
+                            <!-- DATA FRAME SECTOR PANEL 4: PAYMENT CONSOLE -->
                             <div class="wizard-step-panel" id="wizardStep4">
                                 <h3 class="wizard-step-subheading">Payment</h3>
                                 <div class="payment-view">
@@ -1573,7 +1610,7 @@
                                     <div class="qr-box">
                                         <img id="paymentQrImg" src="" alt="UPI Terminal QR">
                                     </div>
-                                    <p style="font-size:0.8rem; color:var(--text-muted); letter-spacing:0.5px;">UPI ID: 9745640896kgb@cnrb</p>
+                                    <p style="font-size:0.8rem; color:rgba(255,255,255,0.8); letter-spacing:0.5px;">UPI ID: 9745640896kgb@cnrb</p>
                                 </div>
                                 <div class="form-group" style="margin-top:20px;">
                                     <label for="transactionId">Transaction Reference ID / UTR *</label>
@@ -1595,18 +1632,18 @@
                                 </div>
                             </div>
 
-                            <!-- DATA FRAME SECTOR PANEL 5: SERVER POST SUMMARY MATRIX VERIFICATION -->
+                            <!-- DATA FRAME SECTOR PANEL 5: REVIEW & SUBMIT -->
                             <div class="wizard-step-panel" id="wizardStep5">
                                 <h3 class="wizard-step-subheading">Review & Submit</h3>
-                                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Please inspect field data points metrics prior to transmitting onto the main application server core ledger.</p>
+                                <p style="font-size:0.85rem; color:rgba(255,255,255,0.8); margin-bottom:15px;">Please inspect field data points metrics prior to transmitting onto the main application server core ledger.</p>
                                 
                                 <div class="review-data-matrix" id="reviewSummaryMatrix">
-                                    <!-- Javascript generates dynamic field row blocks arrays securely inside -->
+                                    <!-- Dynamic rows rendering frame inside -->
                                 </div>
 
                                 <div class="wizard-nav-row">
                                     <button type="button" class="btn-wizard-action back" onclick="goToWizardStep(4)">Back</button>
-                                    <button type="submit" id="submitBtn" class="btn-wizard-action" style="background:#ffffff; color:#000000; font-weight:700;">Submit Film Entry</button>
+                                    <button type="submit" id="submitBtn" class="btn-wizard-action continue">Submit Film Entry</button>
                                 </div>
                             </div>
 
@@ -1621,7 +1658,7 @@
             <div class="contact-glass-wrapper">
                 <div class="contact-card-body">
                     <h3 style="font-size:1.4rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Contact Helpdesk</h3>
-                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Get operational or routing support from our technical assistants.</p>
+                    <p style="color:rgba(255,255,255,0.8); font-size:0.9rem; margin-bottom:20px;">Get operational or routing support from our technical assistants.</p>
                     
                     <div class="contact-channel-row">
                         <label>Call Help Lines</label>
@@ -1665,8 +1702,8 @@
         <div id="successScreen" class="page-view success-screen">
             <div class="success-icon">✓</div>
             <h2>Submission Complete</h2>
-            <p style="color:var(--text-muted); margin: 15px 0 30px 0;">Your entry files and payment snapshot reference have been logged onto our core data ledger system.</p>
-            <button type="button" class="btn-wizard-action" style="max-width:220px; background:#fff; color:#000; margin:0 auto;" onclick="resetPortalView()">Submit Another Entry</button>
+            <p style="color:rgba(255,255,255,0.8); margin: 15px 0 30px 0;">Your entry files and payment snapshot reference have been logged onto our core data ledger system.</p>
+            <button type="button" class="btn-wizard-action continue" style="max-width:220px; margin:0 auto;" onclick="resetPortalView()">Submit Another Entry</button>
         </div>
 
         <!-- PERSISTENT FOOTER MAP MATRIX -->
@@ -1691,7 +1728,6 @@
     <script>
         /*****************************************************************
          * ⚙️ MASTER VARIABLE HUB
-         * Adjust image pathways, countdown parameters, and registration gates.
          *****************************************************************/
         const REGISTRATION_GATE = {
             isOpen: true 
@@ -1707,11 +1743,26 @@
         const SITE_IMAGES = {
             mainLogo: "Sharankrishna short film logo New-05.png",
             paymentQrCode: "angle.jpg",
-            heroBackground: "hero.png", 
             socialInstagram: "—Pngtree—instagram icon vector_8704817.png",
             socialYoutube: "—Pngtree—youtube social media 3d stereo_8704808.png",
             socialFacebook: "—Pngtree—facebook icon facebook logo_3584837.png"
         };
+
+        /**
+         * 🏆 DYNAMIC CATEGORY MANAGER HUB
+         */
+        const CATEGORY_ITEMS = [
+            { title: "Best<br>Short Film", emoji: "🎬", image: "" },
+            { title: "Best<br>Director", emoji: "👥", image: "" }, 
+            { title: "Best<br>Screenplay", emoji: "📝", image: "" }, 
+            { title: "Best<br>Actor", emoji: "🧍", image: "" },
+            { title: "Best<br>Actress", emoji: "🧍‍♀️", image: "" },
+            { title: "Best<br>Cinematography", emoji: "📷", image: "" },
+            { title: "Best<br>Editing", emoji: "✂️", image: "" },
+            { title: "Best<br>Music", emoji: "🎵", image: "" },
+            { title: "Campus<br>Category", emoji: "🎓", image: "" },
+            { title: "Special Jury<br>Mentions", emoji: "✨", image: "" }
+        ];
 
         const GALLERY_IMAGES = [
             { category: "winners2025", src: "https://images.unsplash.com/photo-1518156677180-95a2893f3e9f?q=80&w=600&auto=format&fit=crop", title: "Best Short Film: 'Bug'", sub: "Winner 2025" },
@@ -1726,29 +1777,23 @@
             googleWebAppUrl: "https://script.google.com/macros/s/AKfycbzTfiL56zKjqcZhLm1Mk0rNp5Vm9yQutdfqRMavbdSMIyN-bYpE5_KYQFkbRHNOSKk/exec"
         };
 
-        /*****************************************************************
-         * END OF HUB VARIABLES CONFIGURATIONS
-         *****************************************************************/
-
         let currentWizardStep = 1;
 
         document.addEventListener("DOMContentLoaded", () => {
-            // Mapping initial layout structural asset strings onto system tags nodes
+            // Mapping system elements onto template spaces
             document.getElementById('mainLogo').src = SITE_IMAGES.mainLogo;
             document.getElementById('paymentQrImg').src = SITE_IMAGES.paymentQrCode;
             document.getElementById('socialIconInstagram').src = SITE_IMAGES.socialInstagram;
             document.getElementById('socialIconYoutube').src = SITE_IMAGES.socialYoutube;
             document.getElementById('socialIconFacebook').src = SITE_IMAGES.socialFacebook;
 
-            // Date text assignments onto Ribbon row metrics
+            // Date adjustments
             document.getElementById('labelDeadlineDate').textContent = PORTAL_TIMELINES.deadlineLabelText;
             document.getElementById('labelEventDate').textContent = PORTAL_TIMELINES.eventLabelText;
 
-            // Injecting the image url inside a clean cinematic gradient framework to ensure readability
-            document.querySelector('.hero-section').style.backgroundImage = `linear-gradient(to right, rgba(11, 11, 13, 0.92) 40%, rgba(11, 11, 13, 0.35)), url('${SITE_IMAGES.heroBackground}')`;
-
             evaluateRegistrationGateState();
             initiateTimersEngine();
+            generateDynamicCategories();
             renderGallery('winners2025');
         });
 
@@ -1763,6 +1808,30 @@
             window.scrollTo({ top: 0, behavior: 'instant' });
         }
 
+        function generateDynamicCategories() {
+            const container = document.getElementById('categoriesGridContainer');
+            if (!container) return;
+            container.innerHTML = ''; 
+
+            CATEGORY_ITEMS.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'category-asset-card';
+
+                let iconMarkup = '';
+                if (item.image && item.image.trim() !== '') {
+                    iconMarkup = `<img src="${item.image}" alt="${item.title.replace('<br>', ' ')}" class="category-icon-img">`;
+                } else {
+                    iconMarkup = `<span class="category-emoji">${item.emoji}</span>`;
+                }
+
+                card.innerHTML = `
+                    <div class="icon-placeholder">${iconMarkup}</div>
+                    <p>${item.title}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
         function evaluateRegistrationGateState() {
             const browserTitleEl = document.getElementById('browserTabTitle');
             const navRegLink = document.getElementById('navRegistration');
@@ -1775,7 +1844,7 @@
                 if (heroSubmitBtn) {
                     heroSubmitBtn.textContent = "Registrations Closed";
                     heroSubmitBtn.style.background = "rgba(255,255,255,0.05)";
-                    heroSubmitBtn.style.color = "var(--text-muted)";
+                    heroSubmitBtn.style.color = "rgba(255,255,255,0.4)";
                     heroSubmitBtn.style.border = "1px solid rgba(255,255,255,0.08)";
                     heroSubmitBtn.style.boxShadow = "none";
                     heroSubmitBtn.disabled = true;
@@ -1785,7 +1854,7 @@
                         <div class="closed-state-card">
                             <div class="closed-state-icon">🔒</div>
                             <h2 class="portal-main-heading" style="margin-bottom:12px;">Registrations Closed</h2>
-                            <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.6;">
+                            <p style="color:rgba(255,255,255,0.7); font-size:0.95rem; line-height:1.6;">
                                 The intake window for short film entries has reached its expiration cutoff ceiling. Thank you to everyone who submitted their vision.
                             </p>
                         </div>
