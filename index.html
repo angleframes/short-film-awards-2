@@ -28,6 +28,10 @@
             --ios-blur: blur(30px) saturate(160%);
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -125,61 +129,33 @@
         .page-view {
             display: none;
             width: 100%;
-            animation: tabFadeIn 0.4s ease;
         }
 
         .page-view.active {
             display: block;
         }
 
-        @keyframes tabFadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ======================================================= */
-        /* SPLIT ASSET HERO VIEW LAYOUT (MATCHING IMAGE LAYOUT) */
-        /* ======================================================= */
+        /* Hero View Layout */
         .hero-section {
             min-height: calc(100vh - 110px);
             width: 100%;
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr; /* Splits space into text column and asset column */
-            padding: 40px 8% 40px 8%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; 
+            padding: 60px 8% 40px 8%;
             position: relative;
             overflow: hidden;
-            align-items: center;
-            gap: 40px;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+            background-attachment: fixed; 
         }
 
         .hero-main-body {
             z-index: 3;
+            max-width: 700px; 
             width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        /* Feature Artwork Container (Right-side display) */
-        .hero-artwork-column {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            min-height: 450px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2;
-        }
-
-        .hero-artwork-frame {
-            width: 100%;
-            height: 100%;
-            max-height: 550px;
-            background-position: center center;
-            background-repeat: no-repeat;
-            background-size: contain; /* Keeps trophy presentation uncropped */
-            transition: transform 0.5s ease;
+            margin-bottom: 40px;
         }
 
         .hero-presenter-tag {
@@ -301,9 +277,10 @@
         }
 
         .countdown-card-block {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.6); 
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
             padding: 15px 20px;
         }
@@ -342,20 +319,20 @@
             letter-spacing: 0.5px;
         }
 
-        /* Metric Ribbon (Spans across bottom of dynamic hero block) */
+        /* Metric Ribbon */
         .hero-metric-ribbon {
-            grid-column: span 2;
             width: 100%;
-            background: rgba(11, 11, 13, 0.5);
+            background: rgba(11, 11, 13, 0.75);
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
             padding: 20px 30px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
-            margin-top: 30px;
             z-index: 3;
+            margin-top: auto; 
         }
 
         .ribbon-item {
@@ -506,7 +483,7 @@
             border-color: rgba(255, 255, 255, 0.3);
         }
 
-        /* RULES AND REGULATION OVERLAY MODAL STYLING */
+        /* RULES AND REGULATION OVERLAY MODAL */
         .rules-modal-overlay {
             display: none;
             position: fixed;
@@ -593,7 +570,7 @@
             line-height: 1.5;
         }
 
-        /* GALLERY PREMIUM STYLE */
+        /* GALLERY STYLE */
         .gallery-outer-card {
             max-width: 680px;
             width: 92%;
@@ -772,7 +749,7 @@
             opacity: 0.8;
         }
 
-        /* REGISTRATION APPLICATION ENTRY FORM SECTION */
+        /* REGISTRATION FORM SECTION */
         .portal-form-wrapper {
             max-width: 600px;
             width: 100%;
@@ -800,7 +777,7 @@
             color: #ffffff;
         }
 
-        /* STEP PIPELINE TIMELINE MATRIX */
+        /* STEP TIMELINE MATRIX */
         .step-pipeline-container {
             display: flex;
             justify-content: space-between;
@@ -883,7 +860,7 @@
             font-weight: 500;
         }
 
-        /* MULTI-STEP PANEL BUILD */
+        /* MULTI-STEP PANELS */
         .wizard-step-panel {
             display: none;
         }
@@ -1097,7 +1074,7 @@
         .qr-box { width: 160px; height: 160px; background: #fff; padding: 8px; margin: 15px auto; border-radius: 10px; }
         .qr-box img { width: 100%; height: 100%; object-fit: contain; }
         .story-page-content { display: flex; flex-direction: column; gap: 24px; padding: 20px; max-width: 800px; margin: 40px auto; }
-        .story-block { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 166px;}
+        .story-block { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 30px; border-radius: 12px;}
         .story-block h3 { margin-bottom: 12px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.5px; }
         .story-block p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
         .success-screen { text-align: center; padding: 60px 20px; max-width: 600px; margin: 40px auto; }
@@ -1135,19 +1112,11 @@
             letter-spacing: 0.3px;
         }
 
-        /* MOBILE OVERRIDES */
+        /* RESPONSIVE LAYOUT BREAKPOINTS */
         @media (max-width: 992px) {
             .hero-section {
-                grid-template-columns: 1fr; /* Drop split view down to stacked layout on mid-size blocks */
-                gap: 20px;
-                padding-top: 20px;
-            }
-            .hero-artwork-column {
-                min-height: 350px;
-                order: -1; /* Place trophy back over copy text blocks on mobile viewports */
-            }
-            .hero-metric-ribbon {
-                grid-column: span 1;
+                padding: 40px 6% 30px 6%;
+                min-height: auto;
             }
         }
 
@@ -1167,7 +1136,7 @@
                 padding: 10px 5px;
                 justify-content: space-around;
                 gap: 0;
-                z-index: 1001;
+                z-index: 101;
             }
             .navbar a {
                 font-size: 0.6rem;
@@ -1211,7 +1180,7 @@
 </head>
 <body>
 
-    <!-- PERSISTENT NAVIGATION LAYER -->
+    <!-- PERSISTENT APP HEADER / BAR MENU LAYER -->
     <div class="site-header-wrapper">
         <div class="brand-logo-area">
             <img id="mainLogo" src="" alt="Angle Frames Logo">
@@ -1226,14 +1195,14 @@
         </nav>
     </div>
 
-    <!-- MAIN DYNAMIC CONTENT SWITCHER LAYOUT SPACE -->
+    <!-- DYNAMIC CONTROLLER CONTENT CANVAS PANELS CONTAINER -->
     <div class="main-layout-content">
 
-        <!-- TAB SCREEN 1: LANDING WINDOW (UPDATED SPLIT GRID LAYOUT) -->
+        <!-- SCREEN DISPLAY 1: FULL SCREEN BG HERO HOMEPAGE DISPLAY -->
         <div id="pageHome" class="page-view active">
             <div class="hero-section">
                 
-                <!-- Left Column Content Section -->
+                <!-- Text / Dashboard metrics cluster overlay -->
                 <div class="hero-main-body">
                     <p class="hero-presenter-tag">Angle Frames Presents</p>
                     <h1 class="hero-main-title">Sharankrishna <strong>Short Film Awards</strong></h1>
@@ -1246,7 +1215,7 @@
                         </div>
                     </div>
 
-                    <!-- Dual Countdown Display Component -->
+                    <!-- Dual Digital Countdown Blocks Engine Component Dashboard Grid -->
                     <div class="countdown-dashboard-container">
                         <div class="countdown-card-block">
                             <div class="countdown-title-tag">Submission Deadline Countdown</div>
@@ -1279,12 +1248,7 @@
                     </div>
                 </div>
 
-                <!-- Right Column Placeholder (Matches the trophy framing from ChatGPT Image Jun 14, 2026, 11_46_16 AM.png) -->
-                <div class="hero-artwork-column">
-                    <div id="heroBgTarget" class="hero-artwork-frame"></div>
-                </div>
-
-                <!-- Bottom Metric Dashboard Grid Frame Ribbon Section -->
+                <!-- Bottom Metric Dashboard Ribbon Bar Row Grid Element -->
                 <div class="hero-metric-ribbon">
                     <div class="ribbon-item">
                         <span class="ribbon-icon">📅</span>
@@ -1318,7 +1282,7 @@
             </div>
         </div>
 
-        <!-- TAB SCREEN 2: ABOUT / STORY INDEX -->
+        <!-- SCREEN DISPLAY 2: ABOUT STORY DIRECTORIES ARCHIVE -->
         <div id="pageStory" class="page-view">
             <div class="story-page-content">
                 <div class="story-block">
@@ -1348,7 +1312,7 @@
             </div>
         </div>
 
-        <!-- TAB SCREEN 3: AWARDS CATEGORIES GRID VIEW -->
+        <!-- SCREEN DISPLAY 3: CATEGORIES COMPETITION GRID MATRIX -->
         <div id="pageCategories" class="page-view">
             <div class="categories-viewport-wrapper">
                 <div class="categories-header-block">
@@ -1401,7 +1365,7 @@
             </div>
         </div>
 
-        <!-- RULES AND REGULATION MODAL POPUP LAYER -->
+        <!-- LAUNCH RULES CONFIG OVERLAY MODAL WINDOW LAYER -->
         <div id="rulesModal" class="rules-modal-overlay" onclick="toggleRulesModal(false)">
             <div class="rules-modal-container" onclick="event.stopPropagation()">
                 <button class="rules-modal-close" onclick="toggleRulesModal(false)">&times;</button>
@@ -1431,10 +1395,9 @@
             </div>
         </div>
 
-        <!-- TAB SCREEN 4: GALLERY OVERVIEW Grid MATRIX -->
+        <!-- SCREEN DISPLAY 4: ARCHIVE GALLERY -->
         <div id="pageGallery" class="page-view">
             <div class="gallery-outer-card">
-                
                 <h2 class="gallery-main-title">Gallery</h2>
 
                 <div class="gallery-filter-row">
@@ -1445,18 +1408,17 @@
                 </div>
 
                 <div class="gallery-photo-grid" id="galleryPhotoGrid">
-                    <!-- Loaded dynamically from config dynamic matrices -->
+                    <!-- Dynamic rendering engine inputs structural rows nodes -->
                 </div>
 
                 <button class="btn-gallery-more">
                     <span>View More Photos</span>
                     <span style="font-size: 1rem;">&rarr;</span>
                 </button>
-
             </div>
         </div>
 
-        <!-- TAB SCREEN 5: STEP WIZARD PORTAL INTERFACE DESIGN -->
+        <!-- SCREEN DISPLAY 5: MULTI STEP WIZARD PORTAL DATA REGISTRATION CONSOLE -->
         <div id="pageRegistration" class="page-view">
             <div class="portal-form-wrapper">
                 <div class="portal-glass-card" id="registrationCardContent">
@@ -1464,6 +1426,7 @@
                     <div id="activeFormContainer">
                         <h2 class="portal-main-heading">Registration</h2>
 
+                        <!-- WIZARD STEP LINE CONTROL BAR -->
                         <div class="step-pipeline-container">
                             <div class="step-pipeline-line">
                                 <div class="step-pipeline-line-progress" id="pipelineProgressLine"></div>
@@ -1492,7 +1455,7 @@
 
                         <form id="submissionForm" onsubmit="handleFinalSubmit(event)">
                             
-                            <!-- STEP PANEL 1: APPLICANT CONFIGS -->
+                            <!-- DATA FRAME SECTOR PANEL 1: CONTACT APPLICANTS PATHS -->
                             <div class="wizard-step-panel active" id="wizardStep1">
                                 <h3 class="wizard-step-subheading">Applicant Details</h3>
                                 <div class="form-group">
@@ -1518,7 +1481,7 @@
                                 </div>
                             </div>
 
-                            <!-- STEP PANEL 2: FILM ENTRIES METRICS -->
+                            <!-- DATA FRAME SECTOR PANEL 2: CINEMATIC ASSETS SPECS -->
                             <div class="wizard-step-panel" id="wizardStep2">
                                 <h3 class="wizard-step-subheading">Film Details</h3>
                                 <div class="form-grid">
@@ -1549,7 +1512,7 @@
                                 </div>
                             </div>
 
-                            <!-- STEP PANEL 3: CREW DECK DIRECTORY -->
+                            <!-- DATA FRAME SECTOR PANEL 3: CAST CREW ATTRIBUTIONS INDEXING -->
                             <div class="wizard-step-panel" id="wizardStep3">
                                 <h3 class="wizard-step-subheading">Cast & Crew Details</h3>
                                 <div class="form-grid">
@@ -1602,7 +1565,7 @@
                                 </div>
                             </div>
 
-                            <!-- STEP PANEL 4: PROCESS GATEWAY CONSOLE -->
+                            <!-- DATA FRAME SECTOR PANEL 4: TRANSACTION GATEWAY LEDGER SNAPSHOTS -->
                             <div class="wizard-step-panel" id="wizardStep4">
                                 <h3 class="wizard-step-subheading">Payment</h3>
                                 <div class="payment-view">
@@ -1632,13 +1595,13 @@
                                 </div>
                             </div>
 
-                            <!-- STEP PANEL 5: SUMMARY SUMMARY TRANSMIT LOG -->
+                            <!-- DATA FRAME SECTOR PANEL 5: SERVER POST SUMMARY MATRIX VERIFICATION -->
                             <div class="wizard-step-panel" id="wizardStep5">
                                 <h3 class="wizard-step-subheading">Review & Submit</h3>
                                 <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:15px;">Please inspect field data points metrics prior to transmitting onto the main application server core ledger.</p>
                                 
                                 <div class="review-data-matrix" id="reviewSummaryMatrix">
-                                    <!-- Populated build elements metrics strings securely via JavaScript -->
+                                    <!-- Javascript generates dynamic field row blocks arrays securely inside -->
                                 </div>
 
                                 <div class="wizard-nav-row">
@@ -1653,7 +1616,7 @@
             </div>
         </div>
 
-        <!-- TAB SCREEN 6: CONTACT INFORMATION ARCHIVE -->
+        <!-- SCREEN DISPLAY 6: HELPDESK ROUTING MATRIX INFOS -->
         <div id="pageContact" class="page-view">
             <div class="contact-glass-wrapper">
                 <div class="contact-card-body">
@@ -1698,7 +1661,7 @@
             </div>
         </div>
 
-        <!-- SUBMISSION RECOGNITION INTERFACE LAYER -->
+        <!-- TRANSACTION SUCCESS SCREEN BLOCK CONSOLE LAYER -->
         <div id="successScreen" class="page-view success-screen">
             <div class="success-icon">✓</div>
             <h2>Submission Complete</h2>
@@ -1724,17 +1687,17 @@
         </div>
     </div>
 
+    <!-- CENTRAL CONTROLLER SCRIPTS LOGIC MODULE -->
     <script>
         /*****************************************************************
-         * ⚙️ MASTER CONTROL PANEL (Images, Deadlines & Gates)
-         * Change parameters here to edit content, turn timers, or open/close entry access.
+         * ⚙️ MASTER VARIABLE HUB
+         * Adjust image pathways, countdown parameters, and registration gates.
          *****************************************************************/
         const REGISTRATION_GATE = {
-            isOpen: true // 🟢 Set to true to OPEN registration. 🔴 Set to false to CLOSE registration (Tab shows Entries Closed).
+            isOpen: true 
         };
 
         const PORTAL_TIMELINES = {
-            // Use standard format: "Month DD, YYYY HH:MM:SS"
             submissionDeadline: "December 31, 2026 23:59:59",
             awardsEventDate: "February 12, 2027 18:00:00",
             deadlineLabelText: "31 Dec 2026",
@@ -1744,10 +1707,10 @@
         const SITE_IMAGES = {
             mainLogo: "Sharankrishna short film logo New-05.png",
             paymentQrCode: "angle.jpg",
-            heroBackground: "hero 2.jpg", /* Your centerpiece trophy artwork file loads directly here */
+            heroBackground: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop", 
             socialInstagram: "—Pngtree—instagram icon vector_8704817.png",
-            socialYoutube: "yt.png",
-            socialFacebook: "facebook.png"
+            socialYoutube: "—Pngtree—youtube social media 3d stereo_8704808.png",
+            socialFacebook: "—Pngtree—facebook icon facebook logo_3584837.png"
         };
 
         const GALLERY_IMAGES = [
@@ -1756,34 +1719,33 @@
             { category: "winners2026", src: "", title: "To Be Announced", sub: "Coming Soon" },
             { category: "winners2027", src: "", title: "To Be Announced", sub: "Coming Soon" },
             { category: "events", src: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=600&auto=format&fit=crop", title: "Festival Panel Event", sub: "Live Screening" },
-            { category: "events", src: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=600&auto=format&fit=crop", title: "Audience Hall Screening", sub: "Cinema Hall" },
-            { category: "events", src: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&auto=format&fit=crop", title: "Stage Lineup Presentation", sub: "Main Stage" }
+            { category: "events", src: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=600&auto=format&fit=crop", title: "Audience Hall Screening", sub: "Cinema Hall" }
         ];
-
-        /*****************************************************************
-         * END OF MASTER CONTROL PANEL
-         *****************************************************************/
 
         const APP_CONFIG = {
             googleWebAppUrl: "https://script.google.com/macros/s/AKfycbzTfiL56zKjqcZhLm1Mk0rNp5Vm9yQutdfqRMavbdSMIyN-bYpE5_KYQFkbRHNOSKk/exec"
         };
 
+        /*****************************************************************
+         * END OF HUB VARIABLES CONFIGURATIONS
+         *****************************************************************/
+
         let currentWizardStep = 1;
 
         document.addEventListener("DOMContentLoaded", () => {
-            // Core asset configurations assignment
+            // Mapping initial layout structural asset strings onto system tags nodes
             document.getElementById('mainLogo').src = SITE_IMAGES.mainLogo;
             document.getElementById('paymentQrImg').src = SITE_IMAGES.paymentQrCode;
             document.getElementById('socialIconInstagram').src = SITE_IMAGES.socialInstagram;
             document.getElementById('socialIconYoutube').src = SITE_IMAGES.socialYoutube;
             document.getElementById('socialIconFacebook').src = SITE_IMAGES.socialFacebook;
 
-            // Apply Dates to layout UI Ribbon strings dynamically
+            // Date text assignments onto Ribbon row metrics
             document.getElementById('labelDeadlineDate').textContent = PORTAL_TIMELINES.deadlineLabelText;
             document.getElementById('labelEventDate').textContent = PORTAL_TIMELINES.eventLabelText;
 
-            // Centers image file inside right-hand view frame column
-            document.getElementById('heroBgTarget').style.backgroundImage = `url('${SITE_IMAGES.heroBackground}')`;
+            // Injecting the image url inside a clean cinematic gradient framework to ensure readability
+            document.querySelector('.hero-section').style.backgroundImage = `linear-gradient(to right, rgba(11, 11, 13, 0.92) 40%, rgba(11, 11, 13, 0.35)), url('${SITE_IMAGES.heroBackground}')`;
 
             evaluateRegistrationGateState();
             initiateTimersEngine();
@@ -1791,26 +1753,13 @@
         });
 
         function switchViewTab(targetTabId, sourceAnchorElement) {
-            // Hide all views cleanly
-            document.querySelectorAll('.page-view').forEach(view => {
-                view.classList.remove('active');
-            });
-            
-            // Remove active style from nav paths links
-            document.querySelectorAll('.navbar a').forEach(link => {
-                link.classList.remove('active');
-            });
+            document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
+            document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
 
-            // Activate specific panel target layout elements
             const targetedPanel = document.getElementById(targetTabId);
-            if (targetedPanel) {
-                targetedPanel.classList.add('active');
-            }
-            if (sourceAnchorElement) {
-                sourceAnchorElement.classList.add('active');
-            }
+            if (targetedPanel) targetedPanel.classList.add('active');
+            if (sourceAnchorElement) sourceAnchorElement.classList.add('active');
 
-            // Scroll browser window back to exact apex point dynamically
             window.scrollTo({ top: 0, behavior: 'instant' });
         }
 
@@ -1821,11 +1770,9 @@
             const formContainer = document.getElementById('registrationCardContent');
 
             if (!REGISTRATION_GATE.isOpen) {
-                if (browserTitleEl) {
-                    browserTitleEl.textContent = "Entries Closed | Sharankrishna Short Film Awards";
-                }
-                if(navRegLink) navRegLink.textContent = "Entries Closed";
-                if(heroSubmitBtn) {
+                if (browserTitleEl) browserTitleEl.textContent = "Entries Closed | Sharankrishna Short Film Awards";
+                if (navRegLink) navRegLink.textContent = "Entries Closed";
+                if (heroSubmitBtn) {
                     heroSubmitBtn.textContent = "Registrations Closed";
                     heroSubmitBtn.style.background = "rgba(255,255,255,0.05)";
                     heroSubmitBtn.style.color = "var(--text-muted)";
@@ -1833,7 +1780,7 @@
                     heroSubmitBtn.style.boxShadow = "none";
                     heroSubmitBtn.disabled = true;
                 }
-                if(formContainer) {
+                if (formContainer) {
                     formContainer.innerHTML = `
                         <div class="closed-state-card">
                             <div class="closed-state-icon">🔒</div>
@@ -1844,11 +1791,6 @@
                         </div>
                     `;
                 }
-            } else {
-                if (browserTitleEl) {
-                    browserTitleEl.textContent = "Sharankrishna Short Film Awards - Entry Portal";
-                }
-                if(navRegLink) navRegLink.textContent = "Registration";
             }
         }
 
@@ -1881,9 +1823,7 @@
         }
 
         function filterGallery(category, contextPill) {
-            document.querySelectorAll('.gallery-filter-row .btn-gallery-pill').forEach(pill => {
-                pill.classList.remove('active');
-            });
+            document.querySelectorAll('.gallery-filter-row .btn-gallery-pill').forEach(pill => pill.classList.remove('active'));
             contextPill.classList.add('active');
             renderGallery(category);
         }
@@ -1893,18 +1833,15 @@
             gridMatrix.innerHTML = ''; 
             
             GALLERY_IMAGES.forEach(photo => {
-                if(photo.category === category) {
+                if (photo.category === category) {
                     const frame = document.createElement('div');
                     frame.className = 'gallery-photo-frame';
                     
                     let mediaSourceElement = `<div class="gallery-image-container"><img src="${photo.src}" alt="${photo.title}"></div>`;
-                    if(!photo.src || photo.src.trim() === "") {
+                    if (!photo.src || photo.src.trim() === "") {
                         mediaSourceElement = `
                         <div class="gallery-image-container">
-                            <div class="placeholder-empty-graphic">
-                                🎬
-                                <span>Upcoming Winner</span>
-                            </div>
+                            <div class="placeholder-empty-graphic">🎬<span>Upcoming Winner</span></div>
                         </div>`;
                     }
 
@@ -1922,23 +1859,16 @@
 
         function toggleRulesModal(show) {
             const modal = document.getElementById('rulesModal');
-            if (show) {
-                modal.classList.add('active');
-            } else {
-                modal.classList.remove('active');
-            }
+            if (show) modal.classList.add('active');
+            else modal.classList.remove('active');
         }
 
         function goToWizardStep(stepNumber) {
             if (!REGISTRATION_GATE.isOpen) return;
-            if (stepNumber > currentWizardStep) {
-                if (!validateStepInputs(currentWizardStep)) return;
-            }
+            if (stepNumber > currentWizardStep && !validateStepInputs(currentWizardStep)) return;
 
             document.querySelectorAll('.wizard-step-panel').forEach(panel => panel.classList.remove('active'));
-            document.querySelectorAll('.pipeline-node').forEach(node => {
-                node.classList.remove('active', 'completed');
-            });
+            document.querySelectorAll('.pipeline-node').forEach(node => node.classList.remove('active', 'completed'));
 
             currentWizardStep = stepNumber;
             document.getElementById('wizardStep' + stepNumber).classList.add('active');
@@ -1952,9 +1882,7 @@
                 if (i === stepNumber) node.classList.add('active');
             }
 
-            if (stepNumber === 5) {
-                generateReviewSummary();
-            }
+            if (stepNumber === 5) generateReviewSummary();
         }
 
         function validateStepInputs(step) {
@@ -1982,14 +1910,14 @@
             
             const fieldsToReview = [
                 { label: "Applicant Name", id: "applicantName" },
-                { label: "Email Link", id: "email" },
+                { label: "Email Address", id: "email" },
                 { label: "Phone Connection", id: "phone" },
                 { label: "City Location", id: "city" },
                 { label: "Short Film Title", id: "filmName" },
                 { label: "Category Track", id: "category" },
-                { label: "Film Link", id: "filmLink" },
-                { label: "Director", id: "director" },
-                { label: "Reference UTR ID", id: "transactionId" }
+                { label: "Film Asset URL", id: "filmLink" },
+                { label: "Director In-Charge", id: "director" },
+                { label: "Reference UTR Code", id: "transactionId" }
             ];
 
             fieldsToReview.forEach(item => {
@@ -2015,16 +1943,13 @@
 
         function handleFinalSubmit(event) {
             event.preventDefault();
-            if (!REGISTRATION_GATE.isOpen) {
-                alert("Registrations are closed.");
-                return;
-            }
+            if (!REGISTRATION_GATE.isOpen) return;
 
             const submitBtn = document.getElementById('submitBtn');
             const fileInput = document.getElementById('paymentScreenshot');
 
             if (fileInput.files.length === 0) {
-                alert("Please attach processing verification screenshot ledger documents.");
+                alert("Please upload payment validation screenshot receipts.");
                 return;
             }
 
@@ -2065,19 +1990,16 @@
                 .then(res => res.json())
                 .then(response => {
                     if (response.status === "success") {
-                        // Switch over to success pane directly
-                        const formContainer = document.getElementById('activeFormContainer');
-                        const successScr = document.getElementById('successScreen');
-                        if (formContainer) formContainer.style.display = 'none';
-                        if (successScr) successScr.classList.add('active');
+                        document.getElementById('activeFormContainer').style.display = 'none';
+                        document.getElementById('successScreen').classList.add('active');
                     } else {
-                        alert("Submission terminal rejection: " + response.message);
+                        alert("Submission rejection code: " + response.message);
                     }
                     submitBtn.disabled = false;
                     submitBtn.textContent = "Submit Film Entry";
                 })
                 .catch(() => {
-                    alert("Core network timeout fault.");
+                    alert("Network ledger processing fault.");
                     submitBtn.disabled = false;
                     submitBtn.textContent = "Submit Film Entry";
                 });
