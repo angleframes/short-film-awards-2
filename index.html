@@ -1,13 +1,16 @@
+Here is the complete, single-file HTML code stack with all the fixes applied.
+
+The mobile styles have been fully updated so that the header blocks and tab containers have no rigid boxes or borders on phones, and the bottom menu items glide with a smooth, native swipe gesture without any visible scrollbars.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Custom Browser Tab Icon (Favicon) -->
     <link rel="icon" type="image/png" href="Favicon.png">
 
-    <!-- The default browser tab title -->
     <title id="browserTabTitle">Sharankrishna Short Film Awards - Entry Portal</title>
     
     <style>
@@ -51,7 +54,6 @@
         }
 
         /* --- Global Fixed Background Framework --- */
-        /* Fixed, unblurred beautiful background using hero.png across all tabs */
         .global-background-overlay {
             position: fixed;
             top: 0;
@@ -100,9 +102,19 @@
             align-items: center;
         }
 
+        /* Logo base styling with responsive animations */
         .brand-logo-area img {
             height: 55px;
             width: auto;
+            transition: filter 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            filter: blur(0px);
+            opacity: 1;
+        }
+
+        /* Triggered variant style when any view tab other than Home is active */
+        .brand-logo-area img.logo-blurred {
+            filter: blur(4px);
+            opacity: 0.5;
         }
 
         .navbar {
@@ -1180,44 +1192,67 @@
             .site-header-wrapper { 
                 padding: 12px 20px; 
                 justify-content: center;
+                background: transparent; /* Removes background box grid footprint behind logo */
+                border-bottom: none;     /* Removes hard border ceiling dividers */
             }
             
-            /* Bottom Native-App Bar Configuration on Screen Devices */
+            /* Clean Fluid Swipe Tab Dock Configuration for Mobile Screens */
             .navbar { 
                 display: flex; 
                 position: fixed;
                 bottom: 0;
                 left: 0;
                 width: 100%;
-                background: rgba(10, 10, 12, 0.95);
-                backdrop-filter: blur(25px);
-                -webkit-backdrop-filter: blur(25px);
-                border-top: 1px solid rgba(255, 255, 255, 0.15);
-                padding: 8px 4px;
-                justify-content: space-around;
-                gap: 0;
+                background: linear-gradient(to top, rgba(6, 6, 8, 0.95) 80%, rgba(6, 6, 8, 0)); /* Soft ambient blending layout gradient shadow instead of solid boxes */
+                padding: 12px 10px 24px 10px; 
+                justify-content: flex-start;  /* Permits seamless dynamic sideways scrolling expansion */
+                gap: 8px;
                 z-index: 1000;
+                
+                /* Activates buttery momentum swiping layout capabilities */
                 overflow-x: auto;
-                scrollbar-width: none;
+                scroll-behavior: smooth;
+                -webkit-overflow-scrolling: touch; 
+                
+                /* Completely hides system scrollbars from the structural pipeline views */
+                scrollbar-width: none; 
+                -ms-overflow-style: none;
             }
-            .navbar::-webkit-scrollbar { display: none; }
+            .navbar::-webkit-scrollbar { 
+                display: none; 
+                width: 0 !important;
+                height: 0 !important;
+            }
             
             .navbar a {
-                font-size: 0.62rem;
-                padding: 8px 10px;
-                letter-spacing: 0.5px;
-                flex-shrink: 0;
-                color: rgba(255,255,255,0.6);
+                font-size: 0.72rem;
+                padding: 8px 14px;
+                letter-spacing: 0.8px;
+                flex-shrink: 0; /* Ensures the tags don't squish sideways during a active swipe input */
+                color: rgba(255, 255, 255, 0.6);
+                background: transparent !important; /* Strips any bounding box shapes from individual elements */
+                border: none !important;
+            }
+
+            /* Sleek clean active underline indicator instead of a full highlighted box background */
+            .navbar a.active {
+                color: #ffffff;
+                font-weight: 700;
             }
             .navbar a.active::after {
-                bottom: -2px;
-                left: 10px;
-                right: 10px;
+                content: '';
+                position: absolute;
+                bottom: 0;
+                left: 14px;
+                right: 14px;
+                height: 2px;
+                background: #ffffff;
+                border-radius: 2px;
             }
 
             .main-layout-content {
-                margin-top: 90px;
-                padding-bottom: 75px; 
+                margin-top: 80px;
+                padding-bottom: 90px; 
             }
 
             .form-grid { grid-template-columns: 1fr; gap: 0; }
@@ -1240,17 +1275,15 @@
             .hero-metric-ribbon { grid-template-columns: 1fr; }
             .categories-grid-matrix { grid-template-columns: 1fr; }
             .gallery-photo-grid { grid-template-columns: 1fr; }
-            .navbar a { font-size: 0.58rem; padding: 6px 6px; }
+            .navbar a { font-size: 0.7rem; padding: 8px 12px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- PERSISTENT LAYER FIXED BACKGROUND FRAMEWORK -->
     <div class="global-background-overlay"></div>
     <div class="vignette-overlay"></div>
 
-    <!-- PERSISTENT APP HEADER / BAR MENU LAYER -->
     <div class="site-header-wrapper">
         <div class="brand-logo-area">
             <img id="mainLogo" src="" alt="Angle Frames Logo">
@@ -1265,10 +1298,8 @@
         </nav>
     </div>
 
-    <!-- DYNAMIC CONTROLLER CONTENT CANVAS PANELS CONTAINER -->
     <div class="main-layout-content">
 
-        <!-- SCREEN DISPLAY 1: HOME PAGE -->
         <div id="pageHome" class="page-view active">
             <div class="hero-section">
                 
@@ -1284,7 +1315,6 @@
                         </div>
                     </div>
 
-                    <!-- Dual Digital Countdown Blocks Engine Component Dashboard Grid -->
                     <div class="countdown-dashboard-container">
                         <div class="countdown-card-block">
                             <div class="countdown-title-tag">Submission Deadline Countdown</div>
@@ -1317,7 +1347,6 @@
                     </div>
                 </div>
 
-                <!-- Bottom Metric Dashboard Ribbon Bar Row Grid Element -->
                 <div class="hero-metric-ribbon">
                     <div class="ribbon-item">
                         <span class="ribbon-icon">📅</span>
@@ -1351,7 +1380,6 @@
             </div>
         </div>
 
-        <!-- SCREEN DISPLAY 2: ABOUT STORY DIRECTORIES ARCHIVE -->
         <div id="pageStory" class="page-view">
             <div class="story-page-content">
                 <div class="story-block">
@@ -1381,7 +1409,6 @@
             </div>
         </div>
 
-        <!-- SCREEN DISPLAY 3: CATEGORIES COMPETITION GRID MATRIX -->
         <div id="pageCategories" class="page-view">
             <div class="categories-viewport-wrapper">
                 <div class="categories-header-block">
@@ -1391,7 +1418,6 @@
                     </div>
                 </div>
 
-                <!-- Dynamic array mapping outputs structural cards here -->
                 <div class="categories-grid-matrix" id="categoriesGridContainer"></div>
 
                 <div class="rules-guidelines-trigger-row">
@@ -1402,7 +1428,6 @@
             </div>
         </div>
 
-        <!-- LAUNCH RULES CONFIG OVERLAY MODAL WINDOW LAYER -->
         <div id="rulesModal" class="rules-modal-overlay" onclick="toggleRulesModal(false)">
             <div class="rules-modal-container" onclick="event.stopPropagation()">
                 <button class="rules-modal-close" onclick="toggleRulesModal(false)">&times;</button>
@@ -1432,7 +1457,6 @@
             </div>
         </div>
 
-        <!-- SCREEN DISPLAY 4: ARCHIVE GALLERY -->
         <div id="pageGallery" class="page-view">
             <div class="gallery-outer-card">
                 <h2 class="gallery-main-title">Gallery</h2>
@@ -1445,8 +1469,7 @@
                 </div>
 
                 <div class="gallery-photo-grid" id="galleryPhotoGrid">
-                    <!-- Dynamic rendering engine inputs structural rows nodes -->
-                </div>
+                    </div>
 
                 <button class="btn-gallery-more">
                     <span>View More Photos</span>
@@ -1455,7 +1478,6 @@
             </div>
         </div>
 
-        <!-- SCREEN DISPLAY 5: MULTI STEP WIZARD PORTAL DATA REGISTRATION CONSOLE -->
         <div id="pageRegistration" class="page-view">
             <div class="portal-form-wrapper">
                 <div class="portal-glass-card" id="registrationCardContent">
@@ -1463,7 +1485,6 @@
                     <div id="activeFormContainer">
                         <h2 class="portal-main-heading">Registration</h2>
 
-                        <!-- WIZARD STEP LINE CONTROL BAR -->
                         <div class="step-pipeline-container">
                             <div class="step-pipeline-line">
                                 <div class="step-pipeline-line-progress" id="pipelineProgressLine"></div>
@@ -1492,7 +1513,6 @@
 
                         <form id="submissionForm" onsubmit="handleFinalSubmit(event)">
                             
-                            <!-- DATA FRAME SECTOR PANEL 1: APPLICANT DETAILS -->
                             <div class="wizard-step-panel active" id="wizardStep1">
                                 <h3 class="wizard-step-subheading">Applicant Details</h3>
                                 <div class="form-group">
@@ -1518,7 +1538,6 @@
                                 </div>
                             </div>
 
-                            <!-- DATA FRAME SECTOR PANEL 2: FILM DETAILS -->
                             <div class="wizard-step-panel" id="wizardStep2">
                                 <h3 class="wizard-step-subheading">Film Details</h3>
                                 <div class="form-grid">
@@ -1549,7 +1568,6 @@
                                 </div>
                             </div>
 
-                            <!-- DATA FRAME SECTOR PANEL 3: CAST & CREW DETAILS -->
                             <div class="wizard-step-panel" id="wizardStep3">
                                 <h3 class="wizard-step-subheading">Cast & Crew Details</h3>
                                 <div class="form-grid">
@@ -1602,7 +1620,6 @@
                                 </div>
                             </div>
 
-                            <!-- DATA FRAME SECTOR PANEL 4: PAYMENT CONSOLE -->
                             <div class="wizard-step-panel" id="wizardStep4">
                                 <h3 class="wizard-step-subheading">Payment</h3>
                                 <div class="payment-view">
@@ -1632,18 +1649,16 @@
                                 </div>
                             </div>
 
-                            <!-- DATA FRAME SECTOR PANEL 5: REVIEW & SUBMIT -->
                             <div class="wizard-step-panel" id="wizardStep5">
                                 <h3 class="wizard-step-subheading">Review & Submit</h3>
                                 <p style="font-size:0.85rem; color:rgba(255,255,255,0.8); margin-bottom:15px;">Please inspect field data points metrics prior to transmitting onto the main application server core ledger.</p>
                                 
                                 <div class="review-data-matrix" id="reviewSummaryMatrix">
-                                    <!-- Dynamic rows rendering frame inside -->
-                                </div>
+                                    </div>
 
                                 <div class="wizard-nav-row">
                                     <button type="button" class="btn-wizard-action back" onclick="goToWizardStep(4)">Back</button>
-                                    <button type="submit" id="submitBtn" class="btn-wizard-action continue">Submit Film Entry</button>
+                                    <submit id="submitBtn" class="btn-wizard-action continue">Submit Film Entry</button>
                                 </div>
                             </div>
 
@@ -1653,7 +1668,6 @@
             </div>
         </div>
 
-        <!-- SCREEN DISPLAY 6: HELPDESK ROUTING MATRIX INFOS -->
         <div id="pageContact" class="page-view">
             <div class="contact-glass-wrapper">
                 <div class="contact-card-body">
@@ -1698,7 +1712,6 @@
             </div>
         </div>
 
-        <!-- TRANSACTION SUCCESS SCREEN BLOCK CONSOLE LAYER -->
         <div id="successScreen" class="page-view success-screen">
             <div class="success-icon">✓</div>
             <h2>Submission Complete</h2>
@@ -1706,7 +1719,6 @@
             <button type="button" class="btn-wizard-action continue" style="max-width:220px; margin:0 auto;" onclick="resetPortalView()">Submit Another Entry</button>
         </div>
 
-        <!-- PERSISTENT FOOTER MAP MATRIX -->
         <div class="support-footer">
             <div class="support-footer-links">
                 <a onclick="switchViewTab('pageHome', document.getElementById('navHome'))">Home</a> · 
@@ -1724,7 +1736,6 @@
         </div>
     </div>
 
-    <!-- CENTRAL CONTROLLER SCRIPTS LOGIC MODULE -->
     <script>
         /*****************************************************************
          * ⚙️ MASTER VARIABLE HUB
@@ -1797,6 +1808,7 @@
             renderGallery('winners2025');
         });
 
+        /* View tab rendering switcher engine with custom image blurring filters built inside logic loops */
         function switchViewTab(targetTabId, sourceAnchorElement) {
             document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
             document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
@@ -1804,6 +1816,16 @@
             const targetedPanel = document.getElementById(targetTabId);
             if (targetedPanel) targetedPanel.classList.add('active');
             if (sourceAnchorElement) sourceAnchorElement.classList.add('active');
+
+            // Manage dynamic logo blurring behavior across routing matrix paths
+            const mainLogoElement = document.getElementById('mainLogo');
+            if (mainLogoElement) {
+                if (targetTabId !== 'pageHome') {
+                    mainLogoElement.classList.add('logo-blurred');
+                } else {
+                    mainLogoElement.classList.remove('logo-blurred');
+                }
+            }
 
             window.scrollTo({ top: 0, behavior: 'instant' });
         }
@@ -2082,3 +2104,5 @@
     </script>
 </body>
 </html>
+
+```
