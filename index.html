@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <link rel="icon" type="Favicon.png" href="Favicon.png">
+    <link rel="icon" type="image/png" href="Favicon.png">
 
     <title id="browserTabTitle">Sharankrishna Short Film Awards - Entry Portal</title>
     
@@ -110,6 +110,25 @@
         .brand-logo-area img.logo-blurred {
             filter: blur(4px);
             opacity: 0.5;
+        }
+
+        /* Hidden by default on Desktop Viewports */
+        .menu-toggle-btn {
+            display: none;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            font-size: 1.5rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            z-index: 1100;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+        .menu-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .navbar {
@@ -1184,77 +1203,74 @@
         }
 
         @media (max-width: 768px) {
-            /* 1. Mobile Background Frame Correction without shifting Desktop viewports */
+            /* Fix Background Fit on mobile viewports */
             .global-background-overlay {
                 background-size: contain;
                 background-position: top center;
                 background-color: var(--site-bg);
             }
 
+            /* Restyle header wrapper for responsive single-action mobile layout */
             .site-header-wrapper { 
-                padding: 12px 20px; 
-                justify-content: center;
-                background: transparent; 
-                border-bottom: none;     
+                padding: 15px 20px; 
+                justify-content: space-between;
+                background: rgba(6, 6, 8, 0.95);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
             
-            /* 2. Full Swipe Tab Dock Configuration pushed flush to the horizontal edges */
+            /* Reveal the integrated single-click format toggle menu trigger */
+            .menu-toggle-btn {
+                display: flex;
+            }
+
+            /* Convert horizontal nav asset menu into a stacked vertical dropdown framework */
             .navbar { 
-                display: flex; 
-                position: fixed;
-                bottom: 0;
+                display: none; /* Hidden dynamically until toggled active */
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
                 left: 0;
                 width: 100%;
-                background: linear-gradient(to top, rgba(6, 6, 8, 0.98) 85%, rgba(6, 6, 8, 0));
-                padding: 12px 16px 24px 16px; /* 16px horizontal spacing anchors items squarely to screen boundary lines */
-                justify-content: flex-start;  
-                gap: 4px;
-                z-index: 1000;
-                
-                /* Kinetic Scrolling Activation Framework */
-                overflow-x: auto;
-                scroll-behavior: smooth;
-                -webkit-overflow-scrolling: touch; 
-                
-                /* Universal Scroll Indicator Clean Removal */
-                scrollbar-width: none; 
-                -ms-overflow-style: none;
+                background: rgba(11, 11, 14, 0.98);
+                backdrop-filter: blur(25px);
+                -webkit-backdrop-filter: blur(25px);
+                padding: 15px 0;
+                gap: 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8);
             }
-            .navbar::-webkit-scrollbar { 
-                display: none; 
-                width: 0 !important;
-                height: 0 !important;
+            
+            /* Class injected by JavaScript to open the dropdown menu format */
+            .navbar.active {
+                display: flex;
             }
             
             .navbar a {
-                font-size: 0.72rem;
-                padding: 8px 12px;
-                letter-spacing: 0.5px;
-                flex-shrink: 0; /* Prevents textual content compression inside responsive swipe motions */
-                color: rgba(255, 255, 255, 0.6);
-                background: transparent !important; 
-                border: none !important;
+                width: 100%;
+                text-align: center;
+                padding: 14px 0;
+                font-size: 0.85rem;
+                letter-spacing: 1.5px;
+                border-radius: 0;
+                color: rgba(255, 255, 255, 0.7);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            }
+            .navbar a:last-child {
+                border-bottom: none;
             }
 
-            /* Minimalist Active Tab Highlight Pipeline */
-            .navbar a.active {
+            .navbar a:hover, .navbar a.active {
+                background: rgba(255, 255, 255, 0.05);
                 color: #ffffff;
-                font-weight: 700;
             }
+
+            /* Remove absolute bottom pipelines elements inside dynamic listing views */
             .navbar a.active::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                left: 12px;
-                right: 12px;
-                height: 2px;
-                background: #ffffff;
-                border-radius: 2px;
+                display: none;
             }
 
             .main-layout-content {
-                margin-top: 60px;
-                padding-bottom: 90px; 
+                margin-top: 90px;
             }
 
             .form-grid { grid-template-columns: 1fr; gap: 0; }
@@ -1277,7 +1293,6 @@
             .hero-metric-ribbon { grid-template-columns: 1fr; }
             .categories-grid-matrix { grid-template-columns: 1fr; }
             .gallery-photo-grid { grid-template-columns: 1fr; }
-            .navbar a { font-size: 0.7rem; padding: 8px 10px; }
         }
     </style>
 </head>
@@ -1290,7 +1305,10 @@
         <div class="brand-logo-area">
             <img id="mainLogo" src="" alt="Angle Frames Logo">
         </div>
-        <nav class="navbar">
+        
+        <button type="button" class="menu-toggle-btn" onclick="toggleMobileMenu()" aria-label="Toggle Navigation menu">☰</button>
+        
+        <nav class="navbar" id="mainNavbar">
             <a id="navHome" class="active" onclick="switchViewTab('pageHome', this)">Home</a>
             <a id="navStory" onclick="switchViewTab('pageStory', this)">About</a>
             <a id="navCategories" onclick="switchViewTab('pageCategories', this)">Categories</a>
@@ -1587,7 +1605,7 @@
                                         <label for="writer">Writer & Screenplay *</label>
                                         <input type="text" id="writer" placeholder="Screenwriter's name">
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-grid">
                                         <label for="cinematographer">Cinematographer *</label>
                                         <input type="text" id="cinematographer" placeholder="DoP name">
                                     </div>
@@ -1810,6 +1828,14 @@
             renderGallery('winners2025');
         });
 
+        /* Dynamic mobile multi-view drawer toggle function */
+        function toggleMobileMenu() {
+            const nav = document.getElementById('mainNavbar');
+            if (nav) {
+                nav.classList.toggle('active');
+            }
+        }
+
         /* View tab rendering switcher engine with custom image blurring filters built inside logic loops */
         function switchViewTab(targetTabId, sourceAnchorElement) {
             document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
@@ -1827,6 +1853,12 @@
                 } else {
                     mainLogoElement.classList.remove('logo-blurred');
                 }
+            }
+
+            // Clean single-click optimization wrapper: collapse mobile container drawer view automatically on click
+            const nav = document.getElementById('mainNavbar');
+            if (nav && nav.classList.contains('active')) {
+                nav.classList.remove('active');
             }
 
             window.scrollTo({ top: 0, behavior: 'instant' });
