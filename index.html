@@ -86,7 +86,7 @@
             top: 0;
             left: 0;
             z-index: 1000;
-            padding: 15px 40px;
+            padding: 15px 40px; /* Kept original navigation padding */
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -97,10 +97,10 @@
             align-items: center;
         }
 
-        /* Fixed Invisible & Blurring Bug: Logo base styling with responsive sharpening dimensions */
+        /* Fixed Invisible & Blurring Bug: ONLY the logo is scaled up independently */
         .brand-logo-area img {
             height: auto;
-            width: 220px; /* Enhanced visible desktop size */
+            width: 220px; /* Increased visible desktop size */
             max-width: 100%;
             display: block;
             opacity: 1;
@@ -137,10 +137,11 @@
             gap: 5px;
         }
 
+        /* Navigation links kept explicitly small as original */
         .navbar a {
             color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
-            font-size: 0.75rem;
+            font-size: 0.75rem; /* Original size preserved */
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1.5px;
@@ -1227,7 +1228,7 @@
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
 
-            /* Visibility Fix: Boost mobile scale metrics for full logo rendering output */
+            /* Boost mobile scale metrics for full logo rendering output without touching navigation text */
             .brand-logo-area img {
                 width: 140px; 
             }
@@ -1858,7 +1859,7 @@
             if (targetedPanel) targetedPanel.classList.add('active');
             if (sourceAnchorElement) sourceAnchorElement.classList.add('active');
 
-            // Clean single-click optimization wrapper: collapse mobile container drawer view automatically on click
+            // Collapse mobile layout container dropdown automatically on click
             const nav = document.getElementById('mainNavbar');
             if (nav && nav.classList.contains('active')) {
                 nav.classList.remove('active');
