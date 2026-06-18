@@ -48,7 +48,91 @@
             position: relative;
         }
 
-        /* --- Global Fixed Background Framework (Desktop First Style) --- */
+        /* --- SCROLL ANIMATION ENGINE --- */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(80px);
+            transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .scroll-reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .scroll-reveal-left {
+            opacity: 0;
+            transform: translateX(-120px) scale(0.95);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .scroll-reveal-left.visible {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+        .scroll-reveal-right {
+            opacity: 0;
+            transform: translateX(120px) scale(0.95);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .scroll-reveal-right.visible {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+        .scroll-reveal-scale {
+            opacity: 0;
+            transform: scale(0.7) translateY(60px);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .scroll-reveal-scale.visible {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+        .scroll-reveal-blur {
+            opacity: 0;
+            filter: blur(20px);
+            transform: translateY(40px);
+            transition: opacity 1.1s cubic-bezier(0.16, 1, 0.3, 1), transform 1.1s cubic-bezier(0.16, 1, 0.3, 1), filter 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .scroll-reveal-blur.visible {
+            opacity: 1;
+            filter: blur(0);
+            transform: translateY(0);
+        }
+        /* Staggered delay helpers */
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.35s; }
+        .delay-4 { transition-delay: 0.5s; }
+        .delay-5 { transition-delay: 0.65s; }
+
+        /* Section dividers */
+        .section-divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.15) 50%, transparent 100%);
+            margin: 0;
+        }
+
+        /* Cinematic section labels */
+        .section-eyebrow {
+            display: inline-block;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: rgba(255,255,255,0.45);
+            margin-bottom: 18px;
+            position: relative;
+        }
+        .section-eyebrow::before {
+            content: '';
+            display: inline-block;
+            width: 30px;
+            height: 1px;
+            background: rgba(255,255,255,0.4);
+            vertical-align: middle;
+            margin-right: 12px;
+        }
+
+        /* --- Global Fixed Background Framework --- */
         .global-background-overlay {
             position: fixed;
             top: 0;
@@ -62,7 +146,6 @@
             z-index: -2;
         }
 
-        /* Dark overlay gradient to ensure text readability without blurring the artwork */
         .vignette-overlay {
             position: fixed;
             top: 0;
@@ -75,10 +158,10 @@
             pointer-events: none;
         }
 
-        /* --- Standardized Height Full Width Header & Navigation --- */
+        /* --- Header & Navigation --- */
         .site-header-wrapper {
             width: 100%;
-            height: 70px; /* Standard industry sweet spot height */
+            height: 70px;
             background: rgba(6, 6, 8, 0.8); 
             backdrop-filter: var(--ios-blur);
             -webkit-backdrop-filter: var(--ios-blur);
@@ -91,28 +174,26 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: background 0.4s ease;
         }
 
         .brand-logo-area {
             display: flex;
             align-items: center;
-            height: 100%; /* Spans full navbar height for alignment */
+            height: 100%;
         }
 
-        /* Logo is sized cleanly to stay highly visible but contained */
         .brand-logo-area img {
-            max-height: 48px; /* Keeps logo completely visible within 70px bar */
-            width: auto; /* Maintains perfect crisp aspect ratio */
+            max-height: 48px;
+            width: auto;
             display: block;
             opacity: 1;
-            /* Anti-blur rendering fixes */
             transform: translateZ(0);
             will-change: transform;
             image-rendering: -webkit-optimize-contrast;
             image-rendering: crisp-edges;
         }
 
-        /* Hidden by default on Desktop Viewports */
         .menu-toggle-btn {
             display: none;
             background: transparent;
@@ -138,7 +219,6 @@
             height: 100%;
         }
 
-        /* Navigation links at their original, elegant compact sizes */
         .navbar a {
             color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
@@ -174,33 +254,14 @@
             border-radius: 2px;
         }
 
-        /* Workspace Canvas Panel Switcher Screens Container */
-        .main-layout-content {
-            margin-top: 90px; /* Aligned nicely to standard navbar shadow buffer */
-            flex: 1;
+        /* --- HERO SECTION --- */
+        #section-home {
+            min-height: 100vh;
             width: 100%;
             display: flex;
             flex-direction: column;
-        }
-
-        /* TAB VIEWS STATES */
-        .page-view {
-            display: none;
-            width: 100%;
-        }
-
-        .page-view.active {
-            display: block;
-        }
-
-        /* Hero View Layout */
-        .hero-section {
-            min-height: calc(100vh - 130px);
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between; 
-            padding: 20px 8% 40px 8%;
+            justify-content: space-between;
+            padding: 120px 8% 60px 8%;
             position: relative;
         }
 
@@ -235,7 +296,6 @@
             display: block;
         }
 
-        /* Association Branding Row */
         .association-wrapper {
             display: flex;
             flex-direction: column;
@@ -279,7 +339,6 @@
             text-shadow: 0 2px 8px rgba(0,0,0,0.6);
         }
 
-        /* Action Buttons Row */
         .hero-action-row {
             display: flex;
             align-items: center;
@@ -302,6 +361,7 @@
             gap: 12px;
             box-shadow: 0 10px 25px rgba(255, 255, 255, 0.15);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
         }
 
         .btn-action-primary:hover {
@@ -325,6 +385,7 @@
             align-items: center;
             gap: 12px;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
 
         .btn-action-secondary:hover {
@@ -332,7 +393,7 @@
             border-color: rgba(255, 255, 255, 0.5);
         }
 
-        /* Dual Countdown Display Dashboard Component */
+        /* Dual Countdown */
         .countdown-dashboard-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -397,7 +458,6 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
             z-index: 3;
-            margin-top: auto; 
         }
 
         .ribbon-item {
@@ -434,27 +494,113 @@
             letter-spacing: 0.5px;
         }
 
-        /* AWARDS CATEGORIES SECTION */
-        .categories-viewport-wrapper {
-            max-width: 1000px;
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.6;
+            animation: scrollBounce 2.5s ease-in-out infinite;
+        }
+        .scroll-indicator span {
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.7);
+        }
+        .scroll-arrow {
+            width: 24px;
+            height: 24px;
+            border-right: 2px solid rgba(255,255,255,0.6);
+            border-bottom: 2px solid rgba(255,255,255,0.6);
+            transform: rotate(45deg);
+        }
+        @keyframes scrollBounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* ===== SECTIONS SHARED LAYOUT ===== */
+        .page-section {
             width: 100%;
-            margin: 20px auto 40px auto;
-            padding: 0 24px;
-            text-align: center;
+            padding: 120px 8%;
+            position: relative;
         }
 
-        .categories-header-block {
-            margin-bottom: 35px;
+        /* Parallax bg tint per section */
+        .page-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(6,6,8,0.6) 0%, rgba(6,6,8,0.85) 100%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .page-section > * { position: relative; z-index: 1; }
+
+        .section-inner {
+            max-width: 1100px;
+            margin: 0 auto;
         }
 
-        .categories-header-block h2 {
-            font-size: 1.8rem;
-            font-weight: 600;
+        .section-heading {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
-            color: #ffffff;
-            margin-bottom: 8px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            line-height: 1.05;
+            margin-bottom: 16px;
+        }
+
+        /* ===== ABOUT SECTION ===== */
+        #section-story {
+            background: transparent;
+        }
+
+        .story-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 60px;
+        }
+
+        .story-block {
+            background: var(--glass-bg);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            border: 1px solid var(--glass-border);
+            padding: 36px;
+            border-radius: 16px;
+            transition: border-color 0.4s ease, transform 0.4s ease;
+        }
+        .story-block:hover {
+            border-color: rgba(255,255,255,0.3);
+            transform: translateY(-4px);
+        }
+
+        .story-block h3 {
+            margin-bottom: 14px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding-bottom: 10px;
+            font-weight: 700;
+        }
+        .story-block p {
+            color: rgba(255,255,255,0.85);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* ===== CATEGORIES SECTION ===== */
+        #section-categories {
+            text-align: center;
         }
 
         .categories-star-divider {
@@ -463,18 +609,19 @@
             justify-content: center;
             gap: 15px;
             color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 50px;
         }
 
         .categories-star-divider::before,
         .categories-star-divider::after {
             content: '';
-            width: 40px;
+            width: 60px;
             height: 1px;
             background: rgba(255, 255, 255, 0.3);
         }
 
         .categories-star-divider span {
-            font-size: 0.85rem;
+            font-size: 1rem;
             color: rgba(255, 255, 255, 0.9);
         }
 
@@ -482,7 +629,7 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 16px;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
         }
 
         .category-asset-card {
@@ -491,19 +638,19 @@
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
-            padding: 24px 12px;
+            padding: 28px 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 14px;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .category-asset-card:hover {
             background: rgba(6, 6, 8, 0.9);
             border-color: rgba(255, 255, 255, 0.4);
-            transform: translateY(-2px);
+            transform: translateY(-6px) scale(1.02);
         }
 
         .category-asset-card .icon-placeholder {
@@ -521,7 +668,7 @@
         }
 
         .category-asset-card .category-emoji {
-            font-size: 1.8rem;
+            font-size: 2rem;
         }
 
         .category-asset-card p {
@@ -562,7 +709,7 @@
             border-color: rgba(255, 255, 255, 0.5);
         }
 
-        /* RULES AND REGULATION OVERLAY MODAL */
+        /* Rules Modal */
         .rules-modal-overlay {
             display: none;
             position: fixed;
@@ -616,9 +763,7 @@
             line-height: 1;
         }
 
-        .rules-modal-close:hover {
-            color: #ffffff;
-        }
+        .rules-modal-close:hover { color: #ffffff; }
 
         .rules-modal-title {
             font-size: 1.25rem;
@@ -649,30 +794,8 @@
             line-height: 1.5;
         }
 
-        /* GALLERY STYLE */
-        .gallery-outer-card {
-            max-width: 750px;
-            width: 92%;
-            margin: 20px auto 40px auto;
-            padding: 30px;
-            background: var(--glass-bg);
-            backdrop-filter: var(--ios-blur);
-            -webkit-backdrop-filter: var(--ios-blur);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            box-shadow: inset 0px 1px 1px rgba(255, 255, 255, 0.05), 0px 25px 55px rgba(0,0,0,0.6);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .gallery-main-title {
-            color: #ffffff;
-            font-size: 1.4rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 24px;
+        /* ===== GALLERY SECTION ===== */
+        #section-gallery {
             text-align: center;
         }
 
@@ -680,7 +803,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             overflow-x: auto;
             width: 100%;
             justify-content: center;
@@ -718,9 +841,11 @@
         .gallery-photo-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            width: 100%;
-            margin-bottom: 30px;
+            gap: 24px;
+            margin-bottom: 40px;
+            max-width: 750px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .gallery-photo-frame {
@@ -747,10 +872,13 @@
             height: 100%;
             object-fit: cover;
             display: block;
-            transition: transform 0.3s ease;
+            transition: transform 0.4s ease;
+        }
+        .gallery-photo-frame:hover {
+            transform: translateY(-4px);
         }
         .gallery-photo-frame:hover img {
-            transform: scale(1.03);
+            transform: scale(1.05);
         }
 
         .gallery-photo-details {
@@ -784,7 +912,6 @@
             font-size: 2.2rem;
             border: 2px dashed rgba(255,255,255,0.1);
             border-radius: 8px;
-            margin: 0;
         }
         .placeholder-empty-graphic span {
             font-size: 0.7rem;
@@ -812,28 +939,23 @@
             justify-content: center;
             gap: 10px;
             transition: all 0.3s ease;
+            margin: 0 auto;
         }
         .btn-gallery-more:hover {
             background: rgba(255, 255, 255, 0.1);
             border-color: rgba(255, 255, 255, 0.4);
         }
 
-        /* CLOSED REGISTRATION BLOCK STATE STYLE */
-        .closed-state-card {
+        /* ===== REGISTRATION SECTION ===== */
+        #section-registration {
             text-align: center;
-            padding: 40px 20px;
-        }
-        .closed-state-icon {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
         }
 
-        /* REGISTRATION FORM SECTION */
         .portal-form-wrapper {
             max-width: 650px;
             width: 100%;
-            margin: 20px auto 80px auto;
-            padding: 0 20px;
+            margin: 60px auto 0 auto;
+            text-align: left;
         }
 
         .portal-glass-card {
@@ -856,7 +978,6 @@
             color: #ffffff;
         }
 
-        /* STEP TIMELINE MATRIX */
         .step-pipeline-container {
             display: flex;
             justify-content: space-between;
@@ -939,7 +1060,6 @@
             font-weight: 600;
         }
 
-        /* MULTI-STEP PANELS */
         .wizard-step-panel {
             display: none;
         }
@@ -965,7 +1085,6 @@
             padding-left: 10px;
         }
 
-        /* INPUT CONFIGURATIONS */
         .form-group { margin-bottom: 24px; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
@@ -1000,7 +1119,6 @@
             border-color: rgba(255, 255, 255, 0.6);
         }
 
-        /* CONTROLS BUTTONS */
         .wizard-nav-row {
             display: flex;
             gap: 12px;
@@ -1069,12 +1187,37 @@
         .review-row span:first-child { color: rgba(255,255,255,0.7); }
         .review-row span:last-child { color: #ffffff; font-weight: 500; }
 
-        /* CONTACT LAYOUT */
-        .contact-glass-wrapper {
-            max-width: 550px;
-            width: 100%;
-            margin: 20px auto 40px auto;
-            padding: 0 20px;
+        .closed-state-card {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .closed-state-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.4);
+            cursor: pointer;
+        }
+        .file-upload-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .file-upload-text { color: rgba(255,255,255,0.8); font-size: 0.85rem; }
+        .file-uploaded-name { display: none; margin-top: 8px; font-size: 0.85rem; color: #30d158; font-weight: 600; }
+        .payment-view { background: rgba(0, 0, 0, 0.4); padding: 20px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.12); text-align: center; }
+        .qr-box { width: 160px; height: 160px; background: #fff; padding: 8px; margin: 15px auto; border-radius: 10px; }
+        .qr-box img { width: 100%; height: 100%; object-fit: contain; }
+
+        .success-screen-inner { text-align: center; padding: 60px 20px; }
+        .success-icon { width: 64px; height: 64px; background: rgba(48, 209, 88, 0.1); border: 1px solid #30d158; color: #30d158; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 1.8rem; }
+
+        /* ===== CONTACT SECTION ===== */
+        #section-contact {
+            text-align: center;
         }
 
         .contact-card-body {
@@ -1086,6 +1229,8 @@
             border-radius: 20px;
             text-align: center;
             box-shadow: 0 20px 45px rgba(0,0,0,0.6);
+            max-width: 550px;
+            margin: 60px auto 0 auto;
         }
 
         .contact-channel-row {
@@ -1101,6 +1246,8 @@
             font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 0;
         }
 
         .contact-channel-row p {
@@ -1146,31 +1293,7 @@
             display: block;
         }
 
-        /* HELPERS */
-        .file-upload-wrapper {
-            position: relative;
-            border: 1px dashed rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            padding: 24px;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.4);
-            cursor: pointer;
-        }
-        .file-upload-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
-        .file-upload-text { color: rgba(255,255,255,0.8); font-size: 0.85rem; }
-        .file-uploaded-name { display: none; margin-top: 8px; font-size: 0.85rem; color: #30d158; font-weight: 600; }
-        .payment-view { background: rgba(0, 0, 0, 0.4); padding: 20px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.12); text-align: center; }
-        .qr-box { width: 160px; height: 160px; background: #fff; padding: 8px; margin: 15px auto; border-radius: 10px; }
-        .qr-box img { width: 100%; height: 100%; object-fit: contain; }
-        
-        .story-page-content { display: flex; flex-direction: column; gap: 24px; padding: 0 20px; max-width: 800px; margin: 20px auto 40px auto; }
-        .story-block { background: var(--glass-bg); backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur); border: 1px solid var(--glass-border); padding: 30px; border-radius: 12px;}
-        .story-block h3 { margin-bottom: 12px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.15); padding-bottom: 6px; }
-        .story-block p { color: #ffffff; font-size: 0.95rem; line-height: 1.6; }
-        
-        .success-screen { text-align: center; padding: 60px 20px; max-width: 600px; margin: 40px auto; }
-        .success-icon { width: 64px; height: 64px; background: rgba(48, 209, 88, 0.1); border: 1px solid #30d158; color: #30d158; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 1.8rem; }
-
+        /* ===== FOOTER ===== */
         .support-footer {
             padding: 40px 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -1180,7 +1303,8 @@
             font-size: 0.8rem;
             color: rgba(255, 255, 255, 0.7);
             line-height: 1.6;
-            margin-top: auto;
+            position: relative;
+            z-index: 2;
         }
         .support-footer-links {
             display: flex;
@@ -1204,42 +1328,30 @@
             letter-spacing: 0.3px;
         }
 
-        /* --- RESPONSIVE MOBILE & PC VIEWPORT CONFIGURATIONS --- */
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 992px) {
-            .hero-section {
-                padding: 20px 6% 30px 6%;
-                min-height: auto;
-            }
+            .story-grid { grid-template-columns: 1fr; }
             .categories-grid-matrix { grid-template-columns: repeat(3, 1fr); }
         }
 
         @media (max-width: 768px) {
-            /* Fix Background Fit on mobile viewports */
             .global-background-overlay {
                 background-size: contain;
                 background-position: top center;
                 background-color: var(--site-bg);
             }
 
-            /* Restyle header wrapper for responsive layout */
             .site-header-wrapper { 
-                height: 60px; /* Slightly lower standard on screens */
+                height: 60px;
                 padding: 0 20px; 
                 justify-content: space-between;
                 background: rgba(6, 6, 8, 0.95);
             }
 
-            /* Contain mobile size of logo within standard framework safely */
-            .brand-logo-area img {
-                max-height: 38px; 
-            }
+            .brand-logo-area img { max-height: 38px; }
             
-            /* Reveal the integrated single-click format toggle menu trigger */
-            .menu-toggle-btn {
-                display: flex;
-            }
+            .menu-toggle-btn { display: flex; }
 
-            /* Convert horizontal nav asset menu into a stacked vertical dropdown framework */
             .navbar { 
                 display: none; 
                 flex-direction: column;
@@ -1257,10 +1369,7 @@
                 box-shadow: 0 15px 30px rgba(0, 0, 0, 0.8);
             }
             
-            /* Class injected by JavaScript to open the dropdown menu format */
-            .navbar.active {
-                display: flex;
-            }
+            .navbar.active { display: flex; }
             
             .navbar a {
                 width: 100%;
@@ -1272,38 +1381,25 @@
                 color: rgba(255, 255, 255, 0.7);
                 border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             }
-            .navbar a:last-child {
-                border-bottom: none;
-            }
-
+            .navbar a:last-child { border-bottom: none; }
             .navbar a:hover, .navbar a.active {
                 background: rgba(255, 255, 255, 0.05);
                 color: #ffffff;
             }
+            .navbar a.active::after { display: none; }
 
-            /* Remove absolute bottom pipelines elements inside dynamic listing views */
-            .navbar a.active::after {
-                display: none;
-            }
-
-            .main-layout-content {
-                margin-top: 80px;
-            }
-
+            #section-home { padding: 100px 5% 50px 5%; }
+            .page-section { padding: 80px 5%; }
             .form-grid { grid-template-columns: 1fr; gap: 0; }
             .countdown-dashboard-container { grid-template-columns: 1fr; gap: 12px; }
-            
             .hero-metric-ribbon { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
             .categories-grid-matrix { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .gallery-photo-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            
             .hero-main-title { font-size: 2.2rem; }
             .portal-glass-card { padding: 24px; }
             .step-pipeline-container { display: none; }
             .social-links-grid { gap: 20px; }
-            
             .btn-wizard-action { padding: 14px; font-size: 0.8rem; }
-            .gallery-outer-card { padding: 16px; width: 95%; }
         }
 
         @media (max-width: 480px) {
@@ -1318,6 +1414,7 @@
     <div class="global-background-overlay"></div>
     <div class="vignette-overlay"></div>
 
+    <!-- FIXED HEADER -->
     <div class="site-header-wrapper">
         <div class="brand-logo-area">
             <img id="mainLogo" src="" alt="Angle Frames Logo">
@@ -1326,117 +1423,124 @@
         <button type="button" class="menu-toggle-btn" onclick="toggleMobileMenu()" aria-label="Toggle Navigation menu">☰</button>
         
         <nav class="navbar" id="mainNavbar">
-            <a id="navHome" class="active" onclick="switchViewTab('pageHome', this)">Home</a>
-            <a id="navStory" onclick="switchViewTab('pageStory', this)">About</a>
-            <a id="navCategories" onclick="switchViewTab('pageCategories', this)">Categories</a>
-            <a id="navGallery" onclick="switchViewTab('pageGallery', this)">Gallery</a>
-            <a id="navRegistration" onclick="switchViewTab('pageRegistration', this)">Registration</a>
-            <a id="navContact" onclick="switchViewTab('pageContact', this)">Contact Us</a>
+            <a id="navHome" class="active" href="#section-home">Home</a>
+            <a id="navStory" href="#section-story">About</a>
+            <a id="navCategories" href="#section-categories">Categories</a>
+            <a id="navGallery" href="#section-gallery">Gallery</a>
+            <a id="navRegistration" href="#section-registration">Registration</a>
+            <a id="navContact" href="#section-contact">Contact Us</a>
         </nav>
     </div>
 
-    <div class="main-layout-content">
+    <!-- ===== HERO SECTION ===== -->
+    <section id="section-home">
+        <div class="hero-main-body">
+            <p class="hero-presenter-tag scroll-reveal">Angle Frames Presents</p>
+            <h1 class="hero-main-title scroll-reveal delay-1">Sharankrishna <strong>Short Film Awards</strong></h1>
+            
+            <div class="association-wrapper scroll-reveal delay-2">
+                <span class="association-tag">In Association With</span>
+                <div class="association-logo-box">
+                    <h2 class="association-main-title">JAIN (Deemed-to-be University), Kochi Campus</h2>
+                </div>
+            </div>
 
-        <div id="pageHome" class="page-view active">
-            <div class="hero-section">
-                
-                <div class="hero-main-body">
-                    <p class="hero-presenter-tag">Angle Frames Presents</p>
-                    <h1 class="hero-main-title">Sharankrishna <strong>Short Film Awards</strong></h1>
-                    
-                    <div class="association-wrapper">
-                        <span class="association-tag">In Association With</span>
-                        <div class="association-logo-box">
-                            <h2 class="association-main-title">JAIN (Deemed-to-be University), Kochi Campus</h2>
-                        </div>
-                    </div>
-
-                    <div class="countdown-dashboard-container">
-                        <div class="countdown-card-block">
-                            <div class="countdown-title-tag">Submission Deadline Countdown</div>
-                            <div class="countdown-timer-digits-row" id="deadlineCountdown">
-                                <div class="time-unit-slot"><span class="time-number" id="d-days">00</span><span class="time-label">Days</span></div>
-                                <div class="time-unit-slot"><span class="time-number" id="d-hours">00</span><span class="time-label">Hrs</span></div>
-                                <div class="time-unit-slot"><span class="time-number" id="d-mins">00</span><span class="time-label">Mins</span></div>
-                                <div class="time-unit-slot"><span class="time-number" id="d-secs">00</span><span class="time-label">Secs</span></div>
-                            </div>
-                        </div>
-                        <div class="countdown-card-block">
-                            <div class="countdown-title-tag">Grand Awards Event Countdown</div>
-                            <div class="countdown-timer-digits-row" id="eventCountdown">
-                                <div class="time-unit-slot"><span class="time-number" id="e-days">00</span><span class="time-label">Days</span></div>
-                                <div class="time-unit-slot"><span class="time-number" id="e-hours">00</span><span class="time-label">Hrs</span></div>
-                                <div class="time-unit-slot"><span class="time-number" id="e-mins">00</span><span class="time-label">Mins</span></div>
-                                <div class="time-unit-slot"><span class="time-number" id="e-secs">00</span><span class="time-label">Secs</span></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <p class="hero-tagline">
-                        Honoring Creativity. Recognizing Talent.<br>
-                        Inspiring the Next Generation of Filmmakers.
-                    </p>
-
-                    <div class="hero-action-row">
-                        <button type="button" id="heroSubmitBtn" class="btn-action-primary" onclick="switchViewTab('pageRegistration', document.getElementById('navRegistration'))">Submit Your Film &rarr;</button>
-                        <button type="button" class="btn-action-secondary" onclick="switchViewTab('pageCategories', document.getElementById('navCategories'))">View Categories &rarr;</button>
+            <div class="countdown-dashboard-container scroll-reveal delay-3">
+                <div class="countdown-card-block">
+                    <div class="countdown-title-tag">Submission Deadline Countdown</div>
+                    <div class="countdown-timer-digits-row" id="deadlineCountdown">
+                        <div class="time-unit-slot"><span class="time-number" id="d-days">00</span><span class="time-label">Days</span></div>
+                        <div class="time-unit-slot"><span class="time-number" id="d-hours">00</span><span class="time-label">Hrs</span></div>
+                        <div class="time-unit-slot"><span class="time-number" id="d-mins">00</span><span class="time-label">Mins</span></div>
+                        <div class="time-unit-slot"><span class="time-number" id="d-secs">00</span><span class="time-label">Secs</span></div>
                     </div>
                 </div>
+                <div class="countdown-card-block">
+                    <div class="countdown-title-tag">Grand Awards Event Countdown</div>
+                    <div class="countdown-timer-digits-row" id="eventCountdown">
+                        <div class="time-unit-slot"><span class="time-number" id="e-days">00</span><span class="time-label">Days</span></div>
+                        <div class="time-unit-slot"><span class="time-number" id="e-hours">00</span><span class="time-label">Hrs</span></div>
+                        <div class="time-unit-slot"><span class="time-number" id="e-mins">00</span><span class="time-label">Mins</span></div>
+                        <div class="time-unit-slot"><span class="time-number" id="e-secs">00</span><span class="time-label">Secs</span></div>
+                    </div>
+                </div>
+            </div>
 
-                <div class="hero-metric-ribbon">
-                    <div class="ribbon-item">
-                        <span class="ribbon-icon">📅</span>
-                        <div class="ribbon-text">
-                            <span class="ribbon-label">Submission Deadline</span>
-                            <span class="ribbon-value" id="labelDeadlineDate">31 Dec 2026</span>
-                        </div>
-                    </div>
-                    <div class="ribbon-item">
-                        <span class="ribbon-icon">🏆</span>
-                        <div class="ribbon-text">
-                            <span class="ribbon-label">Winners Announcement</span>
-                            <span class="ribbon-value" id="labelEventDate">12 Feb 2027</span>
-                        </div>
-                    </div>
-                    <div class="ribbon-item">
-                        <span class="ribbon-icon">💳</span>
-                        <div class="ribbon-text">
-                            <span class="ribbon-label">Entry Fee</span>
-                            <span class="ribbon-value">₹ 1000</span>
-                        </div>
-                    </div>
-                    <div class="ribbon-item">
-                        <span class="ribbon-icon">🎬</span>
-                        <div class="ribbon-text">
-                            <span class="ribbon-label">Open To</span>
-                            <span class="ribbon-value">All Filmmakers</span>
-                        </div>
-                    </div>
+            <p class="hero-tagline scroll-reveal delay-3">
+                Honoring Creativity. Recognizing Talent.<br>
+                Inspiring the Next Generation of Filmmakers.
+            </p>
+
+            <div class="hero-action-row scroll-reveal delay-4">
+                <a href="#section-registration" id="heroSubmitBtn" class="btn-action-primary">Submit Your Film &rarr;</a>
+                <a href="#section-categories" class="btn-action-secondary">View Categories &rarr;</a>
+            </div>
+        </div>
+
+        <div class="hero-metric-ribbon scroll-reveal delay-5">
+            <div class="ribbon-item">
+                <span class="ribbon-icon">📅</span>
+                <div class="ribbon-text">
+                    <span class="ribbon-label">Submission Deadline</span>
+                    <span class="ribbon-value" id="labelDeadlineDate">31 Dec 2026</span>
+                </div>
+            </div>
+            <div class="ribbon-item">
+                <span class="ribbon-icon">🏆</span>
+                <div class="ribbon-text">
+                    <span class="ribbon-label">Winners Announcement</span>
+                    <span class="ribbon-value" id="labelEventDate">12 Feb 2027</span>
+                </div>
+            </div>
+            <div class="ribbon-item">
+                <span class="ribbon-icon">💳</span>
+                <div class="ribbon-text">
+                    <span class="ribbon-label">Entry Fee</span>
+                    <span class="ribbon-value">₹ 1000</span>
+                </div>
+            </div>
+            <div class="ribbon-item">
+                <span class="ribbon-icon">🎬</span>
+                <div class="ribbon-text">
+                    <span class="ribbon-label">Open To</span>
+                    <span class="ribbon-value">All Filmmakers</span>
                 </div>
             </div>
         </div>
 
-        <div id="pageStory" class="page-view">
-            <div class="story-page-content">
-                <div class="story-block">
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ===== ABOUT SECTION ===== -->
+    <section id="section-story" class="page-section">
+        <div class="section-inner">
+            <span class="section-eyebrow scroll-reveal">Our Story</span>
+            <h2 class="section-heading scroll-reveal delay-1">About the<br>Awards</h2>
+            <div class="story-grid">
+                <div class="story-block scroll-reveal-left delay-1">
                     <h3>About Angle Frames</h3>
                     <p>
                         Angle Frames stands as a premier creative collective and platform committed to fueling the fires of independent filmmaking. Founded with a vision to build bridges for raw, unadulterated storytelling, Angle Frames discovers, highlights, and honors ground-breaking visual concepts. By organizing top-tier competitive arenas, masterclasses, and project distributions, we give voice to young digital visionaries across the region.
                     </p>
                 </div>
-                <div class="story-block">
+                <div class="story-block scroll-reveal-right delay-2">
                     <h3>About Jain University</h3>
                     <p>
-                        Ranked consistently among India’s top educational institutions, JAIN (Deemed-to-be University) acts as a powerful catalyst for human development and progressive learning. The Kochi Campus emphasizes creative exploration and technical mastery, specifically within its creative and media programs. Through its collaboration on the Sharankrishna Short Film Awards, Jain University reinforces its institutional drive toward nurturing industry-ready artistic talents.
+                        Ranked consistently among India's top educational institutions, JAIN (Deemed-to-be University) acts as a powerful catalyst for human development and progressive learning. The Kochi Campus emphasizes creative exploration and technical mastery, specifically within its creative and media programs. Through its collaboration on the Sharankrishna Short Film Awards, Jain University reinforces its institutional drive toward nurturing industry-ready artistic talents.
                     </p>
                 </div>
-                <div class="story-block">
+                <div class="story-block scroll-reveal-left delay-2">
                     <h3>Who is Sharankrishna?</h3>
                     <p>
                         Sharankrishna was a vibrant creative spirit whose life was anchored deeply in the world of independent filmmaking and visual storytelling. Cinema was an absolute passion, a canvas for honest thoughts, and an arena for boundless raw expression.
                     </p>
                 </div>
-                <div class="story-block">
+                <div class="story-block scroll-reveal-right delay-3">
                     <h3>The Story Behind Our Logo</h3>
                     <p>
                         The core visual structure integrates a gold-toned camera aperture frame enclosing geometric perspectives. The closing aperture signifies pinning down a transient slice of time into a permanent timeline.
@@ -1444,78 +1548,92 @@
                 </div>
             </div>
         </div>
+    </section>
 
-        <div id="pageCategories" class="page-view">
-            <div class="categories-viewport-wrapper">
-                <div class="categories-header-block">
-                    <h2>Awards Categories</h2>
-                    <div class="categories-star-divider">
-                        <span>★</span>
-                    </div>
-                </div>
+    <div class="section-divider"></div>
 
-                <div class="categories-grid-matrix" id="categoriesGridContainer"></div>
-
-                <div class="rules-guidelines-trigger-row">
-                    <button class="btn-rules-guidelines" onclick="toggleRulesModal(true)">
-                        View All Rules & Guidelines <span>&rarr;</span>
-                    </button>
-                </div>
+    <!-- ===== CATEGORIES SECTION ===== -->
+    <section id="section-categories" class="page-section">
+        <div class="section-inner">
+            <span class="section-eyebrow scroll-reveal">Compete & Win</span>
+            <h2 class="section-heading scroll-reveal delay-1">Awards Categories</h2>
+            <div class="categories-star-divider scroll-reveal delay-2">
+                <span>★</span>
             </div>
-        </div>
 
-        <div id="rulesModal" class="rules-modal-overlay" onclick="toggleRulesModal(false)">
-            <div class="rules-modal-container" onclick="event.stopPropagation()">
-                <button class="rules-modal-close" onclick="toggleRulesModal(false)">&times;</button>
-                <h3 class="rules-modal-title">Rules & Guidelines</h3>
-                <div class="rules-list-content">
-                    <div class="rule-item-box">
-                        <h4>1. Runtime Duration</h4>
-                        <p>All project submissions must keep total run times strictly at or underneath a maximum runtime limit of 30 minutes including credits.</p>
-                    </div>
-                    <div class="rule-item-box">
-                        <h4>2. Eligibility & Timeline</h4>
-                        <p>Films must have been completed on or after January 1, 2024. Works-in-progress are not accepted.</p>
-                    </div>
-                    <div class="rule-item-box">
-                        <h4>3. Original Content & Copyright</h4>
-                        <p>Applicants must hold all clear intellectual rights, licenses, and permits regarding both music tracks and imagery materials utilized inside the submission.</p>
-                    </div>
-                    <div class="rule-item-box">
-                        <h4>4. Campus Track Requirements</h4>
-                        <p>Submissions for the student division require proof of active institutional enrollment (Student ID Card Scan upload validation).</p>
-                    </div>
-                    <div class="rule-item-box">
-                        <h4>5. Review Panel Verdicts</h4>
-                        <p>Decisions and evaluations handed down by the official judging board remain absolute, terminal, and unalterable.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <div class="categories-grid-matrix" id="categoriesGridContainer"></div>
 
-        <div id="pageGallery" class="page-view">
-            <div class="gallery-outer-card">
-                <h2 class="gallery-main-title">Gallery</h2>
-
-                <div class="gallery-filter-row">
-                    <button id="pillWinners2025" class="btn-gallery-pill active" onclick="filterGallery('winners2025', this)">Winners 2025</button>
-                    <button id="pillWinners2026" class="btn-gallery-pill" onclick="filterGallery('winners2026', this)">Winners 2026</button>
-                    <button id="pillWinners2027" class="btn-gallery-pill" onclick="filterGallery('winners2027', this)">Winners 2027</button>
-                    <button id="pillEvents" class="btn-gallery-pill" onclick="filterGallery('events', this)">Events</button>
-                </div>
-
-                <div class="gallery-photo-grid" id="galleryPhotoGrid">
-                    </div>
-
-                <button class="btn-gallery-more">
-                    <span>View More Photos</span>
-                    <span style="font-size: 1rem;">&rarr;</span>
+            <div class="rules-guidelines-trigger-row scroll-reveal delay-2">
+                <button class="btn-rules-guidelines" onclick="toggleRulesModal(true)">
+                    View All Rules & Guidelines <span>&rarr;</span>
                 </button>
             </div>
         </div>
+    </section>
 
-        <div id="pageRegistration" class="page-view">
-            <div class="portal-form-wrapper">
+    <!-- Rules Modal -->
+    <div id="rulesModal" class="rules-modal-overlay" onclick="toggleRulesModal(false)">
+        <div class="rules-modal-container" onclick="event.stopPropagation()">
+            <button class="rules-modal-close" onclick="toggleRulesModal(false)">&times;</button>
+            <h3 class="rules-modal-title">Rules & Guidelines</h3>
+            <div class="rules-list-content">
+                <div class="rule-item-box">
+                    <h4>1. Runtime Duration</h4>
+                    <p>All project submissions must keep total run times strictly at or underneath a maximum runtime limit of 30 minutes including credits.</p>
+                </div>
+                <div class="rule-item-box">
+                    <h4>2. Eligibility & Timeline</h4>
+                    <p>Films must have been completed on or after January 1, 2024. Works-in-progress are not accepted.</p>
+                </div>
+                <div class="rule-item-box">
+                    <h4>3. Original Content & Copyright</h4>
+                    <p>Applicants must hold all clear intellectual rights, licenses, and permits regarding both music tracks and imagery materials utilized inside the submission.</p>
+                </div>
+                <div class="rule-item-box">
+                    <h4>4. Campus Track Requirements</h4>
+                    <p>Submissions for the student division require proof of active institutional enrollment (Student ID Card Scan upload validation).</p>
+                </div>
+                <div class="rule-item-box">
+                    <h4>5. Review Panel Verdicts</h4>
+                    <p>Decisions and evaluations handed down by the official judging board remain absolute, terminal, and unalterable.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <!-- ===== GALLERY SECTION ===== -->
+    <section id="section-gallery" class="page-section">
+        <div class="section-inner">
+            <span class="section-eyebrow scroll-reveal">Memories & Moments</span>
+            <h2 class="section-heading scroll-reveal delay-1">Gallery</h2>
+
+            <div class="gallery-filter-row scroll-reveal delay-2">
+                <button id="pillWinners2025" class="btn-gallery-pill active" onclick="filterGallery('winners2025', this)">Winners 2025</button>
+                <button id="pillWinners2026" class="btn-gallery-pill" onclick="filterGallery('winners2026', this)">Winners 2026</button>
+                <button id="pillWinners2027" class="btn-gallery-pill" onclick="filterGallery('winners2027', this)">Winners 2027</button>
+                <button id="pillEvents" class="btn-gallery-pill" onclick="filterGallery('events', this)">Events</button>
+            </div>
+
+            <div class="gallery-photo-grid" id="galleryPhotoGrid"></div>
+
+            <button class="btn-gallery-more scroll-reveal delay-3">
+                <span>View More Photos</span>
+                <span style="font-size: 1rem;">&rarr;</span>
+            </button>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- ===== REGISTRATION SECTION ===== -->
+    <section id="section-registration" class="page-section">
+        <div class="section-inner" style="text-align:center;">
+            <span class="section-eyebrow scroll-reveal">Enter the Competition</span>
+            <h2 class="section-heading scroll-reveal delay-1">Registration</h2>
+
+            <div class="portal-form-wrapper scroll-reveal-scale delay-2">
                 <div class="portal-glass-card" id="registrationCardContent">
                     
                     <div id="activeFormContainer">
@@ -1689,8 +1807,7 @@
                                 <h3 class="wizard-step-subheading">Review & Submit</h3>
                                 <p style="font-size:0.85rem; color:rgba(255,255,255,0.8); margin-bottom:15px;">Please inspect field data points metrics prior to transmitting onto the main application server core ledger.</p>
                                 
-                                <div class="review-data-matrix" id="reviewSummaryMatrix">
-                                    </div>
+                                <div class="review-data-matrix" id="reviewSummaryMatrix"></div>
 
                                 <div class="wizard-nav-row">
                                     <button type="button" class="btn-wizard-action back" onclick="goToWizardStep(4)">Back</button>
@@ -1700,80 +1817,88 @@
 
                         </form>
                     </div>
-                </div>
-            </div>
-        </div>
 
-        <div id="pageContact" class="page-view">
-            <div class="contact-glass-wrapper">
-                <div class="contact-card-body">
-                    <h3 style="font-size:1.4rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">Contact Helpdesk</h3>
-                    <p style="color:rgba(255,255,255,0.8); font-size:0.9rem; margin-bottom:20px;">Get operational or routing support from our technical assistants.</p>
-                    
-                    <div class="contact-channel-row">
-                        <label>Call Help Lines</label>
-                        <p><a href="tel:+917902959564">+91 7902959564</a></p>
-                        <p style="margin-top:5px;"><a href="tel:+919745640896">+91 9745640896</a></p>
-                    </div>
-
-                    <div class="contact-channel-row">
-                        <label>Official Inquiry Mailbox</label>
-                        <p><a href="mailto:angleframes.contact@gmail.com">angleframes.contact@gmail.com</a></p>
-                    </div>
-
-                    <div class="contact-channel-row">
-                        <label>Headquarters Office Address</label>
-                        <div class="contact-address-text">
-                            Angle frames 12/399,<br>
-                            Krishnalayam Thenhippalam<br>
-                            Malappuram, Kerala - 673636
-                        </div>
-                    </div>
-
-                    <div class="contact-channel-row" style="margin-bottom:0;">
-                        <label style="margin-bottom: 12px;">Connect & Follow Us</label>
-                        <div class="social-links-grid">
-                            <a href="https://www.instagram.com/sharankrishna_shortfilm_awards/" target="_blank" class="social-link-icon-anchor">
-                                <img id="socialIconInstagram" src="" alt="Instagram">
-                            </a>
-                            <a href="https://www.youtube.com/@ANGLEFRAMES" target="_blank" class="social-link-icon-anchor">
-                                <img id="socialIconYoutube" src="" alt="YouTube">
-                            </a>
-                            <a href="https://www.facebook.com/share/1BRDQLmtVp/" target="_blank" class="social-link-icon-anchor">
-                                <img id="socialIconFacebook" src="" alt="Facebook">
-                            </a>
+                    <div id="successScreen" style="display:none;">
+                        <div class="success-screen-inner">
+                            <div class="success-icon">✓</div>
+                            <h2>Submission Complete</h2>
+                            <p style="color:rgba(255,255,255,0.8); margin: 15px 0 30px 0;">Your entry files and payment snapshot reference have been logged onto our core data ledger system.</p>
+                            <button type="button" class="btn-wizard-action continue" style="max-width:220px; margin:0 auto;" onclick="resetPortalView()">Submit Another Entry</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <div id="successScreen" class="page-view success-screen">
-            <div class="success-icon">✓</div>
-            <h2>Submission Complete</h2>
-            <p style="color:rgba(255,255,255,0.8); margin: 15px 0 30px 0;">Your entry files and payment snapshot reference have been logged onto our core data ledger system.</p>
-            <button type="button" class="btn-wizard-action continue" style="max-width:220px; margin:0 auto;" onclick="resetPortalView()">Submit Another Entry</button>
+    <div class="section-divider"></div>
+
+    <!-- ===== CONTACT SECTION ===== -->
+    <section id="section-contact" class="page-section">
+        <div class="section-inner" style="text-align:center;">
+            <span class="section-eyebrow scroll-reveal">Get in Touch</span>
+            <h2 class="section-heading scroll-reveal delay-1">Contact Helpdesk</h2>
+
+            <div class="contact-card-body scroll-reveal-scale delay-2">
+                <p style="color:rgba(255,255,255,0.8); font-size:0.9rem; margin-bottom:20px;">Get operational or routing support from our technical assistants.</p>
+                
+                <div class="contact-channel-row">
+                    <label>Call Help Lines</label>
+                    <p><a href="tel:+917902959564">+91 7902959564</a></p>
+                    <p style="margin-top:5px;"><a href="tel:+919745640896">+91 9745640896</a></p>
+                </div>
+
+                <div class="contact-channel-row">
+                    <label>Official Inquiry Mailbox</label>
+                    <p><a href="mailto:angleframes.contact@gmail.com">angleframes.contact@gmail.com</a></p>
+                </div>
+
+                <div class="contact-channel-row">
+                    <label>Headquarters Office Address</label>
+                    <div class="contact-address-text">
+                        Angle frames 12/399,<br>
+                        Krishnalayam Thenhippalam<br>
+                        Malappuram, Kerala - 673636
+                    </div>
+                </div>
+
+                <div class="contact-channel-row" style="margin-bottom:0;">
+                    <label style="margin-bottom: 12px;">Connect & Follow Us</label>
+                    <div class="social-links-grid">
+                        <a href="https://www.instagram.com/sharankrishna_shortfilm_awards/" target="_blank" class="social-link-icon-anchor">
+                            <img id="socialIconInstagram" src="" alt="Instagram">
+                        </a>
+                        <a href="https://www.youtube.com/@ANGLEFRAMES" target="_blank" class="social-link-icon-anchor">
+                            <img id="socialIconYoutube" src="" alt="YouTube">
+                        </a>
+                        <a href="https://www.facebook.com/share/1BRDQLmtVp/" target="_blank" class="social-link-icon-anchor">
+                            <img id="socialIconFacebook" src="" alt="Facebook">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="support-footer">
+        <div class="support-footer-links">
+            <a href="#section-home">Home</a> · 
+            <a href="#section-story">About</a> · 
+            <a href="#section-categories">Categories</a> · 
+            <a href="#section-gallery">Gallery</a> · 
+            <a href="#section-contact">Contact</a>
+        </div>
+        
+        <div class="footer-address-block">
+            <strong>Angle frames</strong> 12/399, Krishnalayam Thenhippalam Malappuram, Kerala - 673636
         </div>
 
-        <div class="support-footer">
-            <div class="support-footer-links">
-                <a onclick="switchViewTab('pageHome', document.getElementById('navHome'))">Home</a> · 
-                <a onclick="switchViewTab('pageStory', document.getElementById('navStory'))">About</a> · 
-                <a onclick="switchViewTab('pageCategories', document.getElementById('navCategories'))">Categories</a> · 
-                <a onclick="switchViewTab('pageGallery', document.getElementById('navGallery'))">Gallery</a> · 
-                <a onclick="switchViewTab('pageContact', document.getElementById('navContact'))">Contact</a>
-            </div>
-            
-            <div class="footer-address-block">
-                <strong>Angle frames</strong> 12/399, Krishnalayam Thenhippalam Malappuram, Kerala - 673636
-            </div>
-
-            <p>&copy; 2026 Angle Frames Presents Sharankrishna Short Film Awards. All Rights Reserved.</p>
-        </div>
+        <p>&copy; 2026 Angle Frames Presents Sharankrishna Short Film Awards. All Rights Reserved.</p>
     </div>
 
     <script>
-        /*****************************************************************
+        /****************************************************************
          * ⚙️ MASTER VARIABLE HUB
          *****************************************************************/
         const REGISTRATION_GATE = {
@@ -1795,9 +1920,6 @@
             socialFacebook: "—Pngtree—facebook icon facebook logo_3584837.png"
         };
 
-        /**
-         * 🏆 DYNAMIC CATEGORY MANAGER HUB
-         */
         const CATEGORY_ITEMS = [
             { title: "Best<br>Short Film", emoji: "🎬", image: "" },
             { title: "Best<br>Director", emoji: "👥", image: "" }, 
@@ -1826,15 +1948,76 @@
 
         let currentWizardStep = 1;
 
+        /* ===== MASSIVE SCROLL ANIMATION ENGINE ===== */
+        function initScrollAnimations() {
+            const allAnimated = document.querySelectorAll(
+                '.scroll-reveal, .scroll-reveal-left, .scroll-reveal-right, .scroll-reveal-scale, .scroll-reveal-blur'
+            );
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -60px 0px'
+            });
+
+            allAnimated.forEach(el => observer.observe(el));
+
+            // Also animate category cards with stagger as they enter view
+            const categoryObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const cards = entry.target.querySelectorAll('.category-asset-card');
+                        cards.forEach((card, i) => {
+                            card.style.opacity = '0';
+                            card.style.transform = 'translateY(60px) scale(0.9)';
+                            card.style.transition = `opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.07}s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.07}s`;
+                            setTimeout(() => {
+                                card.style.opacity = '1';
+                                card.style.transform = 'translateY(0) scale(1)';
+                            }, 50);
+                        });
+                        categoryObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            const grid = document.getElementById('categoriesGridContainer');
+            if (grid) categoryObserver.observe(grid);
+        }
+
+        /* Active nav highlight on scroll */
+        function initNavHighlight() {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.navbar a[href^="#"]');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === '#' + entry.target.id) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { threshold: 0.4 });
+
+            sections.forEach(section => observer.observe(section));
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
-            // Mapping system elements onto template spaces
             document.getElementById('mainLogo').src = SITE_IMAGES.mainLogo;
             document.getElementById('paymentQrImg').src = SITE_IMAGES.paymentQrCode;
             document.getElementById('socialIconInstagram').src = SITE_IMAGES.socialInstagram;
             document.getElementById('socialIconYoutube').src = SITE_IMAGES.socialYoutube;
             document.getElementById('socialIconFacebook').src = SITE_IMAGES.socialFacebook;
 
-            // Date adjustments
             document.getElementById('labelDeadlineDate').textContent = PORTAL_TIMELINES.deadlineLabelText;
             document.getElementById('labelEventDate').textContent = PORTAL_TIMELINES.eventLabelText;
 
@@ -1842,32 +2025,18 @@
             initiateTimersEngine();
             generateDynamicCategories();
             renderGallery('winners2025');
+            initScrollAnimations();
+            initNavHighlight();
+
+            // Trigger hero animations immediately
+            document.querySelectorAll('#section-home .scroll-reveal').forEach(el => {
+                setTimeout(() => el.classList.add('visible'), 100);
+            });
         });
 
-        /* Dynamic mobile multi-view drawer toggle function */
         function toggleMobileMenu() {
             const nav = document.getElementById('mainNavbar');
-            if (nav) {
-                nav.classList.toggle('active');
-            }
-        }
-
-        /* View tab rendering switcher engine */
-        function switchViewTab(targetTabId, sourceAnchorElement) {
-            document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
-            document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
-
-            const targetedPanel = document.getElementById(targetTabId);
-            if (targetedPanel) targetedPanel.classList.add('active');
-            if (sourceAnchorElement) sourceAnchorElement.classList.add('active');
-
-            // Collapse mobile layout container dropdown automatically on click
-            const nav = document.getElementById('mainNavbar');
-            if (nav && nav.classList.contains('active')) {
-                nav.classList.remove('active');
-            }
-
-            window.scrollTo({ top: 0, behavior: 'instant' });
+            if (nav) nav.classList.toggle('active');
         }
 
         function generateDynamicCategories() {
@@ -1909,7 +2078,7 @@
                     heroSubmitBtn.style.color = "rgba(255,255,255,0.4)";
                     heroSubmitBtn.style.border = "1px solid rgba(255,255,255,0.08)";
                     heroSubmitBtn.style.boxShadow = "none";
-                    heroSubmitBtn.disabled = true;
+                    heroSubmitBtn.style.pointerEvents = "none";
                 }
                 if (formContainer) {
                     formContainer.innerHTML = `
@@ -2122,7 +2291,7 @@
                 .then(response => {
                     if (response.status === "success") {
                         document.getElementById('activeFormContainer').style.display = 'none';
-                        document.getElementById('successScreen').classList.add('active');
+                        document.getElementById('successScreen').style.display = 'block';
                     } else {
                         alert("Submission rejection code: " + response.message);
                     }
