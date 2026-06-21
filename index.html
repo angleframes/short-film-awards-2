@@ -254,6 +254,41 @@
             border-radius: 2px;
         }
 
+        .nav-more-wrapper { position: relative; display: inline-flex; }
+        .nav-more-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 10px;
+            background: rgba(11, 11, 14, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 10px;
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            min-width: 200px;
+            padding: 8px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6);
+            z-index: 1100;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .nav-more-dropdown.active { display: flex; }
+        .nav-more-dropdown a {
+            color: rgba(255, 255, 255, 0.75);
+            text-decoration: none;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: block;
+        }
+        .nav-more-dropdown a:hover { background: rgba(255, 255, 255, 0.08); color: #ffffff; }
+
         /* --- HERO SECTION --- */
         #section-home {
             min-height: 100vh;
@@ -530,6 +565,9 @@
             width: 100%;
             padding: 120px 8%;
             position: relative;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         /* Parallax bg tint per section */
@@ -839,14 +877,22 @@
         }
 
         .gallery-photo-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            display: flex;
+            flex-wrap: nowrap;
             gap: 24px;
             margin-bottom: 40px;
-            max-width: 750px;
-            margin-left: auto;
-            margin-right: auto;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x proximity;
+            -webkit-overflow-scrolling: touch;
+            padding: 4px 4px 22px 4px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
         }
+        .gallery-photo-grid::-webkit-scrollbar { height: 6px; }
+        .gallery-photo-grid::-webkit-scrollbar-track { background: transparent; }
+        .gallery-photo-grid::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.25); border-radius: 10px; }
+        .gallery-photo-grid::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.4); }
 
         .gallery-photo-frame {
             background: rgba(6, 6, 8, 0.6);
@@ -857,6 +903,8 @@
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
             display: flex;
             flex-direction: column;
+            flex: 0 0 260px;
+            scroll-snap-align: start;
         }
         
         .gallery-image-container {
@@ -921,30 +969,93 @@
             color: rgba(255,255,255,0.6);
         }
 
-        .btn-gallery-more {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #ffffff;
-            width: 100%;
-            max-width: 280px;
-            padding: 14px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-            font-weight: 600;
+        .gallery-scroll-hint {
+            font-size: 0.7rem;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            cursor: pointer;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 18px;
+        }
+
+        /* ===== INFO MODALS (Privacy / Guidelines / Updates / Jury / How-To) ===== */
+        .jury-panel-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            text-align: center;
+        }
+        .jury-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            padding: 20px 12px;
+        }
+        .jury-avatar-placeholder {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px dashed rgba(255, 255, 255, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            margin: 0 auto;
+            margin: 0 auto 12px auto;
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.4);
         }
-        .btn-gallery-more:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.4);
+        .jury-card h4 { font-size: 0.82rem; color: #ffffff; margin-bottom: 4px; font-weight: 600; }
+        .jury-card p { font-size: 0.68rem; color: rgba(255, 255, 255, 0.55); text-transform: uppercase; letter-spacing: 0.5px; }
+        .jury-panel-note {
+            margin-top: 18px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: center;
+            line-height: 1.5;
         }
+
+        .updates-timeline { display: flex; flex-direction: column; gap: 18px; }
+        .update-entry { border-left: 2px solid rgba(255, 255, 255, 0.2); padding-left: 16px; position: relative; }
+        .update-entry::before {
+            content: '';
+            position: absolute;
+            left: -5px;
+            top: 5px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ffffff;
+        }
+        .update-date { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(255, 255, 255, 0.5); margin-bottom: 4px; }
+        .update-title { font-size: 0.9rem; font-weight: 600; color: #ffffff; margin-bottom: 4px; }
+        .update-text { font-size: 0.83rem; color: #e4e4e7; line-height: 1.5; }
+
+        .rules-modal-container .modal-link-cta {
+            display: inline-block;
+            margin-top: 18px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ffffff;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+            cursor: pointer;
+        }
+
+        .info-modal-container .info-tab-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            margin-bottom: 26px;
+            padding-bottom: 4px;
+        }
+        .info-modal-container .info-tab-row::-webkit-scrollbar { display: none; }
+        .info-modal-container .info-tab-row { -ms-overflow-style: none; scrollbar-width: none; }
+        .info-tab-pane { display: none; }
+        .info-tab-pane.active { display: block; }
+
+        .support-footer-links { flex-wrap: wrap; row-gap: 8px; }
+        .support-footer-links-secondary { margin-top: -5px; }
 
         /* ===== REGISTRATION SECTION ===== */
         #section-registration {
@@ -1293,6 +1404,50 @@
             display: block;
         }
 
+        /* ===== WHATSAPP FLOATING BUTTON ===== */
+        .whatsapp-float-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: #25D366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+            z-index: 1500;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+        }
+        .whatsapp-float-btn svg {
+            width: 28px;
+            height: 28px;
+            fill: #ffffff;
+        }
+        .whatsapp-float-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55);
+            animation: whatsappPulse 2.6s infinite;
+            pointer-events: none;
+        }
+        .whatsapp-float-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 8px 26px rgba(0, 0, 0, 0.55);
+        }
+        @keyframes whatsappPulse {
+            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.55); }
+            70% { box-shadow: 0 0 0 14px rgba(37, 211, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+        @media (max-width: 600px) {
+            .whatsapp-float-btn { width: 50px; height: 50px; bottom: 18px; right: 18px; }
+            .whatsapp-float-btn svg { width: 25px; height: 25px; }
+        }
+
         /* ===== FOOTER ===== */
         .support-footer {
             padding: 40px 20px;
@@ -1388,13 +1543,33 @@
             }
             .navbar a.active::after { display: none; }
 
+            .nav-more-wrapper { width: 100%; display: flex; flex-direction: column; }
+            .nav-more-dropdown {
+                position: static;
+                width: 100%;
+                margin-top: 0;
+                border: none;
+                border-radius: 0;
+                background: rgba(255, 255, 255, 0.03);
+                box-shadow: none;
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+                padding: 0;
+            }
+            .nav-more-dropdown a {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+                text-align: center;
+                padding: 12px 0;
+                border-radius: 0;
+            }
+
             #section-home { padding: 100px 5% 50px 5%; }
             .page-section { padding: 80px 5%; }
             .form-grid { grid-template-columns: 1fr; gap: 0; }
             .countdown-dashboard-container { grid-template-columns: 1fr; gap: 12px; }
             .hero-metric-ribbon { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
             .categories-grid-matrix { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .gallery-photo-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .gallery-photo-frame { flex-basis: 220px; }
             .hero-main-title { font-size: 2.2rem; }
             .portal-glass-card { padding: 24px; }
             .step-pipeline-container { display: none; }
@@ -1405,7 +1580,7 @@
         @media (max-width: 480px) {
             .hero-metric-ribbon { grid-template-columns: 1fr; }
             .categories-grid-matrix { grid-template-columns: 1fr; }
-            .gallery-photo-grid { grid-template-columns: 1fr; }
+            .gallery-photo-frame { flex-basis: 190px; }
         }
     </style>
 </head>
@@ -1429,6 +1604,16 @@
             <a id="navGallery" href="#section-gallery">Gallery</a>
             <a id="navRegistration" href="#section-registration">Registration</a>
             <a id="navContact" href="#section-contact">Contact Us</a>
+            <div class="nav-more-wrapper" id="navMoreWrapper">
+                <a href="javascript:void(0)" id="navMoreTrigger" onclick="toggleMoreDropdown(event)">More &#9662;</a>
+                <div class="nav-more-dropdown" id="navMoreDropdown">
+                    <a onclick="selectMoreItem('submit')">How To Submit</a>
+                    <a onclick="selectMoreItem('guidelines')">Festival Guidelines</a>
+                    <a onclick="selectMoreItem('updates')">Festival Updates</a>
+                    <a onclick="selectMoreItem('jury')">Jury Panel</a>
+                    <a onclick="selectMoreItem('privacy')">Privacy Policy</a>
+                </div>
+            </div>
         </nav>
     </div>
 
@@ -1456,7 +1641,7 @@
                     </div>
                 </div>
                 <div class="countdown-card-block">
-                    <div class="countdown-title-tag">Grand Awards Event Countdown</div>
+                    <div class="countdown-title-tag">Grand Function & Winners Announcement</div>
                     <div class="countdown-timer-digits-row" id="eventCountdown">
                         <div class="time-unit-slot"><span class="time-number" id="e-days">00</span><span class="time-label">Days</span></div>
                         <div class="time-unit-slot"><span class="time-number" id="e-hours">00</span><span class="time-label">Hrs</span></div>
@@ -1488,7 +1673,7 @@
             <div class="ribbon-item">
                 <span class="ribbon-icon">🏆</span>
                 <div class="ribbon-text">
-                    <span class="ribbon-label">Winners Announcement</span>
+                    <span class="ribbon-label">Winners & Grand Function</span>
                     <span class="ribbon-value" id="labelEventDate">12 Feb 2027</span>
                 </div>
             </div>
@@ -1603,6 +1788,99 @@
 
     <div class="section-divider"></div>
 
+    <!-- Festival Info Modal (tabbed: How To Submit / Guidelines / Updates / Jury / Privacy) -->
+    <div id="infoModal" class="rules-modal-overlay" onclick="closeInfoModal()">
+        <div class="rules-modal-container info-modal-container" onclick="event.stopPropagation()">
+            <button class="rules-modal-close" onclick="closeInfoModal()">&times;</button>
+            <h3 class="rules-modal-title" id="infoModalTitle">How To Submit</h3>
+
+            <div class="info-tab-row">
+                <button id="infoTabBtn-submit" class="btn-gallery-pill active" onclick="switchInfoTab('submit')">How To Submit</button>
+                <button id="infoTabBtn-guidelines" class="btn-gallery-pill" onclick="switchInfoTab('guidelines')">Guidelines</button>
+                <button id="infoTabBtn-updates" class="btn-gallery-pill" onclick="switchInfoTab('updates')">Updates</button>
+                <button id="infoTabBtn-jury" class="btn-gallery-pill" onclick="switchInfoTab('jury')">Jury Panel</button>
+                <button id="infoTabBtn-privacy" class="btn-gallery-pill" onclick="switchInfoTab('privacy')">Privacy</button>
+            </div>
+
+            <!-- How To Submit -->
+            <div id="infoTabPane-submit" class="info-tab-pane active">
+                <div class="rules-list-content">
+                    <div class="rule-item-box">
+                        <h4>1. Your Details</h4>
+                        <p>Start the entry wizard with your name, email, phone number, and city so we can reach you about your submission.</p>
+                    </div>
+                    <div class="rule-item-box">
+                        <h4>2. Film Details</h4>
+                        <p>Add your film's title, category, runtime, and a working link to the film hosted on YouTube or a cloud storage service.</p>
+                    </div>
+                    <div class="rule-item-box">
+                        <h4>3. Crew & Cast Credits</h4>
+                        <p>List your director, producer, writer, cinematographer, editor, music director, and lead cast members so the credits are accurately recorded.</p>
+                    </div>
+                    <div class="rule-item-box">
+                        <h4>4. Entry Fee Payment</h4>
+                        <p>Pay the entry fee via the UPI QR code shown in the portal, then upload your payment screenshot or PDF along with the transaction reference ID.</p>
+                    </div>
+                    <div class="rule-item-box">
+                        <h4>5. Review & Confirm</h4>
+                        <p>Double-check your entry summary on the final step, then submit. You'll see an on-screen confirmation once your entry has been received.</p>
+                    </div>
+                </div>
+                <a href="#section-registration" class="modal-link-cta" onclick="closeInfoModal()">Start Your Submission &rarr;</a>
+            </div>
+
+            <!-- Festival Guidelines -->
+            <div id="infoTabPane-guidelines" class="info-tab-pane">
+                <div class="rules-list-content" id="guidelinesListContainer"></div>
+                <span class="modal-link-cta" onclick="closeInfoModal(); toggleRulesModal(true);">View Submission Rules &rarr;</span>
+            </div>
+
+            <!-- Festival Updates -->
+            <div id="infoTabPane-updates" class="info-tab-pane">
+                <div class="updates-timeline" id="updatesListContainer"></div>
+            </div>
+
+            <!-- Jury Panel -->
+            <div id="infoTabPane-jury" class="info-tab-pane">
+                <div class="jury-panel-grid" id="juryPanelGrid"></div>
+                <p class="jury-panel-note">Our jury panel for this edition is being finalized and will be announced soon. Follow our social channels for the official reveal.</p>
+            </div>
+
+            <!-- Privacy Policy -->
+            <div id="infoTabPane-privacy" class="info-tab-pane">
+                <div class="rules-list-content">
+                    <div class="rule-item-box">
+                        <h4>Information We Collect</h4>
+                        <p>When you register a film entry, we collect details you provide such as your name, email, phone number, city, film and crew information, and payment reference details.</p>
+                    </div>
+                    <div class="rule-item-box">
+                        <h4>How We Use Your Information</h4>
+                        <p>Your information is used solely to process your submission, verify entry payments, communicate updates about the festival, and coordinate the judging process.</p>
+                    </div>
+                    <div class="rule-item-box">
+                        <h4>Data Sharing</h4>
+                        <p>We do not sell or rent your personal information. Limited details may be shared internally with the jury panel and organizing team strictly for evaluation purposes.</p>
+                    </div>
+                    <div class="rule-item-box">
+                        <h4>Data Security</h4>
+                        <p>We take reasonable technical and organizational measures to protect your information from unauthorized access, alteration, or disclosure.</p>
+                    </div>
+                    <div class="rule-item-box">
+                        <h4>Your Rights</h4>
+                        <p>You may request access to, correction of, or deletion of your personal data at any time by reaching out through our contact helpdesk.</p>
+                    </div>
+                    <div class="rule-item-box">
+                        <h4>Contact Us</h4>
+                        <p>For any privacy-related questions, write to us at angleframes.contact@gmail.com.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="section-divider"></div>
+
     <!-- ===== GALLERY SECTION ===== -->
     <section id="section-gallery" class="page-section">
         <div class="section-inner">
@@ -1612,16 +1890,11 @@
             <div class="gallery-filter-row scroll-reveal delay-2">
                 <button id="pillWinners2025" class="btn-gallery-pill active" onclick="filterGallery('winners2025', this)">Winners 2025</button>
                 <button id="pillWinners2026" class="btn-gallery-pill" onclick="filterGallery('winners2026', this)">Winners 2026</button>
-                <button id="pillWinners2027" class="btn-gallery-pill" onclick="filterGallery('winners2027', this)">Winners 2027</button>
                 <button id="pillEvents" class="btn-gallery-pill" onclick="filterGallery('events', this)">Events</button>
             </div>
 
+            <div class="gallery-scroll-hint scroll-reveal delay-2">&larr; Swipe to explore &rarr;</div>
             <div class="gallery-photo-grid" id="galleryPhotoGrid"></div>
-
-            <button class="btn-gallery-more scroll-reveal delay-3">
-                <span>View More Photos</span>
-                <span style="font-size: 1rem;">&rarr;</span>
-            </button>
         </div>
     </section>
 
@@ -1889,6 +2162,14 @@
             <a href="#section-gallery">Gallery</a> · 
             <a href="#section-contact">Contact</a>
         </div>
+
+        <div class="support-footer-links support-footer-links-secondary">
+            <a onclick="openInfoModal('submit')">How To Submit</a> · 
+            <a onclick="openInfoModal('guidelines')">Festival Guidelines</a> · 
+            <a onclick="openInfoModal('updates')">Festival Updates</a> · 
+            <a onclick="openInfoModal('jury')">Jury Panel</a> · 
+            <a onclick="openInfoModal('privacy')">Privacy Policy</a>
+        </div>
         
         <div class="footer-address-block">
             <strong>Angle frames</strong> 12/399, Krishnalayam Thenhippalam Malappuram, Kerala - 673636
@@ -1897,12 +2178,20 @@
         <p>&copy; 2026 Angle Frames Presents Sharankrishna Short Film Awards. All Rights Reserved.</p>
     </div>
 
+    <!-- WhatsApp Enquiry Button (always visible) -->
+    <a href="https://wa.me/919745640896?text=Hi%2C%20I%20have%20an%20enquiry%20about%20the%20Sharankrishna%20Short%20Film%20Awards."
+       class="whatsapp-float-btn" target="_blank" rel="noopener noreferrer" aria-label="Chat with us on WhatsApp">
+        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16.01 3C9.39 3 4 8.36 4 14.94c0 2.2.6 4.27 1.64 6.05L3 29l8.27-2.57a13.1 13.1 0 0 0 4.74.89h.01c6.62 0 12-5.36 12-11.94C28.02 8.36 22.63 3 16.01 3Zm0 21.6h-.01a10.5 10.5 0 0 1-5.36-1.47l-.38-.23-4.9 1.53 1.56-4.76-.25-.4a9.85 9.85 0 0 1-1.55-5.33C5.12 9.5 9.96 4.71 16 4.71c2.78 0 5.4 1.08 7.36 3.04a10.3 10.3 0 0 1 3.05 7.19c0 5.48-4.83 10.27-10.4 10.27ZM21.55 17.6c-.3-.15-1.78-.88-2.06-.98-.28-.1-.48-.15-.69.15-.2.3-.78.98-.96 1.18-.18.2-.35.22-.65.07-.3-.15-1.27-.47-2.42-1.49-.9-.8-1.5-1.78-1.68-2.08-.18-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.69-1.67-.95-2.28-.25-.6-.5-.52-.69-.53h-.59c-.2 0-.53.08-.81.38-.28.3-1.06 1.04-1.06 2.53s1.09 2.93 1.24 3.13c.15.2 2.15 3.29 5.21 4.61.73.31 1.3.5 1.74.64.73.23 1.4.2 1.92.12.59-.09 1.78-.73 2.03-1.43.25-.7.25-1.3.18-1.43-.08-.13-.28-.2-.58-.35Z"/>
+        </svg>
+    </a>
+
     <script>
         /****************************************************************
          * ⚙️ MASTER VARIABLE HUB
          *****************************************************************/
         const REGISTRATION_GATE = {
-            isOpen: true 
+            isOpen: false 
         };
 
         const PORTAL_TIMELINES = {
@@ -1917,7 +2206,14 @@
             paymentQrCode: "angle.jpg",
             socialInstagram: "—Pngtree—instagram icon vector_8704817.png",
             socialYoutube: "—Pngtree—youtube social media 3d stereo_8704808.png",
-            socialFacebook: "—Pngtree—facebook icon facebook logo_3584837.png"
+            socialFacebook: "—Pngtree—facebook icon facebook logo_3584837.png",
+            // Per-section background images — add a file name/path to give that section its own backdrop.
+            // Leave as "" to keep the default shared background.
+            sectionBgStory: "",
+            sectionBgCategories: "",
+            sectionBgGallery: "",
+            sectionBgRegistration: "",
+            sectionBgContact: ""
         };
 
         const CATEGORY_ITEMS = [
@@ -1937,7 +2233,6 @@
             { category: "winners2025", src: "MRC01071.JPG.jpeg", title: "Best Short Film: 'Bug'", sub: "Winner 2025" },
             { category: "winners2025", src: "MRC01028.JPG.jpeg", title: "Campus Category: 'Timeless'", sub: "Winner 2025" },
             { category: "winners2026", src: "", title: "To Be Announced", sub: "Coming Soon" },
-            { category: "winners2027", src: "", title: "To Be Announced", sub: "Coming Soon" },
             { category: "events", src: "MRC00606.JPG.jpeg", title: "Festival Panel Event", sub: "Live Screening" },
             { category: "events", src: "MRC00614.JPG.jpeg", title: "Audience Hall Screening", sub: "Cinema Hall" },
             { category: "events", src: "MRC00617.JPG.jpeg", title: "Audience Hall Screening", sub: "Cinema Hall" },
@@ -1947,6 +2242,36 @@
         const APP_CONFIG = {
             googleWebAppUrl: "https://script.google.com/macros/s/AKfycbzTfiL56zKjqcZhLm1Mk0rNp5Vm9yQutdfqRMavbdSMIyN-bYpE5_KYQFkbRHNOSKk/exec"
         };
+
+        /****************************************************************
+         * ✏️ EASY-EDIT ZONE — Festival Updates & Guidelines
+         * Just edit the text below. No HTML knowledge needed.
+         * Add, remove, or reorder entries by copying/deleting a block.
+         *****************************************************************/
+
+        // Festival Updates — newest entry first.
+        const UPDATES_FEED = [
+            { date: "Coming Soon", title: "Jury Panel Reveal", text: "Our official jury panel for this edition will be announced here and across our social channels shortly." },
+            { date: "Coming Soon", title: "Screening Schedule", text: "The full festival day screening schedule and venue details will be published as the event date approaches." },
+            { date: "Now Open", title: "Entries Open", text: "Submissions are now open for the Sharankrishna Short Film Awards. Head to the Registration section to enter your film." }
+        ];
+
+        // Festival Guidelines — shown in order, numbered automatically.
+        const GUIDELINES_ITEMS = [
+            { title: "Screening Conduct", text: "Attendees and finalists are expected to remain seated for the full duration of each screening block. Mobile devices should be silenced inside the auditorium." },
+            { title: "Photography & Recording", text: "Personal photography is welcome in lobby and lounge areas. Recording of screened films from inside the auditorium is strictly prohibited to protect filmmakers' copyright." },
+            { title: "Accreditation & Entry", text: "A valid e-pass or entry confirmation (sent after registration) must be presented at the venue check-in desk for admission to the festival and awards night." },
+            { title: "Code of Conduct", text: "Angle Frames maintains a zero-tolerance policy toward harassment, discrimination, or disruptive behavior of any kind toward fellow attendees, filmmakers, or staff." },
+            { title: "Schedule Changes", text: "Screening order and program timings are subject to last-minute adjustment. Please check official festival updates and on-site signage for the most current schedule." }
+        ];
+
+        // Replace with confirmed jury members once finalized. Leave src empty to show a placeholder avatar.
+        const JURY_PANEL = [
+            { name: "To Be Announced", role: "Jury Chair", src: "" },
+            { name: "To Be Announced", role: "Filmmaking", src: "" },
+            { name: "To Be Announced", role: "Cinematography", src: "" },
+            { name: "To Be Announced", role: "Screenwriting", src: "" }
+        ];
 
         let currentWizardStep = 1;
 
@@ -2013,6 +2338,14 @@
             sections.forEach(section => observer.observe(section));
         }
 
+        // Sets a section's background image if a URL is provided in SITE_IMAGES; otherwise leaves the default.
+        function applySectionBackground(sectionId, url) {
+            const el = document.getElementById(sectionId);
+            if (el && url && url.trim() !== '') {
+                el.style.backgroundImage = `url('${url}')`;
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('mainLogo').src = SITE_IMAGES.mainLogo;
             document.getElementById('paymentQrImg').src = SITE_IMAGES.paymentQrCode;
@@ -2023,10 +2356,19 @@
             document.getElementById('labelDeadlineDate').textContent = PORTAL_TIMELINES.deadlineLabelText;
             document.getElementById('labelEventDate').textContent = PORTAL_TIMELINES.eventLabelText;
 
+            applySectionBackground('section-story', SITE_IMAGES.sectionBgStory);
+            applySectionBackground('section-categories', SITE_IMAGES.sectionBgCategories);
+            applySectionBackground('section-gallery', SITE_IMAGES.sectionBgGallery);
+            applySectionBackground('section-registration', SITE_IMAGES.sectionBgRegistration);
+            applySectionBackground('section-contact', SITE_IMAGES.sectionBgContact);
+
             evaluateRegistrationGateState();
             initiateTimersEngine();
             generateDynamicCategories();
             renderGallery('winners2025');
+            renderUpdatesFeed();
+            renderGuidelines();
+            renderJuryPanel();
             initScrollAnimations();
             initNavHighlight();
 
@@ -2040,6 +2382,28 @@
             const nav = document.getElementById('mainNavbar');
             if (nav) nav.classList.toggle('active');
         }
+
+        function toggleMoreDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('navMoreDropdown');
+            if (dropdown) dropdown.classList.toggle('active');
+        }
+
+        function selectMoreItem(tabId) {
+            const dropdown = document.getElementById('navMoreDropdown');
+            if (dropdown) dropdown.classList.remove('active');
+            const nav = document.getElementById('mainNavbar');
+            if (nav) nav.classList.remove('active');
+            openInfoModal(tabId);
+        }
+
+        document.addEventListener('click', (e) => {
+            const wrapper = document.getElementById('navMoreWrapper');
+            const dropdown = document.getElementById('navMoreDropdown');
+            if (wrapper && dropdown && !wrapper.contains(e.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
 
         function generateDynamicCategories() {
             const container = document.getElementById('categoriesGridContainer');
@@ -2163,6 +2527,89 @@
             const modal = document.getElementById('rulesModal');
             if (show) modal.classList.add('active');
             else modal.classList.remove('active');
+        }
+
+        // Tabbed info modal (How To Submit / Guidelines / Updates / Jury / Privacy)
+        const INFO_TAB_TITLES = {
+            submit: "How To Submit",
+            guidelines: "Festival Guidelines",
+            updates: "Festival Updates",
+            jury: "Jury Panel",
+            privacy: "Privacy Policy"
+        };
+
+        function openInfoModal(tabId) {
+            const modal = document.getElementById('infoModal');
+            if (!modal) return;
+            modal.classList.add('active');
+            switchInfoTab(tabId);
+        }
+
+        function closeInfoModal() {
+            const modal = document.getElementById('infoModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function switchInfoTab(tabId) {
+            Object.keys(INFO_TAB_TITLES).forEach(key => {
+                const pane = document.getElementById(`infoTabPane-${key}`);
+                const btn = document.getElementById(`infoTabBtn-${key}`);
+                if (pane) pane.classList.toggle('active', key === tabId);
+                if (btn) btn.classList.toggle('active', key === tabId);
+            });
+            const titleEl = document.getElementById('infoModalTitle');
+            if (titleEl) titleEl.textContent = INFO_TAB_TITLES[tabId] || '';
+        }
+
+        function renderUpdatesFeed() {
+            const container = document.getElementById('updatesListContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            UPDATES_FEED.forEach(update => {
+                const entry = document.createElement('div');
+                entry.className = 'update-entry';
+                entry.innerHTML = `
+                    <div class="update-date">${update.date}</div>
+                    <div class="update-title">${update.title}</div>
+                    <div class="update-text">${update.text}</div>
+                `;
+                container.appendChild(entry);
+            });
+        }
+
+        function renderGuidelines() {
+            const container = document.getElementById('guidelinesListContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            GUIDELINES_ITEMS.forEach((item, index) => {
+                const box = document.createElement('div');
+                box.className = 'rule-item-box';
+                box.innerHTML = `
+                    <h4>${index + 1}. ${item.title}</h4>
+                    <p>${item.text}</p>
+                `;
+                container.appendChild(box);
+            });
+        }
+
+        function renderJuryPanel() {
+            const grid = document.getElementById('juryPanelGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            JURY_PANEL.forEach(member => {
+                const card = document.createElement('div');
+                card.className = 'jury-card';
+                let avatarElement = `<div class="jury-avatar-placeholder">🎭</div>`;
+                if (member.src && member.src.trim() !== '') {
+                    avatarElement = `<img src="${member.src}" alt="${member.name}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;margin:0 auto 12px auto;display:block;">`;
+                }
+                card.innerHTML = `
+                    ${avatarElement}
+                    <h4>${member.name}</h4>
+                    <p>${member.role}</p>
+                `;
+                grid.appendChild(card);
+            });
         }
 
         function goToWizardStep(stepNumber) {
