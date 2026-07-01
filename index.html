@@ -331,6 +331,21 @@
             display: block;
         }
 
+        /* ---- TextAnimate (blurInUp by character) css port ---- */
+        .ta-char {
+            display: inline-block;
+            opacity: 0;
+            filter: blur(10px);
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, filter 0.5s ease, transform 0.5s ease;
+            white-space: pre;
+        }
+        .ta-char.ta-in {
+            opacity: 1;
+            filter: blur(0);
+            transform: translateY(0);
+        }
+
         .association-wrapper {
             display: flex;
             flex-direction: column;
@@ -444,6 +459,7 @@
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
             padding: 15px 20px;
+            --glow-bg: #060608;
         }
 
         .countdown-title-tag {
@@ -595,6 +611,35 @@
             margin-bottom: 16px;
         }
 
+        /* Shiny Text Effect — exact port from uploaded file */
+        .shiny-text {
+            display: inline-block;
+            --color: #b5b5b5;
+            --shine-color: #ffffff;
+            --spread: 120deg;
+            --speed: 2s;
+            --delay: 0s;
+            background-image: linear-gradient(
+                var(--spread),
+                var(--color) 0%,
+                var(--color) 35%,
+                var(--shine-color) 50%,
+                var(--color) 65%,
+                var(--color) 100%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-position: 150% center;
+            animation: shine var(--speed) linear var(--delay) infinite;
+        }
+
+        @keyframes shine {
+            0%   { background-position: 150% center; }
+            100% { background-position: -50% center; }
+        }
+
         /* ===== ABOUT SECTION ===== */
         #section-story {
             background: transparent;
@@ -615,6 +660,7 @@
             padding: 36px;
             border-radius: 16px;
             transition: border-color 0.4s ease, transform 0.4s ease;
+            --glow-bg: #12121600;
         }
         .story-block:hover {
             border-color: rgba(255,255,255,0.3);
@@ -634,6 +680,290 @@
             color: rgba(255,255,255,0.85);
             font-size: 0.95rem;
             line-height: 1.7;
+        }
+
+        /* ===== SCROLL STACK EFFECT (ported, site colors) ===== */
+        .scroll-stack-inner {
+            padding: 6vh 0 20vh;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .scroll-stack-card {
+            transform-origin: top center;
+            will-change: transform, filter;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            min-height: 15rem;
+            width: 100%;
+            padding: 2rem;
+            border-radius: 24px;
+            box-sizing: border-box;
+            position: relative;
+            background: linear-gradient(135deg, rgba(20,20,26,0.92) 0%, rgba(9,9,12,0.95) 100%);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            --glow-bg: #0c0c10;
+        }
+
+        .scroll-stack-card .stack-card-index {
+            position: absolute;
+            top: 1.3rem;
+            right: 1.6rem;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            font-weight: 600;
+        }
+
+        .scroll-stack-card .stack-emoji { font-size: 2.6rem; margin-bottom: 0.7rem; }
+
+        .scroll-stack-card .stack-card-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #ffffff;
+            margin: 0 0 0.5rem 0;
+            line-height: 1.1;
+        }
+
+        .scroll-stack-card .stack-card-sub {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        .scroll-stack-card .stack-card-media {
+            width: 100%;
+            height: 9rem;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 1.1rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .scroll-stack-card .stack-card-media img { width: 100%; height: 100%; object-fit: cover; }
+        .scroll-stack-card .stack-media-placeholder {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            font-size: 2.4rem; color: rgba(255,255,255,0.35);
+        }
+        .scroll-stack-card .stack-media-placeholder span { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px; }
+
+        .scroll-stack-end { width: 100%; height: 1px; }
+
+        @media (max-width: 768px) {
+            .scroll-stack-inner { padding: 4vh 5% 15vh; }
+            .scroll-stack-card { min-height: 13rem; padding: 1.5rem; border-radius: 20px; }
+            .scroll-stack-card .stack-card-title { font-size: 1.3rem; }
+            .scroll-stack-card .stack-emoji { font-size: 2.2rem; }
+        }
+
+        /* ===== GALLERY — Character Select (exact CSS from uploaded file, site colors) ===== */
+
+        /* Wrapper section */
+        .gallery-select-wrap {
+            position: relative;
+            padding: 0 !important;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        /* Hidden radios — exact same as uploaded file */
+        .gallery-select-wrap input[type="radio"] {
+            position: absolute;
+            appearance: none;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Aside strip at bottom — exact positioning as uploaded file */
+        .gallery-select-aside {
+            position: absolute;
+            width: 100%;
+            left: 0;
+            bottom: 0;
+            z-index: 10;
+            background: linear-gradient(transparent, rgba(6,6,8,0.92));
+            padding: 60px 20px 16px;
+        }
+
+        .gallery-select-strip {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            list-style: none;
+            padding: 0;
+            margin: 0 auto;
+            max-width: 1080px;
+        }
+
+        /* li — exact same transition + transform-origin as uploaded */
+        .gallery-select-strip li {
+            transition: 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            cursor: pointer;
+            transform-origin: center bottom;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.08);
+        }
+
+        .gallery-select-strip li label {
+            display: block;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .gallery-select-strip li label img {
+            width: 100%;
+            aspect-ratio: 16/10;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gallery-select-strip li label span:not(.thumb-placeholder) {
+            display: block;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.5);
+            text-align: center;
+            padding: 4px 2px;
+            background: rgba(0,0,0,0.4);
+        }
+
+        .thumb-placeholder {
+            width: 100%;
+            aspect-ratio: 16/10;
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: rgba(255,255,255,0.25);
+        }
+
+        /* Hover — exact same as uploaded file */
+        .gallery-select-strip li:hover {
+            transform: scale(1.15) translateY(-10px);
+            z-index: 15;
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        /* :has(li:hover) — exact same blur effect as uploaded file */
+        .gallery-select-strip:has(li:hover) li:not(:hover) {
+            filter: grayscale(1) blur(2px);
+            opacity: 0.4;
+        }
+
+        /* Checked state highlight — site purple glow */
+        .gallery-select-wrap:has(#g-photo1:checked) .gallery-select-strip li:nth-child(1),
+        .gallery-select-wrap:has(#g-photo2:checked) .gallery-select-strip li:nth-child(2),
+        .gallery-select-wrap:has(#g-photo3:checked) .gallery-select-strip li:nth-child(3),
+        .gallery-select-wrap:has(#g-photo4:checked) .gallery-select-strip li:nth-child(4),
+        .gallery-select-wrap:has(#g-photo5:checked) .gallery-select-strip li:nth-child(5),
+        .gallery-select-wrap:has(#g-photo6:checked) .gallery-select-strip li:nth-child(6),
+        .gallery-select-wrap:has(#g-photo7:checked) .gallery-select-strip li:nth-child(7) {
+            border-color: rgba(255,255,255,0.9);
+            box-shadow: 0 0 18px rgba(192,132,252,0.55);
+        }
+
+        /* Stage — figures sit here, covers full section */
+        .gallery-select-stage {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        /* All figures hidden by default — exact same as uploaded file */
+        .gs-fig {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+            z-index: 2;
+        }
+
+        /* CSS :has() selector shows the right figure — exact same mechanism as uploaded file */
+        .gallery-select-wrap:has(#g-photo1:checked) .gs-fig[data-id="photo1"],
+        .gallery-select-wrap:has(#g-photo2:checked) .gs-fig[data-id="photo2"],
+        .gallery-select-wrap:has(#g-photo3:checked) .gs-fig[data-id="photo3"],
+        .gallery-select-wrap:has(#g-photo4:checked) .gs-fig[data-id="photo4"],
+        .gallery-select-wrap:has(#g-photo5:checked) .gs-fig[data-id="photo5"],
+        .gallery-select-wrap:has(#g-photo6:checked) .gs-fig[data-id="photo6"],
+        .gallery-select-wrap:has(#g-photo7:checked) .gs-fig[data-id="photo7"] {
+            display: block;
+        }
+
+        .gs-fig img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.72;
+        }
+
+        /* Figcaption — adapted from uploaded file's figcaption style, site position */
+        .gs-fig figcaption {
+            position: absolute;
+            bottom: 160px;
+            left: 6%;
+            z-index: 5;
+        }
+        .gs-fig figcaption h3 {
+            font-size: clamp(1.8rem, 4vw, 3.5rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #ffffff;
+            text-shadow: 0 4px 24px rgba(0,0,0,0.85);
+            margin: 0 0 8px 0;
+            line-height: 1.1;
+        }
+        .gs-fig figcaption h3 em { font-style: normal; color: rgba(255,255,255,0.7); }
+        .gs-fig figcaption p {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: rgba(255,255,255,0.55);
+        }
+
+        .gs-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 4rem;
+            opacity: 0.2;
+            color: #fff;
+        }
+        .gs-placeholder span { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 3px; }
+
+        /* Heading overlay — top-left like uploaded file's figcaption position */
+        .gallery-select-header {
+            position: absolute;
+            top: 6%;
+            left: 6%;
+            z-index: 20;
+        }
+        .gallery-select-header .section-eyebrow { display: block; margin-bottom: 6px; }
+        .gallery-select-header .section-heading { margin-bottom: 0; }
+
+        @media (max-width: 768px) {
+            .gallery-select-strip { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+            .gs-fig figcaption { bottom: 200px; }
+            .gs-fig figcaption h3 { font-size: 1.5rem; }
         }
 
         /* ===== CATEGORIES SECTION ===== */
@@ -668,27 +998,254 @@
             grid-template-columns: repeat(5, 1fr);
             gap: 16px;
             margin-bottom: 50px;
+            perspective: 1200px;
         }
 
+        /* ===== BORDER GLOW ENGINE — shared .glow-card utility ===== */
+        .glow-card {
+            --edge-proximity: 0;
+            --cursor-angle: 45deg;
+            --edge-sensitivity: 30;
+            --color-sensitivity: calc(var(--edge-sensitivity) + 20);
+            --glow-padding: 30px;
+            --cone-spread: 25;
+            --fill-opacity: 0.5;
+            --glow-bg: #060608;
+
+            position: relative;
+            isolation: isolate;
+            transform: translate3d(0, 0, 0.01px);
+            overflow: visible !important;
+        }
+
+        .glow-card::before,
+        .glow-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            transition: opacity 0.25s ease-out;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .glow-card:not(:hover):not(.sweep-active)::before,
+        .glow-card:not(:hover):not(.sweep-active)::after,
+        .glow-card:not(:hover):not(.sweep-active) > .edge-light { opacity: 0; transition: opacity 0.75s ease-in-out; }
+
+        .glow-card::before {
+            border: 1px solid transparent;
+            background:
+                linear-gradient(var(--glow-bg) 0 100%) padding-box,
+                linear-gradient(rgb(255 255 255 / 0%) 0% 100%) border-box,
+                var(--gradient-one) border-box, var(--gradient-two) border-box,
+                var(--gradient-three) border-box, var(--gradient-four) border-box,
+                var(--gradient-five) border-box, var(--gradient-six) border-box,
+                var(--gradient-seven) border-box, var(--gradient-base) border-box;
+            opacity: calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+            -webkit-mask-image: conic-gradient(from var(--cursor-angle) at center, black calc(var(--cone-spread)*1%), transparent calc((var(--cone-spread)+15)*1%), transparent calc((100 - var(--cone-spread) - 15)*1%), black calc((100 - var(--cone-spread))*1%));
+            mask-image: conic-gradient(from var(--cursor-angle) at center, black calc(var(--cone-spread)*1%), transparent calc((var(--cone-spread)+15)*1%), transparent calc((100 - var(--cone-spread) - 15)*1%), black calc((100 - var(--cone-spread))*1%));
+        }
+
+        .glow-card::after {
+            border: 1px solid transparent;
+            background:
+                var(--gradient-one) padding-box, var(--gradient-two) padding-box,
+                var(--gradient-three) padding-box, var(--gradient-four) padding-box,
+                var(--gradient-five) padding-box, var(--gradient-six) padding-box,
+                var(--gradient-seven) padding-box, var(--gradient-base) padding-box;
+            -webkit-mask-image:
+                linear-gradient(to bottom, black, black),
+                radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%),
+                radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%),
+                radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%),
+                radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%),
+                radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%),
+                conic-gradient(from var(--cursor-angle) at center, transparent 5%, black 15%, black 85%, transparent 95%);
+            mask-image:
+                linear-gradient(to bottom, black, black),
+                radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%),
+                radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%),
+                radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%),
+                radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%),
+                radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%),
+                conic-gradient(from var(--cursor-angle) at center, transparent 5%, black 15%, black 85%, transparent 95%);
+            -webkit-mask-composite: xor;
+            mask-composite: subtract, add, add, add, add, add;
+            opacity: calc(var(--fill-opacity) * (var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+            mix-blend-mode: soft-light;
+        }
+
+        .glow-card > .edge-light {
+            position: absolute;
+            inset: calc(var(--glow-padding) * -1);
+            border-radius: inherit;
+            transition: opacity 0.25s ease-out;
+            pointer-events: none;
+            z-index: 1;
+            -webkit-mask-image: conic-gradient(from var(--cursor-angle) at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%);
+            mask-image: conic-gradient(from var(--cursor-angle) at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%);
+            opacity: calc((var(--edge-proximity) - var(--edge-sensitivity)) / (100 - var(--edge-sensitivity)));
+            mix-blend-mode: plus-lighter;
+        }
+
+        .glow-card > .edge-light::before {
+            content: "";
+            position: absolute;
+            inset: var(--glow-padding);
+            border-radius: inherit;
+            box-shadow:
+                inset 0 0 0 1px var(--glow-color),
+                inset 0 0 1px 0 var(--glow-color-60),
+                inset 0 0 3px 0 var(--glow-color-50),
+                inset 0 0 6px 0 var(--glow-color-40),
+                inset 0 0 15px 0 var(--glow-color-30),
+                inset 0 0 25px 2px var(--glow-color-20),
+                inset 0 0 50px 2px var(--glow-color-10),
+                0 0 1px 0 var(--glow-color-60),
+                0 0 3px 0 var(--glow-color-50),
+                0 0 6px 0 var(--glow-color-40),
+                0 0 15px 0 var(--glow-color-30),
+                0 0 25px 2px var(--glow-color-20),
+                0 0 50px 2px var(--glow-color-10);
+        }
+
+        /* inner content z-index so it stays above glow layers */
+        .glow-card > *:not(.edge-light) { position: relative; z-index: 2; }
+
+        /* ===== BORDER GLOW ENGINE (category cards) ===== */
         .category-asset-card {
-            background: rgba(6, 6, 8, 0.75);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 12px;
-            padding: 28px 12px;
+            --edge-proximity: 0;
+            --cursor-angle: 45deg;
+            --edge-sensitivity: 30;
+            --color-sensitivity: calc(var(--edge-sensitivity) + 20);
+            --border-radius: 12px;
+            --glow-padding: 30px;
+            --cone-spread: 25;
+            --card-bg: #060608;
+            --fill-opacity: 0.5;
+
+            position: relative;
+            border-radius: var(--border-radius);
+            isolation: isolate;
+            transform: translate3d(0, 0, 0.01px);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 14px;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 28px 12px;
+            border: 1px solid rgb(255 255 255 / 12%);
+            background: var(--card-bg);
+            overflow: visible;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .category-asset-card:hover {
-            background: rgba(6, 6, 8, 0.9);
-            border-color: rgba(255, 255, 255, 0.4);
-            transform: translateY(-6px) scale(1.02);
+        .category-asset-card:hover { transform: translateY(-6px) scale(1.02); }
+
+        .category-asset-card::before,
+        .category-asset-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            transition: opacity 0.25s ease-out;
+            z-index: -1;
+        }
+
+        .category-asset-card:not(:hover):not(.sweep-active)::before,
+        .category-asset-card:not(:hover):not(.sweep-active)::after,
+        .category-asset-card:not(:hover):not(.sweep-active) > .edge-light { opacity: 0; transition: opacity 0.75s ease-in-out; }
+
+        .category-asset-card::before {
+            border: 1px solid transparent;
+            background:
+                linear-gradient(var(--card-bg) 0 100%) padding-box,
+                linear-gradient(rgb(255 255 255 / 0%) 0% 100%) border-box,
+                var(--gradient-one) border-box,
+                var(--gradient-two) border-box,
+                var(--gradient-three) border-box,
+                var(--gradient-four) border-box,
+                var(--gradient-five) border-box,
+                var(--gradient-six) border-box,
+                var(--gradient-seven) border-box,
+                var(--gradient-base) border-box;
+            opacity: calc((var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+            -webkit-mask-image: conic-gradient(from var(--cursor-angle) at center, black calc(var(--cone-spread) * 1%), transparent calc((var(--cone-spread) + 15) * 1%), transparent calc((100 - var(--cone-spread) - 15) * 1%), black calc((100 - var(--cone-spread)) * 1%));
+            mask-image: conic-gradient(from var(--cursor-angle) at center, black calc(var(--cone-spread) * 1%), transparent calc((var(--cone-spread) + 15) * 1%), transparent calc((100 - var(--cone-spread) - 15) * 1%), black calc((100 - var(--cone-spread)) * 1%));
+        }
+
+        .category-asset-card::after {
+            border: 1px solid transparent;
+            background:
+                var(--gradient-one) padding-box, var(--gradient-two) padding-box,
+                var(--gradient-three) padding-box, var(--gradient-four) padding-box,
+                var(--gradient-five) padding-box, var(--gradient-six) padding-box,
+                var(--gradient-seven) padding-box, var(--gradient-base) padding-box;
+            -webkit-mask-image:
+                linear-gradient(to bottom, black, black),
+                radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%),
+                radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%),
+                radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%),
+                radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%),
+                radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%),
+                conic-gradient(from var(--cursor-angle) at center, transparent 5%, black 15%, black 85%, transparent 95%);
+            mask-image:
+                linear-gradient(to bottom, black, black),
+                radial-gradient(ellipse at 50% 50%, black 40%, transparent 65%),
+                radial-gradient(ellipse at 66% 66%, black 5%, transparent 40%),
+                radial-gradient(ellipse at 33% 33%, black 5%, transparent 40%),
+                radial-gradient(ellipse at 66% 33%, black 5%, transparent 40%),
+                radial-gradient(ellipse at 33% 66%, black 5%, transparent 40%),
+                conic-gradient(from var(--cursor-angle) at center, transparent 5%, black 15%, black 85%, transparent 95%);
+            -webkit-mask-composite: xor;
+            mask-composite: subtract, add, add, add, add, add;
+            opacity: calc(var(--fill-opacity) * (var(--edge-proximity) - var(--color-sensitivity)) / (100 - var(--color-sensitivity)));
+            mix-blend-mode: soft-light;
+        }
+
+        .category-asset-card > .edge-light {
+            content: "";
+            position: absolute;
+            inset: calc(var(--glow-padding) * -1);
+            border-radius: inherit;
+            transition: opacity 0.25s ease-out;
+            pointer-events: none;
+            z-index: 1;
+            -webkit-mask-image: conic-gradient(from var(--cursor-angle) at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%);
+            mask-image: conic-gradient(from var(--cursor-angle) at center, black 2.5%, transparent 10%, transparent 90%, black 97.5%);
+            opacity: calc((var(--edge-proximity) - var(--edge-sensitivity)) / (100 - var(--edge-sensitivity)));
+            mix-blend-mode: plus-lighter;
+        }
+
+        .category-asset-card > .edge-light::before {
+            content: "";
+            position: absolute;
+            inset: var(--glow-padding);
+            border-radius: inherit;
+            box-shadow:
+                inset 0 0 0 1px var(--glow-color),
+                inset 0 0 1px 0 var(--glow-color-60),
+                inset 0 0 3px 0 var(--glow-color-50),
+                inset 0 0 6px 0 var(--glow-color-40),
+                inset 0 0 15px 0 var(--glow-color-30),
+                inset 0 0 25px 2px var(--glow-color-20),
+                inset 0 0 50px 2px var(--glow-color-10),
+                0 0 1px 0 var(--glow-color-60),
+                0 0 3px 0 var(--glow-color-50),
+                0 0 6px 0 var(--glow-color-40),
+                0 0 15px 0 var(--glow-color-30),
+                0 0 25px 2px var(--glow-color-20),
+                0 0 50px 2px var(--glow-color-10);
+        }
+
+        .category-asset-card .card-inner-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
         }
 
         .category-asset-card .icon-placeholder {
@@ -705,9 +1262,7 @@
             object-fit: contain;
         }
 
-        .category-asset-card .category-emoji {
-            font-size: 2rem;
-        }
+        .category-asset-card .category-emoji { font-size: 2rem; }
 
         .category-asset-card p {
             font-size: 0.78rem;
@@ -716,6 +1271,7 @@
             line-height: 1.3;
             letter-spacing: 0.5px;
             text-transform: uppercase;
+            text-align: center;
         }
 
         .rules-guidelines-trigger-row {
@@ -817,6 +1373,14 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
+        }
+
+        .rule-item-box {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 14px 16px;
+            --glow-bg: #0d0d10;
         }
 
         .rule-item-box h4 {
@@ -989,6 +1553,7 @@
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
             padding: 20px 12px;
+            --glow-bg: #0d0d10;
         }
         .jury-avatar-placeholder {
             width: 56px;
@@ -1621,7 +2186,7 @@
     <section id="section-home">
         <div class="hero-main-body">
             <p class="hero-presenter-tag scroll-reveal">Angle Frames Presents</p>
-            <h1 class="hero-main-title scroll-reveal delay-1">Sharankrishna <strong>Short Film Awards</strong></h1>
+            <h1 class="hero-main-title scroll-reveal delay-1" id="heroTitleAnimate">Sharankrishna <strong>Short Film Awards</strong></h1>
             
             <div class="association-wrapper scroll-reveal delay-2">
                 <span class="association-tag">In Association With</span>
@@ -1631,7 +2196,8 @@
             </div>
 
             <div class="countdown-dashboard-container scroll-reveal delay-3">
-                <div class="countdown-card-block">
+                <div class="countdown-card-block glow-card">
+                    <span class="edge-light"></span>
                     <div class="countdown-title-tag">Submission Deadline Countdown</div>
                     <div class="countdown-timer-digits-row" id="deadlineCountdown">
                         <div class="time-unit-slot"><span class="time-number" id="d-days">00</span><span class="time-label">Days</span></div>
@@ -1640,7 +2206,8 @@
                         <div class="time-unit-slot"><span class="time-number" id="d-secs">00</span><span class="time-label">Secs</span></div>
                     </div>
                 </div>
-                <div class="countdown-card-block">
+                <div class="countdown-card-block glow-card">
+                    <span class="edge-light"></span>
                     <div class="countdown-title-tag">Grand Function & Winners Announcement</div>
                     <div class="countdown-timer-digits-row" id="eventCountdown">
                         <div class="time-unit-slot"><span class="time-number" id="e-days">00</span><span class="time-label">Days</span></div>
@@ -1705,27 +2272,31 @@
     <section id="section-story" class="page-section">
         <div class="section-inner">
             <span class="section-eyebrow scroll-reveal">Our Story</span>
-            <h2 class="section-heading scroll-reveal delay-1">About the<br>Awards</h2>
+            <h2 class="section-heading scroll-reveal delay-1"><span class="shiny-text">About the<br>Awards</span></h2>
             <div class="story-grid">
-                <div class="story-block scroll-reveal-left delay-1">
+                <div class="story-block scroll-reveal-left delay-1 glow-card">
+                    <span class="edge-light"></span>
                     <h3>About Angle Frames</h3>
                     <p>
                         Angle Frames stands as a premier creative collective and platform committed to fueling the fires of independent filmmaking. Founded with a vision to build bridges for raw, unadulterated storytelling, Angle Frames discovers, highlights, and honors ground-breaking visual concepts. By organizing top-tier competitive arenas, masterclasses, and project distributions, we give voice to young digital visionaries across the region.
                     </p>
                 </div>
-                <div class="story-block scroll-reveal-right delay-2">
+                <div class="story-block scroll-reveal-right delay-2 glow-card">
+                    <span class="edge-light"></span>
                     <h3>About Jain University</h3>
                     <p>
                         Ranked consistently among India's top educational institutions, JAIN (Deemed-to-be University) acts as a powerful catalyst for human development and progressive learning. The Kochi Campus emphasizes creative exploration and technical mastery, specifically within its creative and media programs. Through its collaboration on the Sharankrishna Short Film Awards, Jain University reinforces its institutional drive toward nurturing industry-ready artistic talents.
                     </p>
                 </div>
-                <div class="story-block scroll-reveal-left delay-2">
+                <div class="story-block scroll-reveal-left delay-2 glow-card">
+                    <span class="edge-light"></span>
                     <h3>Who is Sharankrishna?</h3>
                     <p>
                         Sharankrishna was a vibrant creative spirit whose life was anchored deeply in the world of independent filmmaking and visual storytelling. Cinema was an absolute passion, a canvas for honest thoughts, and an arena for boundless raw expression.
                     </p>
                 </div>
-                <div class="story-block scroll-reveal-right delay-3">
+                <div class="story-block scroll-reveal-right delay-3 glow-card">
+                    <span class="edge-light"></span>
                     <h3>The Story Behind Our Logo</h3>
                     <p>
                         The core visual structure integrates a gold-toned camera aperture frame enclosing geometric perspectives. The closing aperture signifies pinning down a transient slice of time into a permanent timeline.
@@ -1741,12 +2312,12 @@
     <section id="section-categories" class="page-section">
         <div class="section-inner">
             <span class="section-eyebrow scroll-reveal">Compete & Win</span>
-            <h2 class="section-heading scroll-reveal delay-1">Awards Categories</h2>
+            <h2 class="section-heading scroll-reveal delay-1"><span class="shiny-text">Awards Categories</span></h2>
             <div class="categories-star-divider scroll-reveal delay-2">
                 <span>★</span>
             </div>
 
-            <div class="categories-grid-matrix" id="categoriesGridContainer"></div>
+            <div class="scroll-stack-inner" id="categoriesGridContainer"></div>
 
             <div class="rules-guidelines-trigger-row scroll-reveal delay-2">
                 <button class="btn-rules-guidelines" onclick="toggleRulesModal(true)">
@@ -1762,23 +2333,23 @@
             <button class="rules-modal-close" onclick="toggleRulesModal(false)">&times;</button>
             <h3 class="rules-modal-title">Rules & Guidelines</h3>
             <div class="rules-list-content">
-                <div class="rule-item-box">
+                <div class="rule-item-box glow-card"><span class="edge-light"></span>
                     <h4>1. Runtime Duration</h4>
                     <p>All project submissions must keep total run times strictly at or underneath a maximum runtime limit of 30 minutes including credits.</p>
                 </div>
-                <div class="rule-item-box">
+                <div class="rule-item-box glow-card"><span class="edge-light"></span>
                     <h4>2. Eligibility & Timeline</h4>
                     <p>Films must have been completed on or after January 1, 2024. Works-in-progress are not accepted.</p>
                 </div>
-                <div class="rule-item-box">
+                <div class="rule-item-box glow-card"><span class="edge-light"></span>
                     <h4>3. Original Content & Copyright</h4>
                     <p>Applicants must hold all clear intellectual rights, licenses, and permits regarding both music tracks and imagery materials utilized inside the submission.</p>
                 </div>
-                <div class="rule-item-box">
+                <div class="rule-item-box glow-card"><span class="edge-light"></span>
                     <h4>4. Campus Track Requirements</h4>
                     <p>Submissions for the student division require proof of active institutional enrollment (Student ID Card Scan upload validation).</p>
                 </div>
-                <div class="rule-item-box">
+                <div class="rule-item-box glow-card"><span class="edge-light"></span>
                     <h4>5. Review Panel Verdicts</h4>
                     <p>Decisions and evaluations handed down by the official judging board remain absolute, terminal, and unalterable.</p>
                 </div>
@@ -1805,23 +2376,23 @@
             <!-- How To Submit -->
             <div id="infoTabPane-submit" class="info-tab-pane active">
                 <div class="rules-list-content">
-                    <div class="rule-item-box">
+                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>1. Your Details</h4>
                         <p>Start the entry wizard with your name, email, phone number, and city so we can reach you about your submission.</p>
                     </div>
-                    <div class="rule-item-box">
+                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>2. Film Details</h4>
                         <p>Add your film's title, category, runtime, and a working link to the film hosted on YouTube or a cloud storage service.</p>
                     </div>
-                    <div class="rule-item-box">
+                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>3. Crew & Cast Credits</h4>
                         <p>List your director, producer, writer, cinematographer, editor, music director, and lead cast members so the credits are accurately recorded.</p>
                     </div>
-                    <div class="rule-item-box">
+                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>4. Entry Fee Payment</h4>
                         <p>Pay the entry fee via the UPI QR code shown in the portal, then upload your payment screenshot or PDF along with the transaction reference ID.</p>
                     </div>
-                    <div class="rule-item-box">
+                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>5. Review & Confirm</h4>
                         <p>Double-check your entry summary on the final step, then submit. You'll see an on-screen confirmation once your entry has been received.</p>
                     </div>
@@ -1849,27 +2420,27 @@
             <!-- Privacy Policy -->
             <div id="infoTabPane-privacy" class="info-tab-pane">
                 <div class="rules-list-content">
-                    <div class="rule-item-box">
+                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>Information We Collect</h4>
                         <p>When you register a film entry, we collect details you provide such as your name, email, phone number, city, film and crew information, and payment reference details.</p>
                     </div>
-                    <div class="rule-item-box">
+                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>How We Use Your Information</h4>
                         <p>Your information is used solely to process your submission, verify entry payments, communicate updates about the festival, and coordinate the judging process.</p>
                     </div>
-                    <div class="rule-item-box">
+                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>Data Sharing</h4>
                         <p>We do not sell or rent your personal information. Limited details may be shared internally with the jury panel and organizing team strictly for evaluation purposes.</p>
                     </div>
-                    <div class="rule-item-box">
+                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>Data Security</h4>
                         <p>We take reasonable technical and organizational measures to protect your information from unauthorized access, alteration, or disclosure.</p>
                     </div>
-                    <div class="rule-item-box">
+                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>Your Rights</h4>
                         <p>You may request access to, correction of, or deletion of your personal data at any time by reaching out through our contact helpdesk.</p>
                     </div>
-                    <div class="rule-item-box">
+                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>Contact Us</h4>
                         <p>For any privacy-related questions, write to us at angleframes.contact@gmail.com.</p>
                     </div>
@@ -1882,20 +2453,68 @@
     <div class="section-divider"></div>
 
     <!-- ===== GALLERY SECTION ===== -->
-    <section id="section-gallery" class="page-section">
-        <div class="section-inner">
-            <span class="section-eyebrow scroll-reveal">Memories & Moments</span>
-            <h2 class="section-heading scroll-reveal delay-1">Gallery</h2>
+    <section id="section-gallery" class="page-section gallery-select-wrap">
 
-            <div class="gallery-filter-row scroll-reveal delay-2">
-                <button id="pillWinners2025" class="btn-gallery-pill active" onclick="filterGallery('winners2025', this)">Winners 2025</button>
-                <button id="pillWinners2026" class="btn-gallery-pill" onclick="filterGallery('winners2026', this)">Winners 2026</button>
-                <button id="pillEvents" class="btn-gallery-pill" onclick="filterGallery('events', this)">Events</button>
-            </div>
+        <!-- Hidden radios — exact same pattern as uploaded file -->
+        <input type="radio" name="gallery" id="g-photo1" checked>
+        <input type="radio" name="gallery" id="g-photo2">
+        <input type="radio" name="gallery" id="g-photo3">
+        <input type="radio" name="gallery" id="g-photo4">
+        <input type="radio" name="gallery" id="g-photo5">
+        <input type="radio" name="gallery" id="g-photo6">
+        <input type="radio" name="gallery" id="g-photo7">
 
-            <div class="gallery-scroll-hint scroll-reveal delay-2">&larr; Swipe to explore &rarr;</div>
-            <div class="gallery-photo-grid" id="galleryPhotoGrid"></div>
+        <!-- Thumbnail strip (aside) comes BEFORE section — required for CSS :has() sibling selector -->
+        <aside class="gallery-select-aside">
+            <ul class="gallery-select-strip">
+                <li><label for="g-photo1"><img src="MRC01071.JPG.jpeg" alt="Best Short Film: Bug" onerror="this.parentElement.classList.add('no-img')"><span>Best Short Film</span></label></li>
+                <li><label for="g-photo2"><img src="MRC01028.JPG.jpeg" alt="Campus Category: Timeless" onerror="this.parentElement.classList.add('no-img')"><span>Campus Category</span></label></li>
+                <li><label for="g-photo3"><span class="thumb-placeholder">🎬</span><span>Coming Soon</span></label></li>
+                <li><label for="g-photo4"><img src="MRC00606.JPG.jpeg" alt="Festival Panel Event" onerror="this.parentElement.classList.add('no-img')"><span>Festival Panel</span></label></li>
+                <li><label for="g-photo5"><img src="MRC00614.JPG.jpeg" alt="Audience Hall Screening" onerror="this.parentElement.classList.add('no-img')"><span>Hall Screening</span></label></li>
+                <li><label for="g-photo6"><img src="MRC00617.JPG.jpeg" alt="Audience Hall Screening" onerror="this.parentElement.classList.add('no-img')"><span>Hall Screening</span></label></li>
+                <li><label for="g-photo7"><img src="MRC00629.JPG.jpeg" alt="Audience Hall Screening" onerror="this.parentElement.classList.add('no-img')"><span>Hall Screening</span></label></li>
+            </ul>
+        </aside>
+
+        <!-- Large figure display — comes AFTER aside so :has() + sibling works -->
+        <div class="gallery-select-stage">
+            <figure class="gs-fig" data-id="photo1">
+                <img src="MRC01071.JPG.jpeg" alt="Best Short Film: Bug">
+                <figcaption><h3>Best Short Film: <em>'Bug'</em></h3><p>Winner 2025</p></figcaption>
+            </figure>
+            <figure class="gs-fig" data-id="photo2">
+                <img src="MRC01028.JPG.jpeg" alt="Campus Category: Timeless">
+                <figcaption><h3>Campus Category: <em>'Timeless'</em></h3><p>Winner 2025</p></figcaption>
+            </figure>
+            <figure class="gs-fig" data-id="photo3">
+                <div class="gs-placeholder">🎬<span>Upcoming Winner</span></div>
+                <figcaption><h3>To Be Announced</h3><p>Coming Soon</p></figcaption>
+            </figure>
+            <figure class="gs-fig" data-id="photo4">
+                <img src="MRC00606.JPG.jpeg" alt="Festival Panel Event">
+                <figcaption><h3>Festival Panel Event</h3><p>Live Screening</p></figcaption>
+            </figure>
+            <figure class="gs-fig" data-id="photo5">
+                <img src="MRC00614.JPG.jpeg" alt="Audience Hall Screening">
+                <figcaption><h3>Audience Hall Screening</h3><p>Cinema Hall</p></figcaption>
+            </figure>
+            <figure class="gs-fig" data-id="photo6">
+                <img src="MRC00617.JPG.jpeg" alt="Audience Hall Screening">
+                <figcaption><h3>Audience Hall Screening</h3><p>Cinema Hall</p></figcaption>
+            </figure>
+            <figure class="gs-fig" data-id="photo7">
+                <img src="MRC00629.JPG.jpeg" alt="Audience Hall Screening">
+                <figcaption><h3>Audience Hall Screening</h3><p>Cinema Hall</p></figcaption>
+            </figure>
         </div>
+
+        <!-- Section heading overlay -->
+        <div class="gallery-select-header">
+            <span class="section-eyebrow">Memories &amp; Moments</span>
+            <h2 class="section-heading"><span class="shiny-text">Gallery</span></h2>
+        </div>
+
     </section>
 
     <div class="section-divider"></div>
@@ -1904,11 +2523,11 @@
     <section id="section-registration" class="page-section">
         <div class="section-inner" style="text-align:center;">
             <span class="section-eyebrow scroll-reveal">Enter the Competition</span>
-            <h2 class="section-heading scroll-reveal delay-1">Registration</h2>
+            <h2 class="section-heading scroll-reveal delay-1"><span class="shiny-text">Registration</span></h2>
 
             <div class="portal-form-wrapper scroll-reveal-scale delay-2">
-                <div class="portal-glass-card" id="registrationCardContent">
-                    
+                <div class="portal-glass-card glow-card" id="registrationCardContent">
+                    <span class="edge-light"></span>
                     <div id="activeFormContainer">
                         <h2 class="portal-main-heading">Registration</h2>
 
@@ -2110,9 +2729,10 @@
     <section id="section-contact" class="page-section">
         <div class="section-inner" style="text-align:center;">
             <span class="section-eyebrow scroll-reveal">Get in Touch</span>
-            <h2 class="section-heading scroll-reveal delay-1">Contact Helpdesk</h2>
+            <h2 class="section-heading scroll-reveal delay-1"><span class="shiny-text">Contact Helpdesk</span></h2>
 
-            <div class="contact-card-body scroll-reveal-scale delay-2">
+            <div class="contact-card-body scroll-reveal-scale delay-2 glow-card">
+                <span class="edge-light"></span>
                 <p style="color:rgba(255,255,255,0.8); font-size:0.9rem; margin-bottom:20px;">Get operational or routing support from our technical assistants.</p>
                 
                 <div class="contact-channel-row">
@@ -2191,7 +2811,7 @@
          * ⚙️ MASTER VARIABLE HUB
          *****************************************************************/
         const REGISTRATION_GATE = {
-            isOpen: false 
+            isOpen: true 
         };
 
         const PORTAL_TIMELINES = {
@@ -2210,10 +2830,10 @@
             // Per-section background images — add a file name/path to give that section its own backdrop.
             // Leave as "" to keep the default shared background.
             sectionBgStory: "",
-            sectionBgCategories: "view-3d-cinema-elements.jpg",
-            sectionBgGallery: "3d-cinema-movie-projector.jpg",
-            sectionBgRegistration: "view-3d-cinema-film-reel.jpg",
-            sectionBgContact: "view-3d-film-reel (1).jpg"
+            sectionBgCategories: "",
+            sectionBgGallery: "",
+            sectionBgRegistration: "",
+            sectionBgContact: ""
         };
 
         const CATEGORY_ITEMS = [
@@ -2253,7 +2873,7 @@
         const UPDATES_FEED = [
             { date: "Coming Soon", title: "Jury Panel Reveal", text: "Our official jury panel for this edition will be announced here and across our social channels shortly." },
             { date: "Coming Soon", title: "Screening Schedule", text: "The full festival day screening schedule and venue details will be published as the event date approaches." },
-            { date: "Now Open", title: "Entries closed open shortly", text: "Submissions are now closed for the Sharankrishna Short Film Awards. Head to the Registration section to enter your film." }
+            { date: "Now Open", title: "Entries Open", text: "Submissions are now open for the Sharankrishna Short Film Awards. Head to the Registration section to enter your film." }
         ];
 
         // Festival Guidelines — shown in order, numbered automatically.
@@ -2276,6 +2896,38 @@
         let currentWizardStep = 1;
 
         /* ===== MASSIVE SCROLL ANIMATION ENGINE ===== */
+        // TextAnimate (blurInUp, by character, once) — css port of magicui TextAnimate
+        function textAnimateBlurInUp(el) {
+            if (!el || el.dataset.taDone) return;
+            el.dataset.taDone = '1';
+            let charIndex = 0;
+
+            function wrapChars(node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    const frag = document.createDocumentFragment();
+                    node.textContent.split('').forEach(ch => {
+                        const span = document.createElement('span');
+                        span.className = 'ta-char';
+                        span.textContent = ch;
+                        span.style.transitionDelay = (charIndex * 0.03) + 's';
+                        charIndex++;
+                        frag.appendChild(span);
+                    });
+                    node.replaceWith(frag);
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    Array.from(node.childNodes).forEach(wrapChars);
+                }
+            }
+
+            Array.from(el.childNodes).forEach(wrapChars);
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    el.querySelectorAll('.ta-char').forEach(s => s.classList.add('ta-in'));
+                });
+            });
+        }
+
         function initScrollAnimations() {
             const allAnimated = document.querySelectorAll(
                 '.scroll-reveal, .scroll-reveal-left, .scroll-reveal-right, .scroll-reveal-scale, .scroll-reveal-blur'
@@ -2294,19 +2946,68 @@
 
             allAnimated.forEach(el => observer.observe(el));
 
-            // Also animate category cards with stagger as they enter view
+            // Category cards enter using a rotating set of distinct animation styles —
+            // random fly-in with 3D tilt, drop & bounce, spin-pop, and a 3D flip reveal —
+            // so the row feels choreographed rather than one repeated effect.
             const categoryObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         const cards = entry.target.querySelectorAll('.category-asset-card');
                         cards.forEach((card, i) => {
+                            const style = i % 4;
+                            const delay = i * 0.08;
+                            const dir = i % 2 === 0 ? 1 : -1;
+                            let fromTransform, toTransform, transitionRule;
+
+                            if (style === 0) {
+                                // Fly in from a random direction all around the screen with a 3D tumble
+                                const angle = Math.random() * Math.PI * 2;
+                                const distance = Math.min(window.innerWidth, 900) * (0.45 + Math.random() * 0.55);
+                                const dx = Math.cos(angle) * distance;
+                                const dy = Math.sin(angle) * distance * 0.7;
+                                const rot = (Math.random() - 0.5) * 160;
+                                const tiltX = (Math.random() - 0.5) * 60;
+                                const tiltY = (Math.random() - 0.5) * 60;
+                                fromTransform = `perspective(1000px) translate(${dx}px, ${dy}px) rotate(${rot}deg) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(0.3)`;
+                                toTransform = `perspective(1000px) translate(0px, 0px) rotate(0deg) rotateX(0deg) rotateY(0deg) scale(1)`;
+                                transitionRule = `opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s, transform 1.05s cubic-bezier(0.22, 1.45, 0.36, 1) ${delay}s, filter 0.75s ease ${delay}s`;
+                            } else if (style === 1) {
+                                // Drop from above and bounce into place
+                                fromTransform = `translateY(-260px) scale(0.85)`;
+                                toTransform = `translateY(0px) scale(1)`;
+                                transitionRule = `opacity 0.5s ease ${delay}s, transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) ${delay}s, filter 0.5s ease ${delay}s`;
+                            } else if (style === 2) {
+                                // Spin and pop into place
+                                fromTransform = `rotate(${dir * 280}deg) scale(0.2)`;
+                                toTransform = `rotate(0deg) scale(1)`;
+                                transitionRule = `opacity 0.6s ease ${delay}s, transform 0.95s cubic-bezier(0.34, 1.56, 0.64, 1) ${delay}s, filter 0.6s ease ${delay}s`;
+                            } else {
+                                // 3D flip reveal, alternating left/right
+                                fromTransform = `perspective(900px) rotateY(${dir * 110}deg) scale(0.92)`;
+                                toTransform = `perspective(900px) rotateY(0deg) scale(1)`;
+                                transitionRule = `opacity 0.5s ease ${delay}s, transform 0.85s cubic-bezier(0.22, 1, 0.36, 1) ${delay}s, filter 0.5s ease ${delay}s`;
+                            }
+
+                            card.style.willChange = 'transform, opacity, filter';
                             card.style.opacity = '0';
-                            card.style.transform = 'translateY(60px) scale(0.9)';
-                            card.style.transition = `opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.07}s, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.07}s`;
-                            setTimeout(() => {
-                                card.style.opacity = '1';
-                                card.style.transform = 'translateY(0) scale(1)';
-                            }, 50);
+                            card.style.filter = 'blur(6px)';
+                            card.style.transform = fromTransform;
+                            card.style.transition = transitionRule;
+
+                            requestAnimationFrame(() => {
+                                requestAnimationFrame(() => {
+                                    card.style.opacity = '1';
+                                    card.style.filter = 'blur(0px)';
+                                    card.style.transform = toTransform;
+                                    setTimeout(() => {
+                                        card.style.willChange = 'auto';
+                                        card.style.transition = '';
+                                        card.style.filter = '';
+                                        card.style.transform = '';
+                                        card.style.opacity = '';
+                                    }, 1150 + i * 80);
+                                });
+                            });
                         });
                         categoryObserver.unobserve(entry.target);
                     }
@@ -2319,23 +3020,43 @@
 
         /* Active nav highlight on scroll */
         function initNavHighlight() {
-            const sections = document.querySelectorAll('section[id]');
-            const navLinks = document.querySelectorAll('.navbar a[href^="#"]');
+            const sections = Array.from(document.querySelectorAll('section[id]'));
+            const navLinks = Array.from(document.querySelectorAll('.navbar a[href^="#"]'));
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        navLinks.forEach(link => {
-                            link.classList.remove('active');
-                            if (link.getAttribute('href') === '#' + entry.target.id) {
-                                link.classList.add('active');
-                            }
-                        });
-                    }
+            function setActive(id) {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === '#' + id);
                 });
-            }, { threshold: 0.4 });
+            }
 
-            sections.forEach(section => observer.observe(section));
+            // Highlight whichever section currently covers the most of the viewport.
+            // Height-agnostic: works for normal and very tall scroll-stack sections.
+            function onScroll() {
+                const vh = window.innerHeight;
+                let bestId = sections.length ? sections[0].id : null;
+                let bestVisible = -1;
+                for (const sec of sections) {
+                    const r = sec.getBoundingClientRect();
+                    const visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+                    if (visible > bestVisible) {
+                        bestVisible = visible;
+                        bestId = sec.id;
+                    }
+                }
+                if (bestId) setActive(bestId);
+            }
+
+            let ticking = false;
+            function onScrollThrottled() {
+                if (!ticking) {
+                    requestAnimationFrame(() => { onScroll(); ticking = false; });
+                    ticking = true;
+                }
+            }
+            window.addEventListener('scroll', onScrollThrottled, { passive: true });
+            document.addEventListener('scroll', onScrollThrottled, { passive: true, capture: true });
+            document.body.addEventListener('scroll', onScrollThrottled, { passive: true });
+            onScroll();
         }
 
         // Sets a section's background image if a URL is provided in SITE_IMAGES; otherwise leaves the default.
@@ -2365,11 +3086,14 @@
             evaluateRegistrationGateState();
             initiateTimersEngine();
             generateDynamicCategories();
-            renderGallery('winners2025');
+            renderGallery();
             renderUpdatesFeed();
             renderGuidelines();
             renderJuryPanel();
             initScrollAnimations();
+            textAnimateBlurInUp(document.getElementById('heroTitleAnimate'));
+            // Init glow on all static .glow-card elements (dynamic ones call initCardGlow inline)
+            document.querySelectorAll('.glow-card').forEach(initCardGlow);
             initNavHighlight();
 
             // Trigger hero animations immediately
@@ -2405,28 +3129,281 @@
             }
         });
 
+        // ===== BORDER GLOW ENGINE (exact port from glow component) =====
+        const GLOW_CONFIG = {
+            glowColor: '220 80 70',         // blue-ish for film theme
+            glowIntensity: 1.0,
+            colors: ['#c084fc', '#38bdf8', '#f472b6'],
+            edgeSensitivity: 30
+        };
+
+        function parseHSL(hslStr) {
+            const match = hslStr.match(/([\d.]+)\s*([\d.]+)%?\s*([\d.]+)%?/);
+            if (!match) return { h: 220, s: 80, l: 70 };
+            return { h: parseFloat(match[1]), s: parseFloat(match[2]), l: parseFloat(match[3]) };
+        }
+
+        function applyGlowVars(el, glowColor, intensity) {
+            const { h, s, l } = parseHSL(glowColor);
+            const base = `${h}deg ${s}% ${l}%`;
+            const opacities = [100, 60, 50, 40, 30, 20, 10];
+            const keys = ['', '-60', '-50', '-40', '-30', '-20', '-10'];
+            for (let i = 0; i < opacities.length; i++) {
+                el.style.setProperty(`--glow-color${keys[i]}`, `hsl(${base} / ${Math.min(opacities[i] * intensity, 100)}%)`);
+            }
+        }
+
+        const GRADIENT_POSITIONS = ['80% 55%', '69% 34%', '8% 6%', '41% 38%', '86% 85%', '82% 18%', '51% 4%'];
+        const GRADIENT_KEYS = ['--gradient-one','--gradient-two','--gradient-three','--gradient-four','--gradient-five','--gradient-six','--gradient-seven'];
+        const COLOR_MAP = [0, 1, 2, 0, 1, 2, 1];
+
+        function applyGradientVars(el, colors) {
+            for (let i = 0; i < 7; i++) {
+                const c = colors[Math.min(COLOR_MAP[i], colors.length - 1)];
+                el.style.setProperty(GRADIENT_KEYS[i], `radial-gradient(at ${GRADIENT_POSITIONS[i]}, ${c} 0px, transparent 50%)`);
+            }
+            el.style.setProperty('--gradient-base', `linear-gradient(${colors[0]} 0 100%)`);
+        }
+
+        function getEdgeProximity(el, x, y) {
+            const rect = el.getBoundingClientRect();
+            const cx = rect.width / 2, cy = rect.height / 2;
+            const dx = x - cx, dy = y - cy;
+            let kx = Infinity, ky = Infinity;
+            if (dx !== 0) kx = cx / Math.abs(dx);
+            if (dy !== 0) ky = cy / Math.abs(dy);
+            return Math.min(Math.max(1 / Math.min(kx, ky), 0), 1);
+        }
+
+        function getCursorAngle(el, x, y) {
+            const rect = el.getBoundingClientRect();
+            const cx = rect.width / 2, cy = rect.height / 2;
+            const dx = x - cx, dy = y - cy;
+            if (dx === 0 && dy === 0) return 0;
+            let degrees = Math.atan2(dy, dx) * (180 / Math.PI) + 90;
+            if (degrees < 0) degrees += 360;
+            return degrees;
+        }
+
+        function glowAnimateValue({ start = 0, end = 100, duration = 1000, delay = 0, ease, onUpdate, onEnd }) {
+            setTimeout(() => {
+                const t0 = performance.now();
+                (function tick() {
+                    const elapsed = performance.now() - t0;
+                    const t = Math.min(elapsed / duration, 1);
+                    const progress = ease ? ease(t) : t;
+                    onUpdate(start + (end - start) * progress);
+                    if (t < 1) requestAnimationFrame(tick);
+                    else if (onEnd) onEnd();
+                })();
+            }, delay);
+        }
+
+        const easeInCubic = x => x * x * x;
+        const easeOutCubic = x => 1 - Math.pow(1 - x, 3);
+
+        function initCardGlow(card) {
+            applyGlowVars(card, GLOW_CONFIG.glowColor, GLOW_CONFIG.glowIntensity);
+            applyGradientVars(card, GLOW_CONFIG.colors);
+
+            card.addEventListener('pointermove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--edge-proximity', (getEdgeProximity(card, x, y) * 100).toFixed(3));
+                card.style.setProperty('--cursor-angle', `${getCursorAngle(card, x, y).toFixed(3)}deg`);
+            });
+
+            // radar sweep entrance
+            const angleStart = 110, angleEnd = 465;
+            card.classList.add('sweep-active');
+            card.style.setProperty('--cursor-angle', `${angleStart}deg`);
+
+            glowAnimateValue({ duration: 500, ease: easeOutCubic, onUpdate: v => card.style.setProperty('--edge-proximity', v) });
+            glowAnimateValue({ ease: easeInCubic, duration: 1500, end: 50, onUpdate: v => {
+                card.style.setProperty('--cursor-angle', `${(angleEnd - angleStart) * (v / 100) + angleStart}deg`);
+            }});
+            glowAnimateValue({ ease: easeOutCubic, delay: 1500, duration: 2250, start: 50, end: 100, onUpdate: v => {
+                card.style.setProperty('--cursor-angle', `${(angleEnd - angleStart) * (v / 100) + angleStart}deg`);
+            }});
+            glowAnimateValue({ ease: easeInCubic, delay: 2500, duration: 1500, start: 100, end: 0,
+                onUpdate: v => card.style.setProperty('--edge-proximity', v),
+                onEnd: () => card.classList.remove('sweep-active')
+            });
+        }
+        // ===== END BORDER GLOW ENGINE =====
+
+        // ===== SCROLL STACK ENGINE (exact math ported to window scroll) =====
+        const STACK_CONFIG = {
+            itemDistance: 100,
+            itemScale: 0.03,
+            itemStackDistance: 30,
+            stackPosition: 0.18,   // fraction of viewport height
+            scaleEndPosition: 0.08,
+            baseScale: 0.85,
+            rotationAmount: 1.5,
+            blurAmount: 2
+        };
+
+        const stackRegistry = [];
+
+        function initScrollStack(container) {
+            const cards = Array.from(container.querySelectorAll('.scroll-stack-card'));
+            const endEl = container.querySelector('.scroll-stack-end');
+            if (!cards.length) return;
+
+            cards.forEach((card, i) => {
+                if (i < cards.length - 1) card.style.marginBottom = `${STACK_CONFIG.itemDistance}px`;
+                card.style.transformOrigin = 'top center';
+                card.style.willChange = 'transform, filter';
+            });
+
+            const inst = { container, cards, endEl, lastTransforms: new Map(), cardTops: [], endTop: 0 };
+            measureStack(inst);
+            stackRegistry.push(inst);
+            updateStackInstance(inst);
+        }
+
+        // Static layout position relative to page top (NOT affected by transforms).
+        function pageTop(el) {
+            let top = 0;
+            while (el) { top += el.offsetTop; el = el.offsetParent; }
+            return top;
+        }
+
+        // Measure once (and on resize) with transforms cleared so positions are stable.
+        function measureStack(inst) {
+            const { cards, endEl } = inst;
+            // temporarily clear transforms so offset math is pure layout
+            const saved = cards.map(c => c.style.transform);
+            cards.forEach(c => { c.style.transform = 'none'; });
+            inst.cardTops = cards.map(c => pageTop(c));
+            inst.endTop = endEl ? pageTop(endEl) : 0;
+            cards.forEach((c, i) => { c.style.transform = saved[i] || ''; });
+        }
+
+        function stackProgress(scrollTop, start, end) {
+            if (scrollTop < start) return 0;
+            if (scrollTop > end) return 1;
+            return (scrollTop - start) / (end - start);
+        }
+
+        function updateStackInstance(inst) {
+            const { cards, lastTransforms, cardTops, endTop } = inst;
+            const vh = window.innerHeight;
+            const scrollTop = window.scrollY;
+
+            const stackPositionPx = STACK_CONFIG.stackPosition * vh;
+            const scaleEndPositionPx = STACK_CONFIG.scaleEndPosition * vh;
+            const endElementTop = endTop;
+
+            cards.forEach((card, i) => {
+                const cardTop = cardTops[i];
+                const triggerStart = cardTop - stackPositionPx - STACK_CONFIG.itemStackDistance * i;
+                const triggerEnd = cardTop - scaleEndPositionPx;
+                const pinStart = cardTop - stackPositionPx - STACK_CONFIG.itemStackDistance * i;
+                const pinEnd = endElementTop - vh / 2;
+
+                const scaleP = stackProgress(scrollTop, triggerStart, triggerEnd);
+                const targetScale = STACK_CONFIG.baseScale + i * STACK_CONFIG.itemScale;
+                const scale = 1 - scaleP * (1 - targetScale);
+                const rotation = STACK_CONFIG.rotationAmount ? i * STACK_CONFIG.rotationAmount * scaleP : 0;
+
+                let blur = 0;
+                if (STACK_CONFIG.blurAmount) {
+                    let topCardIndex = 0;
+                    for (let j = 0; j < cards.length; j++) {
+                        const jTriggerStart = cardTops[j] - stackPositionPx - STACK_CONFIG.itemStackDistance * j;
+                        if (scrollTop >= jTriggerStart) topCardIndex = j;
+                    }
+                    if (i < topCardIndex) blur = Math.max(0, (topCardIndex - i) * STACK_CONFIG.blurAmount);
+                }
+
+                let translateY = 0;
+                const isPinned = scrollTop >= pinStart && scrollTop <= pinEnd;
+                if (isPinned) {
+                    translateY = scrollTop - cardTop + stackPositionPx + STACK_CONFIG.itemStackDistance * i;
+                } else if (scrollTop > pinEnd) {
+                    translateY = pinEnd - cardTop + stackPositionPx + STACK_CONFIG.itemStackDistance * i;
+                }
+
+                const nt = {
+                    translateY: Math.round(translateY * 100) / 100,
+                    scale: Math.round(scale * 1000) / 1000,
+                    rotation: Math.round(rotation * 100) / 100,
+                    blur: Math.round(blur * 100) / 100
+                };
+
+                const lt = lastTransforms.get(i);
+                const changed = !lt ||
+                    Math.abs(lt.translateY - nt.translateY) > 0.1 ||
+                    Math.abs(lt.scale - nt.scale) > 0.001 ||
+                    Math.abs(lt.rotation - nt.rotation) > 0.1 ||
+                    Math.abs(lt.blur - nt.blur) > 0.1;
+
+                if (changed) {
+                    card.style.transform = `translate3d(0, ${nt.translateY}px, 0) scale(${nt.scale}) rotate(${nt.rotation}deg)`;
+                    card.style.filter = nt.blur > 0 ? `blur(${nt.blur}px)` : '';
+                    lastTransforms.set(i, nt);
+                }
+            });
+        }
+
+        function updateAllStacks() {
+            stackRegistry.forEach(updateStackInstance);
+        }
+
+        let stackTicking = false;
+        window.addEventListener('scroll', () => {
+            if (!stackTicking) {
+                requestAnimationFrame(() => { updateAllStacks(); stackTicking = false; });
+                stackTicking = true;
+            }
+        }, { passive: true });
+        window.addEventListener('resize', () => {
+            stackRegistry.forEach(measureStack);
+            updateAllStacks();
+        });
+        // Re-measure once assets/images settle to catch layout shifts
+        window.addEventListener('load', () => {
+            stackRegistry.forEach(measureStack);
+            updateAllStacks();
+        });
+        // ===== END SCROLL STACK ENGINE =====
+
         function generateDynamicCategories() {
             const container = document.getElementById('categoriesGridContainer');
             if (!container) return;
-            container.innerHTML = ''; 
+            container.innerHTML = '';
 
-            CATEGORY_ITEMS.forEach(item => {
+            CATEGORY_ITEMS.forEach((item, idx) => {
                 const card = document.createElement('div');
-                card.className = 'category-asset-card';
+                card.className = 'scroll-stack-card glow-card';
 
                 let iconMarkup = '';
                 if (item.image && item.image.trim() !== '') {
-                    iconMarkup = `<img src="${item.image}" alt="${item.title.replace('<br>', ' ')}" class="category-icon-img">`;
+                    iconMarkup = `<div class="stack-card-media"><img src="${item.image}" alt="${item.title.replace('<br>', ' ')}"></div>`;
                 } else {
-                    iconMarkup = `<span class="category-emoji">${item.emoji}</span>`;
+                    iconMarkup = `<div class="stack-emoji">${item.emoji}</div>`;
                 }
 
+                const titleClean = item.title.replace('<br>', ' ');
                 card.innerHTML = `
-                    <div class="icon-placeholder">${iconMarkup}</div>
-                    <p>${item.title}</p>
+                    <span class="edge-light"></span>
+                    <span class="stack-card-index">${String(idx + 1).padStart(2, '0')} / ${CATEGORY_ITEMS.length}</span>
+                    ${iconMarkup}
+                    <h3 class="stack-card-title">${titleClean}</h3>
+                    <p class="stack-card-sub">Award Category</p>
                 `;
                 container.appendChild(card);
+                initCardGlow(card);
             });
+
+            const end = document.createElement('div');
+            end.className = 'scroll-stack-end';
+            container.appendChild(end);
+
+            initScrollStack(container);
         }
 
         function evaluateRegistrationGateState() {
@@ -2488,39 +3465,9 @@
             setInterval(updateClocks, 1000);
         }
 
-        function filterGallery(category, contextPill) {
-            document.querySelectorAll('.gallery-filter-row .btn-gallery-pill').forEach(pill => pill.classList.remove('active'));
-            contextPill.classList.add('active');
-            renderGallery(category);
-        }
-
-        function renderGallery(category) {
-            const gridMatrix = document.getElementById('galleryPhotoGrid');
-            gridMatrix.innerHTML = ''; 
-            
-            GALLERY_IMAGES.forEach(photo => {
-                if (photo.category === category) {
-                    const frame = document.createElement('div');
-                    frame.className = 'gallery-photo-frame';
-                    
-                    let mediaSourceElement = `<div class="gallery-image-container"><img src="${photo.src}" alt="${photo.title}"></div>`;
-                    if (!photo.src || photo.src.trim() === "") {
-                        mediaSourceElement = `
-                        <div class="gallery-image-container">
-                            <div class="placeholder-empty-graphic">🎬<span>Upcoming Winner</span></div>
-                        </div>`;
-                    }
-
-                    frame.innerHTML = `
-                        ${mediaSourceElement}
-                        <div class="gallery-photo-details">
-                            <div class="gallery-photo-title">${photo.title}</div>
-                            <div class="gallery-photo-sub">${photo.sub}</div>
-                        </div>
-                    `;
-                    gridMatrix.appendChild(frame);
-                }
-            });
+        function renderGallery() {
+            // Gallery is now CSS-only (radio + :has() selector, exact same as uploaded file).
+            // No JS needed. Figures and thumbnails are static HTML.
         }
 
         function toggleRulesModal(show) {
@@ -2583,12 +3530,14 @@
             container.innerHTML = '';
             GUIDELINES_ITEMS.forEach((item, index) => {
                 const box = document.createElement('div');
-                box.className = 'rule-item-box';
+                box.className = 'rule-item-box glow-card';
                 box.innerHTML = `
+                    <span class="edge-light"></span>
                     <h4>${index + 1}. ${item.title}</h4>
                     <p>${item.text}</p>
                 `;
                 container.appendChild(box);
+                initCardGlow(box);
             });
         }
 
@@ -2598,17 +3547,19 @@
             grid.innerHTML = '';
             JURY_PANEL.forEach(member => {
                 const card = document.createElement('div');
-                card.className = 'jury-card';
+                card.className = 'jury-card glow-card';
                 let avatarElement = `<div class="jury-avatar-placeholder">🎭</div>`;
                 if (member.src && member.src.trim() !== '') {
                     avatarElement = `<img src="${member.src}" alt="${member.name}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;margin:0 auto 12px auto;display:block;">`;
                 }
                 card.innerHTML = `
+                    <span class="edge-light"></span>
                     ${avatarElement}
                     <h4>${member.name}</h4>
                     <p>${member.role}</p>
                 `;
                 grid.appendChild(card);
+                initCardGlow(card);
             });
         }
 
