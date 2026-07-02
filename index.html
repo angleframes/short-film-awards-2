@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <link rel="icon" type="image/png" href="Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
 
     <title id="browserTabTitle">Sharankrishna Short Film Awards - Entry Portal</title>
     
@@ -162,19 +165,23 @@
         .site-header-wrapper {
             width: 100%;
             height: 70px;
-            background: rgba(6, 6, 8, 0.8); 
-            backdrop-filter: var(--ios-blur);
-            -webkit-backdrop-filter: var(--ios-blur);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: transparent;
+            border-bottom: none;
             position: fixed;
             top: 0;
             left: 0;
             z-index: 1000;
-            padding: 0 40px; 
+            padding: 20px 40px; 
             display: flex;
             justify-content: space-between;
             align-items: center;
             transition: background 0.4s ease;
+        }
+        .site-header-wrapper .navbar {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .brand-logo-area {
@@ -216,7 +223,13 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            height: 100%;
+            height: 54px;
+            padding: 0 8px;
+            border-radius: 40px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: var(--ios-blur);
+            -webkit-backdrop-filter: var(--ios-blur);
         }
 
         .navbar a {
@@ -235,12 +248,10 @@
 
         .navbar a:hover {
             color: var(--text-main);
-            background: rgba(255, 255, 255, 0.05);
         }
 
         .navbar a.active {
             color: var(--text-main);
-            background: rgba(255, 255, 255, 0.1);
         }
 
         .navbar a.active::after {
@@ -295,7 +306,9 @@
             width: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
             padding: 120px 8% 60px 8%;
             position: relative;
         }
@@ -305,6 +318,10 @@
             max-width: 650px; 
             width: 100%;
             margin-bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
         }
 
         .hero-presenter-tag {
@@ -313,22 +330,24 @@
             text-transform: uppercase;
             letter-spacing: 3px;
             color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 12px;
+            margin: 0 0 12px 0;
         }
 
         .hero-main-title {
-            font-size: 3.2rem;
-            font-weight: 400;
+            font-family: 'SF Pro Display', -apple-system, sans-serif;
+            font-size: clamp(1.4rem, 4vw, 3.2rem);
+            font-weight: 700;
             line-height: 1.1;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 25px;
             text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            white-space: nowrap;
         }
 
         .hero-main-title strong {
             font-weight: 700;
-            display: block;
+            display: inline;
         }
 
         /* ---- TextAnimate (blurInUp by character) css port ---- */
@@ -349,13 +368,15 @@
         .association-wrapper {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
             gap: 6px;
             margin-bottom: 25px;
             border-top: 1px solid rgba(255, 255, 255, 0.15);
             border-bottom: 1px solid rgba(255, 255, 255, 0.15);
             padding: 14px 0;
             max-width: max-content;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .association-tag {
@@ -369,6 +390,7 @@
         .association-logo-box {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
             flex-wrap: wrap;
         }
@@ -392,6 +414,7 @@
         .hero-action-row {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 16px;
         }
 
@@ -404,7 +427,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            border-radius: 8px;
+            border-radius: 40px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -429,7 +452,7 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            border-radius: 8px;
+            border-radius: 40px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -458,8 +481,14 @@
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
-            padding: 15px 20px;
+            padding: 22px 20px;
             --glow-bg: #060608;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 110px;
         }
 
         .countdown-title-tag {
@@ -467,12 +496,14 @@
             color: rgba(255, 255, 255, 0.7);
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             font-weight: 600;
+            text-align: center;
         }
 
         .countdown-timer-digits-row {
             display: flex;
+            justify-content: center;
             gap: 12px;
         }
 
@@ -780,7 +811,6 @@
             justify-content: center;
             overflow: hidden;
             pointer-events: none;
-            opacity: 0.13;
         }
 
         .clock-face-bg {
@@ -804,6 +834,7 @@
             transform: scale(1.0);
             pointer-events: none;
             z-index: 0;
+            opacity: 0.13;
         }
 
         .clock-hand-container {
@@ -813,13 +844,14 @@
             align-items: center;
             justify-content: center;
             z-index: 3;
+            opacity: 0.55;
         }
 
         .clock-second {
             position: relative;
             width: 10px;
             height: 10px;
-            background: #d4af37;
+            background: #ffffff;
             border-radius: 50%;
             border: 1px solid #eee;
             animation: watch-reverse 60s linear infinite;
@@ -828,12 +860,12 @@
         .clock-second::before {
             content: "";
             position: absolute;
-            width: 2px;
+            width: 5px;
             height: calc(var(--clock-size) / 2);
-            left: 3px;
+            left: 1.5px;
             bottom: -10px;
-            background: #d4af37;
-            border-radius: 2px;
+            background: #ffffff;
+            border-radius: 3px;
         }
 
         .clock-second::after {
@@ -2233,7 +2265,7 @@
             .hero-metric-ribbon { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
             .categories-grid-matrix { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .gallery-photo-frame { flex-basis: 220px; }
-            .hero-main-title { font-size: 2.2rem; }
+            .hero-main-title { font-size: clamp(1rem, 5vw, 2.2rem); }
             .portal-glass-card { padding: 24px; }
             .step-pipeline-container { display: none; }
             .social-links-grid { gap: 20px; }
