@@ -858,7 +858,8 @@
         .gallery-select-wrap {
             position: relative;
             padding: 0 !important;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: visible;
             min-height: 100vh;
         }
 
@@ -878,8 +879,8 @@
             left: 0;
             bottom: 0;
             z-index: 10;
-            background: linear-gradient(transparent, rgba(6,6,8,0.92));
-            padding: 70px 0 16px;  /* extra top padding gives lift room */
+            background: linear-gradient(transparent, rgba(6,6,8,0.92) 35%);
+            padding: 90px 0 16px;
             overflow: visible;
         }
 
@@ -914,13 +915,13 @@
             border: 2px solid rgba(255,255,255,0.08);
         }
 
-        /* Clip the image itself, not the li (so the border-radius shows without cropping lift) */
+        /* Clip only the image for border-radius, not the li card */
         .gallery-select-strip li label {
             display: block;
             cursor: pointer;
             position: relative;
             border-radius: 8px;
-            overflow: hidden;
+            overflow: visible;
         }
 
         .gallery-select-strip li label img {
@@ -928,6 +929,7 @@
             aspect-ratio: 16/10;
             object-fit: cover;
             display: block;
+            border-radius: 8px;
             /* Default: grayscale. Color reveals on hover or when selected */
             filter: grayscale(1);
             transition: filter 0.35s ease;
@@ -956,9 +958,9 @@
             border-radius: 8px;
         }
 
-        /* Hover: lift + show color */
+        /* Hover: scale only, no translateY (overflow-x:auto clips translateY) */
         .gallery-select-strip li:hover {
-            transform: scale(1.12) translateY(-10px);
+            transform: scale(1.1);
             z-index: 15;
             border-color: rgba(255,255,255,0.4);
         }
@@ -1055,7 +1057,7 @@
             .gallery-select-strip li label img,
             .thumb-placeholder { aspect-ratio: 3/4; }
             .gallery-select-strip li label span:not(.thumb-placeholder) { font-size: 0.5rem; }
-            .gallery-select-strip li:hover { transform: scale(1.08) translateY(-8px); }
+            .gallery-select-strip li:hover { transform: scale(1.08); }
             .gs-fig figcaption { bottom: 170px; left: 5%; right: 5%; }
             .gs-fig figcaption h3 { font-size: 1.3rem; letter-spacing: 1px; }
             .gs-fig figcaption p { font-size: 0.7rem; letter-spacing: 2px; }
