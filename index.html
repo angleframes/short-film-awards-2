@@ -177,11 +177,13 @@
             align-items: center;
             transition: background 0.4s ease;
         }
-        .site-header-wrapper .navbar {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
+        @media (min-width: 769px) {
+            .site-header-wrapper .navbar {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
         }
 
         .brand-logo-area {
@@ -335,7 +337,7 @@
 
         .hero-main-title {
             font-family: 'SF Pro Display', -apple-system, sans-serif;
-            font-size: clamp(1.4rem, 4vw, 3.2rem);
+            font-size: clamp(0.9rem, 4.3vw, 3.2rem);
             font-weight: 700;
             line-height: 1.1;
             text-transform: uppercase;
@@ -415,6 +417,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-wrap: wrap;
             gap: 16px;
         }
 
@@ -2265,7 +2268,6 @@
             .hero-metric-ribbon { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
             .categories-grid-matrix { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .gallery-photo-frame { flex-basis: 220px; }
-            .hero-main-title { font-size: clamp(1rem, 5vw, 2.2rem); }
             .portal-glass-card { padding: 24px; }
             .step-pipeline-container { display: none; }
             .social-links-grid { gap: 20px; }
@@ -2276,6 +2278,8 @@
             .hero-metric-ribbon { grid-template-columns: 1fr; }
             .categories-grid-matrix { grid-template-columns: 1fr; }
             .gallery-photo-frame { flex-basis: 190px; }
+            .btn-action-primary, .btn-action-secondary { padding: 14px 22px; font-size: 0.75rem; }
+            .hero-presenter-tag { letter-spacing: 2px; }
         }
     </style>
 </head>
