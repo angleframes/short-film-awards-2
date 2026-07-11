@@ -1,4 +1,132 @@
 <!DOCTYPE html>
+    <!-- ============================================================
+         ⚙️  MASTER CONFIGURATION — Edit everything here
+         All site content, images, dates, cards live in this block.
+         ============================================================ -->
+    <script>
+        /****************************************************************
+         * ⚙️ MASTER VARIABLE HUB
+         *****************************************************************/
+        const REGISTRATION_GATE = {
+            isOpen: false 
+        };
+
+        const PORTAL_TIMELINES = {
+            submissionDeadline: "December 31, 2026 23:59:59",
+            awardsEventDate: "February 12, 2027 18:00:00",
+            deadlineLabelText: "31 Dec 2026",
+            eventLabelText: "12 Feb 2027"
+        };
+
+        const SITE_IMAGES = {
+            mainLogo: "logo nav.png",
+            paymentQrCode: "angle.jpg",
+            socialInstagram: "—Pngtree—instagram icon vector_8704817.png",
+            socialYoutube: "—Pngtree—youtube social media 3d stereo_8704808.png",
+            socialFacebook: "—Pngtree—facebook icon facebook logo_3584837.png",
+            // Per-section background images — add a file name/path to give that section its own backdrop.
+            // Leave as "" to keep the default shared background.
+            sectionBgStory: "",
+            sectionBgCategories: "",
+            sectionBgGallery: "",
+            sectionBgRegistration: "",
+            sectionBgContact: ""
+        };
+
+        const CATEGORY_ITEMS = [
+            { title: "Best<br>Short Film", emoji: "🎬", image: "" },
+            { title: "Best<br>Director", emoji: "👥", image: "" }, 
+            { title: "Best<br>Screenplay", emoji: "📝", image: "" }, 
+            { title: "Best<br>Actor", emoji: "🧍", image: "" },
+            { title: "Best<br>Actress", emoji: "🧍‍♀️", image: "" },
+            { title: "Best<br>Cinematography", emoji: "📷", image: "" },
+            { title: "Best<br>Editing", emoji: "✂️", image: "" },
+            { title: "Best<br>Music", emoji: "🎵", image: "" },
+            { title: "Campus<br>Category", emoji: "🎓", image: "" },
+            { title: "Special Jury<br>Mentions", emoji: "✨", image: "" }
+        ];
+
+        const GALLERY_IMAGES = [
+            { category: "winners2025", src: "MRC01071.JPG.webm", title: "Best Short Film: 'Bug'", sub: "Winner 2025" },
+            { category: "winners2025", src: "MRC01028.JPG.jpeg", title: "Campus Category: 'Timeless'", sub: "Winner 2025" },
+            { category: "winners2026", src: "", title: "To Be Announced", sub: "Coming Soon" },
+            { category: "events", src: "MRC00606.JPG.jpeg", title: "Inauguration", sub: "Inauguration" },
+            { category: "events", src: "MRC00614.JPG.jpeg", title: "Inauguration", sub: "Cinema Hall" },
+            { category: "events", src: "MRC00617.JPG.jpeg", title: "Inauguration", sub: "Cinema Hall" },
+            { category: "events", src: "MRC00629.JPG.jpeg", title: "Inauguration", sub: "Cinema Hall" }
+        ];
+
+        const APP_CONFIG = {
+            googleWebAppUrl: "https://script.google.com/macros/s/AKfycbzTfiL56zKjqcZhLm1Mk0rNp5Vm9yQutdfqRMavbdSMIyN-bYpE5_KYQFkbRHNOSKk/exec"
+        };
+
+        /****************************************************************
+         * ✏️ ABOUT SECTION — Edit card content here
+         * eyebrow: small label above heading
+         * heading: bold title
+         * image: filename of photo to show on right/left
+         * text: paragraph content (HTML allowed for <strong> etc.)
+         *****************************************************************/
+        const ABOUT_CARDS = [
+            {
+                eyebrow: "Who Is",
+                heading: "Sharankrishna",
+                image: "sharan-photo.jpg",
+                text: `Sharan Krishna was an extraordinarily talented visual artist, director, and designer whose creativity and warmth left an unforgettable mark on everyone he met. A graduate in IT from Jain University and a designer at Midnay (Kozhikode Cyberpark), Sharan was also the Co-founder and CEO of Angle Frames. Tragically, destiny took him away at the young age of 23 on November 12, 2024, but his legacy is monumental—having already directed 16 short films (including award-winners like Vidya, No, Karutham Naalaykkaay, Nirbhaya, Lisa Bhramam, and Three Minutes), a web series, a documentary, and tireless volunteer designs for WordCamp Kerala. Known for his infectious smile, humility, and selfless love for people, Sharan brought a "Midas touch" to everything he created. To keep his inspiring light alive, his family, friends, and teachers have instituted the Sharan Krishna Short Film Award. Hosted on February 12th—a date <strong>deeply special to Sharan</strong>—this award celebrates his timeless spirit and inspires us all to live with the same kindness, passion, and <strong>boundless creativity</strong> that he championed.`
+            },
+            {
+                eyebrow: "About",
+                heading: "Jain University",
+                image: "jain-university.jpg",
+                text: `Established as a prominent regional extension of the highly prestigious parent institution, JAIN (Deemed-to-be University), Kochi stands as a premier hub for <strong>academic excellence, innovation, and global learning</strong> in Kerala. Approved by the University Grants Commission (UGC) and accredited with a distinguished NAAC A++ grade, the university is strategically located at Knowledge Park within the tech-rich Infopark ecosystem in Kakkanad. The eco-friendly, modern campus features a learner-centric environment equipped with fully air-conditioned smart classrooms, advanced computer labs, and a dynamic entrepreneurial ecosystem aligned with National Education Policy (NEP) guidelines. Offering a comprehensive selection of undergraduate and postgraduate <strong>programs</strong> across management, commerce, computer science, and the humanities, JAIN Kochi bridges the gap between theory and industry through hands-on internships, professional certifications, international exchange initiatives, and <strong>robust campus placements</strong>. By cultivating deep critical thinking, real-world skills, and <strong>an entrepreneurial mindset</strong>, the university actively transforms aspiring <strong>students</strong> into globally competent, future-ready professionals and leaders.`
+            },
+            {
+                eyebrow: "About",
+                heading: "Angle Frames",
+                image: "angle-frames.jpg",
+                text: `Founded by Anal Chandran and Sharankrishna, ANGLE FRAMES is an independent, multi-disciplinary digital media studio based in Kerala, India, focused on high-quality visual production and design. Built on a passion for creative storytelling, the studio specializes in directing and producing engaging short films, dynamic social media reels, corporate media videos, and professional video editing workflows. Beyond moving images, Angle Frames functions as a full-service creative engine, delivering striking graphic design and promotional publicity artwork to give every project a standout visual identity. From crafting the viral mini-web series Ikkachakka to producing award-winning independent films, the team takes a raw concept and refines it into a polished, cinematic reality—bringing precise framing, unique vision, and distinct artistry to every single piece of content they create.`
+            },
+            {
+                eyebrow: "The Story Behind",
+                heading: "Our Logo",
+                image: "logo nav.png",
+                text: `The logo for the Sharankrishna Short Film Awards is a deeply symbolic fusion of legacy, identity, and cinematic artistry. At its core, the emblem blends three distinct structural layers to tell a continuous story. The anti-clockwise spiral lines represent a journey of remembrance, intentionally retracing the creative path once walked by Sharan Krishna. Seamlessly woven into this movement is the letter "S", which stands as a guiding presence embodying his name and enduring influence on our craft. Encapsulating it all is the geometric frame of a camera aperture, serving as our absolute artistic and cinematic focal point. Together, these elements reflect Sharan Krishna's life journey through the lens of limitless creativity and vision, anchoring the spirit of this film festival at the very heart of the independent movie industry.`
+            }
+        ];
+
+        /****************************************************************
+         * ✏️ EASY-EDIT ZONE — Festival Updates & Guidelines
+         * Just edit the text below. No HTML knowledge needed.
+         * Add, remove, or reorder entries by copying/deleting a block.
+         *****************************************************************/
+
+        // Festival Updates — newest entry first.
+        const UPDATES_FEED = [
+            { date: "Coming Soon", title: "Jury Panel Reveal", text: "Our official jury panel for this edition will be announced here and across our social channels shortly." },
+            { date: "Coming Soon", title: "Screening Schedule", text: "The full festival day screening schedule and venue details will be published as the event date approaches." },
+            { date: "Now Open", title: "Entries Open", text: "Submissions are now open for the Sharankrishna Short Film Awards. Head to the Registration section to enter your film." }
+        ];
+
+        // Festival Guidelines — shown in order, numbered automatically.
+        const GUIDELINES_ITEMS = [
+            { title: "Screening Conduct", text: "Attendees and finalists are expected to remain seated for the full duration of each screening block. Mobile devices should be silenced inside the auditorium." },
+            { title: "Photography & Recording", text: "Personal photography is welcome in lobby and lounge areas. Recording of screened films from inside the auditorium is strictly prohibited to protect filmmakers' copyright." },
+            { title: "Accreditation & Entry", text: "A valid e-pass or entry confirmation (sent after registration) must be presented at the venue check-in desk for admission to the festival and awards night." },
+            { title: "Code of Conduct", text: "Angle Frames maintains a zero-tolerance policy toward harassment, discrimination, or disruptive behavior of any kind toward fellow attendees, filmmakers, or staff." },
+            { title: "Schedule Changes", text: "Screening order and program timings are subject to last-minute adjustment. Please check official festival updates and on-site signage for the most current schedule." }
+        ];
+
+        // Replace with confirmed jury members once finalized. Leave src empty to show a placeholder avatar.
+        const JURY_PANEL = [
+            { name: "To Be Announced", role: "Jury Chair", src: "" },
+            { name: "To Be Announced", role: "Filmmaking", src: "" },
+            { name: "To Be Announced", role: "Cinematography", src: "" },
+            { name: "To Be Announced", role: "Screenwriting", src: "" }
+        ];
+
+        let currentWizardStep = 1;
+    </script>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -672,41 +800,164 @@
             background: transparent;
         }
 
+        /* ===== ABOUT / STORY — Numbered Card Layout ===== */
         .story-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
             margin-top: 60px;
         }
 
         .story-block {
-            background: var(--glass-bg);
-            backdrop-filter: var(--ios-blur);
-            -webkit-backdrop-filter: var(--ios-blur);
-            border: 1px solid var(--glass-border);
-            padding: 36px;
-            border-radius: 16px;
-            transition: border-color 0.4s ease, transform 0.4s ease;
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 0;
+            background: rgba(10,10,10,0.72);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 18px;
+            overflow: hidden;
+            min-height: 340px;
+            transition: border-color 0.4s ease, box-shadow 0.4s ease;
             --glow-bg: #12121600;
         }
         .story-block:hover {
-            border-color: rgba(255,255,255,0.3);
-            transform: translateY(-4px);
+            border-color: rgba(255,255,255,0.22);
+            box-shadow: 0 0 40px rgba(255,255,255,0.04);
         }
 
-        .story-block h3 {
-            margin-bottom: 14px;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid rgba(255,255,255,0.15);
-            padding-bottom: 10px;
-            font-weight: 700;
+        /* Text side */
+        .story-block-text {
+            padding: 48px 44px;
+            position: relative;
+            z-index: 2;
         }
-        .story-block p {
-            color: rgba(255,255,255,0.85);
-            font-size: 0.95rem;
-            line-height: 1.7;
+        /* Image side */
+        .story-block-img {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 340px;
+            overflow: hidden;
+        }
+        .story-block-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+            display: block;
+            filter: grayscale(30%) brightness(0.85);
+            transition: filter 0.5s ease, transform 0.5s ease;
+        }
+        .story-block:hover .story-block-img img {
+            filter: grayscale(0%) brightness(0.95);
+            transform: scale(1.03);
+        }
+        /* Gradient fade img into card */
+        .story-block-img::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, rgba(10,10,10,0.55) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        /* Reverse: image left, text right */
+        .story-block.reverse {
+            direction: rtl;
+        }
+        .story-block.reverse > * {
+            direction: ltr;
+        }
+        .story-block.reverse .story-block-img::after {
+            background: linear-gradient(to left, rgba(10,10,10,0.55) 0%, transparent 50%);
+        }
+
+        /* Big background number */
+        .story-block-num {
+            position: absolute;
+            top: -18px;
+            left: 28px;
+            font-size: 9rem;
+            font-weight: 900;
+            line-height: 1;
+            color: rgba(255,255,255,0.045);
+            font-family: var(--font-display, 'SF Pro Display', 'Inter', sans-serif);
+            letter-spacing: -4px;
+            pointer-events: none;
+            user-select: none;
+            z-index: 1;
+        }
+        .story-block.reverse .story-block-num {
+            left: auto;
+            right: 28px;
+        }
+
+        /* Eyebrow */
+        .story-block-eyebrow {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.45);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* Heading */
+        .story-block-text h3 {
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin: 0 0 6px;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        /* Gold underline accent */
+        .story-block-text .story-underline {
+            display: block;
+            width: 36px;
+            height: 3px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 2px;
+            margin: 12px 0 20px;
+        }
+
+        .story-block-text p {
+            color: rgba(255,255,255,0.78);
+            font-size: 0.9rem;
+            line-height: 1.75;
+            margin: 0;
+        }
+
+        /* Placeholder when no image supplied */
+        .story-block-img.no-img {
+            background: rgba(255,255,255,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .story-block-img.no-img::after { display: none; }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .story-block,
+            .story-block.reverse {
+                grid-template-columns: 1fr;
+                direction: ltr;
+                min-height: unset;
+            }
+            .story-block-img { min-height: 220px; order: -1; }
+            .story-block.reverse .story-block-img { order: -1; }
+            .story-block-img::after,
+            .story-block.reverse .story-block-img::after {
+                background: linear-gradient(to bottom, transparent 60%, rgba(10,10,10,0.7) 100%);
+            }
+            .story-block-text { padding: 28px 24px 32px; }
+            .story-block-text h3 { font-size: 1.5rem; }
+            .story-block-num { font-size: 6rem; top: -10px; left: 16px; }
+            .story-block.reverse .story-block-num { right: 16px; left: auto; }
         }
 
         /* ===== SCROLL STACK EFFECT (ported, site colors) ===== */
@@ -2493,7 +2744,6 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 992px) {
-            .story-grid { grid-template-columns: 1fr; }
             .categories-grid-matrix { grid-template-columns: repeat(3, 1fr); }
         }
 
@@ -2605,6 +2855,7 @@
     </style>
 </head>
 <body>
+
 
     <!-- Full-page clock background -->
     <div id="clock-bg-wrapper">
@@ -2738,35 +2989,8 @@
         <div class="section-inner">
             <span class="section-eyebrow scroll-reveal">Our Story</span>
             <h2 class="section-heading scroll-reveal delay-1"><span class="shiny-text">About the<br>Awards</span></h2>
-            <div class="story-grid">
-                <div class="story-block scroll-reveal-left delay-1 glow-card">
-                    <span class="edge-light"></span>
-                    <h3>Who is Sharankrishna?</h3>
-                    <p>
-                        Sharan Krishna was an extraordinarily talented visual artist, director, and designer whose creativity and warmth left an unforgettable mark on everyone he met. A graduate in IT from Jain University and a designer at Midnay (Kozhikode Cyberpark), Sharan was also the Co-founder and CEO of Angle Frames. Tragically, destiny took him away at the young age of 23 on November 12, 2024, but his legacy is monumental—having already directed 16 short films (including award-winners like Vidya, No, Karutham Naalaykkaay, Nirbhaya, Lisa Bhramam, and Three Minutes), a web series, a documentary, and tireless volunteer designs for WordCamp Kerala. Known for his infectious smile, humility, and selfless love for people, Sharan brought a "Midas touch" to everything he created. To keep his inspiring light alive, his family, friends, and teachers have instituted the Sharan Krishna Short Film Award. Hosted on February 12th—a date deeply special to Sharan—this award celebrates his timeless spirit and inspires us all to live with the same kindness, passion, and boundless creativity that he championed.
-                    </p>
-                </div>
-                <div class="story-block scroll-reveal-right delay-2 glow-card">
-                    <span class="edge-light"></span>
-                    <h3>About Jain University</h3>
-                    <p>
-                        Established as a prominent regional extension of the highly prestigious parent institution, JAIN (Deemed-to-be University), Kochi stands as a premier hub for academic excellence, innovation, and global learning in Kerala. Approved by the University Grants Commission (UGC) and accredited with a distinguished NAAC A++ grade, the university is strategically located at Knowledge Park within the tech-rich Infopark ecosystem in Kakkanad. The eco-friendly, modern campus features a learner-centric environment equipped with fully air-conditioned smart classrooms, advanced computer labs, and a dynamic entrepreneurial ecosystem aligned with National Education Policy (NEP) guidelines. Offering a comprehensive selection of undergraduate and postgraduate programs across management, commerce, computer science, and the humanities, JAIN Kochi bridges the gap between theory and industry through hands-on internships, professional certifications, international exchange initiatives, and robust campus placements. By cultivating deep critical thinking, real-world skills, and an entrepreneurial mindset, the university actively transforms aspiring students into globally competent, future-ready professionals and leaders.
-                    </p>
-                </div>
-                <div class="story-block scroll-reveal-left delay-2 glow-card">
-                    <span class="edge-light"></span>
-                    <h3>About Angle Frames</h3>
-                    <p>
-                        Founded by Anal Chandran and Sharankrishna, ANGLE FRAMES is an independent, multi-disciplinary digital media studio based in Kerala, India, focused on high-quality visual production and design. Built on a passion for creative storytelling, the studio specializes in directing and producing engaging short films, dynamic social media reels, corporate media videos, and professional video editing workflows. Beyond moving images, Angle Frames functions as a full-service creative engine, delivering striking graphic design and promotional publicity artwork to give every project a standout visual identity. From crafting the viral mini-web series Ikkachakka to producing award-winning independent films, the team takes a raw concept and refines it into a polished, cinematic reality—bringing precise framing, unique vision, and distinct artistry to every single piece of content they create.
-                    </p>
-                </div>
-                <div class="story-block scroll-reveal-right delay-3 glow-card">
-                    <span class="edge-light"></span>
-                    <h3>The Story Behind Our Logo</h3>
-                    <p>
-                        The logo for the Sharankrishna Short Film Awards is a deeply symbolic fusion of legacy, identity, and cinematic artistry. At its core, the emblem blends three distinct structural layers to tell a continuous story. The anti-clockwise spiral lines represent a journey of remembrance, intentionally retracing the creative path once walked by Sharan Krishna. Seamlessly woven into this movement is the letter "S", which stands as a guiding presence embodying his name and enduring influence on our craft. Encapsulating it all is the geometric frame of a camera aperture, serving as our absolute artistic and cinematic focal point. Together, these elements reflect Sharan Krishna's life journey through the lens of limitless creativity and vision, anchoring the spirit of this film festival at the very heart of the independent movie industry.
-                    </p>
-                </div>
+            <div class="story-grid" id="aboutCardsContainer">
+                <!-- rendered by renderAboutCards() from ABOUT_CARDS config -->
             </div>
         </div>
     </section>
@@ -3250,94 +3474,6 @@
     </a>
 
     <script>
-        /****************************************************************
-         * ⚙️ MASTER VARIABLE HUB
-         *****************************************************************/
-        const REGISTRATION_GATE = {
-            isOpen: false 
-        };
-
-        const PORTAL_TIMELINES = {
-            submissionDeadline: "December 31, 2026 23:59:59",
-            awardsEventDate: "February 12, 2027 18:00:00",
-            deadlineLabelText: "31 Dec 2026",
-            eventLabelText: "12 Feb 2027"
-        };
-
-        const SITE_IMAGES = {
-            mainLogo: "logo nav.png",
-            paymentQrCode: "angle.jpg",
-            socialInstagram: "—Pngtree—instagram icon vector_8704817.png",
-            socialYoutube: "—Pngtree—youtube social media 3d stereo_8704808.png",
-            socialFacebook: "—Pngtree—facebook icon facebook logo_3584837.png",
-            // Per-section background images — add a file name/path to give that section its own backdrop.
-            // Leave as "" to keep the default shared background.
-            sectionBgStory: "",
-            sectionBgCategories: "",
-            sectionBgGallery: "",
-            sectionBgRegistration: "",
-            sectionBgContact: ""
-        };
-
-        const CATEGORY_ITEMS = [
-            { title: "Best<br>Short Film", emoji: "🎬", image: "" },
-            { title: "Best<br>Director", emoji: "👥", image: "" }, 
-            { title: "Best<br>Screenplay", emoji: "📝", image: "" }, 
-            { title: "Best<br>Actor", emoji: "🧍", image: "" },
-            { title: "Best<br>Actress", emoji: "🧍‍♀️", image: "" },
-            { title: "Best<br>Cinematography", emoji: "📷", image: "" },
-            { title: "Best<br>Editing", emoji: "✂️", image: "" },
-            { title: "Best<br>Music", emoji: "🎵", image: "" },
-            { title: "Campus<br>Category", emoji: "🎓", image: "" },
-            { title: "Special Jury<br>Mentions", emoji: "✨", image: "" }
-        ];
-
-        const GALLERY_IMAGES = [
-            { category: "winners2025", src: "MRC01071.JPG.webm", title: "Best Short Film: 'Bug'", sub: "Winner 2025" },
-            { category: "winners2025", src: "MRC01028.JPG.jpeg", title: "Campus Category: 'Timeless'", sub: "Winner 2025" },
-            { category: "winners2026", src: "", title: "To Be Announced", sub: "Coming Soon" },
-            { category: "events", src: "MRC00606.JPG.jpeg", title: "Inauguration", sub: "Inauguration" },
-            { category: "events", src: "MRC00614.JPG.jpeg", title: "Inauguration", sub: "Cinema Hall" },
-            { category: "events", src: "MRC00617.JPG.jpeg", title: "Inauguration", sub: "Cinema Hall" },
-            { category: "events", src: "MRC00629.JPG.jpeg", title: "Inauguration", sub: "Cinema Hall" }
-        ];
-
-        const APP_CONFIG = {
-            googleWebAppUrl: "https://script.google.com/macros/s/AKfycbzTfiL56zKjqcZhLm1Mk0rNp5Vm9yQutdfqRMavbdSMIyN-bYpE5_KYQFkbRHNOSKk/exec"
-        };
-
-        /****************************************************************
-         * ✏️ EASY-EDIT ZONE — Festival Updates & Guidelines
-         * Just edit the text below. No HTML knowledge needed.
-         * Add, remove, or reorder entries by copying/deleting a block.
-         *****************************************************************/
-
-        // Festival Updates — newest entry first.
-        const UPDATES_FEED = [
-            { date: "Coming Soon", title: "Jury Panel Reveal", text: "Our official jury panel for this edition will be announced here and across our social channels shortly." },
-            { date: "Coming Soon", title: "Screening Schedule", text: "The full festival day screening schedule and venue details will be published as the event date approaches." },
-            { date: "Now Open", title: "Entries Open", text: "Submissions are now open for the Sharankrishna Short Film Awards. Head to the Registration section to enter your film." }
-        ];
-
-        // Festival Guidelines — shown in order, numbered automatically.
-        const GUIDELINES_ITEMS = [
-            { title: "Screening Conduct", text: "Attendees and finalists are expected to remain seated for the full duration of each screening block. Mobile devices should be silenced inside the auditorium." },
-            { title: "Photography & Recording", text: "Personal photography is welcome in lobby and lounge areas. Recording of screened films from inside the auditorium is strictly prohibited to protect filmmakers' copyright." },
-            { title: "Accreditation & Entry", text: "A valid e-pass or entry confirmation (sent after registration) must be presented at the venue check-in desk for admission to the festival and awards night." },
-            { title: "Code of Conduct", text: "Angle Frames maintains a zero-tolerance policy toward harassment, discrimination, or disruptive behavior of any kind toward fellow attendees, filmmakers, or staff." },
-            { title: "Schedule Changes", text: "Screening order and program timings are subject to last-minute adjustment. Please check official festival updates and on-site signage for the most current schedule." }
-        ];
-
-        // Replace with confirmed jury members once finalized. Leave src empty to show a placeholder avatar.
-        const JURY_PANEL = [
-            { name: "To Be Announced", role: "Jury Chair", src: "" },
-            { name: "To Be Announced", role: "Filmmaking", src: "" },
-            { name: "To Be Announced", role: "Cinematography", src: "" },
-            { name: "To Be Announced", role: "Screenwriting", src: "" }
-        ];
-
-        let currentWizardStep = 1;
-
         /* ===== MASSIVE SCROLL ANIMATION ENGINE ===== */
         // TextAnimate (blurInUp, by character, once) — css port of magicui TextAnimate
         function textAnimateBlurInUp(el) {
@@ -3529,6 +3665,7 @@
             evaluateRegistrationGateState();
             initiateTimersEngine();
             generateDynamicCategories();
+            renderAboutCards();
             renderGallery();
             initGalleryPicker();
             renderUpdatesFeed();
@@ -3974,6 +4111,32 @@
             }
             updateClocks();
             setInterval(updateClocks, 1000);
+        }
+
+        function renderAboutCards() {
+            const container = document.getElementById('aboutCardsContainer');
+            if (!container || !ABOUT_CARDS || !ABOUT_CARDS.length) return;
+            container.innerHTML = '';
+            ABOUT_CARDS.forEach((card, idx) => {
+                const num = String(idx + 1).padStart(2, '0');
+                const isReverse = idx % 2 !== 0;
+                const isLogo = card.image && card.image.match(/\.(png|svg)$/i) && idx === ABOUT_CARDS.length - 1;
+                const imgStyle = isLogo ? 'style="object-fit:contain;padding:40px;background:#0a0a0a;"' : '';
+                const el = document.createElement('div');
+                el.className = 'story-block scroll-reveal delay-1' + (isReverse ? ' reverse' : '');
+                el.innerHTML = `
+                    <span class="story-block-num">${num}</span>
+                    <div class="story-block-text">
+                        <span class="story-block-eyebrow">${card.eyebrow}</span>
+                        <h3>${card.heading}</h3>
+                        <span class="story-underline"></span>
+                        <p>${card.text}</p>
+                    </div>
+                    <div class="story-block-img">
+                        <img src="${card.image}" alt="${card.heading}" ${imgStyle} onerror="this.parentElement.classList.add('no-img');this.style.display='none';">
+                    </div>`;
+                container.appendChild(el);
+            });
         }
 
         function renderGallery() {
