@@ -47,13 +47,13 @@
         ];
 
         const GALLERY_IMAGES = [
-            { category: "winners2025", src: "MRC01071.JPG.webp", title: "Best Short Film: 'Bug'", sub: "Winner 2025" },
-            { category: "winners2025", src: "MRC01028.JPG.webp", title: "Campus Category: 'Timeless'", sub: "Winner 2025" },
+            { category: "winners2025", src: "Gallery/MRC01071.JPG.webp", title: "Best Short Film: 'Bug'", sub: "Winner 2025" },
+            { category: "winners2025", src: "Gallery/MRC01028.JPG.webp", title: "Campus Category: 'Timeless'", sub: "Winner 2025" },
             { category: "winners2026", src: "", title: "To Be Announced", sub: "Coming Soon" },
-            { category: "events", src: "MRC00606.JPG.jpeg", title: "Inauguration", sub: "Inauguration" },
-            { category: "events", src: "MRC00614.JPG.jpeg", title: "Inauguration", sub: "Cinema Hall" },
-            { category: "events", src: "MRC00617.JPG.jpeg", title: "Inauguration", sub: "Cinema Hall" },
-            { category: "events", src: "MRC00629.JPG.jpeg", title: "Inauguration", sub: "Cinema Hall" }
+            { category: "events", src: "Gallery/MRC00606.JPG.webp", title: "Inauguration", sub: "Inauguration" },
+            { category: "events", src: "Gallery/MRC00614.JPG.webp", title: "Inauguration", sub: "Cinema Hall" },
+            { category: "events", src: "Gallery/MRC00617.JPG.webp", title: "Inauguration", sub: "Cinema Hall" },
+            { category: "events", src: "Gallery/MRC00629.JPG.webp", title: "Inauguration", sub: "Cinema Hall" }
         ];
 
         const APP_CONFIG = {
@@ -70,7 +70,7 @@
         const ABOUT_CARDS = [
             {
                 eyebrow: "Who Is",
-                heading: "Sharankrishna ?",
+                heading: "Sharankrishna",
                 image: "sharan-photo.jpg",
                 text: `Sharan Krishna was an extraordinarily talented visual artist, director, and designer whose creativity and warmth left an unforgettable mark on everyone he met. A graduate in IT from Jain University and a designer at Midnay (Kozhikode Cyberpark), Sharan was also the Co-founder and CEO of Angle Frames. Tragically, destiny took him away at the young age of 23 on November 12, 2024, but his legacy is monumental—having already directed 16 short films (including award-winners like Vidya, No, Karutham Naalaykkaay, Nirbhaya, Lisa Bhramam, and Three Minutes), a web series, a documentary, and tireless volunteer designs for WordCamp Kerala. Known for his infectious smile, humility, and selfless love for people, Sharan brought a "Midas touch" to everything he created. To keep his inspiring light alive, his family, friends, and teachers have instituted the Sharan Krishna Short Film Award. Hosted on February 12th—a date <strong>deeply special to Sharan</strong>—this award celebrates his timeless spirit and inspires us all to live with the same kindness, passion, and <strong>boundless creativity</strong> that he championed.`
             },
@@ -104,7 +104,7 @@
         const UPDATES_FEED = [
             { date: "Coming Soon", title: "Jury Panel Reveal", text: "Our official jury panel for this edition will be announced here and across our social channels shortly." },
             { date: "Coming Soon", title: "Screening Schedule", text: "The full festival day screening schedule and venue details will be published as the event date approaches." },
-            { date: "Now Close", title: "Entries Open", text: "Submissions are now open for the Sharankrishna Short Film Awards. Head to the Registration section to enter your film." }
+            { date: "Now Open", title: "Entries Open", text: "Submissions are now open for the Sharankrishna Short Film Awards. Head to the Registration section to enter your film." }
         ];
 
         // Festival Guidelines — shown in order, numbered automatically.
@@ -663,53 +663,55 @@
         /* Metric Ribbon */
         .hero-metric-ribbon {
             width: 100%;
-            background: rgba(6, 6, 8, 0.8);
+            background: rgba(8,8,10,0.9);
             backdrop-filter: var(--ios-blur);
             -webkit-backdrop-filter: var(--ios-blur);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 12px;
-            padding: 20px 30px;
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 16px;
+            padding: 22px 32px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            gap: 0;
             z-index: 3;
         }
-
         .ribbon-item {
             display: flex;
+            flex-direction: row;
             align-items: center;
-            gap: 14px;
-            border-right: 1px solid rgba(255, 255, 255, 0.12);
+            gap: 16px;
+            padding: 0 32px;
+            border-right: 1px solid rgba(255,255,255,0.09);
         }
-
-        .ribbon-item:last-child {
-            border-right: none;
-        }
-
+        .ribbon-item:first-child { padding-left: 0; }
+        .ribbon-item:last-child { border-right: none; padding-right: 0; }
         .ribbon-icon {
-            font-size: 1.4rem;
+            font-size: 1.8rem;
+            flex-shrink: 0;
+            line-height: 1;
         }
-
         .ribbon-text {
             display: flex;
             flex-direction: column;
+            align-items: flex-start;
+            gap: 3px;
         }
-
         .ribbon-label {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.7);
-            letter-spacing: 1px;
-            margin-bottom: 2px;
-        }
-
-        .ribbon-value {
-            font-size: 0.88rem;
+            font-size: 0.6rem;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.4);
+            white-space: nowrap;
+            text-align: left;
         }
-
-        /* Scroll indicator */
+        .ribbon-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            white-space: nowrap;
+            text-align: left;
+        }
+                /* Scroll indicator */
         .scroll-indicator {
             position: absolute;
             bottom: 30px;
@@ -2831,7 +2833,7 @@
             .footer-bottom-bar { flex-direction: column; align-items: flex-start; }
             .footer-social-grid { justify-content: flex-start; }
             .countdown-dashboard-container { grid-template-columns: 1fr; gap: 12px; }
-            .hero-metric-ribbon { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
+            .hero-metric-ribbon { grid-template-columns: repeat(2, 1fr); padding: 16px; } .ribbon-item { padding: 12px; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); } .ribbon-item:nth-child(odd) { border-right: 1px solid rgba(255,255,255,0.1); }
             .categories-grid-matrix { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .gallery-photo-frame { flex-basis: 220px; }
             .portal-glass-card { padding: 24px; }
@@ -2842,7 +2844,7 @@
 
         @media (max-width: 480px) {
             .hero-main-title { white-space: normal; font-size: clamp(1.6rem, 9vw, 2.6rem); }
-            .hero-metric-ribbon { grid-template-columns: 1fr; }
+            .hero-metric-ribbon { grid-template-columns: 1fr; padding: 16px; } .ribbon-item { padding: 12px 0; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); } .ribbon-item:last-child { border-bottom: none; }
             .categories-grid-matrix { grid-template-columns: 1fr; }
             .gallery-photo-frame { flex-basis: 190px; }
             .btn-action-primary, .btn-action-secondary { padding: 14px 22px; font-size: 0.75rem; }
