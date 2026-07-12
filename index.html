@@ -137,7 +137,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 
-    <title id="browserTabTitle">Sharankrishna Short Film Awards - Entry Portal</title>
+    <title id="browserTabTitle">Sharankrishna Short Film Awards 2026</title>
+    <meta name="description" content="Sharankrishna Short Film Awards 2026 — honoring the legacy of Sharankrishna. Hosted by Jain University Kochi and Angle Frames.">
+    <meta property="og:title" content="Sharankrishna Short Film Awards 2026">
+    <meta property="og:description" content="Sharankrishna Short Film Awards 2026 — honoring the legacy of Sharankrishna. Hosted by Jain University Kochi and Angle Frames.">
     
     <style>
         :root {
@@ -1490,9 +1493,8 @@
 
         /* Heading overlay — top-left like uploaded file's figcaption position */
         .gallery-select-header {
-            position: absolute;
-            top: 6%;
-            left: 6%;
+            position: relative;
+            padding: 60px 6% 24px;
             z-index: 20;
         }
         .gallery-select-header .section-eyebrow { display: block; margin-bottom: 6px; }
@@ -1511,7 +1513,7 @@
             .gs-fig figcaption { bottom: 170px; left: 5%; right: 5%; }
             .gs-fig figcaption h3 { font-size: 1.3rem; letter-spacing: 1px; }
             .gs-fig figcaption p { font-size: 0.7rem; letter-spacing: 2px; }
-            .gallery-select-header { top: 4%; left: 5%; }
+            .gallery-select-header { padding: 40px 5% 16px; }
         }
 
         /* ===== CATEGORIES SECTION ===== */
@@ -3157,6 +3159,12 @@
 
 
     <!-- ===== GALLERY SECTION ===== -->
+    <!-- Gallery heading — outside the photo -->
+    <div class="gallery-select-header">
+        <span class="section-eyebrow">Memories &amp; Moments</span>
+        <h2 class="section-heading"><span class="shiny-text">Gallery</span></h2>
+    </div>
+
     <section id="section-gallery" class="page-section gallery-select-wrap" data-selected="photo1">
 
         <!-- Thumbnail strip — built by JS from GALLERY_IMAGES -->
@@ -3166,12 +3174,6 @@
 
         <!-- Large figure display — built by JS from GALLERY_IMAGES -->
         <div class="gallery-select-stage" id="galleryStage"></div>
-
-        <!-- Section heading overlay -->
-        <div class="gallery-select-header">
-            <span class="section-eyebrow">Memories &amp; Moments</span>
-            <h2 class="section-heading"><span class="shiny-text">Gallery</span></h2>
-        </div>
 
     </section>
 
