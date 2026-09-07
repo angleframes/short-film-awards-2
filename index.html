@@ -57,7 +57,14 @@
         ];
 
         const APP_CONFIG = {
-            googleWebAppUrl: "https://script.google.com/macros/s/AKfycbzTfiL56zKjqcZhLm1Mk0rNp5Vm9yQutdfqRMavbdSMIyN-bYpE5_KYQFkbRHNOSKk/exec"
+            // Node backend (ska-backend) — handles createOrder, verifyOrder, and film submission.
+            // Replace with your deployed backend URL (e.g. https://ska-backend.onrender.com).
+            backendUrl: "https://YOUR-BACKEND.onrender.com",
+            // Cashfree config (NO SECRET KEY HERE — secret lives only in the backend env vars).
+            // This MUST match the backend's CASHFREE_ENV: "sandbox" or "production".
+            cashfreeMode: "sandbox",
+            registrationFee: 1000,
+            currency: "INR"
         };
 
         /****************************************************************
@@ -136,6 +143,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+
+    <!-- Cashfree Web Checkout SDK v3 -->
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 
     <title id="browserTabTitle">Sharankrishna Short Film Awards 2026</title>
     <meta name="description" content="Sharankrishna Short Film Awards 2026 — honoring the legacy of Sharankrishna. Hosted by Jain University Kochi and Angle Frames.">
@@ -2437,6 +2447,13 @@
         .payment-view { background: rgba(0, 0, 0, 0.4); padding: 20px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.12); text-align: center; }
         .qr-box { width: 160px; height: 160px; background: #fff; padding: 8px; margin: 15px auto; border-radius: 10px; }
         .qr-box img { width: 100%; height: 100%; object-fit: contain; }
+        .payment-amount { font-size: 2rem; font-weight: 700; letter-spacing: 0.5px; margin: 4px 0; }
+        .payment-pay-btn { width: 100%; max-width: 320px; margin: 18px auto 0 auto; display: block; }
+        .payment-retry-btn { width: 100%; max-width: 320px; margin: 12px auto 0 auto; display: block; }
+        .payment-status-box { margin: 16px auto 4px auto; padding: 12px 14px; border-radius: 10px; font-size: 0.85rem; line-height: 1.5; text-align: left; max-width: 340px; border: 1px solid rgba(255,255,255,0.14); }
+        .payment-status-box.is-pending { background: rgba(255, 214, 10, 0.08); border-color: rgba(255, 214, 10, 0.4); color: #ffd60a; }
+        .payment-status-box.is-success { background: rgba(48, 209, 88, 0.08); border-color: rgba(48, 209, 88, 0.45); color: #30d158; }
+        .payment-status-box.is-error { background: rgba(255, 69, 58, 0.08); border-color: rgba(255, 69, 58, 0.45); color: #ff6961; }
 
         .success-screen-inner { text-align: center; padding: 60px 20px; }
         .success-icon { width: 64px; height: 64px; background: rgba(48, 209, 88, 0.1); border: 1px solid #30d158; color: #30d158; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 1.8rem; }
@@ -3097,7 +3114,7 @@
                     </div>
                     <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>4. Entry Fee Payment</h4>
-                        <p>Pay the entry fee via the UPI QR code shown in the portal, then upload your payment screenshot or PDF along with the transaction reference ID.</p>
+                        <p>Pay the ₹1,000 entry fee securely inside the portal via Cashfree (UPI, cards, net banking, or wallets). Your payment is verified automatically — no screenshots or reference codes needed.</p>
                     </div>
                     <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>5. Review & Confirm</h4>
@@ -3290,7 +3307,7 @@
                                         <label for="writer">Writer & Screenplay *</label>
                                         <input type="text" id="writer" placeholder="Screenwriter's name">
                                     </div>
-                                    <div class="form-grid">
+                                    <div class="form-group">
                                         <label for="cinematographer">Cinematographer *</label>
                                         <input type="text" id="cinematographer" placeholder="DoP name">
                                     </div>
@@ -3328,29 +3345,21 @@
                             <div class="wizard-step-panel" id="wizardStep4">
                                 <h3 class="wizard-step-subheading">Payment</h3>
                                 <div class="payment-view">
-                                    <p style="font-size: 0.9rem; margin-bottom:12px;">Settle standard film processing ledger registration entry fee: <strong>₹1,000</strong>.</p>
-                                    <div class="qr-box">
-                                        <img id="paymentQrImg" src="" alt="UPI Terminal QR">
-                                    </div>
-                                    <p style="font-size:0.8rem; color:rgba(255,255,255,0.8); letter-spacing:0.5px;">UPI ID: 9745640896kgb@cnrb</p>
+                                    <p style="font-size: 0.9rem; margin-bottom:6px;">Registration entry fee</p>
+                                    <div class="payment-amount">₹1,000</div>
+                                    <p style="font-size:0.78rem; color:rgba(255,255,255,0.6); letter-spacing:0.4px; margin-top:6px;">Secure payment powered by Cashfree · UPI · Cards · Net Banking · Wallets</p>
+
+                                    <div id="paymentStatusBox" class="payment-status-box" style="display:none;"></div>
+
+                                    <button type="button" id="payNowBtn" class="btn-wizard-action continue payment-pay-btn" onclick="startCashfreePayment()">
+                                        <span id="payNowBtnLabel">Pay ₹1,000 Securely</span>
+                                    </button>
+                                    <button type="button" id="paymentRetryBtn" class="btn-wizard-action back payment-retry-btn" style="display:none;" onclick="startCashfreePayment()">Retry Payment</button>
                                 </div>
-                                <div class="form-group" style="margin-top:20px;">
-                                    <label for="transactionId">Transaction Reference ID / UTR *</label>
-                                    <input type="text" id="transactionId" placeholder="Enter reference transaction code">
-                                </div>
-                                <div class="form-group">
-                                    <label>Upload Payment Snapshot Sheet *</label>
-                                    <div class="file-upload-wrapper">
-                                        <div class="file-upload-text" id="uploadPlaceholder">
-                                            Drag files or <strong>browse computing space</strong> to attach proof
-                                        </div>
-                                        <input type="file" id="paymentScreenshot" accept="image/*,application/pdf" onchange="handleFileChange(this)">
-                                        <div class="file-uploaded-name" id="fileNameDisplay"></div>
-                                    </div>
-                                </div>
+
                                 <div class="wizard-nav-row">
                                     <button type="button" class="btn-wizard-action back" onclick="goToWizardStep(3)">Back</button>
-                                    <button type="button" class="btn-wizard-action continue" onclick="goToWizardStep(5)">Review Entry &rarr;</button>
+                                    <button type="button" id="toReviewBtn" class="btn-wizard-action continue" onclick="goToWizardStep(5)" disabled style="opacity:0.45; cursor:not-allowed;">Review Entry &rarr;</button>
                                 </div>
                             </div>
 
@@ -3652,7 +3661,6 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('mainLogo').src = SITE_IMAGES.mainLogo;
-            document.getElementById('paymentQrImg').src = SITE_IMAGES.paymentQrCode;
             document.getElementById('socialIconInstagram').src = SITE_IMAGES.socialInstagram;
             document.getElementById('socialIconYoutube').src = SITE_IMAGES.socialYoutube;
             document.getElementById('socialIconFacebook').src = SITE_IMAGES.socialFacebook;
@@ -4313,6 +4321,12 @@
             if (!REGISTRATION_GATE.isOpen) return;
             if (stepNumber > currentWizardStep && !validateStepInputs(currentWizardStep)) return;
 
+            // Cannot reach Review & Submit until payment is verified by the backend.
+            if (stepNumber === 5 && !paymentState.verified) {
+                showPaymentStatus('is-error', 'Please complete payment before reviewing your entry.');
+                return;
+            }
+
             document.querySelectorAll('.wizard-step-panel').forEach(panel => panel.classList.remove('active'));
             document.querySelectorAll('.pipeline-node').forEach(node => node.classList.remove('active', 'completed'));
 
@@ -4350,10 +4364,19 @@
             return flag;
         }
 
+        function escapeHtml(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
         function generateReviewSummary() {
             const matrix = document.getElementById('reviewSummaryMatrix');
             matrix.innerHTML = '';
-            
+
             const fieldsToReview = [
                 { label: "Applicant Name", id: "applicantName" },
                 { label: "Email Address", id: "email" },
@@ -4362,8 +4385,7 @@
                 { label: "Short Film Title", id: "filmName" },
                 { label: "Category Track", id: "category" },
                 { label: "Film Asset URL", id: "filmLink" },
-                { label: "Director In-Charge", id: "director" },
-                { label: "Reference UTR Code", id: "transactionId" }
+                { label: "Director In-Charge", id: "director" }
             ];
 
             fieldsToReview.forEach(item => {
@@ -4371,19 +4393,178 @@
                 if (element) {
                     const row = document.createElement('div');
                     row.className = 'review-row';
-                    row.innerHTML = `<span>${item.label}</span><span>${element.value}</span>`;
+                    row.innerHTML = `<span>${escapeHtml(item.label)}</span><span>${escapeHtml(element.value)}</span>`;
                     matrix.appendChild(row);
                 }
             });
+
+            // Payment summary (verified via Cashfree, server-side).
+            const payRows = [
+                { label: "Payment Status", value: "Paid" },
+                { label: "Amount", value: "₹" + APP_CONFIG.registrationFee + " " + APP_CONFIG.currency },
+                { label: "Cashfree Order ID", value: paymentState.orderId || "—" }
+            ];
+            payRows.forEach(item => {
+                const row = document.createElement('div');
+                row.className = 'review-row';
+                row.innerHTML = `<span>${escapeHtml(item.label)}</span><span>${escapeHtml(item.value)}</span>`;
+                matrix.appendChild(row);
+            });
         }
 
-        function handleFileChange(input) {
-            const display = document.getElementById('fileNameDisplay');
-            const placeholder = document.getElementById('uploadPlaceholder');
-            if (input.files && input.files.length > 0) {
-                placeholder.style.display = 'none';
-                display.textContent = '✓ ' + input.files[0].name;
-                display.style.display = 'block';
+        /****************************************************************
+         * 💳 CASHFREE PAYMENT — secure flow
+         * Order creation + verification happen on the backend
+         * (Apps Script). The browser never sees the Cashfree secret.
+         *****************************************************************/
+        const paymentState = {
+            verified: false,      // true only after backend confirms PAID
+            orderId: null,        // Cashfree order id
+            cfPaymentId: null,    // Cashfree payment/reference id
+            amount: null,
+            currency: null,
+            paidAt: null,
+            inProgress: false     // guards against double-click / duplicate orders
+        };
+
+        function showPaymentStatus(kind, message) {
+            const box = document.getElementById('paymentStatusBox');
+            if (!box) return;
+            box.className = 'payment-status-box ' + (kind || '');
+            box.innerHTML = message; // message is composed from safe, backend/whitelisted strings only
+            box.style.display = 'block';
+        }
+
+        function setPayUiState(state) {
+            const payBtn = document.getElementById('payNowBtn');
+            const payLabel = document.getElementById('payNowBtnLabel');
+            const retryBtn = document.getElementById('paymentRetryBtn');
+            const toReviewBtn = document.getElementById('toReviewBtn');
+
+            if (state === 'idle') {
+                payBtn.style.display = 'block';
+                payBtn.disabled = false;
+                payLabel.textContent = 'Pay ₹' + APP_CONFIG.registrationFee + ' Securely';
+                retryBtn.style.display = 'none';
+            } else if (state === 'processing') {
+                payBtn.style.display = 'block';
+                payBtn.disabled = true;
+                payLabel.textContent = 'Processing…';
+                retryBtn.style.display = 'none';
+            } else if (state === 'failed') {
+                payBtn.style.display = 'none';
+                retryBtn.style.display = 'block';
+                retryBtn.disabled = false;
+            } else if (state === 'paid') {
+                payBtn.style.display = 'none';
+                retryBtn.style.display = 'none';
+                if (toReviewBtn) {
+                    toReviewBtn.disabled = false;
+                    toReviewBtn.style.opacity = '1';
+                    toReviewBtn.style.cursor = 'pointer';
+                }
+            }
+        }
+
+        function backendCall(payload) {
+            return fetch(APP_CONFIG.backendUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            }).then(res => res.json());
+        }
+
+        async function startCashfreePayment() {
+            if (!REGISTRATION_GATE.isOpen) return;
+            if (paymentState.inProgress) return;      // prevent duplicate orders on double-click
+            if (paymentState.verified) return;         // already paid
+
+            // Make sure applicant + film details are filled before charging.
+            if (!validateStepInputs(1) || !validateStepInputs(2) || !validateStepInputs(3)) {
+                showPaymentStatus('is-error', 'Please complete all details before paying.');
+                return;
+            }
+            if (typeof Cashfree !== 'function') {
+                showPaymentStatus('is-error', 'Payment library failed to load. Check your connection and retry.');
+                setPayUiState('failed');
+                return;
+            }
+
+            paymentState.inProgress = true;
+            setPayUiState('processing');
+            showPaymentStatus('is-pending', 'Creating your secure payment order…');
+
+            try {
+                const orderResp = await backendCall({
+                    action: 'createOrder',
+                    amount: APP_CONFIG.registrationFee,
+                    currency: APP_CONFIG.currency,
+                    customerName: document.getElementById('applicantName').value.trim(),
+                    customerEmail: document.getElementById('email').value.trim(),
+                    customerPhone: document.getElementById('phone').value.trim()
+                });
+
+                if (!orderResp || orderResp.status !== 'success' || !orderResp.payment_session_id || !orderResp.order_id) {
+                    throw new Error(orderResp && orderResp.message ? orderResp.message : 'Could not create order.');
+                }
+
+                paymentState.orderId = orderResp.order_id;
+
+                const cashfree = Cashfree({ mode: APP_CONFIG.cashfreeMode });
+                showPaymentStatus('is-pending', 'Opening secure Cashfree checkout…');
+
+                const result = await cashfree.checkout({
+                    paymentSessionId: orderResp.payment_session_id,
+                    redirectTarget: '_modal'
+                });
+
+                // NOTE: never trust this result alone — always re-verify on the backend.
+                if (result && result.error) {
+                    showPaymentStatus('is-pending', 'Checkout closed. Verifying payment status…');
+                }
+
+                await verifyPaymentWithBackend();
+            } catch (err) {
+                showPaymentStatus('is-error', 'Payment could not be started: ' + escapeHtml(err.message || 'Unknown error') + '. Please try again.');
+                setPayUiState('failed');
+            } finally {
+                paymentState.inProgress = false;
+            }
+        }
+
+        async function verifyPaymentWithBackend() {
+            if (!paymentState.orderId) {
+                setPayUiState('failed');
+                return;
+            }
+            showPaymentStatus('is-pending', 'Verifying your payment with our server…');
+            try {
+                const resp = await backendCall({ action: 'verifyOrder', orderId: paymentState.orderId });
+
+                if (!resp || resp.status !== 'success') {
+                    throw new Error(resp && resp.message ? resp.message : 'Verification failed.');
+                }
+
+                const payStatus = (resp.order_status || '').toUpperCase();
+                if (payStatus === 'PAID') {
+                    paymentState.verified = true;
+                    paymentState.cfPaymentId = resp.cf_payment_id || null;
+                    paymentState.amount = resp.order_amount || APP_CONFIG.registrationFee;
+                    paymentState.currency = resp.order_currency || APP_CONFIG.currency;
+                    paymentState.paidAt = resp.paid_at || new Date().toISOString();
+                    showPaymentStatus('is-success', '✓ Payment received (₹' + escapeHtml(paymentState.amount) + '). Order ' + escapeHtml(paymentState.orderId) + '. You can now review &amp; submit.');
+                    setPayUiState('paid');
+                } else if (payStatus === 'ACTIVE' || payStatus === 'PENDING') {
+                    showPaymentStatus('is-pending', 'Payment is still pending. If you completed it, wait a moment and press Retry to re-check.');
+                    setPayUiState('failed');
+                } else {
+                    // FAILED, EXPIRED, TERMINATED, USER_DROPPED, cancelled, etc.
+                    showPaymentStatus('is-error', 'Payment not completed (status: ' + escapeHtml(payStatus || 'unknown') + '). No charge confirmed — please try again.');
+                    setPayUiState('failed');
+                }
+            } catch (err) {
+                showPaymentStatus('is-error', 'Could not verify payment: ' + escapeHtml(err.message || 'network error') + '. Press Retry to check again.');
+                setPayUiState('failed');
             }
         }
 
@@ -4392,65 +4573,61 @@
             if (!REGISTRATION_GATE.isOpen) return;
 
             const submitBtn = document.getElementById('submitBtn');
-            const fileInput = document.getElementById('paymentScreenshot');
 
-            if (fileInput.files.length === 0) {
-                alert("Please upload payment validation screenshot receipts.");
+            // Hard gate: never submit unless payment is server-verified.
+            if (!paymentState.verified) {
+                alert("Please complete and verify payment before submitting.");
+                goToWizardStep(4);
                 return;
             }
+            if (submitBtn.disabled) return; // guard against double-submit
 
             submitBtn.disabled = true;
             submitBtn.textContent = "Processing Submission...";
 
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                const formData = {
-                    applicantName: document.getElementById('applicantName').value,
-                    phone: document.getElementById('phone').value,
-                    email: document.getElementById('email').value,
-                    city: document.getElementById('city').value,
-                    filmName: document.getElementById('filmName').value,
-                    category: document.getElementById('category').value,
-                    filmLink: document.getElementById('filmLink').value,
-                    director: document.getElementById('director').value,
-                    duration: document.getElementById('duration').value,
-                    producer: document.getElementById('producer').value,
-                    writer: document.getElementById('writer').value,
-                    cinematographer: document.getElementById('cinematographer').value,
-                    editor: document.getElementById('editor').value,
-                    musicDirector: document.getElementById('musicDirector').value,
-                    actor: document.getElementById('actor').value,
-                    actress: document.getElementById('actress').value,
-                    childArtist: document.getElementById('childArtist').value || "None",
-                    transactionId: document.getElementById('transactionId').value,
-                    fileData: e.target.result, 
-                    fileName: file.name
-                };
-
-                fetch(APP_CONFIG.googleWebAppUrl, {
-                    method: "POST",
-                    body: JSON.stringify(formData)
-                })
-                .then(res => res.json())
-                .then(response => {
-                    if (response.status === "success") {
-                        document.getElementById('activeFormContainer').style.display = 'none';
-                        document.getElementById('successScreen').style.display = 'block';
-                    } else {
-                        alert("Submission rejection code: " + response.message);
-                    }
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = "Submit Film Entry";
-                })
-                .catch(() => {
-                    alert("Network ledger processing fault.");
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = "Submit Film Entry";
-                });
+            const formData = {
+                applicantName: document.getElementById('applicantName').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                city: document.getElementById('city').value,
+                filmName: document.getElementById('filmName').value,
+                category: document.getElementById('category').value,
+                filmLink: document.getElementById('filmLink').value,
+                director: document.getElementById('director').value,
+                duration: document.getElementById('duration').value,
+                producer: document.getElementById('producer').value,
+                writer: document.getElementById('writer').value,
+                cinematographer: document.getElementById('cinematographer').value,
+                editor: document.getElementById('editor').value,
+                musicDirector: document.getElementById('musicDirector').value,
+                actor: document.getElementById('actor').value,
+                actress: document.getElementById('actress').value,
+                childArtist: document.getElementById('childArtist').value || "None",
+                // Cashfree payment info stored with the registration:
+                paymentStatus: "Paid",
+                cashfreeOrderId: paymentState.orderId,
+                cashfreePaymentId: paymentState.cfPaymentId,
+                amount: paymentState.amount,
+                currency: paymentState.currency,
+                paidAt: paymentState.paidAt
             };
-            reader.readAsDataURL(file);
+
+            backendCall(formData)
+            .then(response => {
+                if (response.status === "success") {
+                    document.getElementById('activeFormContainer').style.display = 'none';
+                    document.getElementById('successScreen').style.display = 'block';
+                } else {
+                    alert("Submission rejection code: " + response.message);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Submit Film Entry";
+                }
+            })
+            .catch(() => {
+                alert("Network ledger processing fault.");
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Submit Film Entry";
+            });
         }
 
         function resetPortalView() {
