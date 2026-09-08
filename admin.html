@@ -152,9 +152,10 @@
   async function gate() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) { show('login'); return; }
-    // must be an admin (RLS will also enforce)
-    const { data: adminRow } = await sb.from('admins').select('user_id').eq('user_id', session.user.id).maybeSingle();
-    if (!adminRow) { toast('This account is not an admin.', 'err'); await sb.auth.signOut(); show('login'); return; }
+    // must be an admin (is_admin() is SECURITY DEFINER — bypasses RLS, no recursion)
+    const { data: isAdmin, error: adErr } = await sb.rpc('is_admin');
+    if (adErr) { toast('Admin check failed: ' + adErr.message, 'err'); return; }
+    if (!isAdmin) { toast('This account is not an admin.', 'err'); await sb.auth.signOut(); show('login'); return; }
     document.getElementById('whoami').textContent = session.user.email;
     show('dash');
     await Promise.all([loadConfig(), loadGallery(), loadUpdates()]);
