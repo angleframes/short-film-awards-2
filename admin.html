@@ -6,79 +6,143 @@
 <title>Admin · Sharankrishna Short Film Awards</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root { --bg:#0a0a0a; --card:#141414; --line:rgba(255,255,255,0.12); --txt:#f2f2f2; --mut:rgba(255,255,255,0.55); --acc:#e50914; --ok:#30d158; --warn:#ffd60a; }
+  :root {
+    --bg:#0b0b0d; --bg2:#0f0f12; --card:#151519; --card2:#1a1a20;
+    --line:rgba(255,255,255,0.10); --line2:rgba(255,255,255,0.06);
+    --txt:#f4f4f6; --mut:rgba(255,255,255,0.52); --mut2:rgba(255,255,255,0.34);
+    --acc:#e50914; --acc-soft:rgba(229,9,20,0.14); --ok:#30d158; --warn:#ffd60a; --info:#0a84ff;
+  }
   * { box-sizing:border-box; }
-  body { margin:0; background:var(--bg); color:var(--txt); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
-  a { color:var(--acc); }
-  .wrap { max-width:900px; margin:0 auto; padding:24px 16px 80px; }
-  h1 { font-size:1.4rem; margin:0 0 4px; }
-  h2 { font-size:1.05rem; margin:0 0 14px; letter-spacing:0.3px; }
-  .sub { color:var(--mut); font-size:0.85rem; margin:0 0 24px; }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px; margin-bottom:20px; }
-  label { display:block; font-size:0.78rem; color:var(--mut); text-transform:uppercase; letter-spacing:1px; margin:0 0 6px; }
-  input,textarea,select { width:100%; padding:11px 12px; background:#0f0f0f; border:1px solid var(--line); border-radius:9px; color:var(--txt); font-size:0.9rem; margin-bottom:14px; }
+  html,body { margin:0; }
+  body { background:radial-gradient(1200px 600px at 50% -200px, #17171d 0%, var(--bg) 60%); color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; min-height:100vh; }
+  a { color:inherit; text-decoration:none; }
+
+  /* Top bar */
+  .topbar { position:sticky; top:0; z-index:20; backdrop-filter:blur(12px);
+    background:rgba(11,11,13,0.72); border-bottom:1px solid var(--line2); }
+  .topbar-inner { max-width:1020px; margin:0 auto; padding:14px 18px; display:flex; align-items:center; gap:14px; }
+  .brand { display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:0.2px; }
+  .brand .dot { width:10px; height:10px; border-radius:50%; background:var(--acc); box-shadow:0 0 12px var(--acc); }
+  .brand small { display:block; font-weight:500; font-size:0.72rem; color:var(--mut); letter-spacing:0.4px; }
+  .spacer { flex:1; }
+  .top-user { font-size:0.8rem; color:var(--mut); }
+
+  .wrap { max-width:1020px; margin:0 auto; padding:22px 18px 90px; }
+
+  /* Stat tiles */
+  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+  @media(max-width:760px){ .stats{ grid-template-columns:repeat(2,1fr); } }
+  .stat { background:linear-gradient(180deg,var(--card2),var(--card)); border:1px solid var(--line); border-radius:14px; padding:16px; }
+  .stat .k { font-size:0.7rem; text-transform:uppercase; letter-spacing:1.2px; color:var(--mut2); }
+  .stat .v { font-size:1.5rem; font-weight:700; margin-top:8px; }
+  .stat .v.small { font-size:1.05rem; }
+
+  /* Cards */
+  .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:22px; margin-bottom:20px; }
+  .card-head { display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+  .card-head .ic { width:34px; height:34px; border-radius:10px; background:var(--acc-soft); display:flex; align-items:center; justify-content:center; font-size:1rem; }
+  .card-head h2 { font-size:1.05rem; margin:0; }
+  .card-desc { color:var(--mut); font-size:0.82rem; margin:0 0 18px 46px; }
+  @media(max-width:600px){ .card-desc{ margin-left:0; } }
+
+  label { display:block; font-size:0.72rem; color:var(--mut2); text-transform:uppercase; letter-spacing:1px; margin:0 0 6px; }
+  input,textarea,select { width:100%; padding:11px 12px; background:var(--bg2); border:1px solid var(--line); border-radius:10px; color:var(--txt); font-size:0.9rem; margin-bottom:14px; transition:border .15s; }
+  input:focus,textarea:focus,select:focus { outline:none; border-color:rgba(229,9,20,0.6); }
   textarea { min-height:70px; resize:vertical; }
-  button { cursor:pointer; border:none; border-radius:9px; padding:11px 18px; font-size:0.88rem; font-weight:600; }
+  button { cursor:pointer; border:none; border-radius:10px; padding:11px 18px; font-size:0.88rem; font-weight:600; transition:filter .15s, opacity .15s; }
+  button:hover { filter:brightness(1.08); }
+  button:disabled { opacity:0.55; cursor:default; }
   .btn { background:var(--acc); color:#fff; }
   .btn-ghost { background:transparent; border:1px solid var(--line); color:var(--txt); }
-  .btn-del { background:rgba(229,9,20,0.15); color:#ff6961; border:1px solid rgba(229,9,20,0.4); padding:7px 12px; font-size:0.8rem; }
+  .btn-sm { padding:8px 13px; font-size:0.8rem; }
+  .btn-del { background:rgba(229,9,20,0.14); color:#ff6b6b; border:1px solid rgba(229,9,20,0.35); padding:7px 12px; font-size:0.78rem; }
   .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:0 16px; }
   @media(max-width:600px){ .grid2{ grid-template-columns:1fr; } }
-  .toast { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:#1c1c1c; border:1px solid var(--line); padding:12px 18px; border-radius:10px; font-size:0.85rem; display:none; z-index:50; }
-  .toast.ok { border-color:var(--ok); color:var(--ok); }
-  .toast.err { border-color:var(--acc); color:#ff6961; }
-  .item { display:flex; gap:12px; align-items:center; padding:10px 0; border-top:1px solid var(--line); }
-  .item img { width:64px; height:44px; object-fit:cover; border-radius:6px; background:#000; }
+
+  .pill { display:inline-block; padding:3px 11px; border-radius:20px; font-size:0.74rem; font-weight:700; letter-spacing:0.3px; }
+  .pill.open { background:rgba(48,209,88,0.16); color:var(--ok); }
+  .pill.closed { background:rgba(255,214,10,0.16); color:var(--warn); }
+
+  .switch { position:relative; width:54px; height:30px; flex:0 0 auto; }
+  .switch input { opacity:0; width:0; height:0; }
+  .slider { position:absolute; inset:0; background:#3a3a42; border-radius:30px; transition:.2s; }
+  .slider:before { content:""; position:absolute; height:22px; width:22px; left:4px; top:4px; background:#fff; border-radius:50%; transition:.2s; }
+  input:checked + .slider { background:var(--ok); }
+  input:checked + .slider:before { transform:translateX(24px); }
+
+  .item { display:flex; gap:12px; align-items:center; padding:11px 0; border-top:1px solid var(--line2); }
+  .item img { width:66px; height:46px; object-fit:cover; border-radius:8px; background:#000; flex:0 0 auto; }
   .item .meta { flex:1; min-width:0; }
   .item .meta b { display:block; font-size:0.9rem; }
   .item .meta span { color:var(--mut); font-size:0.78rem; }
-  .pill { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
-  .pill.open { background:rgba(48,209,88,0.15); color:var(--ok); }
-  .pill.closed { background:rgba(255,214,10,0.15); color:var(--warn); }
-  .switch { position:relative; width:52px; height:30px; }
-  .switch input { opacity:0; width:0; height:0; }
-  .slider { position:absolute; inset:0; background:#333; border-radius:30px; transition:.2s; }
-  .slider:before { content:""; position:absolute; height:22px; width:22px; left:4px; top:4px; background:#fff; border-radius:50%; transition:.2s; }
-  input:checked + .slider { background:var(--ok); }
-  input:checked + .slider:before { transform:translateX(22px); }
-  #loginView { max-width:380px; margin:12vh auto 0; }
+  .muted-note { font-size:0.8rem; color:var(--mut); margin:12px 0 0; }
+
+  /* table */
+  .tbl-wrap { overflow-x:auto; border:1px solid var(--line2); border-radius:12px; margin-top:6px; }
+  table { width:100%; border-collapse:collapse; font-size:0.82rem; min-width:640px; }
+  th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--line2); white-space:nowrap; }
+  th { color:var(--mut2); text-transform:uppercase; font-size:0.68rem; letter-spacing:0.8px; background:var(--bg2); position:sticky; top:0; }
+  tbody tr:hover { background:rgba(255,255,255,0.02); }
+  .tag { padding:2px 8px; border-radius:6px; font-size:0.72rem; font-weight:600; }
+  .tag.paid { background:rgba(48,209,88,0.16); color:var(--ok); }
+
+  .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px); opacity:0;
+    background:#1c1c22; border:1px solid var(--line); padding:12px 18px; border-radius:11px; font-size:0.85rem;
+    transition:.25s; z-index:60; pointer-events:none; max-width:90vw; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .toast.ok { border-color:var(--ok); color:var(--ok); }
+  .toast.err { border-color:var(--acc); color:#ff6b6b; }
+
+  #loginView { max-width:390px; margin:12vh auto 0; }
+  #loginView h1 { font-size:1.4rem; margin:0 0 4px; }
+  .sub { color:var(--mut); font-size:0.85rem; margin:0 0 22px; }
   .hidden { display:none !important; }
-  .muted-note { font-size:0.75rem; color:var(--mut); margin-top:-6px; margin-bottom:14px; }
+  .skeleton { color:var(--mut2); font-size:0.85rem; padding:8px 0; }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <!-- LOGIN -->
-  <div id="loginView" class="card">
-    <h1>Admin Login</h1>
-    <p class="sub">Sharankrishna Short Film Awards</p>
-    <label for="email">Email</label>
-    <input id="email" type="email" autocomplete="username" placeholder="admin@email.com">
-    <label for="password">Password</label>
-    <input id="password" type="password" autocomplete="current-password" placeholder="••••••••">
-    <button class="btn" style="width:100%" onclick="doLogin()">Log in</button>
+<!-- LOGIN -->
+<div id="loginView" class="card">
+  <h1>Admin Login</h1>
+  <p class="sub">Sharankrishna Short Film Awards</p>
+  <label for="email">Email</label>
+  <input id="email" type="email" autocomplete="username" placeholder="admin@email.com">
+  <label for="password">Password</label>
+  <input id="password" type="password" autocomplete="current-password" placeholder="••••••••">
+  <button class="btn" style="width:100%" onclick="doLogin()">Log in</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashView" class="hidden">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <span class="dot" style="width:10px;height:10px;border-radius:50%;background:var(--acc);box-shadow:0 0 12px var(--acc)"></span>
+      <div class="brand">Control Panel<small id="whoami"></small></div>
+      <span class="spacer"></span>
+      <a class="btn-ghost btn-sm" href="https://sharankrishnashortfilmawards.com" target="_blank" rel="noopener">View live site ↗</a>
+      <button class="btn-ghost btn-sm" onclick="doLogout()">Log out</button>
+    </div>
   </div>
 
-  <!-- DASHBOARD -->
-  <div id="dashView" class="hidden">
-    <div class="row" style="justify-content:space-between; margin-bottom:20px;">
-      <div><h1>Control Panel</h1><p class="sub" id="whoami" style="margin:0;"></p></div>
-      <button class="btn-ghost" onclick="doLogout()">Log out</button>
+  <div class="wrap">
+    <!-- Stat tiles -->
+    <div class="stats">
+      <div class="stat"><div class="k">Registration</div><div class="v small"><span id="statReg" class="pill closed">—</span></div></div>
+      <div class="stat"><div class="k">Film Entries</div><div class="v" id="statEntries">—</div></div>
+      <div class="stat"><div class="k">Gallery Photos</div><div class="v" id="statPhotos">—</div></div>
+      <div class="stat"><div class="k">Deadline</div><div class="v small" id="statDeadline">—</div></div>
     </div>
 
     <!-- Registration + dates -->
     <div class="card">
-      <h2>Registration & Countdown</h2>
-      <div class="row" style="justify-content:space-between; margin-bottom:18px;">
-        <div>
-          <b>Registrations</b>
-          <div><span id="gatePill" class="pill closed">Closed</span></div>
-        </div>
-        <label class="switch" style="margin:0;">
-          <input id="gateToggle" type="checkbox"><span class="slider"></span>
-        </label>
+      <div class="card-head"><div class="ic">🎬</div><h2>Registration &amp; Countdown</h2></div>
+      <p class="card-desc">Toggle saves instantly. Dates &amp; labels control the public countdown — click Save settings.</p>
+      <div class="row" style="justify-content:space-between; margin:0 0 18px;">
+        <div><b>Registrations</b><div style="margin-top:4px;"><span id="gatePill" class="pill closed">Closed</span></div></div>
+        <label class="switch" style="margin:0;"><input id="gateToggle" type="checkbox"><span class="slider"></span></label>
       </div>
       <div class="grid2">
         <div><label>Submission deadline</label><input id="cfgDeadline" type="datetime-local"></div>
@@ -87,11 +151,31 @@
         <div><label>Event label (shown)</label><input id="cfgEventLabel" placeholder="12 Feb 2027"></div>
       </div>
       <button class="btn" onclick="saveConfig(event)">Save settings</button>
+      <span id="cfgSaved" class="muted-note" style="margin-left:12px;"></span>
+    </div>
+
+    <!-- Film Entries -->
+    <div class="card">
+      <div class="card-head"><div class="ic">🎞️</div><h2>Film Entries</h2></div>
+      <p class="card-desc">Paid submissions received via Cashfree. Read-only.</p>
+      <div class="row" style="margin-bottom:8px;">
+        <button class="btn-ghost btn-sm" onclick="loadEntries()">↻ Refresh</button>
+        <button class="btn-ghost btn-sm" onclick="exportEntriesCsv()">⬇ Export CSV</button>
+        <span class="spacer"></span>
+        <span class="muted-note" id="entriesCount" style="margin:0;"></span>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Applicant</th><th>Film</th><th>Category</th><th>Payment</th><th>Amount</th><th>Order ID</th></tr></thead>
+          <tbody id="entriesBody"><tr><td colspan="7" class="skeleton">Loading…</td></tr></tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Gallery -->
     <div class="card">
-      <h2>Gallery Photos</h2>
+      <div class="card-head"><div class="ic">🖼️</div><h2>Gallery Photos</h2></div>
+      <p class="card-desc">JPG / PNG / WEBP, up to 8 MB. Appears in the public Gallery.</p>
       <div class="grid2">
         <div><label>Category</label>
           <select id="gCat">
@@ -105,20 +189,21 @@
         <div><label>Subtitle</label><input id="gSub" placeholder="e.g. Winner 2025"></div>
       </div>
       <button class="btn" onclick="addGallery(event)">Upload photo</button>
-      <div id="galleryList" style="margin-top:16px;"></div>
+      <div id="galleryList" style="margin-top:14px;"></div>
     </div>
 
     <!-- Updates -->
     <div class="card">
-      <h2>Festival Updates</h2>
+      <div class="card-head"><div class="ic">📣</div><h2>Festival Updates</h2></div>
+      <p class="card-desc">Shown in the public “Festival Updates” feed, newest first.</p>
       <div class="grid2">
         <div><label>Date label</label><input id="uDate" placeholder="Now Open / Coming Soon"></div>
         <div><label>Title</label><input id="uTitle" placeholder="Entries Open"></div>
       </div>
       <label>Text</label>
       <textarea id="uBody" placeholder="Update details…"></textarea>
-      <button class="btn" onclick="addUpdate()">Add update</button>
-      <div id="updatesList" style="margin-top:16px;"></div>
+      <button class="btn" onclick="addUpdate(event)">Add update</button>
+      <div id="updatesList" style="margin-top:14px;"></div>
     </div>
   </div>
 </div>
@@ -130,15 +215,16 @@
   const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZsd2xicmFleXlyb2ZraHhudnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4MDQzNDEsImV4cCI6MjEwNDM4MDM0MX0.0apM1gnHcYzTSLs0wTfi1fgaNCf0RKbeginWPXg5EbY";
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
+  let _entriesCache = [];
+
   function toast(msg, kind) {
     const t = document.getElementById('toast');
-    t.textContent = msg; t.className = 'toast ' + (kind || '');
-    t.style.display = 'block';
-    clearTimeout(t._t); t._t = setTimeout(() => t.style.display = 'none', 3200);
+    t.textContent = msg; t.className = 'toast show ' + (kind || '');
+    clearTimeout(t._t); t._t = setTimeout(() => t.className = 'toast ' + (kind || ''), 3400);
   }
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  // datetime-local <-> ISO helpers
-  const toLocalInput = iso => { if (!iso) return ''; const d = new Date(iso); const p = n => String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; };
+  const toLocalInput = iso => { if (!iso) return ''; const d = new Date(iso); if (isNaN(d)) return ''; const p = n => String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; };
+  const fmtDate = iso => { if (!iso) return '—'; const d = new Date(iso); return isNaN(d) ? '—' : d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); };
 
   async function doLogin() {
     const email = document.getElementById('email').value.trim();
@@ -151,14 +237,13 @@
 
   async function gate() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) { show('login'); return; }
-    // must be an admin (is_admin() is SECURITY DEFINER — bypasses RLS, no recursion)
+    if (!session) return show('login');
     const { data: isAdmin, error: adErr } = await sb.rpc('is_admin');
-    if (adErr) { toast('Admin check failed: ' + adErr.message, 'err'); return; }
-    if (!isAdmin) { toast('This account is not an admin.', 'err'); await sb.auth.signOut(); show('login'); return; }
+    if (adErr) return toast('Admin check failed: ' + adErr.message, 'err');
+    if (!isAdmin) { toast('This account is not an admin.', 'err'); await sb.auth.signOut(); return show('login'); }
     document.getElementById('whoami').textContent = session.user.email;
     show('dash');
-    await Promise.all([loadConfig(), loadGallery(), loadUpdates()]);
+    await Promise.all([loadConfig(), loadGallery(), loadUpdates(), loadEntries()]);
   }
   function show(v) {
     document.getElementById('loginView').classList.toggle('hidden', v !== 'login');
@@ -169,49 +254,46 @@
   function applyConfig(data) {
     const open = !!data.registration_open;
     document.getElementById('gateToggle').checked = open;
-    const pill = document.getElementById('gatePill');
-    pill.textContent = open ? 'Open' : 'Closed';
-    pill.className = 'pill ' + (open ? 'open' : 'closed');
+    setGatePill(open);
     document.getElementById('cfgDeadline').value = toLocalInput(data.submission_deadline);
     document.getElementById('cfgEvent').value = toLocalInput(data.awards_event_date);
     document.getElementById('cfgDeadlineLabel').value = data.deadline_label || '';
     document.getElementById('cfgEventLabel').value = data.event_label || '';
+    // stat tiles
+    const sr = document.getElementById('statReg');
+    sr.textContent = open ? 'Open' : 'Closed'; sr.className = 'pill ' + (open ? 'open' : 'closed');
+    document.getElementById('statDeadline').textContent = data.deadline_label || fmtDate(data.submission_deadline);
+  }
+  function setGatePill(open) {
+    const pill = document.getElementById('gatePill');
+    pill.textContent = open ? 'Open' : 'Closed';
+    pill.className = 'pill ' + (open ? 'open' : 'closed');
+    const sr = document.getElementById('statReg');
+    if (sr) { sr.textContent = open ? 'Open' : 'Closed'; sr.className = 'pill ' + (open ? 'open' : 'closed'); }
   }
   async function loadConfig() {
     const { data, error } = await sb.from('site_config').select('*').eq('id', 1).single();
     if (error) return toast(error.message, 'err');
     applyConfig(data);
   }
-  function setGatePill(open) {
-    const pill = document.getElementById('gatePill');
-    pill.textContent = open ? 'Open' : 'Closed';
-    pill.className = 'pill ' + (open ? 'open' : 'closed');
-  }
-  // Toggle saves IMMEDIATELY to the DB; reverts UI if the save fails.
+  // Toggle saves immediately; reverts on failure.
   document.addEventListener('change', async e => {
     if (e.target.id !== 'gateToggle') return;
-    const toggle = e.target;
-    const open = toggle.checked;
-    setGatePill(open);
-    toggle.disabled = true;
+    const toggle = e.target, open = toggle.checked;
+    setGatePill(open); toggle.disabled = true;
     const { data, error } = await sb.from('site_config')
       .update({ registration_open: open, updated_at: new Date().toISOString() })
       .eq('id', 1).select().single();
     toggle.disabled = false;
-    if (error || !data) {
-      toggle.checked = !open;              // revert
-      setGatePill(!open);
-      return toast('Could not save: ' + (error ? error.message : 'no permission'), 'err');
-    }
-    setGatePill(!!data.registration_open); // reflect persisted truth
+    if (error || !data) { toggle.checked = !open; setGatePill(!open); return toast('Could not save: ' + (error ? error.message : 'no permission'), 'err'); }
+    setGatePill(!!data.registration_open);
     toast('Registration ' + (data.registration_open ? 'OPEN' : 'CLOSED') + ' — saved ✓', 'ok');
   });
   async function saveConfig(ev) {
     const btn = ev && ev.target ? ev.target : null;
-    const dl = document.getElementById('cfgDeadline').value;
-    const evt = document.getElementById('cfgEvent').value;
+    const dl = document.getElementById('cfgDeadline').value, evt = document.getElementById('cfgEvent').value;
     const d1 = dl ? new Date(dl) : null, d2 = evt ? new Date(evt) : null;
-    if ((dl && isNaN(d1)) || (evt && isNaN(d2))) { return toast('Invalid date/time.', 'err'); }
+    if ((dl && isNaN(d1)) || (evt && isNaN(d2))) return toast('Invalid date/time.', 'err');
     const payload = {
       registration_open: document.getElementById('gateToggle').checked,
       submission_deadline: d1 ? d1.toISOString() : null,
@@ -221,12 +303,50 @@
       updated_at: new Date().toISOString()
     };
     if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
-    // .select().single() returns the persisted row so we confirm what actually saved
     const { data, error } = await sb.from('site_config').update(payload).eq('id', 1).select().single();
     if (btn) { btn.disabled = false; btn.textContent = 'Save settings'; }
     if (error) return toast('Save failed: ' + error.message, 'err');
-    applyConfig(data); // reflect the real persisted value in the UI
-    toast('Saved ✓ Registration ' + (data.registration_open ? 'OPEN' : 'CLOSED'), 'ok');
+    applyConfig(data);
+    document.getElementById('cfgSaved').textContent = 'Saved ' + new Date().toLocaleTimeString('en-IN');
+    toast('Settings saved ✓', 'ok');
+  }
+
+  // ---- entries ----
+  async function loadEntries() {
+    const body = document.getElementById('entriesBody');
+    const { data, error } = await sb.from('film_entries').select('*').order('created_at', { ascending: false });
+    if (error) {
+      body.innerHTML = `<tr><td colspan="7" class="skeleton">Cannot load entries: ${esc(error.message)}</td></tr>`;
+      document.getElementById('statEntries').textContent = '—';
+      return;
+    }
+    _entriesCache = data || [];
+    document.getElementById('statEntries').textContent = _entriesCache.length;
+    document.getElementById('entriesCount').textContent = _entriesCache.length + ' total';
+    if (!_entriesCache.length) { body.innerHTML = '<tr><td colspan="7" class="skeleton">No entries yet.</td></tr>'; return; }
+    body.innerHTML = _entriesCache.map(r => `
+      <tr>
+        <td>${fmtDate(r.created_at)}</td>
+        <td>${esc(r.applicant_name)}<div style="color:var(--mut);font-size:0.72rem;">${esc(r.email)}</div></td>
+        <td>${esc(r.film_name)}</td>
+        <td>${esc(r.category)}</td>
+        <td><span class="tag paid">${esc(r.payment_status || 'Paid')}</span></td>
+        <td>₹${esc(r.amount)}</td>
+        <td style="font-size:0.72rem;color:var(--mut);">${esc(r.cashfree_order_id)}</td>
+      </tr>`).join('');
+  }
+  function exportEntriesCsv() {
+    if (!_entriesCache.length) return toast('No entries to export.', 'err');
+    const cols = ['created_at','applicant_name','email','phone','city','film_name','category','film_link','duration','director','producer','writer','cinematographer','editor','music_director','actor','actress','child_artist','payment_status','amount','currency','cashfree_order_id','cashfree_payment_id','paid_at'];
+    const csv = [cols.join(',')].concat(_entriesCache.map(r => cols.map(c => {
+      const v = r[c] == null ? '' : String(r[c]).replace(/"/g, '""');
+      return /[",\n]/.test(v) ? `"${v}"` : v;
+    }).join(','))).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'film_entries_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click(); URL.revokeObjectURL(a.href);
   }
 
   // ---- gallery ----
@@ -234,6 +354,7 @@
     const { data, error } = await sb.from('gallery').select('*').order('sort_order').order('created_at', { ascending: false });
     if (error) return toast(error.message, 'err');
     const box = document.getElementById('galleryList');
+    document.getElementById('statPhotos').textContent = (data || []).length;
     box.innerHTML = (data || []).map(g => `
       <div class="item">
         <img src="${esc(g.src)}" alt="">
@@ -246,19 +367,17 @@
     const reset = () => { if (addBtn) { addBtn.disabled = false; addBtn.textContent = 'Upload photo'; } };
     const file = document.getElementById('gFile').files[0];
     if (!file) return toast('Pick an image file first.', 'err');
-    const okTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    const okTypes = ['image/jpeg','image/jpg','image/png','image/webp'];
     if (!okTypes.includes(file.type)) return toast('Only JPG, PNG, or WEBP allowed.', 'err');
     if (file.size > 8 * 1024 * 1024) return toast('Image too large (max 8 MB).', 'err');
-    if (addBtn) { addBtn.disabled = true; addBtn.textContent = 'Uploading…'; } // guards double-click
+    if (addBtn) { addBtn.disabled = true; addBtn.textContent = 'Uploading…'; }
     const path = Date.now() + '_' + file.name.replace(/[^\w.\-]/g, '_');
     const up = await sb.storage.from('gallery').upload(path, file, { upsert: false });
     if (up.error) { reset(); return toast('Upload failed: ' + up.error.message, 'err'); }
     const pub = sb.storage.from('gallery').getPublicUrl(path).data.publicUrl;
     const { error } = await sb.from('gallery').insert({
-      category: document.getElementById('gCat').value,
-      src: pub,
-      title: document.getElementById('gTitle').value.trim(),
-      sub: document.getElementById('gSub').value.trim()
+      category: document.getElementById('gCat').value, src: pub,
+      title: document.getElementById('gTitle').value.trim(), sub: document.getElementById('gSub').value.trim()
     });
     reset();
     if (error) return toast('Saved image but metadata failed: ' + error.message, 'err');
@@ -283,14 +402,16 @@
         <button class="btn-del" onclick="delUpdate(${u.id})">Delete</button>
       </div>`).join('') || '<p class="muted-note">No updates yet.</p>';
   }
-  async function addUpdate() {
+  async function addUpdate(ev) {
+    const btn = ev && ev.target ? ev.target : null;
     const title = document.getElementById('uTitle').value.trim();
     if (!title) return toast('Title required.', 'err');
+    if (btn) { btn.disabled = true; btn.textContent = 'Adding…'; }
     const { error } = await sb.from('updates_feed').insert({
-      date_label: document.getElementById('uDate').value.trim(),
-      title,
+      date_label: document.getElementById('uDate').value.trim(), title,
       body: document.getElementById('uBody').value.trim()
     });
+    if (btn) { btn.disabled = false; btn.textContent = 'Add update'; }
     if (error) return toast(error.message, 'err');
     document.getElementById('uDate').value = ''; document.getElementById('uTitle').value = ''; document.getElementById('uBody').value = '';
     toast('Update added ✓', 'ok'); loadUpdates();
