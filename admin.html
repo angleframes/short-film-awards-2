@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Sharankrishna Short Film Awards</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root { --bg:#0a0a0a; --card:#141414; --line:rgba(255,255,255,0.12); --txt:#f2f2f2; --mut:rgba(255,255,255,0.55); --acc:#e50914; --ok:#30d158; --warn:#ffd60a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  a { color:var(--acc); }
+  .wrap { max-width:900px; margin:0 auto; padding:24px 16px 80px; }
+  h1 { font-size:1.4rem; margin:0 0 4px; }
+  h2 { font-size:1.05rem; margin:0 0 14px; letter-spacing:0.3px; }
+  .sub { color:var(--mut); font-size:0.85rem; margin:0 0 24px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px; margin-bottom:20px; }
+  label { display:block; font-size:0.78rem; color:var(--mut); text-transform:uppercase; letter-spacing:1px; margin:0 0 6px; }
+  input,textarea,select { width:100%; padding:11px 12px; background:#0f0f0f; border:1px solid var(--line); border-radius:9px; color:var(--txt); font-size:0.9rem; margin-bottom:14px; }
+  textarea { min-height:70px; resize:vertical; }
+  button { cursor:pointer; border:none; border-radius:9px; padding:11px 18px; font-size:0.88rem; font-weight:600; }
+  .btn { background:var(--acc); color:#fff; }
+  .btn-ghost { background:transparent; border:1px solid var(--line); color:var(--txt); }
+  .btn-del { background:rgba(229,9,20,0.15); color:#ff6961; border:1px solid rgba(229,9,20,0.4); padding:7px 12px; font-size:0.8rem; }
+  .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media(max-width:600px){ .grid2{ grid-template-columns:1fr; } }
+  .toast { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:#1c1c1c; border:1px solid var(--line); padding:12px 18px; border-radius:10px; font-size:0.85rem; display:none; z-index:50; }
+  .toast.ok { border-color:var(--ok); color:var(--ok); }
+  .toast.err { border-color:var(--acc); color:#ff6961; }
+  .item { display:flex; gap:12px; align-items:center; padding:10px 0; border-top:1px solid var(--line); }
+  .item img { width:64px; height:44px; object-fit:cover; border-radius:6px; background:#000; }
+  .item .meta { flex:1; min-width:0; }
+  .item .meta b { display:block; font-size:0.9rem; }
+  .item .meta span { color:var(--mut); font-size:0.78rem; }
+  .pill { display:inline-block; padding:3px 10px; border-radius:20px; font-size:0.75rem; font-weight:600; }
+  .pill.open { background:rgba(48,209,88,0.15); color:var(--ok); }
+  .pill.closed { background:rgba(255,214,10,0.15); color:var(--warn); }
+  .switch { position:relative; width:52px; height:30px; }
+  .switch input { opacity:0; width:0; height:0; }
+  .slider { position:absolute; inset:0; background:#333; border-radius:30px; transition:.2s; }
+  .slider:before { content:""; position:absolute; height:22px; width:22px; left:4px; top:4px; background:#fff; border-radius:50%; transition:.2s; }
+  input:checked + .slider { background:var(--ok); }
+  input:checked + .slider:before { transform:translateX(22px); }
+  #loginView { max-width:380px; margin:12vh auto 0; }
+  .hidden { display:none !important; }
+  .muted-note { font-size:0.75rem; color:var(--mut); margin-top:-6px; margin-bottom:14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- LOGIN -->
+  <div id="loginView" class="card">
+    <h1>Admin Login</h1>
+    <p class="sub">Sharankrishna Short Film Awards</p>
+    <label for="email">Email</label>
+    <input id="email" type="email" autocomplete="username" placeholder="admin@email.com">
+    <label for="password">Password</label>
+    <input id="password" type="password" autocomplete="current-password" placeholder="••••••••">
+    <button class="btn" style="width:100%" onclick="doLogin()">Log in</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashView" class="hidden">
+    <div class="row" style="justify-content:space-between; margin-bottom:20px;">
+      <div><h1>Control Panel</h1><p class="sub" id="whoami" style="margin:0;"></p></div>
+      <button class="btn-ghost" onclick="doLogout()">Log out</button>
+    </div>
+
+    <!-- Registration + dates -->
+    <div class="card">
+      <h2>Registration & Countdown</h2>
+      <div class="row" style="justify-content:space-between; margin-bottom:18px;">
+        <div>
+          <b>Registrations</b>
+          <div><span id="gatePill" class="pill closed">Closed</span></div>
+        </div>
+        <label class="switch" style="margin:0;">
+          <input id="gateToggle" type="checkbox"><span class="slider"></span>
+        </label>
+      </div>
+      <div class="grid2">
+        <div><label>Submission deadline</label><input id="cfgDeadline" type="datetime-local"></div>
+        <div><label>Awards event date</label><input id="cfgEvent" type="datetime-local"></div>
+        <div><label>Deadline label (shown)</label><input id="cfgDeadlineLabel" placeholder="31 Dec 2026"></div>
+        <div><label>Event label (shown)</label><input id="cfgEventLabel" placeholder="12 Feb 2027"></div>
+      </div>
+      <button class="btn" onclick="saveConfig()">Save settings</button>
+    </div>
+
+    <!-- Gallery -->
+    <div class="card">
+      <h2>Gallery Photos</h2>
+      <div class="grid2">
+        <div><label>Category</label>
+          <select id="gCat">
+            <option value="events">Events</option>
+            <option value="winners2025">Winners 2025</option>
+            <option value="winners2026">Winners 2026</option>
+          </select>
+        </div>
+        <div><label>Image file</label><input id="gFile" type="file" accept="image/*"></div>
+        <div><label>Title</label><input id="gTitle" placeholder="e.g. Best Short Film"></div>
+        <div><label>Subtitle</label><input id="gSub" placeholder="e.g. Winner 2025"></div>
+      </div>
+      <button class="btn" onclick="addGallery()">Upload photo</button>
+      <div id="galleryList" style="margin-top:16px;"></div>
+    </div>
+
+    <!-- Updates -->
+    <div class="card">
+      <h2>Festival Updates</h2>
+      <div class="grid2">
+        <div><label>Date label</label><input id="uDate" placeholder="Now Open / Coming Soon"></div>
+        <div><label>Title</label><input id="uTitle" placeholder="Entries Open"></div>
+      </div>
+      <label>Text</label>
+      <textarea id="uBody" placeholder="Update details…"></textarea>
+      <button class="btn" onclick="addUpdate()">Add update</button>
+      <div id="updatesList" style="margin-top:16px;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  const SUPABASE_URL = "https://flwlbraeyyrofkhxnvwt.supabase.co";
+  const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZsd2xicmFleXlyb2ZraHhudnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4MDQzNDEsImV4cCI6MjEwNDM4MDM0MX0.0apM1gnHcYzTSLs0wTfi1fgaNCf0RKbeginWPXg5EbY";
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+  function toast(msg, kind) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast ' + (kind || '');
+    t.style.display = 'block';
+    clearTimeout(t._t); t._t = setTimeout(() => t.style.display = 'none', 3200);
+  }
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  // datetime-local <-> ISO helpers
+  const toLocalInput = iso => { if (!iso) return ''; const d = new Date(iso); const p = n => String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; };
+
+  async function doLogin() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) return toast(error.message, 'err');
+    await gate();
+  }
+  async function doLogout() { await sb.auth.signOut(); location.reload(); }
+
+  async function gate() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { show('login'); return; }
+    // must be an admin (RLS will also enforce)
+    const { data: adminRow } = await sb.from('admins').select('user_id').eq('user_id', session.user.id).maybeSingle();
+    if (!adminRow) { toast('This account is not an admin.', 'err'); await sb.auth.signOut(); show('login'); return; }
+    document.getElementById('whoami').textContent = session.user.email;
+    show('dash');
+    await Promise.all([loadConfig(), loadGallery(), loadUpdates()]);
+  }
+  function show(v) {
+    document.getElementById('loginView').classList.toggle('hidden', v !== 'login');
+    document.getElementById('dashView').classList.toggle('hidden', v !== 'dash');
+  }
+
+  // ---- config ----
+  async function loadConfig() {
+    const { data, error } = await sb.from('site_config').select('*').eq('id', 1).single();
+    if (error) return toast(error.message, 'err');
+    const open = !!data.registration_open;
+    document.getElementById('gateToggle').checked = open;
+    const pill = document.getElementById('gatePill');
+    pill.textContent = open ? 'Open' : 'Closed';
+    pill.className = 'pill ' + (open ? 'open' : 'closed');
+    document.getElementById('cfgDeadline').value = toLocalInput(data.submission_deadline);
+    document.getElementById('cfgEvent').value = toLocalInput(data.awards_event_date);
+    document.getElementById('cfgDeadlineLabel').value = data.deadline_label || '';
+    document.getElementById('cfgEventLabel').value = data.event_label || '';
+  }
+  document.addEventListener('change', e => {
+    if (e.target.id === 'gateToggle') {
+      const open = e.target.checked;
+      const pill = document.getElementById('gatePill');
+      pill.textContent = open ? 'Open' : 'Closed';
+      pill.className = 'pill ' + (open ? 'open' : 'closed');
+    }
+  });
+  async function saveConfig() {
+    const payload = {
+      registration_open: document.getElementById('gateToggle').checked,
+      submission_deadline: new Date(document.getElementById('cfgDeadline').value).toISOString(),
+      awards_event_date: new Date(document.getElementById('cfgEvent').value).toISOString(),
+      deadline_label: document.getElementById('cfgDeadlineLabel').value.trim(),
+      event_label: document.getElementById('cfgEventLabel').value.trim(),
+      updated_at: new Date().toISOString()
+    };
+    const { error } = await sb.from('site_config').update(payload).eq('id', 1);
+    toast(error ? error.message : 'Settings saved ✓', error ? 'err' : 'ok');
+  }
+
+  // ---- gallery ----
+  async function loadGallery() {
+    const { data, error } = await sb.from('gallery').select('*').order('sort_order').order('created_at', { ascending: false });
+    if (error) return toast(error.message, 'err');
+    const box = document.getElementById('galleryList');
+    box.innerHTML = (data || []).map(g => `
+      <div class="item">
+        <img src="${esc(g.src)}" alt="">
+        <div class="meta"><b>${esc(g.title) || '(untitled)'}</b><span>${esc(g.category)} · ${esc(g.sub) || ''}</span></div>
+        <button class="btn-del" onclick="delGallery(${g.id}, '${esc(g.src)}')">Delete</button>
+      </div>`).join('') || '<p class="muted-note">No photos yet.</p>';
+  }
+  async function addGallery() {
+    const file = document.getElementById('gFile').files[0];
+    if (!file) return toast('Pick an image file first.', 'err');
+    const path = Date.now() + '_' + file.name.replace(/[^\w.\-]/g, '_');
+    const up = await sb.storage.from('gallery').upload(path, file, { upsert: false });
+    if (up.error) return toast(up.error.message, 'err');
+    const pub = sb.storage.from('gallery').getPublicUrl(path).data.publicUrl;
+    const { error } = await sb.from('gallery').insert({
+      category: document.getElementById('gCat').value,
+      src: pub,
+      title: document.getElementById('gTitle').value.trim(),
+      sub: document.getElementById('gSub').value.trim()
+    });
+    if (error) return toast(error.message, 'err');
+    document.getElementById('gFile').value = ''; document.getElementById('gTitle').value = ''; document.getElementById('gSub').value = '';
+    toast('Photo added ✓', 'ok'); loadGallery();
+  }
+  async function delGallery(id, src) {
+    if (!confirm('Delete this photo?')) return;
+    await sb.from('gallery').delete().eq('id', id);
+    try { const p = src.split('/gallery/')[1]; if (p) await sb.storage.from('gallery').remove([p]); } catch (_) {}
+    toast('Deleted', 'ok'); loadGallery();
+  }
+
+  // ---- updates ----
+  async function loadUpdates() {
+    const { data, error } = await sb.from('updates_feed').select('*').order('sort_order').order('created_at', { ascending: false });
+    if (error) return toast(error.message, 'err');
+    const box = document.getElementById('updatesList');
+    box.innerHTML = (data || []).map(u => `
+      <div class="item">
+        <div class="meta"><b>${esc(u.title)}</b><span>${esc(u.date_label)} — ${esc(u.body)}</span></div>
+        <button class="btn-del" onclick="delUpdate(${u.id})">Delete</button>
+      </div>`).join('') || '<p class="muted-note">No updates yet.</p>';
+  }
+  async function addUpdate() {
+    const title = document.getElementById('uTitle').value.trim();
+    if (!title) return toast('Title required.', 'err');
+    const { error } = await sb.from('updates_feed').insert({
+      date_label: document.getElementById('uDate').value.trim(),
+      title,
+      body: document.getElementById('uBody').value.trim()
+    });
+    if (error) return toast(error.message, 'err');
+    document.getElementById('uDate').value = ''; document.getElementById('uTitle').value = ''; document.getElementById('uBody').value = '';
+    toast('Update added ✓', 'ok'); loadUpdates();
+  }
+  async function delUpdate(id) {
+    if (!confirm('Delete this update?')) return;
+    await sb.from('updates_feed').delete().eq('id', id);
+    toast('Deleted', 'ok'); loadUpdates();
+  }
+
+  gate();
+</script>
+</body>
+</html>

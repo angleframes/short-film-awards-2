@@ -66,6 +66,10 @@
             currency: "INR"
         };
 
+        // Supabase (public anon key — safe for the browser; controlled by RLS).
+        const SUPA_URL = "https://flwlbraeyyrofkhxnvwt.supabase.co";
+        const SUPA_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZsd2xicmFleXlyb2ZraHhudnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4MDQzNDEsImV4cCI6MjEwNDM4MDM0MX0.0apM1gnHcYzTSLs0wTfi1fgaNCf0RKbeginWPXg5EbY";
+
         /****************************************************************
          * ✏️ ABOUT SECTION — Edit card content here
          * eyebrow: small label above heading
@@ -145,6 +149,8 @@
 
     <!-- Cashfree Web Checkout SDK v3 -->
     <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    <!-- Supabase client (reads live site settings/gallery/updates) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <title id="browserTabTitle">Sharankrishna Short Film Awards 2026</title>
     <meta name="description" content="Sharankrishna Short Film Awards 2026 — honoring the legacy of Sharankrishna. Hosted by Jain University Kochi and Angle Frames.">
@@ -3658,7 +3664,40 @@
             }
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
+        // Pull live settings/gallery/updates from Supabase (admin panel writes these).
+        // On any failure, the hardcoded defaults above are kept.
+        async function loadRemoteConfig() {
+            try {
+                if (!window.supabase) return;
+                const SB = window.supabase.createClient(SUPA_URL, SUPA_ANON);
+                const [cfgRes, galRes, updRes] = await Promise.all([
+                    SB.from('site_config').select('*').eq('id', 1).single(),
+                    SB.from('gallery').select('*').order('sort_order').order('created_at', { ascending: false }),
+                    SB.from('updates_feed').select('*').order('sort_order').order('created_at', { ascending: false })
+                ]);
+                const cfg = cfgRes.data;
+                if (cfg) {
+                    REGISTRATION_GATE.isOpen = !!cfg.registration_open;
+                    if (cfg.submission_deadline) PORTAL_TIMELINES.submissionDeadline = cfg.submission_deadline;
+                    if (cfg.awards_event_date)   PORTAL_TIMELINES.awardsEventDate   = cfg.awards_event_date;
+                    if (cfg.deadline_label)      PORTAL_TIMELINES.deadlineLabelText  = cfg.deadline_label;
+                    if (cfg.event_label)         PORTAL_TIMELINES.eventLabelText     = cfg.event_label;
+                }
+                if (Array.isArray(galRes.data) && galRes.data.length) {
+                    GALLERY_IMAGES.length = 0;
+                    galRes.data.forEach(g => GALLERY_IMAGES.push({ category: g.category, src: g.src, title: g.title || '', sub: g.sub || '' }));
+                }
+                if (Array.isArray(updRes.data) && updRes.data.length) {
+                    UPDATES_FEED.length = 0;
+                    updRes.data.forEach(u => UPDATES_FEED.push({ date: u.date_label || '', title: u.title || '', text: u.body || '' }));
+                }
+            } catch (e) {
+                console.warn('Remote config load failed — using built-in defaults.', e);
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            await loadRemoteConfig();
             document.getElementById('mainLogo').src = SITE_IMAGES.mainLogo;
             document.getElementById('socialIconInstagram').src = SITE_IMAGES.socialInstagram;
             document.getElementById('socialIconYoutube').src = SITE_IMAGES.socialYoutube;
