@@ -182,13 +182,29 @@
     if (error) return toast(error.message, 'err');
     applyConfig(data);
   }
-  document.addEventListener('change', e => {
-    if (e.target.id === 'gateToggle') {
-      const open = e.target.checked;
-      const pill = document.getElementById('gatePill');
-      pill.textContent = open ? 'Open' : 'Closed';
-      pill.className = 'pill ' + (open ? 'open' : 'closed');
+  function setGatePill(open) {
+    const pill = document.getElementById('gatePill');
+    pill.textContent = open ? 'Open' : 'Closed';
+    pill.className = 'pill ' + (open ? 'open' : 'closed');
+  }
+  // Toggle saves IMMEDIATELY to the DB; reverts UI if the save fails.
+  document.addEventListener('change', async e => {
+    if (e.target.id !== 'gateToggle') return;
+    const toggle = e.target;
+    const open = toggle.checked;
+    setGatePill(open);
+    toggle.disabled = true;
+    const { data, error } = await sb.from('site_config')
+      .update({ registration_open: open, updated_at: new Date().toISOString() })
+      .eq('id', 1).select().single();
+    toggle.disabled = false;
+    if (error || !data) {
+      toggle.checked = !open;              // revert
+      setGatePill(!open);
+      return toast('Could not save: ' + (error ? error.message : 'no permission'), 'err');
     }
+    setGatePill(!!data.registration_open); // reflect persisted truth
+    toast('Registration ' + (data.registration_open ? 'OPEN' : 'CLOSED') + ' — saved ✓', 'ok');
   });
   async function saveConfig(ev) {
     const btn = ev && ev.target ? ev.target : null;
