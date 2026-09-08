@@ -2459,6 +2459,9 @@
         .payment-status-box.is-pending { background: rgba(255, 214, 10, 0.08); border-color: rgba(255, 214, 10, 0.4); color: #ffd60a; }
         .payment-status-box.is-success { background: rgba(48, 209, 88, 0.08); border-color: rgba(48, 209, 88, 0.45); color: #30d158; }
         .payment-status-box.is-error { background: rgba(255, 69, 58, 0.08); border-color: rgba(255, 69, 58, 0.45); color: #ff6961; }
+        /* Hide registration card until live config resolves — prevents open/closed flash */
+        #registrationCardContent { opacity: 0; transition: opacity 0.25s ease; }
+        body.cfg-ready #registrationCardContent { opacity: 1; }
 
         .success-screen-inner { text-align: center; padding: 60px 20px; }
         .success-icon { width: 64px; height: 64px; background: rgba(48, 209, 88, 0.1); border: 1px solid #30d158; color: #30d158; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 1.8rem; }
@@ -3697,6 +3700,7 @@
         }
 
         document.addEventListener("DOMContentLoaded", async () => {
+            setTimeout(() => document.body.classList.add('cfg-ready'), 5000); // failsafe: never stay hidden
             await loadRemoteConfig();
             document.getElementById('mainLogo').src = SITE_IMAGES.mainLogo;
             document.getElementById('socialIconInstagram').src = SITE_IMAGES.socialInstagram;
@@ -4104,13 +4108,46 @@
             categoryCarouselRestartTimer();
         }
 
+        // Single source of truth: manual toggle AND deadline both must allow entry.
+        // Toggle OFF -> closed regardless. Toggle ON + deadline passed -> closed. Toggle ON + valid -> open.
+        function computeGateOpen() {
+            if (!REGISTRATION_GATE.isOpen) return false;
+            const dl = PORTAL_TIMELINES.submissionDeadline ? new Date(PORTAL_TIMELINES.submissionDeadline).getTime() : null;
+            if (dl && !isNaN(dl) && Date.now() > dl) return false;
+            return true;
+        }
+
+        // Snapshot the original wizard markup once, so we can restore it if reopened without a reload.
+        let _originalRegCardHTML = null;
+
         function evaluateRegistrationGateState() {
             const browserTitleEl = document.getElementById('browserTabTitle');
             const navRegLink = document.getElementById('navRegistration');
             const heroSubmitBtn = document.getElementById('heroSubmitBtn');
             const formContainer = document.getElementById('registrationCardContent');
 
-            if (!REGISTRATION_GATE.isOpen) {
+            if (formContainer && _originalRegCardHTML === null) {
+                _originalRegCardHTML = formContainer.innerHTML; // capture the real wizard once
+            }
+
+            const open = computeGateOpen();
+
+            if (open) {
+                if (browserTitleEl) browserTitleEl.textContent = "Sharankrishna Short Film Awards 2026";
+                if (navRegLink) navRegLink.textContent = "Registration";
+                if (heroSubmitBtn) {
+                    heroSubmitBtn.textContent = "Submit Your Film →";
+                    heroSubmitBtn.style.background = "";
+                    heroSubmitBtn.style.color = "";
+                    heroSubmitBtn.style.border = "";
+                    heroSubmitBtn.style.boxShadow = "";
+                    heroSubmitBtn.style.pointerEvents = "";
+                }
+                // Restore the wizard if a previous closed-render had replaced it.
+                if (formContainer && _originalRegCardHTML !== null && document.getElementById('submissionForm') === null) {
+                    formContainer.innerHTML = _originalRegCardHTML;
+                }
+            } else {
                 if (browserTitleEl) browserTitleEl.textContent = "Entries Closed | Sharankrishna Short Film Awards";
                 if (navRegLink) navRegLink.textContent = "Entries Closed";
                 if (heroSubmitBtn) {
@@ -4133,6 +4170,7 @@
                     `;
                 }
             }
+            document.body.classList.add('cfg-ready'); // reveal (kills the load flash)
         }
 
         function initiateTimersEngine() {

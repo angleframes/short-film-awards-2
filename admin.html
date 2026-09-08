@@ -86,7 +86,7 @@
         <div><label>Deadline label (shown)</label><input id="cfgDeadlineLabel" placeholder="31 Dec 2026"></div>
         <div><label>Event label (shown)</label><input id="cfgEventLabel" placeholder="12 Feb 2027"></div>
       </div>
-      <button class="btn" onclick="saveConfig()">Save settings</button>
+      <button class="btn" onclick="saveConfig(event)">Save settings</button>
     </div>
 
     <!-- Gallery -->
@@ -104,7 +104,7 @@
         <div><label>Title</label><input id="gTitle" placeholder="e.g. Best Short Film"></div>
         <div><label>Subtitle</label><input id="gSub" placeholder="e.g. Winner 2025"></div>
       </div>
-      <button class="btn" onclick="addGallery()">Upload photo</button>
+      <button class="btn" onclick="addGallery(event)">Upload photo</button>
       <div id="galleryList" style="margin-top:16px;"></div>
     </div>
 
@@ -166,9 +166,7 @@
   }
 
   // ---- config ----
-  async function loadConfig() {
-    const { data, error } = await sb.from('site_config').select('*').eq('id', 1).single();
-    if (error) return toast(error.message, 'err');
+  function applyConfig(data) {
     const open = !!data.registration_open;
     document.getElementById('gateToggle').checked = open;
     const pill = document.getElementById('gatePill');
@@ -179,6 +177,11 @@
     document.getElementById('cfgDeadlineLabel').value = data.deadline_label || '';
     document.getElementById('cfgEventLabel').value = data.event_label || '';
   }
+  async function loadConfig() {
+    const { data, error } = await sb.from('site_config').select('*').eq('id', 1).single();
+    if (error) return toast(error.message, 'err');
+    applyConfig(data);
+  }
   document.addEventListener('change', e => {
     if (e.target.id === 'gateToggle') {
       const open = e.target.checked;
@@ -187,17 +190,27 @@
       pill.className = 'pill ' + (open ? 'open' : 'closed');
     }
   });
-  async function saveConfig() {
+  async function saveConfig(ev) {
+    const btn = ev && ev.target ? ev.target : null;
+    const dl = document.getElementById('cfgDeadline').value;
+    const evt = document.getElementById('cfgEvent').value;
+    const d1 = dl ? new Date(dl) : null, d2 = evt ? new Date(evt) : null;
+    if ((dl && isNaN(d1)) || (evt && isNaN(d2))) { return toast('Invalid date/time.', 'err'); }
     const payload = {
       registration_open: document.getElementById('gateToggle').checked,
-      submission_deadline: new Date(document.getElementById('cfgDeadline').value).toISOString(),
-      awards_event_date: new Date(document.getElementById('cfgEvent').value).toISOString(),
+      submission_deadline: d1 ? d1.toISOString() : null,
+      awards_event_date: d2 ? d2.toISOString() : null,
       deadline_label: document.getElementById('cfgDeadlineLabel').value.trim(),
       event_label: document.getElementById('cfgEventLabel').value.trim(),
       updated_at: new Date().toISOString()
     };
-    const { error } = await sb.from('site_config').update(payload).eq('id', 1);
-    toast(error ? error.message : 'Settings saved ✓', error ? 'err' : 'ok');
+    if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+    // .select().single() returns the persisted row so we confirm what actually saved
+    const { data, error } = await sb.from('site_config').update(payload).eq('id', 1).select().single();
+    if (btn) { btn.disabled = false; btn.textContent = 'Save settings'; }
+    if (error) return toast('Save failed: ' + error.message, 'err');
+    applyConfig(data); // reflect the real persisted value in the UI
+    toast('Saved ✓ Registration ' + (data.registration_open ? 'OPEN' : 'CLOSED'), 'ok');
   }
 
   // ---- gallery ----
@@ -212,12 +225,18 @@
         <button class="btn-del" onclick="delGallery(${g.id}, '${esc(g.src)}')">Delete</button>
       </div>`).join('') || '<p class="muted-note">No photos yet.</p>';
   }
-  async function addGallery() {
+  async function addGallery(ev) {
+    const addBtn = ev && ev.target ? ev.target : null;
+    const reset = () => { if (addBtn) { addBtn.disabled = false; addBtn.textContent = 'Upload photo'; } };
     const file = document.getElementById('gFile').files[0];
     if (!file) return toast('Pick an image file first.', 'err');
+    const okTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!okTypes.includes(file.type)) return toast('Only JPG, PNG, or WEBP allowed.', 'err');
+    if (file.size > 8 * 1024 * 1024) return toast('Image too large (max 8 MB).', 'err');
+    if (addBtn) { addBtn.disabled = true; addBtn.textContent = 'Uploading…'; } // guards double-click
     const path = Date.now() + '_' + file.name.replace(/[^\w.\-]/g, '_');
     const up = await sb.storage.from('gallery').upload(path, file, { upsert: false });
-    if (up.error) return toast(up.error.message, 'err');
+    if (up.error) { reset(); return toast('Upload failed: ' + up.error.message, 'err'); }
     const pub = sb.storage.from('gallery').getPublicUrl(path).data.publicUrl;
     const { error } = await sb.from('gallery').insert({
       category: document.getElementById('gCat').value,
@@ -225,7 +244,8 @@
       title: document.getElementById('gTitle').value.trim(),
       sub: document.getElementById('gSub').value.trim()
     });
-    if (error) return toast(error.message, 'err');
+    reset();
+    if (error) return toast('Saved image but metadata failed: ' + error.message, 'err');
     document.getElementById('gFile').value = ''; document.getElementById('gTitle').value = ''; document.getElementById('gSub').value = '';
     toast('Photo added ✓', 'ok'); loadGallery();
   }
