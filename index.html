@@ -57,9 +57,8 @@
         ];
 
         const APP_CONFIG = {
-            // Node backend (ska-backend) — handles createOrder, verifyOrder, and film submission.
-            // Replace with your deployed backend URL (e.g. https://ska-backend.onrender.com).
-            backendUrl: "https://YOUR-BACKEND.onrender.com",
+            // Supabase Edge Function — handles createOrder, verifyOrder, and film submission.
+            backendUrl: "https://flwlbraeyyrofkhxnvwt.supabase.co/functions/v1/payment",
             // Cashfree config (NO SECRET KEY HERE — secret lives only in the backend env vars).
             // This MUST match the backend's CASHFREE_ENV: "sandbox" or "production".
             cashfreeMode: "sandbox",
