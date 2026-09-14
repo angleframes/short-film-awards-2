@@ -4476,9 +4476,11 @@
 
             // Payment summary (verified via Cashfree, server-side).
             const payRows = [
-                { label: "Payment Status", value: "Paid" },
-                { label: "Amount", value: "₹" + APP_CONFIG.registrationFee + " " + APP_CONFIG.currency },
-                { label: "Cashfree Order ID", value: paymentState.orderId || "—" }
+                { label: "Payment Status", value: "✓ Paid" },
+                { label: "Amount", value: "₹" + (paymentState.amount || APP_CONFIG.registrationFee) + " INR" },
+                { label: "Payment Method", value: paymentState.paymentMethod || "Online Payment" },
+                { label: "Cashfree Order ID", value: paymentState.orderId || "—" },
+                { label: "Payment ID", value: paymentState.cfPaymentId || "—" }
             ];
             payRows.forEach(item => {
                 const row = document.createElement('div');
@@ -4500,6 +4502,7 @@
             amount: null,
             currency: null,
             paidAt: null,
+            paymentMethod: null,  // e.g. UPI, CARD, NETBANKING (from server)
             inProgress: false     // guards against double-click / duplicate orders
         };
 
@@ -4571,10 +4574,10 @@
             showPaymentStatus('is-pending', 'Creating your secure payment order…');
 
             try {
+                // NOTE: amount and currency are enforced server-side (1000 INR).
+                // Only send customer info needed for the Cashfree order.
                 const orderResp = await backendCall({
                     action: 'createOrder',
-                    amount: APP_CONFIG.registrationFee,
-                    currency: APP_CONFIG.currency,
                     customerName: document.getElementById('applicantName').value.trim(),
                     customerEmail: document.getElementById('email').value.trim(),
                     customerPhone: document.getElementById('phone').value.trim()
@@ -4628,6 +4631,7 @@
                     paymentState.amount = resp.order_amount || APP_CONFIG.registrationFee;
                     paymentState.currency = resp.order_currency || APP_CONFIG.currency;
                     paymentState.paidAt = resp.paid_at || new Date().toISOString();
+                    paymentState.paymentMethod = resp.payment_method || null;
                     showPaymentStatus('is-success', '✓ Payment received (₹' + escapeHtml(paymentState.amount) + '). Order ' + escapeHtml(paymentState.orderId) + '. You can now review &amp; submit.');
                     setPayUiState('paid');
                 } else if (payStatus === 'ACTIVE' || payStatus === 'PENDING') {
@@ -4683,9 +4687,12 @@
                 paymentStatus: "Paid",
                 cashfreeOrderId: paymentState.orderId,
                 cashfreePaymentId: paymentState.cfPaymentId,
+                // amount/currency are server-enforced; sent here only as metadata hint
+                // Backend always uses server-verified values from Cashfree
                 amount: paymentState.amount,
                 currency: paymentState.currency,
-                paidAt: paymentState.paidAt
+                paidAt: paymentState.paidAt,
+                paymentMethod: paymentState.paymentMethod
             };
 
             backendCall(formData)
