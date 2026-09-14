@@ -1320,9 +1320,9 @@
         .gallery-select-wrap {
             position: relative;
             padding: 0 !important;
-            overflow-x: hidden;
-            overflow-y: visible;
-            min-height: 100vh;
+            overflow: hidden;
+            min-height: 100svh;
+            min-height: 100dvh;
         }
 
         /* Hidden radios — kept for fallback, JS takes over */
@@ -1358,13 +1358,11 @@
             overflow-y: visible;
             scroll-snap-type: x proximity;
             -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255,255,255,0.2) transparent;
+            scrollbar-width: none; /* visually hidden, keep touch/mouse scroll */
+            scrollbar-color: transparent transparent;
             justify-content: center;
         }
-        .gallery-select-strip::-webkit-scrollbar { height: 4px; }
-        .gallery-select-strip::-webkit-scrollbar-track { background: transparent; }
-        .gallery-select-strip::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+        .gallery-select-strip::-webkit-scrollbar { display: none; }
         .gallery-select-strip {
             -webkit-mask-image: linear-gradient(to right, transparent 0, #000 60px, #000 calc(100% - 60px), transparent 100%), linear-gradient(to bottom, #000 0, #000 calc(100% - 14px), transparent 100%);
             -webkit-mask-composite: source-in;
@@ -1460,33 +1458,51 @@
         }
 
 
-        .gs-fig img {
+        /* Blurred backdrop layer (covers full stage, blurs the image) */
+        .gs-fig .gs-backdrop {
+            position: absolute;
+            inset: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: 0.72;
+            opacity: 0.35;
+            filter: blur(28px) brightness(0.5) saturate(1.4);
+            transform: scale(1.08); /* prevent blur edge artifacts */
+            z-index: 0;
         }
 
-        /* Figcaption — adapted from uploaded file's figcaption style, site position */
+        /* Main photo — contained, full visibility, no crop */
+        .gs-fig img:not(.gs-backdrop) {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0.92;
+        }
+
+        /* Figcaption — cinematic positioning, safe from thumbnail strip */
         .gs-fig figcaption {
             position: absolute;
-            bottom: 160px;
+            bottom: clamp(170px, 22vh, 220px);
             left: 6%;
+            right: 6%;
             z-index: 5;
+            max-width: 60%;
         }
         .gs-fig figcaption h3 {
-            font-size: clamp(1.8rem, 4vw, 3.5rem);
+            font-size: clamp(1.4rem, 3.5vw, 3.2rem);
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
             color: #ffffff;
-            text-shadow: 0 4px 24px rgba(0,0,0,0.85);
+            text-shadow: 0 4px 24px rgba(0,0,0,0.9);
             margin: 0 0 8px 0;
             line-height: 1.1;
         }
         .gs-fig figcaption h3 em { font-style: normal; color: rgba(255,255,255,0.7); }
         .gs-fig figcaption p {
-            font-size: 0.85rem;
+            font-size: clamp(0.65rem, 1.2vw, 0.85rem);
             text-transform: uppercase;
             letter-spacing: 3px;
             color: rgba(255,255,255,0.55);
@@ -1516,19 +1532,31 @@
         .gallery-select-header .section-heading { margin-bottom: 0; }
 
         @media (max-width: 768px) {
-            .gallery-select-aside { padding: 50px 0 10px; overflow: visible; }
+            .gallery-select-wrap { min-height: 100svh; min-height: 100dvh; }
+            .gallery-select-aside { padding: 44px 0 8px; overflow: visible; }
             .gallery-select-strip li {
-                flex: 0 0 88px;
+                flex: 0 0 80px;
                 overflow: visible;
             }
             .gallery-select-strip li label img,
             .thumb-placeholder { aspect-ratio: 3/4; }
             .gallery-select-strip li label span:not(.thumb-placeholder) { font-size: 0.5rem; }
-            .gallery-select-strip li:hover { transform: scale(1.08); }
-            .gs-fig figcaption { bottom: 170px; left: 5%; right: 5%; }
-            .gs-fig figcaption h3 { font-size: 1.3rem; letter-spacing: 1px; }
-            .gs-fig figcaption p { font-size: 0.7rem; letter-spacing: 2px; }
-            .gallery-select-header { padding: 40px 5% 16px; }
+            .gallery-select-strip li:hover { transform: scale(1.06); }
+            .gs-fig figcaption {
+                bottom: clamp(140px, 20vh, 185px);
+                left: 5%;
+                right: 5%;
+                max-width: 90%;
+            }
+            .gs-fig figcaption h3 { font-size: clamp(1.1rem, 5vw, 1.5rem); letter-spacing: 1px; }
+            .gs-fig figcaption p { font-size: clamp(0.6rem, 2.5vw, 0.72rem); letter-spacing: 2px; }
+            .gallery-select-header { padding: 36px 5% 14px; }
+        }
+
+        @media (max-width: 430px) {
+            .gallery-select-strip li { flex: 0 0 68px; }
+            .gs-fig figcaption { bottom: 130px; }
+            .gs-fig figcaption h3 { font-size: 1rem; }
         }
 
         /* ===== CATEGORIES SECTION ===== */
@@ -2881,6 +2909,41 @@
             .phone-sep { display: none; }
             .contact-channel-row .phone-line a { display: block; margin-bottom: 4px; }
         }
+
+        /* ===== SMALL MOBILE: 320px – 390px ===== */
+        @media (max-width: 390px) {
+            body { overflow-x: hidden; }
+            .site-header-wrapper { padding: 0 14px; }
+            #section-home { padding: 90px 4% 40px 4%; }
+            .page-section { padding: 60px 4%; }
+            .hero-main-title { font-size: clamp(1.4rem, 8.5vw, 2.2rem); }
+            .portal-glass-card { padding: 18px; }
+            .contact-channel-grid { flex-direction: column; }
+            .footer-columns { grid-template-columns: 1fr; gap: 28px; }
+            .btn-wizard-action { width: 100%; min-width: 0; font-size: 0.78rem; padding: 14px 12px; }
+            .wizard-nav-row { flex-direction: column; gap: 10px; }
+            .form-group input, .form-group select, .form-group textarea { font-size: 0.9rem; }
+        }
+
+        /* ===== PERFORMANCE: prefers-reduced-motion ===== */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+            .gs-backdrop { filter: brightness(0.35); }
+            .whatsapp-float-btn::before { animation: none; }
+        }
+
+        /* ===== TOUCH TARGET IMPROVEMENTS ===== */
+        @media (hover: none) and (pointer: coarse) {
+            .navbar a { padding: 16px 14px; }
+            .gallery-select-strip li { flex: 0 0 90px; }
+            .category-carousel-btn { width: 44px; height: 44px; }
+            .btn-action-primary, .btn-action-secondary { padding: 16px 28px; }
+        }
     </style>
 </head>
 <body>
@@ -3178,7 +3241,7 @@
                     </div>
                     <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>Contact Us</h4>
-                        <p>For any privacy-related questions, write to us at angleframes.contact@gmail.com.</p>
+                        <p>For any privacy-related questions, write to us at sharankrishnashortfilmawards@gmail.com.</p>
                     </div>
                 </div>
             </div>
@@ -3224,7 +3287,7 @@
                     </div>
                     <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>Contact</h4>
-                        <p>For queries regarding these Terms, write to us at <a href="mailto:angleframes.contact@gmail.com" style="color:inherit;">angleframes.contact@gmail.com</a>.</p>
+                        <p>For queries regarding these Terms, write to us at <a href="mailto:sharankrishnashortfilmawards@gmail.com" style="color:inherit;">sharankrishnashortfilmawards@gmail.com</a>.</p>
                     </div>
                 </div>
             </div>
@@ -3238,7 +3301,7 @@
                     </div>
                     <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>Failed Payment / Technical Error</h4>
-                        <p>If your payment is debited from your bank account or card but your entry registration fails due to a technical error on our payment gateway or server, you are entitled to a full refund of ₹1,000. To claim this refund, contact us within 7 days at angleframes.contact@gmail.com with your name, registered email address, and the Cashfree Order ID. Verified refunds will be processed within 7–10 working days to the original payment method.</p>
+                        <p>If your payment is debited from your bank account or card but your entry registration fails due to a technical error on our payment gateway or server, you are entitled to a full refund of ₹1,000. To claim this refund, contact us within 7 days at sharankrishnashortfilmawards@gmail.com with your name, registered email address, and the Cashfree Order ID. Verified refunds will be processed within 7–10 working days to the original payment method.</p>
                     </div>
                     <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>Duplicate Payment</h4>
@@ -3258,7 +3321,7 @@
                     </div>
                     <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>How to Request a Refund</h4>
-                        <p>Email angleframes.contact@gmail.com with Subject: "Refund Request — [Your Name]". Include your registered email, Cashfree Order ID, and reason. We will respond within 3 working days.</p>
+                        <p>Email sharankrishnashortfilmawards@gmail.com with Subject: "Refund Request — [Your Name]". Include your registered email, Cashfree Order ID, and reason. We will respond within 3 working days.</p>
                     </div>
                 </div>
             </div>
@@ -3501,7 +3564,7 @@
 
                     <div class="contact-channel-row">
                         <label>Official Inquiry Mailbox</label>
-                        <p><a href="mailto:angleframes.contact@gmail.com">angleframes.contact@gmail.com</a></p>
+                        <p><a href="mailto:sharankrishnashortfilmawards@gmail.com">sharankrishnashortfilmawards@gmail.com</a></p>
                     </div>
                 </div>
             </div>
@@ -3535,7 +3598,7 @@
                 <h4>Get in Touch</h4>
                 <a href="tel:+917902959564">+91 7902959564</a>
                 <a href="tel:+919745640896">+91 9745640896</a>
-                <a href="mailto:angleframes.contact@gmail.com">angleframes.contact@gmail.com</a>
+                <a href="mailto:sharankrishnashortfilmawards@gmail.com">sharankrishnashortfilmawards@gmail.com</a>
             </div>
 
             <div class="footer-col">
@@ -4355,14 +4418,15 @@
 
                 // Thumbnail strip item
                 const li = document.createElement('li');
-                li.innerHTML = `<label data-photo="${pid}"><img src="${photo.src}" alt="${photo.title}"><span>${shortTitle}</span></label>`;
+                li.innerHTML = `<label data-photo="${pid}"><img src="${photo.src}" alt="${photo.title}" loading="lazy" decoding="async"><span>${shortTitle}</span></label>`;
                 strip.appendChild(li);
 
                 // Stage figure
                 const fig = document.createElement('figure');
                 fig.className = 'gs-fig';
                 fig.dataset.id = pid;
-                fig.innerHTML = `<img src="${photo.src}" alt="${photo.title}"><figcaption><h3>${photo.title}</h3><p>${photo.sub}</p></figcaption>`;
+                const isFirst = idx === 0;
+                fig.innerHTML = `<img class="gs-backdrop" src="${photo.src}" alt="" aria-hidden="true" loading="${isFirst ? 'eager' : 'lazy'}" decoding="async"><img src="${photo.src}" alt="${photo.title}" loading="${isFirst ? 'eager' : 'lazy'}" decoding="async"><figcaption><h3>${photo.title}</h3><p>${photo.sub}</p></figcaption>`;
                 stage.appendChild(fig);
             });
 

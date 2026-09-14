@@ -5,63 +5,91 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin · Sharankrishna Short Film Awards</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
   :root {
     --bg:#0b0b0d; --bg2:#0f0f12; --card:#151519; --card2:#1a1a20;
     --line:rgba(255,255,255,0.10); --line2:rgba(255,255,255,0.06);
     --txt:#f4f4f6; --mut:rgba(255,255,255,0.52); --mut2:rgba(255,255,255,0.34);
-    --acc:#e50914; --acc-soft:rgba(229,9,20,0.14); --ok:#30d158; --warn:#ffd60a; --info:#0a84ff;
+    --acc:#e50914; --acc-soft:rgba(229,9,20,0.14);
+    --ok:#30d158; --warn:#ffd60a; --info:#0a84ff; --warn-soft:rgba(255,214,10,0.14);
   }
   * { box-sizing:border-box; }
-  html,body { margin:0; }
-  body { background:radial-gradient(1200px 600px at 50% -200px, #17171d 0%, var(--bg) 60%); color:var(--txt);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; min-height:100vh; }
+  html,body { margin:0; overflow-x:hidden; }
+  body { background:radial-gradient(1200px 600px at 50% -200px, #17171d 0%, var(--bg) 60%);
+    color:var(--txt); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; min-height:100vh; }
   a { color:inherit; text-decoration:none; }
 
   /* Top bar */
-  .topbar { position:sticky; top:0; z-index:20; backdrop-filter:blur(12px);
-    background:rgba(11,11,13,0.72); border-bottom:1px solid var(--line2); }
-  .topbar-inner { max-width:1020px; margin:0 auto; padding:14px 18px; display:flex; align-items:center; gap:14px; }
+  .topbar { position:sticky; top:0; z-index:50; backdrop-filter:blur(14px);
+    background:rgba(11,11,13,0.78); border-bottom:1px solid var(--line2); }
+  .topbar-inner { max-width:1100px; margin:0 auto; padding:12px 18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
   .brand { display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:0.2px; }
-  .brand .dot { width:10px; height:10px; border-radius:50%; background:var(--acc); box-shadow:0 0 12px var(--acc); }
-  .brand small { display:block; font-weight:500; font-size:0.72rem; color:var(--mut); letter-spacing:0.4px; }
+  .brand .dot { width:10px; height:10px; border-radius:50%; background:var(--acc); box-shadow:0 0 12px var(--acc); flex:0 0 auto; }
+  .brand small { display:block; font-weight:500; font-size:0.7rem; color:var(--mut); letter-spacing:0.4px; }
   .spacer { flex:1; }
-  .top-user { font-size:0.8rem; color:var(--mut); }
+  .top-user { font-size:0.78rem; color:var(--mut); white-space:nowrap; }
 
-  .wrap { max-width:1020px; margin:0 auto; padding:22px 18px 90px; }
+  /* Tab bar */
+  .tab-bar { border-bottom:1px solid var(--line2); background:rgba(11,11,13,0.5); }
+  .tab-bar-inner { max-width:1100px; margin:0 auto; padding:0 18px; display:flex; gap:4px; overflow-x:auto; scrollbar-width:none; }
+  .tab-bar-inner::-webkit-scrollbar { display:none; }
+  .tab-btn { background:transparent; border:none; color:var(--mut); font-size:0.8rem; font-weight:600; letter-spacing:0.8px;
+    text-transform:uppercase; padding:13px 16px; border-bottom:2px solid transparent; cursor:pointer; white-space:nowrap;
+    transition:color .15s, border-color .15s; }
+  .tab-btn:hover { color:var(--txt); }
+  .tab-btn.active { color:#fff; border-bottom-color:#fff; }
+
+  .wrap { max-width:1100px; margin:0 auto; padding:22px 18px 90px; }
 
   /* Stat tiles */
-  .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
-  @media(max-width:760px){ .stats{ grid-template-columns:repeat(2,1fr); } }
-  .stat { background:linear-gradient(180deg,var(--card2),var(--card)); border:1px solid var(--line); border-radius:14px; padding:16px; }
-  .stat .k { font-size:0.7rem; text-transform:uppercase; letter-spacing:1.2px; color:var(--mut2); }
-  .stat .v { font-size:1.5rem; font-weight:700; margin-top:8px; }
-  .stat .v.small { font-size:1.05rem; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:12px; margin-bottom:22px; }
+  .stat { background:linear-gradient(180deg,var(--card2),var(--card)); border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
+  .stat .k { font-size:0.68rem; text-transform:uppercase; letter-spacing:1.2px; color:var(--mut2); }
+  .stat .v { font-size:1.4rem; font-weight:700; margin-top:6px; }
+  .stat .v.small { font-size:0.95rem; }
+  .stat .v.ok  { color:var(--ok); }
+  .stat .v.warn { color:var(--warn); }
+  .stat .v.err  { color:#ff6b6b; }
+  .stat .v.info { color:var(--info); }
 
   /* Cards */
   .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:22px; margin-bottom:20px; }
   .card-head { display:flex; align-items:center; gap:12px; margin-bottom:6px; }
-  .card-head .ic { width:34px; height:34px; border-radius:10px; background:var(--acc-soft); display:flex; align-items:center; justify-content:center; font-size:1rem; }
+  .card-head .ic { width:34px; height:34px; border-radius:10px; background:var(--acc-soft);
+    display:flex; align-items:center; justify-content:center; font-size:1rem; flex:0 0 auto; }
   .card-head h2 { font-size:1.05rem; margin:0; }
   .card-desc { color:var(--mut); font-size:0.82rem; margin:0 0 18px 46px; }
-  @media(max-width:600px){ .card-desc{ margin-left:0; } }
+  @media(max-width:600px){ .card-desc { margin-left:0; } }
 
   label { display:block; font-size:0.72rem; color:var(--mut2); text-transform:uppercase; letter-spacing:1px; margin:0 0 6px; }
-  input,textarea,select { width:100%; padding:11px 12px; background:var(--bg2); border:1px solid var(--line); border-radius:10px; color:var(--txt); font-size:0.9rem; margin-bottom:14px; transition:border .15s; }
+  input,textarea,select { width:100%; padding:10px 12px; background:var(--bg2); border:1px solid var(--line);
+    border-radius:10px; color:var(--txt); font-size:0.9rem; margin-bottom:14px; transition:border .15s; }
   input:focus,textarea:focus,select:focus { outline:none; border-color:rgba(229,9,20,0.6); }
   textarea { min-height:70px; resize:vertical; }
-  button { cursor:pointer; border:none; border-radius:10px; padding:11px 18px; font-size:0.88rem; font-weight:600; transition:filter .15s, opacity .15s; }
+  button { cursor:pointer; border:none; border-radius:10px; padding:11px 18px; font-size:0.88rem;
+    font-weight:600; transition:filter .15s, opacity .15s; }
   button:hover { filter:brightness(1.08); }
   button:disabled { opacity:0.55; cursor:default; }
   .btn { background:var(--acc); color:#fff; }
+  .btn-ok { background:rgba(48,209,88,0.18); color:var(--ok); border:1px solid rgba(48,209,88,0.35); }
+  .btn-info { background:rgba(10,132,255,0.18); color:var(--info); border:1px solid rgba(10,132,255,0.35); }
   .btn-ghost { background:transparent; border:1px solid var(--line); color:var(--txt); }
-  .btn-sm { padding:8px 13px; font-size:0.8rem; }
+  .btn-sm { padding:7px 13px; font-size:0.8rem; }
+  .btn-xs { padding:5px 10px; font-size:0.74rem; border-radius:8px; }
   .btn-del { background:rgba(229,9,20,0.14); color:#ff6b6b; border:1px solid rgba(229,9,20,0.35); padding:7px 12px; font-size:0.78rem; }
-  .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
   .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:0 16px; }
-  @media(max-width:600px){ .grid2{ grid-template-columns:1fr; } }
+  @media(max-width:600px){ .grid2 { grid-template-columns:1fr; } }
 
-  .pill { display:inline-block; padding:3px 11px; border-radius:20px; font-size:0.74rem; font-weight:700; letter-spacing:0.3px; }
+  /* Search bar */
+  .search-bar { display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; align-items:flex-start; }
+  .search-bar input[type="search"], .search-bar input[type="text"] { flex:1 1 220px; margin:0; padding:9px 12px; }
+  .search-bar select { width:auto; flex:0 0 auto; margin:0; padding:9px 10px; font-size:0.82rem; }
+  .search-bar button { flex:0 0 auto; }
+
+  .pill { display:inline-block; padding:3px 11px; border-radius:20px; font-size:0.72rem; font-weight:700; letter-spacing:0.3px; }
   .pill.open { background:rgba(48,209,88,0.16); color:var(--ok); }
   .pill.closed { background:rgba(255,214,10,0.16); color:var(--warn); }
 
@@ -79,18 +107,62 @@
   .item .meta span { color:var(--mut); font-size:0.78rem; }
   .muted-note { font-size:0.8rem; color:var(--mut); margin:12px 0 0; }
 
-  /* table */
+  /* Entries table */
   .tbl-wrap { overflow-x:auto; border:1px solid var(--line2); border-radius:12px; margin-top:6px; }
-  table { width:100%; border-collapse:collapse; font-size:0.82rem; min-width:640px; }
+  table { width:100%; border-collapse:collapse; font-size:0.82rem; min-width:720px; }
   th,td { text-align:left; padding:10px 12px; border-bottom:1px solid var(--line2); white-space:nowrap; }
-  th { color:var(--mut2); text-transform:uppercase; font-size:0.68rem; letter-spacing:0.8px; background:var(--bg2); position:sticky; top:0; }
-  tbody tr:hover { background:rgba(255,255,255,0.02); }
+  th { color:var(--mut2); text-transform:uppercase; font-size:0.66rem; letter-spacing:0.8px;
+    background:var(--bg2); position:sticky; top:0; cursor:pointer; user-select:none; }
+  th:hover { color:var(--txt); }
+  tbody tr:hover { background:rgba(255,255,255,0.025); }
   .tag { padding:2px 8px; border-radius:6px; font-size:0.72rem; font-weight:600; }
   .tag.paid { background:rgba(48,209,88,0.16); color:var(--ok); }
+  .tag.pending { background:rgba(255,214,10,0.16); color:var(--warn); }
+  .tag.failed { background:rgba(229,9,20,0.16); color:#ff6b6b; }
+  .tag.general { background:rgba(10,132,255,0.14); color:var(--info); }
+  .tag.campus { background:rgba(255,214,10,0.14); color:var(--warn); }
+
+  .film-link-btn { font-size:0.72rem; color:var(--info); background:rgba(10,132,255,0.12);
+    border:1px solid rgba(10,132,255,0.28); border-radius:6px; padding:3px 9px; }
+
+  /* Pagination */
+  .pagination { display:flex; align-items:center; gap:8px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
+  .pagination button { padding:7px 13px; font-size:0.78rem; }
+  .pagination .pg-info { font-size:0.78rem; color:var(--mut); }
+
+  /* Detail modal */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200;
+    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); overflow-y:auto; padding:24px 16px; }
+  .modal-overlay.open { display:flex; align-items:flex-start; justify-content:center; }
+  .modal-box { background:var(--card); border:1px solid var(--line); border-radius:18px;
+    width:100%; max-width:680px; padding:28px; position:relative; margin:auto; }
+  .modal-close { position:absolute; top:18px; right:18px; background:transparent; border:1px solid var(--line);
+    color:var(--mut); font-size:1rem; border-radius:8px; padding:6px 10px; }
+  .modal-close:hover { color:var(--txt); }
+  .detail-section { margin-bottom:20px; }
+  .detail-section h4 { font-size:0.68rem; text-transform:uppercase; letter-spacing:1.5px; color:var(--mut2);
+    margin:0 0 10px; padding-bottom:6px; border-bottom:1px solid var(--line2); }
+  .detail-row { display:flex; gap:8px; padding:6px 0; border-bottom:1px solid var(--line2); font-size:0.84rem; }
+  .detail-row:last-child { border-bottom:none; }
+  .detail-key { color:var(--mut); flex:0 0 160px; }
+  .detail-val { flex:1; word-break:break-all; }
+  @media(max-width:500px){ .detail-row { flex-direction:column; gap:2px; } .detail-key { flex:none; } }
+
+  /* Link cards */
+  .link-card { background:var(--bg2); border:1px solid var(--line2); border-radius:12px;
+    padding:14px 16px; margin-bottom:10px; }
+  .link-card .lc-url { font-family:monospace; font-size:0.78rem; color:var(--info);
+    background:rgba(10,132,255,0.08); border-radius:6px; padding:6px 10px; word-break:break-all;
+    display:block; margin:8px 0; }
+  .link-card .lc-meta { font-size:0.74rem; color:var(--mut); }
+  .badge { display:inline-block; padding:2px 8px; border-radius:10px; font-size:0.68rem; font-weight:700; }
+  .badge.active { background:rgba(48,209,88,0.16); color:var(--ok); }
+  .badge.expired { background:rgba(255,214,10,0.16); color:var(--warn); }
+  .badge.revoked { background:rgba(229,9,20,0.16); color:#ff6b6b; }
 
   .toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(20px); opacity:0;
     background:#1c1c22; border:1px solid var(--line); padding:12px 18px; border-radius:11px; font-size:0.85rem;
-    transition:.25s; z-index:60; pointer-events:none; max-width:90vw; }
+    transition:.25s; z-index:300; pointer-events:none; max-width:90vw; }
   .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
   .toast.ok { border-color:var(--ok); color:var(--ok); }
   .toast.err { border-color:var(--acc); color:#ff6b6b; }
@@ -100,6 +172,10 @@
   .sub { color:var(--mut); font-size:0.85rem; margin:0 0 22px; }
   .hidden { display:none !important; }
   .skeleton { color:var(--mut2); font-size:0.85rem; padding:8px 0; }
+
+  /* Tab panes */
+  .tab-pane { display:none; }
+  .tab-pane.active { display:block; }
 </style>
 </head>
 <body>
@@ -119,92 +195,182 @@
 <div id="dashView" class="hidden">
   <div class="topbar">
     <div class="topbar-inner">
-      <span class="dot" style="width:10px;height:10px;border-radius:50%;background:var(--acc);box-shadow:0 0 12px var(--acc)"></span>
+      <span class="dot" style="width:10px;height:10px;border-radius:50%;background:var(--acc);box-shadow:0 0 12px var(--acc);flex:0 0 auto"></span>
       <div class="brand">Control Panel<small id="whoami"></small></div>
       <span class="spacer"></span>
-      <a class="btn-ghost btn-sm" href="https://sharankrishnashortfilmawards.com" target="_blank" rel="noopener">View live site ↗</a>
+      <span class="top-user" id="statRegTop"></span>
+      <a class="btn-ghost btn-sm" href="https://sharankrishnashortfilmawards.com" target="_blank" rel="noopener">Live site ↗</a>
       <button class="btn-ghost btn-sm" onclick="doLogout()">Log out</button>
     </div>
   </div>
 
+  <div class="tab-bar">
+    <div class="tab-bar-inner">
+      <button class="tab-btn active" onclick="switchTab('entries')">📋 Entries</button>
+      <button class="tab-btn" onclick="switchTab('registration')">🎬 Registration</button>
+      <button class="tab-btn" onclick="switchTab('gallery')">🖼️ Gallery</button>
+      <button class="tab-btn" onclick="switchTab('updates')">📣 Updates</button>
+      <button class="tab-btn" onclick="switchTab('links')">🔗 Links</button>
+    </div>
+  </div>
+
   <div class="wrap">
-    <!-- Stat tiles -->
-    <div class="stats">
-      <div class="stat"><div class="k">Registration</div><div class="v small"><span id="statReg" class="pill closed">—</span></div></div>
-      <div class="stat"><div class="k">Film Entries</div><div class="v" id="statEntries">—</div></div>
-      <div class="stat"><div class="k">Gallery Photos</div><div class="v" id="statPhotos">—</div></div>
-      <div class="stat"><div class="k">Deadline</div><div class="v small" id="statDeadline">—</div></div>
-    </div>
 
-    <!-- Registration + dates -->
-    <div class="card">
-      <div class="card-head"><div class="ic">🎬</div><h2>Registration &amp; Countdown</h2></div>
-      <p class="card-desc">Toggle saves instantly. Dates &amp; labels control the public countdown — click Save settings.</p>
-      <div class="row" style="justify-content:space-between; margin:0 0 18px;">
-        <div><b>Registrations</b><div style="margin-top:4px;"><span id="gatePill" class="pill closed">Closed</span></div></div>
-        <label class="switch" style="margin:0;"><input id="gateToggle" type="checkbox"><span class="slider"></span></label>
+    <!-- ═══════════════════ ENTRIES TAB ═══════════════════ -->
+    <div class="tab-pane active" id="tab-entries">
+      <div class="stats" id="entriesStats">
+        <div class="stat"><div class="k">Total Entries</div><div class="v" id="stTotal">—</div></div>
+        <div class="stat"><div class="k">Paid</div><div class="v ok" id="stPaid">—</div></div>
+        <div class="stat"><div class="k">Pending</div><div class="v warn" id="stPending">—</div></div>
+        <div class="stat"><div class="k">Failed</div><div class="v err" id="stFailed">—</div></div>
+        <div class="stat"><div class="k">General</div><div class="v info" id="stGeneral">—</div></div>
+        <div class="stat"><div class="k">Campus</div><div class="v" id="stCampus">—</div></div>
+        <div class="stat"><div class="k">Today</div><div class="v" id="stToday">—</div></div>
       </div>
-      <div class="grid2">
-        <div><label>Submission deadline</label><input id="cfgDeadline" type="datetime-local"></div>
-        <div><label>Awards event date</label><input id="cfgEvent" type="datetime-local"></div>
-        <div><label>Deadline label (shown)</label><input id="cfgDeadlineLabel" placeholder="31 Dec 2026"></div>
-        <div><label>Event label (shown)</label><input id="cfgEventLabel" placeholder="12 Feb 2027"></div>
-      </div>
-      <button class="btn" onclick="saveConfig(event)">Save settings</button>
-      <span id="cfgSaved" class="muted-note" style="margin-left:12px;"></span>
-    </div>
 
-    <!-- Film Entries -->
-    <div class="card">
-      <div class="card-head"><div class="ic">🎞️</div><h2>Film Entries</h2></div>
-      <p class="card-desc">Paid submissions received via Cashfree. Read-only.</p>
-      <div class="row" style="margin-bottom:8px;">
-        <button class="btn-ghost btn-sm" onclick="loadEntries()">↻ Refresh</button>
-        <button class="btn-ghost btn-sm" onclick="exportEntriesCsv()">⬇ Export CSV</button>
-        <span class="spacer"></span>
-        <span class="muted-note" id="entriesCount" style="margin:0;"></span>
-      </div>
-      <div class="tbl-wrap">
-        <table>
-          <thead><tr><th>Date</th><th>Applicant</th><th>Film</th><th>Category</th><th>Payment</th><th>Amount</th><th>Order ID</th></tr></thead>
-          <tbody id="entriesBody"><tr><td colspan="7" class="skeleton">Loading…</td></tr></tbody>
-        </table>
-      </div>
-    </div>
+      <div class="card">
+        <div class="card-head"><div class="ic">🎞️</div><h2>Film Entries</h2></div>
 
-    <!-- Gallery -->
-    <div class="card">
-      <div class="card-head"><div class="ic">🖼️</div><h2>Gallery Photos</h2></div>
-      <p class="card-desc">JPG / PNG / WEBP, up to 8 MB. Appears in the public Gallery.</p>
-      <div class="grid2">
-        <div><label>Category</label>
-          <select id="gCat">
-            <option value="events">Events</option>
-            <option value="winners2025">Winners 2025</option>
-            <option value="winners2026">Winners 2026</option>
+        <!-- Search + Filters -->
+        <div class="search-bar" style="margin-top:6px;">
+          <input type="search" id="entSearch" placeholder="Search name, film, email, phone, order ID…" oninput="applyFilters()">
+          <select id="entCategory" onchange="applyFilters()">
+            <option value="">All Categories</option>
+            <option value="General">General</option>
+            <option value="Campus">Campus</option>
+          </select>
+          <select id="entStatus" onchange="applyFilters()">
+            <option value="">All Statuses</option>
+            <option value="PAID">Paid</option>
+            <option value="PENDING">Pending</option>
+            <option value="FAILED">Failed</option>
+          </select>
+          <select id="entSort" onchange="applyFilters()">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="film">Film name A–Z</option>
+            <option value="applicant">Applicant A–Z</option>
           </select>
         </div>
-        <div><label>Image file</label><input id="gFile" type="file" accept="image/*"></div>
-        <div><label>Title</label><input id="gTitle" placeholder="e.g. Best Short Film"></div>
-        <div><label>Subtitle</label><input id="gSub" placeholder="e.g. Winner 2025"></div>
+
+        <div class="row" style="margin-bottom:10px;">
+          <button class="btn-ghost btn-sm" onclick="loadEntries()">↻ Refresh</button>
+          <button class="btn-ghost btn-sm" onclick="exportEntriesCsv()">⬇ CSV</button>
+          <button class="btn-info btn-sm" onclick="exportEntriesPdf()">⬇ PDF (all entries)</button>
+          <span class="spacer"></span>
+          <span class="muted-note" id="entriesCount" style="margin:0;"></span>
+        </div>
+
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th>Date</th>
+              <th>Applicant</th>
+              <th>Film</th>
+              <th>Category</th>
+              <th>Director</th>
+              <th>Film Link</th>
+              <th>Status</th>
+              <th>Amount</th>
+              <th>Source</th>
+              <th>Actions</th>
+            </tr></thead>
+            <tbody id="entriesBody"><tr><td colspan="10" class="skeleton">Loading…</td></tr></tbody>
+          </table>
+        </div>
+        <div class="pagination" id="entriesPagination"></div>
       </div>
-      <button class="btn" onclick="addGallery(event)">Upload photo</button>
-      <div id="galleryList" style="margin-top:14px;"></div>
     </div>
 
-    <!-- Updates -->
-    <div class="card">
-      <div class="card-head"><div class="ic">📣</div><h2>Festival Updates</h2></div>
-      <p class="card-desc">Shown in the public “Festival Updates” feed, newest first.</p>
-      <div class="grid2">
-        <div><label>Date label</label><input id="uDate" placeholder="Now Open / Coming Soon"></div>
-        <div><label>Title</label><input id="uTitle" placeholder="Entries Open"></div>
+    <!-- ═══════════════════ REGISTRATION TAB ═══════════════════ -->
+    <div class="tab-pane" id="tab-registration">
+      <div class="stats">
+        <div class="stat"><div class="k">Registration</div><div class="v small"><span id="statReg" class="pill closed">—</span></div></div>
+        <div class="stat"><div class="k">Film Entries</div><div class="v" id="statEntries">—</div></div>
+        <div class="stat"><div class="k">Gallery Photos</div><div class="v" id="statPhotos">—</div></div>
+        <div class="stat"><div class="k">Deadline</div><div class="v small" id="statDeadline">—</div></div>
       </div>
-      <label>Text</label>
-      <textarea id="uBody" placeholder="Update details…"></textarea>
-      <button class="btn" onclick="addUpdate(event)">Add update</button>
-      <div id="updatesList" style="margin-top:14px;"></div>
+
+      <div class="card">
+        <div class="card-head"><div class="ic">🎬</div><h2>Registration &amp; Countdown</h2></div>
+        <p class="card-desc">Toggle saves instantly. Dates &amp; labels control the public countdown — click Save settings.</p>
+        <div class="row" style="justify-content:space-between; margin:0 0 18px;">
+          <div><b>Registrations</b><div style="margin-top:4px;"><span id="gatePill" class="pill closed">Closed</span></div></div>
+          <label class="switch" style="margin:0;"><input id="gateToggle" type="checkbox"><span class="slider"></span></label>
+        </div>
+        <div class="grid2">
+          <div><label>Submission deadline</label><input id="cfgDeadline" type="datetime-local"></div>
+          <div><label>Awards event date</label><input id="cfgEvent" type="datetime-local"></div>
+          <div><label>Deadline label (shown)</label><input id="cfgDeadlineLabel" placeholder="31 Dec 2026"></div>
+          <div><label>Event label (shown)</label><input id="cfgEventLabel" placeholder="12 Feb 2027"></div>
+        </div>
+        <button class="btn" onclick="saveConfig(event)">Save settings</button>
+        <span id="cfgSaved" class="muted-note" style="margin-left:12px;"></span>
+      </div>
     </div>
+
+    <!-- ═══════════════════ GALLERY TAB ═══════════════════ -->
+    <div class="tab-pane" id="tab-gallery">
+      <div class="card">
+        <div class="card-head"><div class="ic">🖼️</div><h2>Gallery Photos</h2></div>
+        <p class="card-desc">JPG / PNG / WEBP, up to 8 MB. Appears in the public Gallery.</p>
+        <div class="grid2">
+          <div><label>Category</label>
+            <select id="gCat">
+              <option value="events">Events</option>
+              <option value="winners2025">Winners 2025</option>
+              <option value="winners2026">Winners 2026</option>
+            </select>
+          </div>
+          <div><label>Image file</label><input id="gFile" type="file" accept="image/*"></div>
+          <div><label>Title</label><input id="gTitle" placeholder="e.g. Best Short Film"></div>
+          <div><label>Subtitle</label><input id="gSub" placeholder="e.g. Winner 2025"></div>
+        </div>
+        <button class="btn" onclick="addGallery(event)">Upload photo</button>
+        <div id="galleryList" style="margin-top:14px;"></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ UPDATES TAB ═══════════════════ -->
+    <div class="tab-pane" id="tab-updates">
+      <div class="card">
+        <div class="card-head"><div class="ic">📣</div><h2>Festival Updates</h2></div>
+        <p class="card-desc">Shown in the public "Festival Updates" feed, newest first.</p>
+        <div class="grid2">
+          <div><label>Date label</label><input id="uDate" placeholder="Now Open / Coming Soon"></div>
+          <div><label>Title</label><input id="uTitle" placeholder="Entries Open"></div>
+        </div>
+        <label>Text</label>
+        <textarea id="uBody" placeholder="Update details…"></textarea>
+        <button class="btn" onclick="addUpdate(event)">Add update</button>
+        <div id="updatesList" style="margin-top:14px;"></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════ LINKS TAB ═══════════════════ -->
+    <div class="tab-pane" id="tab-links">
+      <div class="card">
+        <div class="card-head"><div class="ic">🔗</div><h2>Direct Submission Links</h2></div>
+        <p class="card-desc">Generate unique links that let filmmakers submit directly, even when registration is closed. Each link tracks its source in entries.</p>
+        <div class="grid2">
+          <div><label>Label / Partner name</label><input id="lkLabel" placeholder="e.g. Film School Bangalore"></div>
+          <div><label>Max uses (0 = unlimited)</label><input id="lkMaxUses" type="number" min="0" value="0" placeholder="0"></div>
+          <div><label>Expires on (optional)</label><input id="lkExpiry" type="datetime-local"></div>
+          <div><label>Note (internal)</label><input id="lkNote" placeholder="e.g. For workshop attendees"></div>
+        </div>
+        <button class="btn" onclick="createLink(event)">Generate Link</button>
+        <div id="linksList" style="margin-top:18px;"></div>
+      </div>
+    </div>
+
+  </div><!-- /wrap -->
+</div><!-- /dashView -->
+
+<!-- ═══════ DETAIL MODAL ═══════ -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeDetail()">✕</button>
+    <div id="detailContent"></div>
   </div>
 </div>
 
@@ -215,8 +381,12 @@
   const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZsd2xicmFleXlyb2ZraHhudnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4MDQzNDEsImV4cCI6MjEwNDM4MDM0MX0.0apM1gnHcYzTSLs0wTfi1fgaNCf0RKbeginWPXg5EbY";
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-  let _entriesCache = [];
+  let _allEntries = [];   // full unfiltered cache
+  let _filtered  = [];   // after search/filter/sort
+  let _page = 1;
+  const PAGE_SIZE = 25;
 
+  // ─── Utilities ────────────────────────────────────────────────────────────
   function toast(msg, kind) {
     const t = document.getElementById('toast');
     t.textContent = msg; t.className = 'toast show ' + (kind || '');
@@ -225,7 +395,21 @@
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const toLocalInput = iso => { if (!iso) return ''; const d = new Date(iso); if (isNaN(d)) return ''; const p = n => String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; };
   const fmtDate = iso => { if (!iso) return '—'; const d = new Date(iso); return isNaN(d) ? '—' : d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); };
+  const fmtDateTime = iso => { if (!iso) return '—'; const d = new Date(iso); return isNaN(d) ? '—' : d.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); };
+  const isUrl = s => { try { return /^https?:\/\//i.test(s) && !!new URL(s); } catch { return false; } };
+  const safe = v => v == null ? '' : String(v);
 
+  // ─── Tab switching ─────────────────────────────────────────────────────────
+  function switchTab(name) {
+    document.querySelectorAll('.tab-btn').forEach((b,i) => {
+      const names = ['entries','registration','gallery','updates','links'];
+      b.classList.toggle('active', names[i] === name);
+    });
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+  }
+
+  // ─── Auth ──────────────────────────────────────────────────────────────────
   async function doLogin() {
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
@@ -243,14 +427,14 @@
     if (!isAdmin) { toast('This account is not an admin.', 'err'); await sb.auth.signOut(); return show('login'); }
     document.getElementById('whoami').textContent = session.user.email;
     show('dash');
-    await Promise.all([loadConfig(), loadGallery(), loadUpdates(), loadEntries()]);
+    await Promise.all([loadConfig(), loadGallery(), loadUpdates(), loadEntries(), loadLinks()]);
   }
   function show(v) {
     document.getElementById('loginView').classList.toggle('hidden', v !== 'login');
     document.getElementById('dashView').classList.toggle('hidden', v !== 'dash');
   }
 
-  // ---- config ----
+  // ─── Config ────────────────────────────────────────────────────────────────
   function applyConfig(data) {
     const open = !!data.registration_open;
     document.getElementById('gateToggle').checked = open;
@@ -259,31 +443,30 @@
     document.getElementById('cfgEvent').value = toLocalInput(data.awards_event_date);
     document.getElementById('cfgDeadlineLabel').value = data.deadline_label || '';
     document.getElementById('cfgEventLabel').value = data.event_label || '';
-    // stat tiles
     const sr = document.getElementById('statReg');
     sr.textContent = open ? 'Open' : 'Closed'; sr.className = 'pill ' + (open ? 'open' : 'closed');
     document.getElementById('statDeadline').textContent = data.deadline_label || fmtDate(data.submission_deadline);
+    document.getElementById('statRegTop').textContent = 'Reg: ' + (open ? 'Open' : 'Closed');
   }
   function setGatePill(open) {
-    const pill = document.getElementById('gatePill');
-    pill.textContent = open ? 'Open' : 'Closed';
-    pill.className = 'pill ' + (open ? 'open' : 'closed');
-    const sr = document.getElementById('statReg');
-    if (sr) { sr.textContent = open ? 'Open' : 'Closed'; sr.className = 'pill ' + (open ? 'open' : 'closed'); }
+    ['gatePill','statReg'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = open ? 'Open' : 'Closed';
+      el.className = 'pill ' + (open ? 'open' : 'closed');
+    });
+    document.getElementById('statRegTop').textContent = 'Reg: ' + (open ? 'Open' : 'Closed');
   }
   async function loadConfig() {
     const { data, error } = await sb.from('site_config').select('*').eq('id', 1).single();
     if (error) return toast(error.message, 'err');
     applyConfig(data);
   }
-  // Toggle saves immediately; reverts on failure.
   document.addEventListener('change', async e => {
     if (e.target.id !== 'gateToggle') return;
     const toggle = e.target, open = toggle.checked;
     setGatePill(open); toggle.disabled = true;
-    const { data, error } = await sb.from('site_config')
-      .update({ registration_open: open, updated_at: new Date().toISOString() })
-      .eq('id', 1).select().single();
+    const { data, error } = await sb.from('site_config').update({ registration_open: open, updated_at: new Date().toISOString() }).eq('id', 1).select().single();
     toggle.disabled = false;
     if (error || !data) { toggle.checked = !open; setGatePill(!open); return toast('Could not save: ' + (error ? error.message : 'no permission'), 'err'); }
     setGatePill(!!data.registration_open);
@@ -311,34 +494,197 @@
     toast('Settings saved ✓', 'ok');
   }
 
-  // ---- entries ----
+  // ─── Entries: load ─────────────────────────────────────────────────────────
   async function loadEntries() {
     const body = document.getElementById('entriesBody');
+    body.innerHTML = '<tr><td colspan="10" class="skeleton">Loading…</td></tr>';
     const { data, error } = await sb.from('film_entries').select('*').order('created_at', { ascending: false });
     if (error) {
-      body.innerHTML = `<tr><td colspan="7" class="skeleton">Cannot load entries: ${esc(error.message)}</td></tr>`;
-      document.getElementById('statEntries').textContent = '—';
+      body.innerHTML = `<tr><td colspan="10" class="skeleton">Cannot load: ${esc(error.message)}</td></tr>`;
       return;
     }
-    _entriesCache = data || [];
-    document.getElementById('statEntries').textContent = _entriesCache.length;
-    document.getElementById('entriesCount').textContent = _entriesCache.length + ' total';
-    if (!_entriesCache.length) { body.innerHTML = '<tr><td colspan="7" class="skeleton">No entries yet.</td></tr>'; return; }
-    body.innerHTML = _entriesCache.map(r => `
-      <tr>
+    _allEntries = data || [];
+    document.getElementById('statEntries').textContent = _allEntries.length;
+
+    // Compute stats
+    const today = new Date().toISOString().slice(0,10);
+    const stPaid    = _allEntries.filter(r => (r.payment_status||'').toUpperCase() === 'PAID').length;
+    const stPending = _allEntries.filter(r => (r.payment_status||'PENDING').toUpperCase() === 'PENDING' && !['PAID','FAILED'].includes((r.payment_status||'').toUpperCase())).length;
+    const stFailed  = _allEntries.filter(r => (r.payment_status||'').toUpperCase() === 'FAILED').length;
+    const stGeneral = _allEntries.filter(r => (r.category||'').toLowerCase().includes('general')).length;
+    const stCampus  = _allEntries.filter(r => (r.category||'').toLowerCase().includes('campus')).length;
+    const stToday   = _allEntries.filter(r => r.created_at && r.created_at.startsWith(today)).length;
+    document.getElementById('stTotal').textContent   = _allEntries.length;
+    document.getElementById('stPaid').textContent    = stPaid;
+    document.getElementById('stPending').textContent = stPending;
+    document.getElementById('stFailed').textContent  = stFailed;
+    document.getElementById('stGeneral').textContent = stGeneral;
+    document.getElementById('stCampus').textContent  = stCampus;
+    document.getElementById('stToday').textContent   = stToday;
+
+    _page = 1;
+    applyFilters();
+  }
+
+  // ─── Entries: filter + sort + render ──────────────────────────────────────
+  function applyFilters() {
+    const q    = (document.getElementById('entSearch').value || '').toLowerCase().trim();
+    const cat  = document.getElementById('entCategory').value;
+    const sta  = document.getElementById('entStatus').value.toUpperCase();
+    const sort = document.getElementById('entSort').value;
+
+    _filtered = _allEntries.filter(r => {
+      if (cat && !(r.category||'').toLowerCase().includes(cat.toLowerCase())) return false;
+      if (sta) {
+        const ps = (r.payment_status||'').toUpperCase();
+        if (sta === 'PAID' && ps !== 'PAID') return false;
+        if (sta === 'PENDING' && ps !== 'PENDING' && ps !== '') return false;
+        if (sta === 'FAILED' && ps !== 'FAILED') return false;
+      }
+      if (q) {
+        const haystack = [r.applicant_name,r.email,r.phone,r.film_name,r.cashfree_order_id,r.cashfree_payment_id].map(safe).join(' ').toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+      return true;
+    });
+
+    _filtered.sort((a,b) => {
+      if (sort === 'oldest')    return new Date(a.created_at) - new Date(b.created_at);
+      if (sort === 'film')      return safe(a.film_name).localeCompare(safe(b.film_name));
+      if (sort === 'applicant') return safe(a.applicant_name).localeCompare(safe(b.applicant_name));
+      return new Date(b.created_at) - new Date(a.created_at); // newest
+    });
+
+    _page = 1;
+    renderEntriesPage();
+  }
+
+  function renderEntriesPage() {
+    const body = document.getElementById('entriesBody');
+    const total = _filtered.length;
+    const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    _page = Math.min(_page, pages);
+    const start = (_page - 1) * PAGE_SIZE;
+    const slice = _filtered.slice(start, start + PAGE_SIZE);
+
+    document.getElementById('entriesCount').textContent = `${total} result${total !== 1 ? 's' : ''} (${_allEntries.length} total)`;
+
+    if (!slice.length) { body.innerHTML = '<tr><td colspan="10" class="skeleton">No entries match.</td></tr>'; renderPagination(0,1,1); return; }
+
+    body.innerHTML = slice.map((r, i) => {
+      const ps = (r.payment_status || 'PAID').toUpperCase();
+      const statusTag = ps === 'PAID' ? '<span class="tag paid">Paid</span>'
+                      : ps === 'FAILED' ? '<span class="tag failed">Failed</span>'
+                      : '<span class="tag pending">Pending</span>';
+      const catTag = (r.category||'').toLowerCase().includes('campus')
+        ? '<span class="tag campus" style="margin-left:4px;">Campus</span>'
+        : '<span class="tag general" style="margin-left:4px;">General</span>';
+      const filmLinkHtml = isUrl(r.film_link)
+        ? `<a href="${esc(r.film_link)}" target="_blank" rel="noopener noreferrer" class="film-link-btn">Open ↗</a>`
+        : '—';
+      const src = r.source ? `<span style="font-size:0.7rem;color:var(--mut);">${esc(r.source)}</span>` : '—';
+      const gIdx = start + i;
+      return `<tr>
         <td>${fmtDate(r.created_at)}</td>
         <td>${esc(r.applicant_name)}<div style="color:var(--mut);font-size:0.72rem;">${esc(r.email)}</div></td>
         <td>${esc(r.film_name)}</td>
-        <td>${esc(r.category)}</td>
-        <td><span class="tag paid">${esc(r.payment_status || 'Paid')}</span></td>
-        <td>₹${esc(r.amount)}</td>
-        <td style="font-size:0.72rem;color:var(--mut);">${esc(r.cashfree_order_id)}</td>
-      </tr>`).join('');
+        <td>${esc(r.category)}${catTag}</td>
+        <td>${esc(r.director||'—')}</td>
+        <td>${filmLinkHtml}</td>
+        <td>${statusTag}</td>
+        <td>₹${esc(r.amount||1000)}</td>
+        <td>${src}</td>
+        <td>
+          <button class="btn-ghost btn-xs" onclick="openDetail(${gIdx})">Details</button>
+          <button class="btn-info btn-xs" style="margin-top:4px;" onclick="exportSinglePdf(${gIdx})">PDF</button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    renderPagination(total, pages, _page);
   }
+
+  function renderPagination(total, pages, current) {
+    const box = document.getElementById('entriesPagination');
+    if (pages <= 1) { box.innerHTML = ''; return; }
+    let html = `<button class="btn-ghost btn-sm" onclick="changePage(${current-1})" ${current<=1?'disabled':''}>← Prev</button>`;
+    html += `<span class="pg-info">Page ${current} of ${pages} &nbsp;(${total} entries)</span>`;
+    html += `<button class="btn-ghost btn-sm" onclick="changePage(${current+1})" ${current>=pages?'disabled':''}>Next →</button>`;
+    box.innerHTML = html;
+  }
+  function changePage(n) { _page = n; renderEntriesPage(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+  // ─── Entries: detail modal ─────────────────────────────────────────────────
+  function openDetail(idx) {
+    const r = _filtered[idx];
+    if (!r) return;
+    const ps = (r.payment_status || 'PAID').toUpperCase();
+    const filmLinkHtml = isUrl(r.film_link)
+      ? `<a href="${esc(r.film_link)}" target="_blank" rel="noopener noreferrer" style="color:var(--info);">Open Film ↗</a>`
+      : esc(r.film_link || '—');
+
+    const section = (title, rows) => `
+      <div class="detail-section">
+        <h4>${title}</h4>
+        ${rows.map(([k,v]) => `<div class="detail-row"><span class="detail-key">${k}</span><span class="detail-val">${v}</span></div>`).join('')}
+      </div>`;
+
+    document.getElementById('detailContent').innerHTML = `
+      <h2 style="margin:0 0 18px;font-size:1.15rem;">${esc(r.film_name||'Entry Details')}</h2>
+      ${section('Applicant Details', [
+        ['Full Name', esc(r.applicant_name||'—')],
+        ['Email', `<a href="mailto:${esc(r.email)}" style="color:var(--info);">${esc(r.email||'—')}</a>`],
+        ['Phone', esc(r.phone||'—')],
+        ['City', esc(r.city||'—')],
+      ])}
+      ${section('Film Details', [
+        ['Film Name', esc(r.film_name||'—')],
+        ['Category', esc(r.category||'—')],
+        ['Film Link', filmLinkHtml],
+        ['Duration', esc(r.duration||'—')],
+      ])}
+      ${section('Cast &amp; Crew', [
+        ['Director', esc(r.director||'—')],
+        ['Producer', esc(r.producer||'—')],
+        ['Writer / Screenplay', esc(r.writer||'—')],
+        ['Cinematographer', esc(r.cinematographer||'—')],
+        ['Editor', esc(r.editor||'—')],
+        ['Music Director', esc(r.music_director||'—')],
+        ['Lead Actor', esc(r.actor||'—')],
+        ['Lead Actress', esc(r.actress||'—')],
+        ['Child Artist', esc(r.child_artist||'—')],
+      ])}
+      ${section('Payment', [
+        ['Status', ps === 'PAID' ? '<span class="tag paid">Paid</span>' : ps === 'FAILED' ? '<span class="tag failed">Failed</span>' : '<span class="tag pending">Pending</span>'],
+        ['Amount', '₹' + esc(r.amount||1000)],
+        ['Currency', esc(r.currency||'INR')],
+        ['Cashfree Order ID', esc(r.cashfree_order_id||'—')],
+        ['Cashfree Payment ID', esc(r.cashfree_payment_id||'—')],
+        ['Payment Method', esc(r.payment_method||'—')],
+        ['Payment Verified At', fmtDateTime(r.payment_verified_at)],
+        ['Paid At', fmtDateTime(r.paid_at)],
+        ['Confirmation Email', r.confirmation_sent ? '<span style="color:var(--ok);">Sent ✓</span>' : 'Not sent'],
+      ])}
+      ${r.source ? section('Source', [
+        ['Source', esc(r.source)],
+        ['Link ID', esc(r.link_id||'—')],
+      ]) : ''}
+      <div class="row" style="margin-top:16px;">
+        <button class="btn-info btn-sm" onclick="exportSinglePdf(${idx})">⬇ Download PDF</button>
+        <button class="btn-ghost btn-sm" onclick="closeDetail()">Close</button>
+      </div>`;
+
+    document.getElementById('detailModal').classList.add('open');
+  }
+  function closeDetail() { document.getElementById('detailModal').classList.remove('open'); }
+  document.getElementById('detailModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeDetail(); });
+
+  // ─── Entries: CSV export ───────────────────────────────────────────────────
   function exportEntriesCsv() {
-    if (!_entriesCache.length) return toast('No entries to export.', 'err');
-    const cols = ['created_at','applicant_name','email','phone','city','film_name','category','film_link','duration','director','producer','writer','cinematographer','editor','music_director','actor','actress','child_artist','payment_status','amount','currency','cashfree_order_id','cashfree_payment_id','paid_at'];
-    const csv = [cols.join(',')].concat(_entriesCache.map(r => cols.map(c => {
+    const data = _filtered.length ? _filtered : _allEntries;
+    if (!data.length) return toast('No entries to export.', 'err');
+    const cols = ['created_at','applicant_name','email','phone','city','film_name','category','film_link','duration','director','producer','writer','cinematographer','editor','music_director','actor','actress','child_artist','payment_status','amount','currency','cashfree_order_id','cashfree_payment_id','paid_at','payment_method','source','link_id'];
+    const csv = [cols.join(',')].concat(data.map(r => cols.map(c => {
       const v = r[c] == null ? '' : String(r[c]).replace(/"/g, '""');
       return /[",\n]/.test(v) ? `"${v}"` : v;
     }).join(','))).join('\n');
@@ -349,7 +695,187 @@
     a.click(); URL.revokeObjectURL(a.href);
   }
 
-  // ---- gallery ----
+  // ─── Entries: PDF export ───────────────────────────────────────────────────
+  function buildPdf(entries, title) {
+    if (typeof jspdf === 'undefined' && typeof window.jspdf === 'undefined') {
+      toast('PDF library not loaded — please wait a moment and retry.', 'err'); return;
+    }
+    const { jsPDF } = window.jspdf || jspdf;
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const margin = 14;
+    const genDate = new Date().toLocaleDateString('en-IN', {day:'2-digit',month:'long',year:'numeric'});
+
+    // Header
+    doc.setFillColor(15,15,18);
+    doc.rect(0,0,pageW,22,'F');
+    doc.setTextColor(212,175,55);
+    doc.setFontSize(11); doc.setFont('helvetica','bold');
+    doc.text('SHARANKRISHNA SHORT FILM AWARDS', margin, 10);
+    doc.setTextColor(180,180,180);
+    doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.text(title + '  ·  Generated ' + genDate + '  ·  Total entries: ' + entries.length, margin, 16);
+
+    // Table
+    const cols = [
+      { header:'Date', dataKey:'date' },
+      { header:'Applicant', dataKey:'applicant' },
+      { header:'Film', dataKey:'film' },
+      { header:'Category', dataKey:'cat' },
+      { header:'Director', dataKey:'dir' },
+      { header:'Film Link', dataKey:'link' },
+      { header:'Status', dataKey:'status' },
+      { header:'Amount', dataKey:'amount' },
+      { header:'Order ID', dataKey:'oid' },
+    ];
+
+    const rows = entries.map(r => ({
+      date: fmtDate(r.created_at),
+      applicant: safe(r.applicant_name) + '\n' + safe(r.email),
+      film: safe(r.film_name),
+      cat: safe(r.category),
+      dir: safe(r.director||'—'),
+      link: isUrl(r.film_link) ? safe(r.film_link) : '—',
+      status: (r.payment_status||'PAID').toUpperCase(),
+      amount: '₹' + safe(r.amount||1000),
+      oid: safe(r.cashfree_order_id||'—'),
+    }));
+
+    // Store link data for annotation
+    const linkRows = entries.map(r => isUrl(r.film_link) ? r.film_link : null);
+
+    doc.autoTable({
+      startY: 26,
+      margin: { left: margin, right: margin },
+      head: [cols.map(c => c.header)],
+      body: rows.map(r => cols.map(c => r[c.dataKey])),
+      styles: { fontSize: 7, cellPadding: 3, overflow: 'linebreak', valign: 'middle',
+        textColor: [220,220,230], lineColor: [40,40,50], lineWidth: 0.2 },
+      headStyles: { fillColor: [20,20,26], textColor: [212,175,55], fontStyle: 'bold', fontSize: 7 },
+      alternateRowStyles: { fillColor: [18,18,24] },
+      bodyStyles: { fillColor: [13,13,18] },
+      columnStyles: {
+        0: { cellWidth: 20 }, 1: { cellWidth: 38 }, 2: { cellWidth: 35 },
+        3: { cellWidth: 20 }, 4: { cellWidth: 28 }, 5: { cellWidth: 55, textColor: [10,132,255] },
+        6: { cellWidth: 16 }, 7: { cellWidth: 16 }, 8: { cellWidth: 38 },
+      },
+      didDrawCell(data) {
+        // Clickable hyperlink annotations on film link column (index 5)
+        if (data.section === 'body' && data.column.index === 5) {
+          const url = linkRows[data.row.index];
+          if (url) {
+            doc.link(data.cell.x, data.cell.y, data.cell.width, data.cell.height, { url });
+          }
+        }
+        // Clickable mailto on applicant column (index 1) — email is on second line
+        if (data.section === 'body' && data.column.index === 1) {
+          const email = safe(entries[data.row.index].email);
+          if (email && email.includes('@')) {
+            doc.link(data.cell.x, data.cell.y + (data.cell.height / 2), data.cell.width, data.cell.height / 2, { url: 'mailto:' + email });
+          }
+        }
+      },
+      // Page numbers
+      didDrawPage(data) {
+        doc.setFontSize(7); doc.setTextColor(100,100,120);
+        doc.text('Page ' + doc.internal.getCurrentPageInfo().pageNumber, pageW - margin, pageH - 6, { align: 'right' });
+      }
+    });
+
+    return doc;
+  }
+
+  function exportEntriesPdf() {
+    const data = _filtered.length && _filtered.length < _allEntries.length ? _filtered : _allEntries;
+    if (!data.length) return toast('No entries to export.', 'err');
+    toast('Generating PDF…', 'ok');
+    setTimeout(() => {
+      try {
+        const doc = buildPdf(data, 'All Film Entries');
+        doc.save('film_entries_' + new Date().toISOString().slice(0,10) + '.pdf');
+      } catch(e) { toast('PDF error: ' + e.message, 'err'); }
+    }, 100);
+  }
+
+  function exportSinglePdf(idx) {
+    const r = _filtered[idx];
+    if (!r) return;
+    toast('Generating PDF…', 'ok');
+    setTimeout(() => {
+      try {
+        const { jsPDF } = window.jspdf || jspdf;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const pageW = doc.internal.pageSize.getWidth();
+        const margin = 18;
+        const genDate = new Date().toLocaleDateString('en-IN', {day:'2-digit',month:'long',year:'numeric'});
+
+        // Header
+        doc.setFillColor(15,15,18); doc.rect(0,0,pageW,30,'F');
+        doc.setTextColor(212,175,55); doc.setFontSize(13); doc.setFont('helvetica','bold');
+        doc.text('SHARANKRISHNA SHORT FILM AWARDS', margin, 12);
+        doc.setTextColor(180,180,180); doc.setFontSize(8); doc.setFont('helvetica','normal');
+        doc.text('Entry Details · ' + genDate, margin, 19);
+        doc.text('Film: ' + safe(r.film_name), margin, 25);
+
+        const section = (title, pairs, startY) => {
+          doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(212,175,55);
+          doc.text(title, margin, startY);
+          doc.setFont('helvetica','normal'); doc.setTextColor(200,200,215);
+          let y = startY + 6;
+          pairs.forEach(([k,v,linkUrl]) => {
+            doc.setTextColor(140,140,160); doc.text(k + ':', margin, y);
+            doc.setTextColor(210,210,225);
+            const vStr = String(v||'—');
+            doc.text(vStr, margin + 52, y, { maxWidth: pageW - margin - 52 - 10 });
+            if (linkUrl) doc.link(margin + 52, y - 4, pageW - margin - 52 - 10, 7, { url: linkUrl });
+            y += 7;
+          });
+          return y + 4;
+        };
+
+        let y = 38;
+        y = section('APPLICANT DETAILS', [
+          ['Full Name', r.applicant_name],
+          ['Email', r.email, r.email ? 'mailto:' + r.email : null],
+          ['Phone', r.phone],
+          ['City', r.city],
+        ], y);
+        y = section('FILM DETAILS', [
+          ['Film Name', r.film_name],
+          ['Category', r.category],
+          ['Film Link', isUrl(r.film_link) ? r.film_link : r.film_link, isUrl(r.film_link) ? r.film_link : null],
+          ['Duration', r.duration],
+        ], y);
+        y = section('CAST & CREW', [
+          ['Director', r.director],
+          ['Producer', r.producer],
+          ['Writer', r.writer],
+          ['Cinematographer', r.cinematographer],
+          ['Editor', r.editor],
+          ['Music Director', r.music_director],
+          ['Lead Actor', r.actor],
+          ['Lead Actress', r.actress],
+          ['Child Artist', r.child_artist],
+        ], y);
+        section('PAYMENT', [
+          ['Status', r.payment_status||'PAID'],
+          ['Amount', '₹' + (r.amount||1000)],
+          ['Cashfree Order ID', r.cashfree_order_id],
+          ['Payment ID', r.cashfree_payment_id],
+          ['Method', r.payment_method],
+          ['Verified At', fmtDateTime(r.payment_verified_at)],
+          ['Confirmation Email', r.confirmation_sent ? 'Sent ✓' : 'Not sent'],
+        ], y);
+
+        doc.setFontSize(7); doc.setTextColor(100,100,120);
+        doc.text('Page 1', pageW - margin, 290, { align: 'right' });
+        doc.save('entry_' + safe(r.cashfree_order_id||r.id||'unknown').replace(/\W/g,'_') + '.pdf');
+      } catch(e) { toast('PDF error: ' + e.message, 'err'); }
+    }, 100);
+  }
+
+  // ─── Gallery ───────────────────────────────────────────────────────────────
   async function loadGallery() {
     const { data, error } = await sb.from('gallery').select('*').order('sort_order').order('created_at', { ascending: false });
     if (error) return toast(error.message, 'err');
@@ -357,7 +883,7 @@
     document.getElementById('statPhotos').textContent = (data || []).length;
     box.innerHTML = (data || []).map(g => `
       <div class="item">
-        <img src="${esc(g.src)}" alt="">
+        <img src="${esc(g.src)}" alt="" loading="lazy">
         <div class="meta"><b>${esc(g.title) || '(untitled)'}</b><span>${esc(g.category)} · ${esc(g.sub) || ''}</span></div>
         <button class="btn-del" onclick="delGallery(${g.id}, '${esc(g.src)}')">Delete</button>
       </div>`).join('') || '<p class="muted-note">No photos yet.</p>';
@@ -367,8 +893,7 @@
     const reset = () => { if (addBtn) { addBtn.disabled = false; addBtn.textContent = 'Upload photo'; } };
     const file = document.getElementById('gFile').files[0];
     if (!file) return toast('Pick an image file first.', 'err');
-    const okTypes = ['image/jpeg','image/jpg','image/png','image/webp'];
-    if (!okTypes.includes(file.type)) return toast('Only JPG, PNG, or WEBP allowed.', 'err');
+    if (!['image/jpeg','image/jpg','image/png','image/webp'].includes(file.type)) return toast('Only JPG, PNG, or WEBP.', 'err');
     if (file.size > 8 * 1024 * 1024) return toast('Image too large (max 8 MB).', 'err');
     if (addBtn) { addBtn.disabled = true; addBtn.textContent = 'Uploading…'; }
     const path = Date.now() + '_' + file.name.replace(/[^\w.\-]/g, '_');
@@ -391,7 +916,7 @@
     toast('Deleted', 'ok'); loadGallery();
   }
 
-  // ---- updates ----
+  // ─── Updates ───────────────────────────────────────────────────────────────
   async function loadUpdates() {
     const { data, error } = await sb.from('updates_feed').select('*').order('sort_order').order('created_at', { ascending: false });
     if (error) return toast(error.message, 'err');
@@ -422,6 +947,86 @@
     toast('Deleted', 'ok'); loadUpdates();
   }
 
+  // ─── Direct Submission Links ───────────────────────────────────────────────
+  async function loadLinks() {
+    const box = document.getElementById('linksList');
+    const { data, error } = await sb.from('submission_links').select('*').order('created_at', { ascending: false }).limit(50);
+    if (error) {
+      box.innerHTML = `<p class="muted-note" style="color:#ff6b6b;">Links table not found — run the schema SQL first.</p>`;
+      return;
+    }
+    if (!data || !data.length) { box.innerHTML = '<p class="muted-note">No links yet.</p>'; return; }
+    const now = new Date();
+    box.innerHTML = data.map(lk => {
+      const url = 'https://sharankrishnashortfilmawards.com/submit.html?token=' + encodeURIComponent(lk.token);
+      const expired = lk.expires_at && new Date(lk.expires_at) < now;
+      const exhausted = lk.max_uses > 0 && lk.use_count >= lk.max_uses;
+      const status = lk.revoked ? 'revoked' : (expired || exhausted) ? 'expired' : 'active';
+      return `<div class="link-card">
+        <div class="row" style="justify-content:space-between;gap:8px;">
+          <div>
+            <b style="font-size:0.9rem;">${esc(lk.label||'(no label)')}</b>
+            <span class="badge ${status}" style="margin-left:8px;">${status}</span>
+          </div>
+          <div class="row" style="gap:6px;">
+            <button class="btn-ghost btn-xs" onclick="copyLink('${esc(url)}')">Copy</button>
+            ${status === 'active' ? `<button class="btn-del" style="padding:4px 9px;font-size:0.72rem;" onclick="revokeLink(${lk.id})">Revoke</button>` : ''}
+          </div>
+        </div>
+        <code class="lc-url">${esc(url)}</code>
+        <div class="lc-meta">
+          Uses: ${lk.use_count||0}${lk.max_uses > 0 ? ' / ' + lk.max_uses : ' (unlimited)'}
+          ${lk.expires_at ? ' · Expires: ' + fmtDateTime(lk.expires_at) : ' · No expiry'}
+          ${lk.note ? ' · ' + esc(lk.note) : ''}
+          · Created: ${fmtDate(lk.created_at)}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function createLink(ev) {
+    const btn = ev && ev.target ? ev.target : null;
+    const label = document.getElementById('lkLabel').value.trim();
+    if (!label) return toast('Label required.', 'err');
+    const maxUses = parseInt(document.getElementById('lkMaxUses').value) || 0;
+    const expiryVal = document.getElementById('lkExpiry').value;
+    const note = document.getElementById('lkNote').value.trim();
+    const expiry = expiryVal ? new Date(expiryVal).toISOString() : null;
+
+    // Generate crypto random token
+    const tokenBytes = crypto.getRandomValues(new Uint8Array(24));
+    const token = Array.from(tokenBytes).map(b => b.toString(16).padStart(2,'0')).join('');
+
+    if (btn) { btn.disabled = true; btn.textContent = 'Creating…'; }
+    const { error } = await sb.from('submission_links').insert({
+      token, label, max_uses: maxUses, expires_at: expiry,
+      note, use_count: 0, revoked: false
+    });
+    if (btn) { btn.disabled = false; btn.textContent = 'Generate Link'; }
+    if (error) { toast('Error: ' + error.message, 'err'); return; }
+
+    document.getElementById('lkLabel').value = '';
+    document.getElementById('lkMaxUses').value = '0';
+    document.getElementById('lkExpiry').value = '';
+    document.getElementById('lkNote').value = '';
+    toast('Link created ✓', 'ok');
+    loadLinks();
+  }
+
+  async function revokeLink(id) {
+    if (!confirm('Revoke this link? It will stop working immediately.')) return;
+    const { error } = await sb.from('submission_links').update({ revoked: true }).eq('id', id);
+    if (error) return toast(error.message, 'err');
+    toast('Link revoked', 'ok'); loadLinks();
+  }
+
+  function copyLink(url) {
+    navigator.clipboard.writeText(url).then(() => toast('Link copied ✓', 'ok')).catch(() => {
+      prompt('Copy this link:', url);
+    });
+  }
+
+  // ─── Bootstrap ─────────────────────────────────────────────────────────────
   gate();
 </script>
 </body>
