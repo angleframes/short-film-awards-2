@@ -222,6 +222,29 @@
             applySectionBackground('section-contact', SITE_IMAGES.sectionBgContact);
 
             evaluateRegistrationGateState();
+
+            // Live sync: update registration gate instantly when admin changes it
+            if (window.supabase) {
+                try {
+                    const SB_RT = window.supabase.createClient(SUPA_URL, SUPA_ANON);
+                    SB_RT.channel('site_config_live')
+                        .on('postgres_changes', {
+                            event: 'UPDATE',
+                            schema: 'public',
+                            table: 'site_config',
+                            filter: 'id=eq.1'
+                        }, (payload) => {
+                            if (payload.new && typeof payload.new.registration_open !== 'undefined') {
+                                REGISTRATION_GATE.isOpen = !!payload.new.registration_open;
+                                evaluateRegistrationGateState();
+                            }
+                        })
+                        .subscribe();
+                } catch (e) {
+                    console.warn('Realtime subscription failed — gate will not auto-update.', e);
+                }
+            }
+
             initiateTimersEngine();
             generateDynamicCategories();
             renderAboutCards();

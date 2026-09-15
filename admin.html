@@ -244,7 +244,13 @@
           <div><label>Category</label>
             <div id="csGalCat" class="cselect-wrap" style="width:100%;display:block;"></div>
           </div>
-          <div><label>Image file</label><input id="gFile" type="file" accept="image/*"></div>
+          <div><label>Image file</label>
+            <label for="gFile" class="sksfa-file-wrap">
+              <span class="sksfa-file-btn">Browse</span>
+              <span class="sksfa-file-name" id="gFileName">No file chosen</span>
+            </label>
+            <input id="gFile" type="file" accept="image/*" onchange="document.getElementById('gFileName').textContent = this.files[0]?.name || 'No file chosen'">
+          </div>
           <div><label>Title</label><input id="gTitle" placeholder="e.g. Best Short Film"></div>
           <div><label>Subtitle</label><input id="gSub" placeholder="e.g. Winner 2025"></div>
         </div>
