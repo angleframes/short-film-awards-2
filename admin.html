@@ -215,8 +215,11 @@
       <div class="card">
         <div class="card-head"><div class="sksfa-card-head-left"><h2>Registration &amp; Countdown</h2></div></div>
         <p class="card-desc">Toggle saves instantly. Dates &amp; labels control the public countdown — click Save settings.</p>
-        <div class="row" style="justify-content:space-between;margin:0 0 18px;">
-          <div><b>Registrations</b><div style="margin-top:4px;"><span id="gatePill" class="pill closed">Closed</span></div></div>
+        <div class="reg-toggle-row">
+          <div class="reg-toggle-info">
+            <div class="reg-toggle-label">Registrations</div>
+            <span id="gatePill" class="pill closed">Closed</span>
+          </div>
           <label class="switch" style="margin:0;"><input id="gateToggle" type="checkbox"><span class="slider"></span></label>
         </div>
         <div class="grid2">
@@ -245,11 +248,13 @@
             <div id="csGalCat" class="cselect-wrap" style="width:100%;display:block;"></div>
           </div>
           <div><label>Image file</label>
-            <label for="gFile" class="sksfa-file-wrap">
-              <span class="sksfa-file-btn">Browse</span>
-              <span class="sksfa-file-name" id="gFileName">No file chosen</span>
+            <label for="gFile" class="sksfa-file-wrap" id="gFileWrap">
+              <svg class="sksfa-file-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 13.5V15.5a1 1 0 001 1h12a1 1 0 001-1v-2M10 3.5v9M7 6.5l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span class="sksfa-file-btn">Choose image</span>
+              <span class="sksfa-file-hint">JPG · PNG · WEBP &nbsp;·&nbsp; Max 8 MB</span>
+              <span class="sksfa-file-name" id="gFileName">No file selected</span>
             </label>
-            <input id="gFile" type="file" accept="image/*" onchange="document.getElementById('gFileName').textContent = this.files[0]?.name || 'No file chosen'">
+            <input id="gFile" type="file" accept="image/*" onchange="var w=document.getElementById('gFileWrap'),n=this.files[0];document.getElementById('gFileName').textContent=n?n.name:'No file selected';w.classList.toggle('has-file',!!n)">
           </div>
           <div><label>Title</label><input id="gTitle" placeholder="e.g. Best Short Film"></div>
           <div><label>Subtitle</label><input id="gSub" placeholder="e.g. Winner 2025"></div>

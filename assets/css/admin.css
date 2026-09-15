@@ -84,14 +84,15 @@
    ════════════════════════════════════════════════════════ */
 .sksfa-admin label {
   display: block;
-  margin-bottom: 5px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.6px;
+  margin-bottom: 7px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
-  color: #888;
+  color: #aaa;
 }
 
+/* ── All single-line controls — consistent 44 px height ── */
 .sksfa-admin input[type="text"],
 .sksfa-admin input[type="email"],
 .sksfa-admin input[type="password"],
@@ -100,12 +101,14 @@
 .sksfa-admin input[type="tel"],
 .sksfa-admin input[type="search"],
 .sksfa-admin input[type="datetime-local"],
-.sksfa-admin input[type="file"],
-.sksfa-admin textarea,
+.sksfa-admin input[type="date"],
+.sksfa-admin input[type="time"],
+.sksfa-admin input:not([type]),
 .sksfa-admin select {
   width: 100%;
   box-sizing: border-box;
-  padding: 9px 12px;
+  height: 44px;
+  padding: 0 14px;
   background: #1a1a1a;
   border: 1px solid rgba(255,255,255,0.12);
   border-radius: 4px;
@@ -117,23 +120,49 @@
   transition: border-color 0.15s, box-shadow 0.15s;
   appearance: none;
   -webkit-appearance: none;
+  color-scheme: dark;
 }
 
-.sksfa-admin input:focus,
-.sksfa-admin textarea:focus,
-.sksfa-admin select:focus {
+/* ── Textarea (multi-line, no fixed height) ── */
+.sksfa-admin textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 14px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 4px;
+  color: #e8e8e8;
+  font-size: 13px;
+  font-family: inherit;
+  margin-bottom: 16px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  appearance: none;
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.sksfa-admin input[type="text"]:focus,
+.sksfa-admin input[type="email"]:focus,
+.sksfa-admin input[type="password"]:focus,
+.sksfa-admin input[type="url"]:focus,
+.sksfa-admin input[type="number"]:focus,
+.sksfa-admin input[type="tel"]:focus,
+.sksfa-admin input[type="search"]:focus,
+.sksfa-admin input[type="datetime-local"]:focus,
+.sksfa-admin input[type="date"]:focus,
+.sksfa-admin input[type="time"]:focus,
+.sksfa-admin input:not([type]):focus,
+.sksfa-admin select:focus,
+.sksfa-admin textarea:focus {
   border-color: rgba(255,255,255,0.35);
   box-shadow: 0 0 0 3px rgba(255,255,255,0.04);
 }
 
 .sksfa-admin input::placeholder,
 .sksfa-admin textarea::placeholder {
-  color: #444;
-}
-
-.sksfa-admin textarea {
-  min-height: 80px;
-  resize: vertical;
+  color: #555;
 }
 
 /* ── Buttons ── */
@@ -243,7 +272,7 @@
 
 .sksfa-admin .muted-note {
   font-size: 11px;
-  color: #555;
+  color: #666;
   margin: 8px 0;
   display: inline-block;
 }
@@ -471,8 +500,8 @@
 .sksfa-admin .sksfa-page-desc {
   margin: 0 0 8px;
   font-size: 13px;
-  color: #555;
-  max-width: 500px;
+  color: #777;
+  max-width: 540px;
 }
 
 .sksfa-admin .sksfa-quote {
@@ -535,8 +564,8 @@
   font-weight: 700;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: #555;
-  margin-bottom: 4px;
+  color: #777;
+  margin-bottom: 5px;
 }
 
 .sksfa-admin .stat .v {
@@ -594,7 +623,7 @@
 .sksfa-admin .sksfa-card-sub {
   margin: 0;
   font-size: 11px;
-  color: #555;
+  color: #777;
 }
 
 .sksfa-admin .sksfa-panel-tag {
@@ -609,8 +638,9 @@
 
 .sksfa-admin .card-desc {
   font-size: 12px;
-  color: #555;
-  margin: -8px 0 16px;
+  color: #777;
+  margin: -4px 0 20px;
+  line-height: 1.5;
 }
 
 /* ════════════════════════════════════════════════════════
@@ -1050,8 +1080,9 @@
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  font-size: 11px;
-  color: #555;
+  font-size: 12px;
+  color: #666;
+  margin-top: 6px;
 }
 
 /* ════════════════════════════════════════════════════════
@@ -1248,37 +1279,55 @@
 .sksfa-admin .sksfa-file-wrap {
   position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 9px 12px;
-  background: #1a1a1a;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 4px;
+  justify-content: center;
+  gap: 4px;
+  padding: 18px 16px;
+  background: #151515;
+  border: 1px dashed rgba(255,255,255,0.16);
+  border-radius: 5px;
   margin-bottom: 16px;
   cursor: pointer;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, background 0.15s;
   width: 100%;
   box-sizing: border-box;
+  text-align: center;
+  min-height: 88px;
 }
-.sksfa-admin .sksfa-file-wrap:hover { border-color: rgba(255,255,255,0.25); }
+.sksfa-admin .sksfa-file-wrap:hover {
+  border-color: rgba(255,255,255,0.32);
+  background: #1a1a1a;
+}
+.sksfa-admin .sksfa-file-wrap.has-file {
+  border-style: solid;
+  border-color: rgba(255,255,255,0.2);
+  background: #1a1a1a;
+}
+.sksfa-admin .sksfa-file-icon {
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 2px;
+}
 .sksfa-admin .sksfa-file-btn {
-  flex-shrink: 0;
-  padding: 4px 12px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 3px;
-  color: #ccc;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
+  color: #ddd;
+  letter-spacing: 0.2px;
+}
+.sksfa-admin .sksfa-file-hint {
+  font-size: 10px;
+  color: #555;
   letter-spacing: 0.3px;
-  white-space: nowrap;
+  margin-top: 1px;
 }
 .sksfa-admin .sksfa-file-name {
-  font-size: 12px;
-  color: #666;
+  font-size: 11px;
+  color: #888;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 100%;
+  margin-top: 4px;
 }
 
 /* ════════════════════════════════════════════════════════
@@ -1300,8 +1349,8 @@
 }
 .sksfa-admin .item .meta span {
   display: block;
-  font-size: 11px;
-  color: #555;
+  font-size: 12px;
+  color: #666;
   line-height: 1.5;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1368,6 +1417,47 @@
    GALLERY TAB — ensure grid children fill width
    ════════════════════════════════════════════════════════ */
 .sksfa-admin .grid2 > div { min-width: 0; width: 100%; }
+
+/* ════════════════════════════════════════════════════════
+   REGISTRATION TOGGLE ROW
+   ════════════════════════════════════════════════════════ */
+.sksfa-admin .reg-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  background: #141414;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+.sksfa-admin .reg-toggle-info { display: flex; flex-direction: column; gap: 6px; }
+.sksfa-admin .reg-toggle-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ddd;
+  letter-spacing: 0.1px;
+}
+
+/* ════════════════════════════════════════════════════════
+   BUTTON HEIGHT CONSISTENCY
+   ════════════════════════════════════════════════════════ */
+.sksfa-admin .btn {
+  height: 38px;
+  padding: 0 22px;
+  box-sizing: border-box;
+}
+.sksfa-admin .btn-ghost { height: 32px; padding: 0 14px; box-sizing: border-box; }
+.sksfa-admin .btn-sm { height: 28px; padding: 0 11px; font-size: 11px; }
+.sksfa-admin .btn-xs { height: 24px; padding: 0 9px; font-size: 11px; }
+.sksfa-admin .btn-del { height: 28px; padding: 0 10px; }
+
+/* ════════════════════════════════════════════════════════
+   CARD form field row gap — use gap instead of margin-bottom
+   ════════════════════════════════════════════════════════ */
+.sksfa-admin .grid2 { gap: 0 20px; }
+.sksfa-admin .grid2 > div { margin-bottom: 18px; }
 
 /* ════════════════════════════════════════════════════════
    RESPONSIVE
