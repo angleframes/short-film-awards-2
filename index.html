@@ -2137,6 +2137,299 @@
             margin-bottom: 18px;
         }
 
+        /* ===== PREMIUM INFO MODAL — two-column shell ===== */
+
+        /* Override container sizing for info modal */
+        .rules-modal-overlay .info-modal-container {
+            max-width: min(90vw, 1280px);
+            width: 90vw;
+            max-height: 88vh;
+            padding: 0;
+            overflow: hidden;
+            border-radius: 18px;
+            display: flex;
+            flex-direction: row;
+            background: #0a0a0c;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* LEFT SIDEBAR */
+        .ims-sidebar {
+            width: 240px;
+            flex: 0 0 240px;
+            background: #0d0d0f;
+            border-right: 1px solid rgba(255,255,255,0.07);
+            display: flex;
+            flex-direction: column;
+            padding: 28px 0 20px;
+            overflow: hidden;
+        }
+        .ims-logo {
+            padding: 0 22px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            margin-bottom: 16px;
+        }
+        .ims-logo img {
+            max-height: 52px;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+            display: block;
+        }
+        .ims-nav {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 0 10px;
+            overflow-y: auto;
+        }
+        .ims-nav::-webkit-scrollbar { width: 3px; }
+        .ims-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
+        .ims-nav-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 9px;
+            color: rgba(255,255,255,0.46);
+            font-size: 0.78rem;
+            font-weight: 500;
+            padding: 10px 12px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background .15s, color .15s, border-color .15s;
+            letter-spacing: 0.2px;
+            width: 100%;
+        }
+        .ims-nav-btn:hover {
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.75);
+        }
+        .ims-nav-btn.active {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.14);
+            color: #ffffff;
+            font-weight: 600;
+        }
+        .ims-nav-icon {
+            width: 18px;
+            height: 18px;
+            flex: 0 0 18px;
+            opacity: 0.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: normal;
+            font-size: 0.82rem;
+        }
+        .ims-nav-btn.active .ims-nav-icon { opacity: 1; }
+        .ims-cinematic {
+            padding: 20px 22px 0;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            margin-top: 12px;
+        }
+        .ims-cinematic-text {
+            font-size: 0.65rem;
+            line-height: 1.6;
+            color: rgba(255,255,255,0.22);
+            letter-spacing: 0.5px;
+            font-style: italic;
+        }
+
+        /* RIGHT CONTENT AREA */
+        .ims-content {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .ims-content-header {
+            padding: 28px 32px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            position: relative;
+            flex: 0 0 auto;
+        }
+        .ims-eyebrow {
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 6px;
+        }
+        .ims-heading {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        .ims-desc {
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.42);
+            line-height: 1.6;
+            max-width: 520px;
+        }
+        .ims-close {
+            position: absolute;
+            top: 22px;
+            right: 24px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.55);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background .15s, color .15s;
+            line-height: 1;
+        }
+        .ims-close:hover { background: rgba(255,255,255,0.12); color: #fff; }
+        .ims-panes {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 32px 32px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.15) transparent;
+        }
+        .ims-panes::-webkit-scrollbar { width: 4px; }
+        .ims-panes::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+        .ims-panes::-webkit-scrollbar-track { background: transparent; }
+
+        /* ── UPDATE CARDS ── */
+        .upd-list { display: flex; flex-direction: column; gap: 10px; }
+        .upd-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 0;
+            background: #111113;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 18px 20px;
+            transition: border-color .15s, background .15s;
+        }
+        .upd-card:hover { border-color: rgba(255,255,255,0.15); background: #141416; }
+        .upd-date-block {
+            flex: 0 0 56px;
+            text-align: center;
+            padding-right: 18px;
+            border-right: 1px solid rgba(255,255,255,0.07);
+            margin-right: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 52px;
+        }
+        .upd-month {
+            display: block;
+            font-size: 0.58rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+        }
+        .upd-day {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1.1;
+        }
+        .upd-year {
+            display: block;
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 0.5px;
+        }
+        .upd-date-plain {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        .upd-body { flex: 1; min-width: 0; }
+        .upd-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+        .upd-badge {
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .upd-badge-new     { border: 1px solid rgba(255,255,255,0.4); color: #fff; }
+        .upd-badge-important { border: 1px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.05); }
+        .upd-badge-info    { border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.45); }
+        .upd-title-text { font-size: 0.94rem; font-weight: 600; color: #ffffff; }
+        .upd-body-text { font-size: 0.82rem; color: rgba(255,255,255,0.55); line-height: 1.6; }
+        .upd-arrow {
+            flex: 0 0 auto;
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.2);
+            padding-left: 14px;
+            align-self: center;
+        }
+        .upd-empty {
+            text-align: center;
+            padding: 48px 20px;
+            color: rgba(255,255,255,0.3);
+        }
+        .upd-empty-icon { font-size: 2rem; margin-bottom: 14px; opacity: 0.4; display: block; }
+        .upd-empty h3 { font-size: 0.95rem; color: rgba(255,255,255,0.6); margin-bottom: 6px; font-weight: 600; }
+        .upd-empty p { font-size: 0.8rem; }
+
+        /* ── MOBILE: stack sidebar above content ── */
+        @media (max-width: 720px) {
+            .rules-modal-overlay .info-modal-container {
+                flex-direction: column;
+                width: 95vw;
+                max-height: 92vh;
+                border-radius: 14px;
+            }
+            .ims-sidebar {
+                width: 100%;
+                flex: 0 0 auto;
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.07);
+                padding: 16px 12px 0;
+            }
+            .ims-logo { display: none; }
+            .ims-cinematic { display: none; }
+            .ims-nav {
+                flex-direction: row;
+                overflow-x: auto;
+                gap: 6px;
+                padding: 0 0 12px;
+                scrollbar-width: none;
+            }
+            .ims-nav::-webkit-scrollbar { display: none; }
+            .ims-nav-btn {
+                white-space: nowrap;
+                flex: 0 0 auto;
+                padding: 7px 13px;
+                font-size: 0.72rem;
+                border-radius: 20px;
+            }
+            .ims-nav-icon { display: none; }
+            .ims-content-header { padding: 18px 18px 14px; }
+            .ims-heading { font-size: 1.2rem; }
+            .ims-desc { display: none; }
+            .ims-close { top: 14px; right: 14px; }
+            .ims-panes { padding: 16px 16px 24px; }
+            .upd-card { padding: 14px 14px; }
+            .upd-date-block { flex: 0 0 46px; padding-right: 12px; margin-right: 14px; }
+            .upd-arrow { display: none; }
+        }
+
         /* ===== INFO MODALS (Privacy / Guidelines / Updates / Jury / How-To) ===== */
         .jury-panel-grid {
             display: grid;
@@ -3159,21 +3452,46 @@
     </div>
 
 
-    <!-- Festival Info Modal (tabbed: How To Submit / Guidelines / Updates / Jury / Privacy) -->
+    <!-- Festival Info Modal — premium two-column shell -->
     <div id="infoModal" class="rules-modal-overlay" onclick="closeInfoModal()">
-        <div class="rules-modal-container info-modal-container" onclick="event.stopPropagation()">
-            <button class="rules-modal-close" onclick="closeInfoModal()">&times;</button>
-            <h3 class="rules-modal-title" id="infoModalTitle">How To Submit</h3>
+        <div class="rules-modal-container info-modal-container" onclick="event.stopPropagation()"
+             role="dialog" aria-modal="true" aria-labelledby="infoModalTitle">
 
-            <div class="info-tab-row">
-                <button id="infoTabBtn-submit" class="btn-gallery-pill active" onclick="switchInfoTab('submit')">How To Submit</button>
-                <button id="infoTabBtn-guidelines" class="btn-gallery-pill" onclick="switchInfoTab('guidelines')">Guidelines</button>
-                <button id="infoTabBtn-updates" class="btn-gallery-pill" onclick="switchInfoTab('updates')">Updates</button>
-                <button id="infoTabBtn-jury" class="btn-gallery-pill" onclick="switchInfoTab('jury')">Jury Panel</button>
-                <button id="infoTabBtn-privacy" class="btn-gallery-pill" onclick="switchInfoTab('privacy')">Privacy</button>
-                <button id="infoTabBtn-terms" class="btn-gallery-pill" onclick="switchInfoTab('terms')">Terms &amp; Conditions</button>
-                <button id="infoTabBtn-refunds" class="btn-gallery-pill" onclick="switchInfoTab('refunds')">Refunds &amp; Cancellations</button>
+          <!-- LEFT SIDEBAR -->
+          <aside class="ims-sidebar">
+            <div class="ims-logo">
+              <img id="imsLogoImg" src="logo nav.png" alt="Sharankrishna Short Film Awards logo">
             </div>
+            <nav class="ims-nav" aria-label="Section navigation">
+              <button id="infoTabBtn-submit"    class="ims-nav-btn active" onclick="switchInfoTab('submit')">
+                <span class="ims-nav-icon">📋</span>How To Submit</button>
+              <button id="infoTabBtn-guidelines" class="ims-nav-btn" onclick="switchInfoTab('guidelines')">
+                <span class="ims-nav-icon">📜</span>Guidelines</button>
+              <button id="infoTabBtn-updates"   class="ims-nav-btn" onclick="switchInfoTab('updates')">
+                <span class="ims-nav-icon">📣</span>Festival Updates</button>
+              <button id="infoTabBtn-jury"      class="ims-nav-btn" onclick="switchInfoTab('jury')">
+                <span class="ims-nav-icon">🎬</span>Jury Panel</button>
+              <button id="infoTabBtn-privacy"   class="ims-nav-btn" onclick="switchInfoTab('privacy')">
+                <span class="ims-nav-icon">🔐</span>Privacy Policy</button>
+              <button id="infoTabBtn-terms"     class="ims-nav-btn" onclick="switchInfoTab('terms')">
+                <span class="ims-nav-icon">📄</span>Terms &amp; Conditions</button>
+              <button id="infoTabBtn-refunds"   class="ims-nav-btn" onclick="switchInfoTab('refunds')">
+                <span class="ims-nav-icon">↩</span>Refunds &amp; Cancellations</button>
+            </nav>
+            <div class="ims-cinematic">
+              <p class="ims-cinematic-text">Honoring Creativity.<br>Recognizing Talent.<br>Inspiring the Next Generation of Filmmakers.</p>
+            </div>
+          </aside>
+
+          <!-- RIGHT CONTENT -->
+          <div class="ims-content">
+            <div class="ims-content-header">
+              <div class="ims-eyebrow" id="imsEyebrow">Festival Information</div>
+              <h2 class="ims-heading" id="infoModalTitle">How To Submit</h2>
+              <p class="ims-desc" id="imsDesc"></p>
+              <button class="ims-close" onclick="closeInfoModal()" aria-label="Close modal">✕</button>
+            </div>
+            <div class="ims-panes">
 
             <!-- How To Submit -->
             <div id="infoTabPane-submit" class="info-tab-pane active">
@@ -3327,10 +3645,10 @@
                         <p>Email sharankrishnashortfilmawards@gmail.com with Subject: "Refund Request — [Your Name]". Include your registered email, Cashfree Order ID, and reason. We will respond within 3 working days.</p>
                     </div>
                 </div>
-            </div>
-
-        </div>
-    </div>
+            </div><!-- /ims-panes -->
+          </div><!-- /ims-content -->
+        </div><!-- /info-modal-container -->
+    </div><!-- /infoModal -->
 
 
     <!-- ===== GALLERY SECTION ===== -->
@@ -3855,6 +4173,8 @@
             setTimeout(() => document.body.classList.add('cfg-ready'), 5000); // failsafe: never stay hidden
             await loadRemoteConfig();
             document.getElementById('mainLogo').src = SITE_IMAGES.mainLogo;
+            const imsLogo = document.getElementById('imsLogoImg');
+            if (imsLogo) imsLogo.src = SITE_IMAGES.mainLogo;
             document.getElementById('socialIconInstagram').src = SITE_IMAGES.socialInstagram;
             document.getElementById('socialIconYoutube').src = SITE_IMAGES.socialYoutube;
             document.getElementById('socialIconFacebook').src = SITE_IMAGES.socialFacebook;
@@ -4460,53 +4780,105 @@
         }
 
         // Tabbed info modal (How To Submit / Guidelines / Updates / Jury / Privacy)
-        const INFO_TAB_TITLES = {
-            submit: "How To Submit",
-            guidelines: "Festival Guidelines",
-            updates: "Festival Updates",
-            jury: "Jury Panel",
-            privacy: "Privacy Policy",
-            terms: "Terms & Conditions",
-            refunds: "Refunds & Cancellations"
-        };
-
         function openInfoModal(tabId) {
             const modal = document.getElementById('infoModal');
             if (!modal) return;
             modal.classList.add('active');
-            switchInfoTab(tabId);
+            document.body.style.overflow = 'hidden';
+            switchInfoTab(tabId || 'submit');
         }
 
         function closeInfoModal() {
             const modal = document.getElementById('infoModal');
             if (modal) modal.classList.remove('active');
+            document.body.style.overflow = '';
         }
 
+        // Escape key closes info modal
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const infoModal = document.getElementById('infoModal');
+                if (infoModal && infoModal.classList.contains('active')) { closeInfoModal(); return; }
+                const rulesModal = document.getElementById('rulesModal');
+                if (rulesModal && rulesModal.classList.contains('active')) { toggleRulesModal(false); }
+            }
+        });
+
+        const INFO_TAB_META = {
+            submit:     { title: 'How To Submit',           eyebrow: 'Getting Started',             desc: 'Follow these five simple steps to register your film for Sharankrishna Short Film Awards.' },
+            guidelines: { title: 'Festival Guidelines',     eyebrow: 'Submission Rules',             desc: 'Read the official guidelines carefully before submitting your film entry.' },
+            updates:    { title: 'Festival Updates',        eyebrow: 'Latest News & Announcements', desc: 'Stay informed with the latest announcements, deadlines and important information about Sharankrishna Short Film Awards.' },
+            jury:       { title: 'Jury Panel',              eyebrow: 'Meet the Jury',               desc: 'Our distinguished jury panel evaluates each submission with care and expertise.' },
+            privacy:    { title: 'Privacy Policy',          eyebrow: 'Data & Privacy',              desc: 'How we collect, use and protect your personal information.' },
+            terms:      { title: 'Terms & Conditions',      eyebrow: 'Legal',                       desc: 'The terms governing your participation in the festival.' },
+            refunds:    { title: 'Refunds & Cancellations', eyebrow: 'Refund Policy',               desc: 'Understand our refund policy and the circumstances under which refunds may apply.' },
+        };
+
         function switchInfoTab(tabId) {
-            Object.keys(INFO_TAB_TITLES).forEach(key => {
+            Object.keys(INFO_TAB_META).forEach(key => {
                 const pane = document.getElementById(`infoTabPane-${key}`);
-                const btn = document.getElementById(`infoTabBtn-${key}`);
+                const btn  = document.getElementById(`infoTabBtn-${key}`);
                 if (pane) pane.classList.toggle('active', key === tabId);
-                if (btn) btn.classList.toggle('active', key === tabId);
+                if (btn)  btn.classList.toggle('active', key === tabId);
             });
-            const titleEl = document.getElementById('infoModalTitle');
-            if (titleEl) titleEl.textContent = INFO_TAB_TITLES[tabId] || '';
+            const meta = INFO_TAB_META[tabId] || {};
+            const titleEl  = document.getElementById('infoModalTitle');
+            const eyebrowEl= document.getElementById('imsEyebrow');
+            const descEl   = document.getElementById('imsDesc');
+            if (titleEl)   titleEl.textContent  = meta.title   || '';
+            if (eyebrowEl) eyebrowEl.textContent = meta.eyebrow || '';
+            if (descEl)    descEl.textContent    = meta.desc    || '';
         }
 
         function renderUpdatesFeed() {
             const container = document.getElementById('updatesListContainer');
             if (!container) return;
+            if (!UPDATES_FEED || !UPDATES_FEED.length) {
+                container.innerHTML = `<div class="upd-empty"><span class="upd-empty-icon">📰</span><h3>No festival updates yet.</h3><p>New announcements will appear here soon.</p></div>`;
+                return;
+            }
             container.innerHTML = '';
+            const list = document.createElement('div');
+            list.className = 'upd-list';
             UPDATES_FEED.forEach(update => {
-                const entry = document.createElement('div');
-                entry.className = 'update-entry';
-                entry.innerHTML = `
-                    <div class="update-date">${update.date}</div>
-                    <div class="update-title">${update.title}</div>
-                    <div class="update-text">${update.text}</div>
+                // Parse date label → structured date block
+                const dateStr = (update.date || '').trim();
+                let dateHtml = '';
+                const parsed = new Date(dateStr);
+                if (dateStr && !isNaN(parsed) && /\d{4}/.test(dateStr)) {
+                    const mon = parsed.toLocaleDateString('en-IN', { month: 'short' }).toUpperCase();
+                    const day = parsed.getDate();
+                    const yr  = parsed.getFullYear();
+                    dateHtml = `<span class="upd-month">${mon}</span><span class="upd-day">${day}</span><span class="upd-year">${yr}</span>`;
+                } else if (dateStr) {
+                    // Free-text label like "Coming Soon"
+                    dateHtml = `<span class="upd-date-plain">${dateStr.replace(/(.{6})/g,'$1<br>').trimEnd()}</span>`;
+                } else {
+                    dateHtml = `<span class="upd-date-plain">—</span>`;
+                }
+
+                // Infer badge
+                const combined = ((update.title || '') + ' ' + (update.text || '')).toLowerCase();
+                let badgeClass = 'upd-badge-info', badgeLabel = 'INFO';
+                if (/important|urgent|deadline|last.?day/.test(combined)) { badgeClass = 'upd-badge-important'; badgeLabel = 'IMPORTANT'; }
+                else if (/open|new|launch|announcing|coming|release|reveal|first/.test(combined)) { badgeClass = 'upd-badge-new'; badgeLabel = 'NEW'; }
+
+                const card = document.createElement('div');
+                card.className = 'upd-card';
+                card.innerHTML = `
+                    <div class="upd-date-block">${dateHtml}</div>
+                    <div class="upd-body">
+                        <div class="upd-top">
+                            <span class="upd-badge ${badgeClass}">${badgeLabel}</span>
+                            <span class="upd-title-text">${update.title || ''}</span>
+                        </div>
+                        <div class="upd-body-text">${update.text || ''}</div>
+                    </div>
+                    <div class="upd-arrow">›</div>
                 `;
-                container.appendChild(entry);
+                list.appendChild(card);
             });
+            container.appendChild(list);
         }
 
         function renderGuidelines() {
