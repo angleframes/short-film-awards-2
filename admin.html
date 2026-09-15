@@ -9,10 +9,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <link rel="stylesheet" href="assets/css/admin.css">
 </head>
-<body>
+<body class="sksfa-admin">
 
 <!-- ═══ LOGIN ═══════════════════════════════════════════ -->
-<div id="loginView" class="card">
+<div id="loginView" class="card sksfa-login-card">
+  <div class="sksfa-login-logo">
+    <img src="logo nav.png" alt="SSFA" onerror="this.style.display='none'">
+  </div>
   <h1>Admin Login</h1>
   <p class="sub">Sharankrishna Short Film Awards — Control Panel</p>
   <label for="lg-email">Email</label>
@@ -25,24 +28,51 @@
 <!-- ═══ DASHBOARD ════════════════════════════════════════ -->
 <div id="dashView" class="hidden">
 
+  <!-- Decorative vertical text -->
+  <div class="sksfa-side-left" aria-hidden="true">GOOD STORIES MAKE A BRIGHTER TOMORROW</div>
+  <div class="sksfa-side-right" aria-hidden="true">PEOPLE STORIES CHANGE WORLDS</div>
+
   <div class="topbar">
     <div class="topbar-inner">
-      <div class="brand">Sharankrishna Short Film Awards<small id="whoami"></small></div>
+      <div class="sksfa-brand-wrap">
+        <img class="sksfa-logo" src="logo nav.png" alt="SSFA" onerror="this.style.display='none'">
+        <div class="brand">Sharankrishna Short Film Awards<small>CINEMA FOR A KINDER TOMORROW<span id="whoami"></span></small></div>
+      </div>
       <span class="spacer"></span>
       <span class="top-badge" id="statRegTop">Reg: —</span>
-      <a class="btn-ghost btn-sm" href="https://sharankrishnashortfilmawards.com" target="_blank" rel="noopener">Live site ↗</a>
+      <a class="btn-ghost btn-sm" href="https://sharankrishnashortfilmawards.com" target="_blank" rel="noopener">Live Site ↗</a>
       <button class="btn-ghost btn-sm" onclick="doLogout()">Log out</button>
+      <div class="sksfa-header-tagline" aria-hidden="true">SHORT<br>FILMS<br>BIGGER<br>HUMANITY</div>
     </div>
   </div>
 
   <div class="tab-bar">
     <div class="tab-bar-inner">
-      <button class="tab-btn active" data-tab="entries"      onclick="switchTab('entries')">Entries</button>
-      <button class="tab-btn"        data-tab="awards"       onclick="switchTab('awards')">Awards</button>
-      <button class="tab-btn"        data-tab="registration" onclick="switchTab('registration')">Registration</button>
-      <button class="tab-btn"        data-tab="gallery"      onclick="switchTab('gallery')">Gallery</button>
-      <button class="tab-btn"        data-tab="updates"      onclick="switchTab('updates')">Updates</button>
-      <button class="tab-btn"        data-tab="links"        onclick="switchTab('links')">Links</button>
+      <button class="tab-btn active" data-tab="entries" onclick="switchTab('entries')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 5h12M4.5 2v10M9.5 2v10" stroke="currentColor" stroke-width="1.2"/></svg>
+        Entries
+      </button>
+      <button class="tab-btn" data-tab="awards" onclick="switchTab('awards')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1.5l1.4 2.8 3.1.45-2.25 2.2.53 3.1L7 8.5 4.22 10.05l.53-3.1L2.5 4.75l3.1-.45L7 1.5z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/><path d="M4.5 11.5h5M7 10v1.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+        Awards
+      </button>
+      <button class="tab-btn" data-tab="registration" onclick="switchTab('registration')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="4.5" width="12" height="2.2" rx="1.1" stroke="currentColor" stroke-width="1.1"/><circle cx="9.5" cy="5.6" r="1.6" fill="currentColor"/><rect x="1" y="8.5" width="12" height="2.2" rx="1.1" stroke="currentColor" stroke-width="1.1"/><circle cx="4.5" cy="9.6" r="1.6" fill="currentColor"/></svg>
+        Registration
+      </button>
+      <button class="tab-btn" data-tab="gallery" onclick="switchTab('gallery')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="5" cy="5.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 9.5l3.5-3 2.5 2.5 2-1.5 4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Gallery
+      </button>
+      <button class="tab-btn" data-tab="updates" onclick="switchTab('updates')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1a5 5 0 015 5c0 1.5-.5 2.7-1.4 3.6L12 13H2L3.4 9.6A5 5 0 017 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.5 13a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.2"/></svg>
+        Updates
+      </button>
+      <button class="tab-btn" data-tab="links" onclick="switchTab('links')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M5.5 8.5a3 3 0 004.24 0l2-2a3 3 0 00-4.24-4.24l-1 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M8.5 5.5a3 3 0 00-4.24 0l-2 2a3 3 0 004.24 4.24l1-1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Links
+      </button>
+      <span class="sksfa-nav-tagline" aria-hidden="true">FILMS CREATE A BRIGHTER TOMORROW</span>
     </div>
   </div>
 
@@ -50,21 +80,62 @@
 
     <!-- ═══ ENTRIES TAB ══════════════════════════════════ -->
     <div class="tab-pane active" id="tab-entries">
+
+      <div class="sksfa-page-title">
+        <div class="sksfa-eyebrow">ADMIN CONTROL PANEL</div>
+        <h1 class="sksfa-h1">Film Entries</h1>
+        <p class="sksfa-page-desc">Manage submissions, review entries and keep the festival moving forward.</p>
+        <span class="sksfa-quote">"Great stories live beyond screens."</span>
+      </div>
+
       <div class="stats" id="entriesStats">
-        <div class="stat"><div class="k">Total Entries</div><div class="v" id="stTotal">—</div></div>
-        <div class="stat"><div class="k">Paid</div><div class="v" id="stPaid">—</div></div>
-        <div class="stat"><div class="k">Pending</div><div class="v" id="stPending">—</div></div>
-        <div class="stat"><div class="k">Failed</div><div class="v" id="stFailed">—</div></div>
-        <div class="stat"><div class="k">General</div><div class="v" id="stGeneral">—</div></div>
-        <div class="stat"><div class="k">Campus</div><div class="v" id="stCampus">—</div></div>
-        <div class="stat"><div class="k">Today</div><div class="v" id="stToday">—</div></div>
+        <div class="stat">
+          <svg class="stat-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><rect x="1" y="3" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.3"/><rect x="4" y="1" width="1.5" height="4" rx="0.75" fill="currentColor"/><rect x="8.25" y="1" width="1.5" height="4" rx="0.75" fill="currentColor"/><rect x="12.5" y="1" width="1.5" height="4" rx="0.75" fill="currentColor"/></svg>
+          <div class="k">Total Entries</div><div class="v" id="stTotal">—</div>
+        </div>
+        <div class="stat">
+          <svg class="stat-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><rect x="1" y="4" width="16" height="11" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 9.5l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div class="k">Paid</div><div class="v" id="stPaid">—</div>
+        </div>
+        <div class="stat">
+          <svg class="stat-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="9" r="7.5" stroke="currentColor" stroke-width="1.3"/><path d="M9 5.5V9l3 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <div class="k">Pending</div><div class="v" id="stPending">—</div>
+        </div>
+        <div class="stat">
+          <svg class="stat-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 2.5L1.5 15.5h15L9 2.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 8v3.5M9 13.5v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div class="k">Failed</div><div class="v" id="stFailed">—</div>
+        </div>
+        <div class="stat">
+          <svg class="stat-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><circle cx="9" cy="6" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 16.5c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <div class="k">General</div><div class="v" id="stGeneral">—</div>
+        </div>
+        <div class="stat">
+          <svg class="stat-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M9 2L3 6.5v1h12v-1L9 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><rect x="3" y="7.5" width="12" height="7.5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+          <div class="k">Campus</div><div class="v" id="stCampus">—</div>
+        </div>
+        <div class="stat">
+          <svg class="stat-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><rect x="2" y="3" width="14" height="12.5" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M2 7h14M6 1.5v3M12 1.5v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <div class="k">Today</div><div class="v" id="stToday">—</div>
+        </div>
       </div>
 
       <div class="card">
-        <div class="card-head"><h2>Film Entries</h2></div>
+        <div class="card-head">
+          <div class="sksfa-card-head-left">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="1" y="3" width="18" height="14" rx="2.5" stroke="currentColor" stroke-width="1.3"/><rect x="4" y="1" width="2" height="4" rx="1" fill="currentColor"/><rect x="9" y="1" width="2" height="4" rx="1" fill="currentColor"/><rect x="14" y="1" width="2" height="4" rx="1" fill="currentColor"/></svg>
+            <div>
+              <h2>Film Entries</h2>
+              <p class="sksfa-card-sub">Search, filter and manage all submitted films.</p>
+            </div>
+          </div>
+          <span class="sksfa-panel-tag" aria-hidden="true">A PLATFORM FOR BOLD STORIES ——</span>
+        </div>
 
         <div class="search-bar" style="margin-top:6px;">
-          <input type="search" id="entSearch" placeholder="Search applicant, film, email, crew…" oninput="applyFilters()">
+          <div class="sksfa-search-wrap">
+            <svg class="sksfa-search-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L13 13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <input type="search" id="entSearch" placeholder="Search applicant, film, email, crew…" oninput="applyFilters()">
+          </div>
           <div id="csTrack" class="cselect-wrap"></div>
           <div id="csStatus" class="cselect-wrap"></div>
           <div id="csSort" class="cselect-wrap"></div>
@@ -102,22 +173,18 @@
 
     <!-- ═══ AWARDS TAB ════════════════════════════════════ -->
     <div class="tab-pane" id="tab-awards">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
-        <div>
-          <div style="font-size:1.05rem;font-weight:600;">Award Categories</div>
-          <div style="font-size:0.78rem;color:var(--mut);margin-top:3px;">Jury evaluation — separate from participant submissions</div>
-        </div>
-        <div class="row" style="gap:8px;">
+      <div class="sksfa-page-title">
+        <div class="sksfa-eyebrow">ADMIN CONTROL PANEL</div>
+        <h1 class="sksfa-h1">Award Categories</h1>
+        <p class="sksfa-page-desc">Jury evaluation — separate from participant submissions</p>
+        <div class="sksfa-tab-actions">
           <button class="btn-ghost btn-sm" onclick="refreshAwardsTab()">↻ Refresh</button>
           <button class="btn-ghost btn-sm" onclick="exportAwardsPdf()">⬇ Export Shortlists PDF</button>
         </div>
       </div>
 
-      <div class="award-grid" id="awardGrid">
-        <!-- injected by renderAwardGrid() -->
-      </div>
+      <div class="award-grid" id="awardGrid"></div>
 
-      <!-- Category detail panel -->
       <div class="award-cat-detail hidden" id="awardCatDetail">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
           <h3 id="awardCatTitle" style="margin:0;flex:1;"></h3>
@@ -134,15 +201,19 @@
 
     <!-- ═══ REGISTRATION TAB ══════════════════════════════ -->
     <div class="tab-pane" id="tab-registration">
+      <div class="sksfa-page-title">
+        <div class="sksfa-eyebrow">ADMIN CONTROL PANEL</div>
+        <h1 class="sksfa-h1">Registration</h1>
+        <p class="sksfa-page-desc">Control registration gate and festival countdown settings.</p>
+      </div>
       <div class="stats">
         <div class="stat"><div class="k">Registration</div><div class="v sm"><span id="statReg" class="pill closed">—</span></div></div>
         <div class="stat"><div class="k">Film Entries</div><div class="v" id="statEntries">—</div></div>
         <div class="stat"><div class="k">Gallery Photos</div><div class="v" id="statPhotos">—</div></div>
         <div class="stat"><div class="k">Deadline</div><div class="v sm" id="statDeadline">—</div></div>
       </div>
-
       <div class="card">
-        <div class="card-head"><h2>Registration &amp; Countdown</h2></div>
+        <div class="card-head"><div class="sksfa-card-head-left"><h2>Registration &amp; Countdown</h2></div></div>
         <p class="card-desc">Toggle saves instantly. Dates &amp; labels control the public countdown — click Save settings.</p>
         <div class="row" style="justify-content:space-between;margin:0 0 18px;">
           <div><b>Registrations</b><div style="margin-top:4px;"><span id="gatePill" class="pill closed">Closed</span></div></div>
@@ -161,8 +232,13 @@
 
     <!-- ═══ GALLERY TAB ═══════════════════════════════════ -->
     <div class="tab-pane" id="tab-gallery">
+      <div class="sksfa-page-title">
+        <div class="sksfa-eyebrow">ADMIN CONTROL PANEL</div>
+        <h1 class="sksfa-h1">Gallery</h1>
+        <p class="sksfa-page-desc">Upload and manage public gallery photos.</p>
+      </div>
       <div class="card">
-        <div class="card-head"><h2>Gallery Photos</h2></div>
+        <div class="card-head"><div class="sksfa-card-head-left"><h2>Gallery Photos</h2></div></div>
         <p class="card-desc">JPG / PNG / WEBP, up to 8 MB. Appears in the public Gallery.</p>
         <div class="grid2">
           <div><label>Category</label>
@@ -179,8 +255,13 @@
 
     <!-- ═══ UPDATES TAB ════════════════════════════════════ -->
     <div class="tab-pane" id="tab-updates">
+      <div class="sksfa-page-title">
+        <div class="sksfa-eyebrow">ADMIN CONTROL PANEL</div>
+        <h1 class="sksfa-h1">Festival Updates</h1>
+        <p class="sksfa-page-desc">Shown in the public Festival Updates feed, newest first.</p>
+      </div>
       <div class="card">
-        <div class="card-head"><h2>Festival Updates</h2></div>
+        <div class="card-head"><div class="sksfa-card-head-left"><h2>Festival Updates</h2></div></div>
         <p class="card-desc">Shown in the public "Festival Updates" feed, newest first.</p>
         <div class="grid2">
           <div><label>Date label</label><input id="uDate" placeholder="Now Open / Coming Soon"></div>
@@ -195,8 +276,13 @@
 
     <!-- ═══ LINKS TAB ═════════════════════════════════════ -->
     <div class="tab-pane" id="tab-links">
+      <div class="sksfa-page-title">
+        <div class="sksfa-eyebrow">ADMIN CONTROL PANEL</div>
+        <h1 class="sksfa-h1">Submission Links</h1>
+        <p class="sksfa-page-desc">Generate direct links that bypass the registration gate.</p>
+      </div>
       <div class="card">
-        <div class="card-head"><h2>Direct Submission Links</h2></div>
+        <div class="card-head"><div class="sksfa-card-head-left"><h2>Direct Submission Links</h2></div></div>
         <p class="card-desc">Unique links that bypass registration gate. Each link tracks source in entries.</p>
         <div class="grid2">
           <div><label>Label / Partner name</label><input id="lkLabel" placeholder="e.g. Film School Bangalore"></div>

@@ -8,13 +8,30 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="assets/css/submit.css">
 </head>
-<body>
+<body class="sksfa-submit">
 
+<!-- ═══ HEADER ═══════════════════════════════════════════ -->
 <div class="site-header">
-  <h1>Sharankrishna Short Film Awards</h1>
-  <p>Film Entry Submission</p>
+  <div class="sksfa-header-inner">
+    <img class="sksfa-header-logo" src="logo nav.png" alt="SSFA" onerror="this.style.display='none'">
+    <div>
+      <h1>Sharankrishna Short Film Awards</h1>
+      <p>Film Entry Submission</p>
+    </div>
+    <nav class="sksfa-header-nav">
+      <a class="sksfa-nav-link" href="https://sharankrishnashortfilmawards.com" target="_blank" rel="noopener">Home ↗</a>
+    </nav>
+  </div>
 </div>
 
+<!-- ═══ HERO ══════════════════════════════════════════════ -->
+<div class="sksfa-hero" id="sksfa-hero-section">
+  <div class="sksfa-hero-eyebrow">Official Submission Portal</div>
+  <h1 class="sksfa-hero-title">Submit Your Film</h1>
+  <p class="sksfa-hero-sub">Share your story with the world. Every voice matters.</p>
+</div>
+
+<!-- ═══ CONTAINER ════════════════════════════════════════ -->
 <div class="container">
 
   <!-- ── VALIDATING ── -->
@@ -65,134 +82,201 @@
 
     <!-- Step indicator -->
     <div class="step-bar" id="stepBar">
-      <div class="step-dot" id="sd1"><div class="sn">1</div><div class="sl">Applicant</div></div>
-      <div class="step-dot" id="sd2"><div class="sn">2</div><div class="sl">Film</div></div>
-      <div class="step-dot" id="sd3"><div class="sn">3</div><div class="sl">Cast &amp; Crew</div></div>
-      <div class="step-dot" id="sd4"><div class="sn">4</div><div class="sl">Payment</div></div>
-      <div class="step-dot" id="sd5"><div class="sn">5</div><div class="sl">Review</div></div>
+      <div class="step-dot" id="sd1"><div class="sn">01</div><div class="sl">Applicant</div></div>
+      <div class="step-dot" id="sd2"><div class="sn">02</div><div class="sl">Film</div></div>
+      <div class="step-dot" id="sd3"><div class="sn">03</div><div class="sl">Cast &amp; Crew</div></div>
+      <div class="step-dot" id="sd4"><div class="sn">04</div><div class="sl">Payment</div></div>
+      <div class="step-dot" id="sd5"><div class="sn">05</div><div class="sl">Review</div></div>
     </div>
 
-    <!-- STEP 1 — Applicant -->
-    <div class="step-panel" id="step1">
-      <div class="card">
-        <div class="card-title">Step 1 of 5 · Applicant Details</div>
-        <div class="grid2">
-          <div class="field">
-            <label>Full Name <span class="req">*</span></label>
-            <input id="applicantName" type="text" placeholder="Your full name" autocomplete="name">
-          </div>
-          <div class="field">
-            <label>Phone <span class="req">*</span></label>
-            <input id="phone" type="tel" placeholder="+91 98765 43210" autocomplete="tel">
-          </div>
-        </div>
-        <div class="grid2">
-          <div class="field">
-            <label>Email <span class="req">*</span></label>
-            <input id="email" type="email" placeholder="your@email.com" autocomplete="email">
-          </div>
-          <div class="field">
-            <label>City <span class="req">*</span></label>
-            <input id="city" type="text" placeholder="City, State">
-          </div>
-        </div>
-      </div>
-      <div class="nav-row">
-        <button class="btn-primary" onclick="nextStep(1)">Continue →</button>
-      </div>
-    </div>
+    <!-- Two-column layout: form + info panel -->
+    <div class="sksfa-form-layout">
 
-    <!-- STEP 2 — Film -->
-    <div class="step-panel" id="step2">
-      <div class="card">
-        <div class="card-title">Step 2 of 5 · Film Details</div>
-        <div class="grid2">
-          <div class="field">
-            <label>Film Name <span class="req">*</span></label>
-            <input id="filmName" type="text" placeholder="Title of your short film">
-          </div>
-          <div class="field">
-            <label>Category <span class="req">*</span></label>
-            <select id="category">
-              <option value="">Select category</option>
-              <option value="General">General</option>
-              <option value="Campus">Campus</option>
-            </select>
-          </div>
-        </div>
-        <div class="grid2">
-          <div class="field">
-            <label>Film Link <span class="req">*</span></label>
-            <input id="filmLink" type="url" placeholder="YouTube / Google Drive URL">
-            <div class="hint">YouTube, Vimeo, or Google Drive link to your film.</div>
-          </div>
-          <div class="field">
-            <label>Duration <span class="req">*</span></label>
-            <input id="duration" type="text" placeholder="e.g. 14 minutes">
-          </div>
-        </div>
-      </div>
-      <div class="nav-row">
-        <button class="btn-back" onclick="goStep(1)">← Back</button>
-        <button class="btn-primary" onclick="nextStep(2)">Continue →</button>
-      </div>
-    </div>
+      <!-- ── LEFT: step panels ── -->
+      <div class="sksfa-form-col">
 
-    <!-- STEP 3 — Cast & Crew -->
-    <div class="step-panel" id="step3">
-      <div class="card">
-        <div class="card-title">Step 3 of 5 · Cast &amp; Crew</div>
-        <div class="grid2">
-          <div class="field"><label>Director <span class="req">*</span></label><input id="director" placeholder="Director's name"></div>
-          <div class="field"><label>Producer <span class="req">*</span></label><input id="producer" placeholder="Producer's name"></div>
+        <!-- STEP 1 — Applicant -->
+        <div class="step-panel" id="step1">
+          <div class="card">
+            <div class="card-title">Step 01 of 05</div>
+            <h2 class="sksfa-step-heading">Applicant Details</h2>
+            <p class="sksfa-step-sub">Tell us about yourself. These details will be used for all official communications.</p>
+            <div class="grid2">
+              <div class="field">
+                <label>Full Name <span class="req">*</span></label>
+                <input id="applicantName" type="text" placeholder="Your full name" autocomplete="name">
+              </div>
+              <div class="field">
+                <label>Phone <span class="req">*</span></label>
+                <input id="phone" type="tel" placeholder="+91 98765 43210" autocomplete="tel">
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field">
+                <label>Email <span class="req">*</span></label>
+                <input id="email" type="email" placeholder="your@email.com" autocomplete="email">
+              </div>
+              <div class="field">
+                <label>City <span class="req">*</span></label>
+                <input id="city" type="text" placeholder="City, State">
+              </div>
+            </div>
+          </div>
+          <div class="nav-row">
+            <button class="btn-primary" onclick="nextStep(1)">Continue →</button>
+          </div>
         </div>
-        <div class="grid2">
-          <div class="field"><label>Writer / Screenplay <span class="req">*</span></label><input id="writer" placeholder="Screenwriter's name"></div>
-          <div class="field"><label>Cinematographer <span class="req">*</span></label><input id="cinematographer" placeholder="DoP name"></div>
-        </div>
-        <div class="grid2">
-          <div class="field"><label>Editor <span class="req">*</span></label><input id="editor" placeholder="Editor name"></div>
-          <div class="field"><label>Music Director <span class="req">*</span></label><input id="musicDirector" placeholder="Composer name"></div>
-        </div>
-        <div class="grid2">
-          <div class="field"><label>Lead Actor <span class="req">*</span></label><input id="actor" placeholder="Lead actor name"></div>
-          <div class="field"><label>Lead Actress <span class="req">*</span></label><input id="actress" placeholder="Lead actress name"></div>
-        </div>
-        <div class="field">
-          <label>Child Artist <span style="color:var(--mut);font-size:0.7rem;">(Optional)</span></label>
-          <input id="childArtist" placeholder="Child talent name if any">
-        </div>
-      </div>
-      <div class="nav-row">
-        <button class="btn-back" onclick="goStep(2)">← Back</button>
-        <button class="btn-primary" onclick="nextStep(3)">Continue →</button>
-      </div>
-    </div>
 
-    <!-- STEP 4 — Payment -->
-    <div class="step-panel" id="step4">
-      <div class="card">
-        <div class="card-title">Step 4 of 5 · Entry Fee Payment</div>
-        <div class="pay-box">
-          <div class="pay-fee">₹1,000</div>
-          <div class="pay-label">Non-refundable entry fee · INR</div>
+        <!-- STEP 2 — Film -->
+        <div class="step-panel" id="step2">
+          <div class="card">
+            <div class="card-title">Step 02 of 05</div>
+            <h2 class="sksfa-step-heading">Film Details</h2>
+            <p class="sksfa-step-sub">Tell us about your short film.</p>
+            <div class="grid2">
+              <div class="field">
+                <label>Film Name <span class="req">*</span></label>
+                <input id="filmName" type="text" placeholder="Title of your short film">
+              </div>
+              <div class="field">
+                <label>Duration <span class="req">*</span></label>
+                <input id="duration" type="text" placeholder="e.g. 14 minutes">
+              </div>
+            </div>
+            <div class="field" style="margin-bottom:16px;">
+              <label>Film Link <span class="req">*</span></label>
+              <input id="filmLink" type="url" placeholder="YouTube / Google Drive URL">
+              <div class="hint">YouTube, Vimeo, or Google Drive link to your film.</div>
+            </div>
+            <div class="field" style="margin-bottom:6px;">
+              <label>Category <span class="req">*</span></label>
+              <div class="sksfa-cat-cards">
+                <div class="sksfa-cat-card" data-value="General" onclick="selectCategory(this)">
+                  <div class="sksfa-cat-name">General</div>
+                  <div class="sksfa-cat-desc">Open to all filmmakers</div>
+                </div>
+                <div class="sksfa-cat-card" data-value="Campus" onclick="selectCategory(this)">
+                  <div class="sksfa-cat-name">Campus</div>
+                  <div class="sksfa-cat-desc">For student filmmakers</div>
+                </div>
+              </div>
+              <!-- hidden select for JS compatibility -->
+              <select id="category" style="display:none;">
+                <option value="">Select category</option>
+                <option value="General">General</option>
+                <option value="Campus">Campus</option>
+              </select>
+            </div>
+          </div>
+          <div class="nav-row">
+            <button class="btn-back" onclick="goStep(1)">← Back</button>
+            <button class="btn-primary" onclick="nextStep(2)">Continue →</button>
+          </div>
         </div>
-        <div id="payStatus" class="pay-status pending" style="display:none;"></div>
-        <button id="payBtn" class="btn-primary" style="margin-top:12px;" onclick="doPayment()">Pay ₹1,000 via Cashfree →</button>
-        <button id="retryBtn" class="btn-primary" style="margin-top:12px;display:none;" onclick="doPayment()">Retry Payment</button>
-      </div>
-      <div class="nav-row" style="margin-top:0;">
-        <button class="btn-back" onclick="goStep(3)">← Back</button>
-      </div>
-    </div>
 
-    <!-- STEP 5 — Review & Submit -->
-    <div class="step-panel" id="step5">
-      <div id="reviewContent"><!-- injected --></div>
-      <button id="submitBtn" class="btn-primary" onclick="doSubmit()">Submit Film Entry →</button>
-    </div>
+        <!-- STEP 3 — Cast & Crew -->
+        <div class="step-panel" id="step3">
+          <div class="card">
+            <div class="card-title">Step 03 of 05</div>
+            <h2 class="sksfa-step-heading">Cast &amp; Crew</h2>
+            <p class="sksfa-step-sub">Credit the people who made your film.</p>
+            <div class="grid2">
+              <div class="field"><label>Director <span class="req">*</span></label><input id="director" placeholder="Director's name"></div>
+              <div class="field"><label>Producer <span class="req">*</span></label><input id="producer" placeholder="Producer's name"></div>
+            </div>
+            <div class="grid2">
+              <div class="field"><label>Writer / Screenplay <span class="req">*</span></label><input id="writer" placeholder="Screenwriter's name"></div>
+              <div class="field"><label>Cinematographer <span class="req">*</span></label><input id="cinematographer" placeholder="DoP name"></div>
+            </div>
+            <div class="grid2">
+              <div class="field"><label>Editor <span class="req">*</span></label><input id="editor" placeholder="Editor name"></div>
+              <div class="field"><label>Music Director <span class="req">*</span></label><input id="musicDirector" placeholder="Composer name"></div>
+            </div>
+            <div class="grid2">
+              <div class="field"><label>Lead Actor <span class="req">*</span></label><input id="actor" placeholder="Lead actor name"></div>
+              <div class="field"><label>Lead Actress <span class="req">*</span></label><input id="actress" placeholder="Lead actress name"></div>
+            </div>
+            <div class="field">
+              <label>Child Artist <span style="color:#444;font-size:0.7rem;">(Optional)</span></label>
+              <input id="childArtist" placeholder="Child talent name if any">
+            </div>
+          </div>
+          <div class="nav-row">
+            <button class="btn-back" onclick="goStep(2)">← Back</button>
+            <button class="btn-primary" onclick="nextStep(3)">Continue →</button>
+          </div>
+        </div>
 
-  </div>
+        <!-- STEP 4 — Payment -->
+        <div class="step-panel" id="step4">
+          <div class="card">
+            <div class="card-title">Step 04 of 05</div>
+            <h2 class="sksfa-step-heading">Entry Fee Payment</h2>
+            <p class="sksfa-step-sub">Secure payment via Cashfree. Non-refundable.</p>
+            <div class="pay-box">
+              <div class="pay-fee">₹1,000</div>
+              <div class="pay-label">Non-refundable entry fee · INR</div>
+            </div>
+            <div id="payStatus" class="pay-status pending" style="display:none;"></div>
+            <button id="payBtn" class="btn-primary" style="margin-top:12px;" onclick="doPayment()">Pay ₹1,000 via Cashfree →</button>
+            <button id="retryBtn" class="btn-primary" style="margin-top:12px;display:none;" onclick="doPayment()">Retry Payment</button>
+          </div>
+          <div class="nav-row" style="margin-top:0;">
+            <button class="btn-back" onclick="goStep(3)">← Back</button>
+          </div>
+        </div>
+
+        <!-- STEP 5 — Review & Submit -->
+        <div class="step-panel" id="step5">
+          <div id="reviewContent"><!-- injected by JS --></div>
+          <button id="submitBtn" class="btn-primary" onclick="doSubmit()">Submit Film Entry →</button>
+        </div>
+
+      </div><!-- /sksfa-form-col -->
+
+      <!-- ── RIGHT: festival info panel ── -->
+      <aside class="sksfa-info-panel">
+        <div class="sksfa-info-panel-title">Festival Info</div>
+
+        <div class="sksfa-info-item">
+          <div class="sksfa-info-label">Entry Fee</div>
+          <div class="sksfa-info-value">₹1,000</div>
+          <div class="sksfa-info-sub">Non-refundable · INR</div>
+        </div>
+
+        <div class="sksfa-info-item">
+          <div class="sksfa-info-label">Submission Deadline</div>
+          <div class="sksfa-info-value" id="infoDeadline">—</div>
+          <div class="sksfa-info-sub" id="infoDeadlineSub"></div>
+        </div>
+
+        <div class="sksfa-info-item">
+          <div class="sksfa-info-label">Winners &amp; Grand Function</div>
+          <div class="sksfa-info-value" id="infoEvent">—</div>
+          <div class="sksfa-info-sub" id="infoEventSub"></div>
+        </div>
+
+        <div class="sksfa-info-item">
+          <div class="sksfa-info-label">Help &amp; Support</div>
+          <div class="sksfa-info-sub">
+            <a class="sksfa-info-link" href="mailto:sharankrishnashortfilmawards@gmail.com">sharankrishnashortfilmawards@gmail.com</a>
+          </div>
+        </div>
+
+        <div class="sksfa-info-item">
+          <div class="sksfa-info-label">Submission Guidelines</div>
+          <ul class="sksfa-guidelines">
+            <li>Short films only (under 30 minutes)</li>
+            <li>Tamil, Telugu, Hindi or English language</li>
+            <li>Film must be uploaded and accessible via link</li>
+            <li>Applicant must be the copyright holder</li>
+            <li>Entry fee is non-refundable</li>
+          </ul>
+        </div>
+      </aside>
+
+    </div><!-- /sksfa-form-layout -->
+  </div><!-- /sForm -->
 
   <!-- ── SUCCESS ── -->
   <div id="sSuccess" class="success-box" style="display:none;">
@@ -204,6 +288,41 @@
   </div>
 
 </div><!-- /container -->
+
+<script>
+/* Sync category card clicks to the hidden <select> */
+function selectCategory(el) {
+  document.querySelectorAll('.sksfa-submit .sksfa-cat-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('category').value = el.dataset.value;
+}
+
+/* Populate info panel dates from site_config (non-blocking, display only) */
+(function loadInfoPanel() {
+  try {
+    const SUPA_URL = typeof SUPABASE_URL !== 'undefined' ? SUPABASE_URL : null;
+    const SUPA_KEY = typeof SUPABASE_ANON_KEY !== 'undefined' ? SUPABASE_ANON_KEY : null;
+    if (!SUPA_URL || !SUPA_KEY) return;
+    fetch(SUPA_URL + '/rest/v1/site_config?select=key,value', {
+      headers: { 'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY }
+    })
+    .then(r => r.json())
+    .then(rows => {
+      if (!Array.isArray(rows)) return;
+      const cfg = {};
+      rows.forEach(r => { cfg[r.key] = r.value; });
+      const dl = document.getElementById('infoDeadline');
+      const dlSub = document.getElementById('infoDeadlineSub');
+      const ev = document.getElementById('infoEvent');
+      const evSub = document.getElementById('infoEventSub');
+      if (dl && cfg.deadline_label) dl.textContent = cfg.deadline_label;
+      if (dlSub && cfg.submission_deadline) dlSub.textContent = new Date(cfg.submission_deadline).toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'});
+      if (ev && cfg.event_label) ev.textContent = cfg.event_label;
+      if (evSub && cfg.awards_event_date) evSub.textContent = new Date(cfg.awards_event_date).toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'});
+    });
+  } catch(e) {}
+})();
+</script>
 
 <script src="assets/js/submit.js"></script>
 </html>

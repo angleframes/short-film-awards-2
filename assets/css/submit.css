@@ -1,113 +1,721 @@
-:root {
-  --bg:#080808; --bg2:#0e0e0e; --card:#111111; --card2:#171717;
-  --line:rgba(255,255,255,0.09); --line2:rgba(255,255,255,0.05);
-  --txt:#efefef; --mut:rgba(255,255,255,0.46); --mut2:rgba(255,255,255,0.28);
-  --ok:#4caf50; --err:#ff5252;
+/* ═══════════════════════════════════════════════════════
+   SSFA Direct Submission Page — Cinematic Design
+   ALL rules scoped under .sksfa-submit
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Base ── */
+.sksfa-submit {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: #0a0a0a;
+  color: #e8e8e8;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
-html{color-scheme:dark;}
-body{background:var(--bg);color:var(--txt);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  min-height:100vh;overflow-x:hidden;}
 
-/* ── HEADER ── */
-.site-header{text-align:center;padding:32px 20px 20px;border-bottom:1px solid var(--line2);}
-.site-header h1{font-size:clamp(1rem,4vw,1.4rem);letter-spacing:2px;text-transform:uppercase;
-  color:#fff;margin-bottom:4px;font-weight:700;}
-.site-header p{font-size:0.72rem;color:var(--mut);letter-spacing:2.5px;text-transform:uppercase;}
+.sksfa-submit::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 60% at 5% 60%, rgba(255,255,255,0.02) 0%, transparent 60%),
+    #0a0a0a;
+  pointer-events: none;
+  z-index: 0;
+}
 
-/* ── LAYOUT ── */
-.container{max-width:620px;margin:0 auto;padding:28px 18px 80px;}
+.sksfa-submit > * { position: relative; z-index: 1; }
 
-/* ── STATE BOXES ── */
-.state-box{text-align:center;padding:60px 20px;}
-.state-box .icon{font-size:3rem;margin-bottom:18px;display:block;}
-.state-box h2{font-size:1.15rem;margin-bottom:10px;color:#fff;}
-.state-box p{color:var(--mut);font-size:0.88rem;line-height:1.8;}
-.state-box a{color:#fff;text-decoration:underline;text-underline-offset:2px;}
+/* ════════════════════════════════════════════════════════
+   SITE HEADER / NAV
+   ════════════════════════════════════════════════════════ */
+.sksfa-submit .site-header {
+  background: rgba(10,10,10,0.97);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  padding: 0 24px;
+}
 
-/* ── STEP INDICATOR ── */
-.step-bar{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:28px;overflow:hidden;}
-.step-dot{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;position:relative;}
-.step-dot::before{content:'';position:absolute;top:14px;left:calc(50% + 14px);right:calc(-50% + 14px);
-  height:1px;background:var(--line);z-index:0;}
-.step-dot:last-child::before{display:none;}
-.step-dot .sn{width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--bg2);
-  color:var(--mut2);font-size:0.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;
-  position:relative;z-index:1;transition:all .2s;}
-.step-dot.done .sn{background:#fff;color:#000;border-color:#fff;}
-.step-dot.active .sn{background:transparent;border-color:#fff;color:#fff;}
-.step-dot .sl{font-size:0.58rem;color:var(--mut2);letter-spacing:0.8px;text-transform:uppercase;
-  text-align:center;max-width:52px;line-height:1.3;}
-.step-dot.active .sl,.step-dot.done .sl{color:var(--mut);}
+.sksfa-submit .sksfa-header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 60px;
+}
 
-/* ── STEP PANELS ── */
-.step-panel{display:none;}
-.step-panel.active{display:block;}
+.sksfa-submit .sksfa-header-logo {
+  height: 32px;
+  width: auto;
+  filter: brightness(0) invert(1);
+  flex-shrink: 0;
+}
 
-/* ── CARDS ── */
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:16px;}
-.card-title{font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;color:var(--mut2);
-  margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--line2);}
+.sksfa-submit .site-header h1 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
+  line-height: 1.2;
+}
 
-/* ── FIELDS ── */
-.field{margin-bottom:14px;}
-.field label{display:block;font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;
-  color:var(--mut2);margin-bottom:5px;}
-.field input,.field select,.field textarea{
-  width:100%;padding:10px 12px;background:var(--bg2);border:1px solid var(--line);
-  border-radius:9px;color:var(--txt);font-size:0.88rem;transition:border .15s;
-  -webkit-appearance:none;appearance:none;}
-.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:rgba(255,255,255,0.35);}
-.field textarea{min-height:70px;resize:vertical;}
-.field .hint{font-size:0.7rem;color:var(--mut);margin-top:4px;}
-.field .req{color:rgba(255,255,255,0.4);}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;}
-@media(max-width:480px){.grid2{grid-template-columns:1fr;}}
+.sksfa-submit .site-header p {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: #555;
+}
 
-/* ── CUSTOM SELECT ARROW ── */
-.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(255,255,255,0.3)'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+.sksfa-submit .sksfa-header-nav {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
 
-/* ── PAYMENT BOX ── */
-.pay-box{background:var(--card2);border:1px solid var(--line);border-radius:12px;
-  padding:22px;text-align:center;margin-bottom:16px;}
-.pay-fee{font-size:2.4rem;font-weight:700;color:#fff;letter-spacing:-1px;}
-.pay-label{font-size:0.7rem;color:var(--mut);letter-spacing:2px;text-transform:uppercase;margin-top:4px;}
-.pay-status{font-size:0.84rem;padding:11px 14px;border-radius:9px;margin-top:12px;
-  background:rgba(255,255,255,0.04);border:1px solid var(--line);}
-.pay-status.ok{background:rgba(76,175,80,0.08);color:var(--ok);border-color:rgba(76,175,80,0.2);}
-.pay-status.pending{background:rgba(255,255,255,0.04);color:var(--mut);border-color:var(--line);}
-.pay-status.err{background:rgba(255,82,82,0.08);color:var(--err);border-color:rgba(255,82,82,0.2);}
+.sksfa-submit .sksfa-nav-link {
+  padding: 6px 12px;
+  color: #666;
+  text-decoration: none;
+  font-size: 12px;
+  border-radius: 4px;
+  transition: color 0.15s;
+  white-space: nowrap;
+}
 
-/* ── REVIEW SECTION ── */
-.review-section{margin-bottom:14px;}
-.review-section h4{font-size:0.63rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--mut2);
-  margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--line2);}
-.review-row{display:flex;gap:8px;padding:6px 0;font-size:0.82rem;border-bottom:1px solid var(--line2);}
-.review-row:last-child{border-bottom:none;}
-.review-key{color:var(--mut);flex:0 0 130px;font-size:0.77rem;}
-.review-val{flex:1;color:var(--txt);word-break:break-all;}
+.sksfa-submit .sksfa-nav-link:hover { color: #ccc; }
 
-/* ── DIRECT LINK BANNER ── */
-.link-banner{background:rgba(255,255,255,0.04);border:1px solid var(--line);
-  border-radius:9px;padding:10px 14px;font-size:0.78rem;color:var(--mut);
-  margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+/* ════════════════════════════════════════════════════════
+   HERO
+   ════════════════════════════════════════════════════════ */
+.sksfa-submit .sksfa-hero {
+  text-align: center;
+  padding: 56px 24px 40px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
 
-/* ── BUTTONS ── */
-button{cursor:pointer;border:none;border-radius:9px;padding:11px 18px;
-  font-size:0.85rem;font-weight:600;transition:opacity .15s,filter .15s;}
-button:hover{filter:brightness(1.1);}
-button:disabled{opacity:0.45;cursor:default;}
-.btn-primary{background:#fff;color:#000;width:100%;padding:14px;font-size:0.9rem;letter-spacing:0.5px;}
-.btn-back{background:transparent;border:1px solid var(--line);color:var(--mut);padding:11px 18px;}
-.btn-back:hover{border-color:rgba(255,255,255,0.25);color:var(--txt);}
-.nav-row{display:flex;gap:10px;margin-top:8px;}
-.nav-row .btn-primary{flex:1;}
+.sksfa-submit .sksfa-hero-eyebrow {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 14px;
+}
 
-/* ── SUCCESS ── */
-.success-box{text-align:center;padding:52px 20px;}
-.success-box .icon{font-size:3.5rem;margin-bottom:18px;display:block;}
-.success-box h2{font-size:1.3rem;color:#fff;margin-bottom:10px;}
-.success-box p{color:var(--mut);font-size:0.88rem;line-height:1.8;}
-.success-order{color:#fff;font-weight:600;font-size:1rem;}
+.sksfa-submit .sksfa-hero-title {
+  margin: 0 0 10px;
+  font-size: 40px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.sksfa-submit .sksfa-hero-sub {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+/* ════════════════════════════════════════════════════════
+   LINK BANNER
+   ════════════════════════════════════════════════════════ */
+.sksfa-submit .link-banner {
+  max-width: 1100px;
+  margin: 0 auto 0;
+  padding: 9px 24px;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-size: 11px;
+  color: #666;
+  letter-spacing: 0.2px;
+}
+
+.sksfa-submit .link-banner strong { color: #aaa; font-weight: 600; }
+
+/* ════════════════════════════════════════════════════════
+   STEP BAR
+   ════════════════════════════════════════════════════════ */
+.sksfa-submit .step-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 28px 16px 0;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.sksfa-submit .step-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  flex: 1;
+}
+
+.sksfa-submit .step-dot + .step-dot::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  right: calc(50% + 18px);
+  left: calc(-50% + 18px);
+  height: 1px;
+  background: rgba(255,255,255,0.1);
+}
+
+.sksfa-submit .step-dot.active + .step-dot::before,
+.sksfa-submit .step-dot.done + .step-dot::before {
+  background: rgba(255,255,255,0.25);
+}
+
+.sksfa-submit .sn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #555;
+  transition: all 0.2s;
+  position: relative;
+  z-index: 1;
+}
+
+.sksfa-submit .step-dot.active .sn {
+  background: #fff;
+  border-color: #fff;
+  color: #000;
+  box-shadow: 0 0 0 4px rgba(255,255,255,0.08);
+}
+
+.sksfa-submit .step-dot.done .sn {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.3);
+  color: #ccc;
+}
+
+.sksfa-submit .sl {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: #444;
+  white-space: nowrap;
+}
+
+.sksfa-submit .step-dot.active .sl { color: #ccc; }
+.sksfa-submit .step-dot.done .sl { color: #666; }
+
+/* ════════════════════════════════════════════════════════
+   MAIN LAYOUT — two-column form + info panel
+   ════════════════════════════════════════════════════════ */
+.sksfa-submit .container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+
+.sksfa-submit .sksfa-form-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 28px;
+  align-items: start;
+  padding-top: 28px;
+}
+
+.sksfa-submit .sksfa-form-col { min-width: 0; }
+
+/* ════════════════════════════════════════════════════════
+   STEP PANELS
+   ════════════════════════════════════════════════════════ */
+.sksfa-submit .step-panel { display: none; }
+.sksfa-submit .step-panel.active { display: block; }
+
+/* ════════════════════════════════════════════════════════
+   CARDS
+   ════════════════════════════════════════════════════════ */
+.sksfa-submit .card {
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 6px;
+  padding: 24px;
+  margin-bottom: 14px;
+}
+
+.sksfa-submit .card-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 6px;
+}
+
+.sksfa-submit .sksfa-step-heading {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 4px;
+  letter-spacing: -0.2px;
+}
+
+.sksfa-submit .sksfa-step-sub {
+  font-size: 12px;
+  color: #555;
+  margin: 0 0 22px;
+}
+
+/* ════════════════════════════════════════════════════════
+   FORM FIELDS
+   ════════════════════════════════════════════════════════ */
+.sksfa-submit .grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 16px;
+}
+
+.sksfa-submit .field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 4px;
+}
+
+.sksfa-submit label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 5px;
+}
+
+.sksfa-submit .req { color: rgba(255,255,255,0.4); }
+
+.sksfa-submit input[type="text"],
+.sksfa-submit input[type="email"],
+.sksfa-submit input[type="tel"],
+.sksfa-submit input[type="url"],
+.sksfa-submit select,
+.sksfa-submit textarea {
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 4px;
+  padding: 10px 12px;
+  color: #e8e8e8;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sksfa-submit input:focus,
+.sksfa-submit select:focus,
+.sksfa-submit textarea:focus {
+  border-color: rgba(255,255,255,0.35);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.04);
+}
+
+.sksfa-submit input::placeholder,
+.sksfa-submit textarea::placeholder { color: #444; }
+
+.sksfa-submit .hint {
+  font-size: 11px;
+  color: #555;
+  margin-top: 4px;
+}
+
+/* Category select as large cards */
+.sksfa-submit .sksfa-cat-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.sksfa-submit .sksfa-cat-card {
+  padding: 14px 16px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  user-select: none;
+}
+
+.sksfa-submit .sksfa-cat-card:hover {
+  border-color: rgba(255,255,255,0.25);
+  background: #1f1f1f;
+}
+
+.sksfa-submit .sksfa-cat-card.selected {
+  border-color: #fff;
+  background: rgba(255,255,255,0.06);
+}
+
+.sksfa-submit .sksfa-cat-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ccc;
+  margin-bottom: 2px;
+}
+
+.sksfa-submit .sksfa-cat-card.selected .sksfa-cat-name { color: #fff; }
+
+.sksfa-submit .sksfa-cat-desc {
+  font-size: 11px;
+  color: #555;
+}
+
+/* ════════════════════════════════════════════════════════
+   PAYMENT STEP
+   ════════════════════════════════════════════════════════ */
+.sksfa-submit .pay-box {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 5px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.sksfa-submit .pay-fee {
+  font-size: 40px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.sksfa-submit .pay-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #555;
+}
+
+.sksfa-submit .pay-status {
+  font-size: 12px;
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  color: #aaa;
+}
+
+/* ════════════════════════════════════════════════════════
+   REVIEW STEP
+   ════════════════════════════════════════════════════════ */
+.sksfa-submit .review-section {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sksfa-submit .review-section:last-child { border-bottom: none; }
+
+.sksfa-submit .review-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.sksfa-submit .review-key {
+  color: #555;
+  min-width: 140px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding-top: 1px;
+}
+
+.sksfa-submit .review-val { color: #ccc; word-break: break-word; }
+
+/* ════════════════════════════════════════════════════════
+   NAV ROW (back/continue)
+   ════════════════════════════════════════════════════════ */
+.sksfa-submit .nav-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 6px;
+  padding-top: 6px;
+}
+
+.sksfa-submit .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 24px;
+  background: #fff;
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  white-space: nowrap;
+}
+
+.sksfa-submit .btn-primary:hover { background: #e8e8e8; }
+.sksfa-submit .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.sksfa-submit .btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 18px;
+  background: transparent;
+  color: #888;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.sksfa-submit .btn-back:hover { border-color: rgba(255,255,255,0.3); color: #ccc; }
+
+/* ════════════════════════════════════════════════════════
+   FESTIVAL INFO PANEL (right column)
+   ════════════════════════════════════════════════════════ */
+.sksfa-submit .sksfa-info-panel {
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 6px;
+  padding: 24px;
+  position: sticky;
+  top: 88px;
+}
+
+.sksfa-submit .sksfa-info-panel-title {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+  margin-bottom: 20px;
+}
+
+.sksfa-submit .sksfa-info-item {
+  margin-bottom: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.sksfa-submit .sksfa-info-item:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.sksfa-submit .sksfa-info-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.sksfa-submit .sksfa-info-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 2px;
+  letter-spacing: -0.3px;
+}
+
+.sksfa-submit .sksfa-info-sub {
+  font-size: 11px;
+  color: #555;
+}
+
+/* Guidelines list */
+.sksfa-submit .sksfa-guidelines {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sksfa-submit .sksfa-guidelines li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: #666;
+  padding: 5px 0;
+}
+
+.sksfa-submit .sksfa-guidelines li::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none'%3E%3Ccircle cx='6' cy='6' r='5.5' stroke='%23444'/%3E%3Cpath d='M3.5 6l2 2 3-3' stroke='%23666' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.sksfa-submit .sksfa-info-link {
+  color: #777;
+  text-decoration: none;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.sksfa-submit .sksfa-info-link:hover { color: #ccc; }
+
+/* ════════════════════════════════════════════════════════
+   STATE BOXES
+   ════════════════════════════════════════════════════════ */
+.sksfa-submit .state-box {
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 6px;
+  padding: 48px 28px;
+  text-align: center;
+  max-width: 480px;
+  margin: 48px auto 0;
+}
+
+.sksfa-submit .state-box .icon {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 16px;
+  line-height: 1;
+}
+
+.sksfa-submit .state-box h2 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.sksfa-submit .state-box p {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.sksfa-submit .state-box a { color: #aaa; }
+.sksfa-submit .state-box a:hover { color: #fff; }
+
+/* ════════════════════════════════════════════════════════
+   SUCCESS BOX
+   ════════════════════════════════════════════════════════ */
+.sksfa-submit .success-box {
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 6px;
+  padding: 60px 28px;
+  text-align: center;
+  max-width: 520px;
+  margin: 48px auto 0;
+}
+
+.sksfa-submit .success-box .icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.sksfa-submit .success-box h2 {
+  margin: 0 0 10px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.3px;
+}
+
+.sksfa-submit .success-box p {
+  margin: 0;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.7;
+}
+
+.sksfa-submit .success-order {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 12px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 3px;
+  font-family: 'Menlo', 'Monaco', monospace;
+  font-size: 13px;
+  color: #ccc;
+}
+
+/* ════════════════════════════════════════════════════════
+   RESPONSIVE
+   ════════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .sksfa-submit .sksfa-form-layout {
+    grid-template-columns: 1fr;
+  }
+  .sksfa-submit .sksfa-info-panel {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .sksfa-submit .sksfa-hero { padding: 36px 16px 28px; }
+  .sksfa-submit .sksfa-hero-title { font-size: 28px; }
+  .sksfa-submit .container { padding: 0 16px 48px; }
+  .sksfa-submit .grid2 { grid-template-columns: 1fr; }
+  .sksfa-submit .sksfa-cat-cards { grid-template-columns: 1fr; }
+  .sksfa-submit .step-bar { padding: 20px 8px 0; gap: 0; }
+  .sksfa-submit .sl { display: none; }
+  .sksfa-submit .sn { width: 30px; height: 30px; font-size: 11px; }
+  .sksfa-submit .site-header { padding: 0 16px; }
+  .sksfa-submit .sksfa-header-nav { display: none; }
+}
+
+@media (max-width: 480px) {
+  .sksfa-submit .sksfa-hero-title { font-size: 24px; }
+  .sksfa-submit .card { padding: 16px; }
+  .sksfa-submit .nav-row { flex-direction: column; align-items: stretch; }
+  .sksfa-submit .btn-primary,
+  .sksfa-submit .btn-back { width: 100%; justify-content: center; }
+  .sksfa-submit .pay-fee { font-size: 32px; }
+}
