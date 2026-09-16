@@ -854,9 +854,12 @@
                 }
             }
 
-            // Scroll thumbnail into view
+            // Scroll ONLY the thumbnail strip (never the document) to center the active thumb
             const activeLi = strip.querySelectorAll('li')[idx];
-            if (activeLi) activeLi.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            if (activeLi) {
+                const targetLeft = activeLi.offsetLeft - (strip.offsetWidth - activeLi.offsetWidth) / 2;
+                strip.scrollTo({ left: Math.max(0, targetLeft), behavior: 'smooth' });
+            }
 
             // Preload adjacent images
             [idx - 1, idx + 1, idx + 2].forEach(i => {
