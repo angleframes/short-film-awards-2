@@ -157,6 +157,7 @@ function switchTab(name) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   if (name === 'awards') refreshAwardsTab();
+  if (name === 'testimonials') loadTestimonials();
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -1506,13 +1507,6 @@ async function loadTestimonials() {
                 </div>
             </div>
         </div>`).join('');
-}
-
-/* Hook tab switch to load testimonials */
-const _origSwitchTab = switchTab;
-function switchTab(name) {
-    _origSwitchTab(name);
-    if (name === 'testimonials') loadTestimonials();
 }
 
 /* ═══════════════════════════════════════════════════════
