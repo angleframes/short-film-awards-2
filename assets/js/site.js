@@ -606,7 +606,6 @@
             const track = document.getElementById('categoryCarouselTrack');
             if (!track) return;
             track.innerHTML = '';
-
             categoryCarouselIndex = Math.floor(CATEGORY_ITEMS.length / 2);
 
             CATEGORY_ITEMS.forEach((item, idx) => {
@@ -620,12 +619,11 @@
                     iconMarkup = `<div class="stack-emoji">${item.emoji}</div>`;
                 }
 
-                const titleClean = item.title.replace('<br>', ' ');
                 card.innerHTML = `
                     <span class="edge-light"></span>
                     <span class="stack-card-index">${String(idx + 1).padStart(2, '0')} / ${CATEGORY_ITEMS.length}</span>
                     ${iconMarkup}
-                    <h3 class="stack-card-title">${titleClean}</h3>
+                    <h3 class="stack-card-title">${item.title}</h3>
                     <p class="stack-card-sub">Award Category</p>
                 `;
                 track.appendChild(card);
@@ -634,6 +632,24 @@
 
             categoryCarouselRender();
             categoryCarouselRestartTimer();
+
+            // Mobile swipe support for category carousel
+            const carouselWrapper = document.querySelector('.category-carousel-wrapper');
+            if (carouselWrapper && !carouselWrapper._swipeInited) {
+                carouselWrapper._swipeInited = true;
+                let _cswX = 0, _cswY = 0;
+                carouselWrapper.addEventListener('pointerdown', e => {
+                    _cswX = e.clientX; _cswY = e.clientY;
+                }, { passive: true });
+                carouselWrapper.addEventListener('pointerup', e => {
+                    const dx = e.clientX - _cswX;
+                    const dy = e.clientY - _cswY;
+                    if (Math.abs(dx) > 44 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                        if (dx < 0) categoryCarouselNext();
+                        else categoryCarouselPrev();
+                    }
+                }, { passive: true });
+            }
         }
 
         // Single source of truth: manual toggle AND deadline both must allow entry.
@@ -755,6 +771,63 @@
             });
         }
 
+        // Gallery state
+        let _galleryPhotos = [];
+        let _galleryCurrentIdx = 0;
+
+        function _gallerySelectIdx(idx, wrap, strip, stage) {
+            if (idx < 0 || idx >= _galleryPhotos.length) return;
+            _galleryCurrentIdx = idx;
+            const pid = `photo${idx + 1}`;
+
+            // Update thumbnail active state
+            strip.querySelectorAll('li').forEach((li, i) => {
+                const selected = i === idx;
+                li.style.borderColor = selected ? 'rgba(255,255,255,0.9)' : '';
+                li.style.boxShadow = selected ? '0 0 18px rgba(192,132,252,0.55)' : '';
+                const img = li.querySelector('img');
+                if (img) img.style.filter = selected ? 'grayscale(0)' : '';
+            });
+
+            // Crossfade: show new figure, hide old
+            const figs = stage.querySelectorAll('.gs-fig');
+            const newFig = stage.querySelector(`.gs-fig[data-id="${pid}"]`);
+            figs.forEach(f => {
+                if (f !== newFig) {
+                    f.style.opacity = '0';
+                    setTimeout(() => { if (f !== newFig) f.style.display = 'none'; }, 200);
+                }
+            });
+            if (newFig) {
+                const mainImg = newFig.querySelector('img:not(.gs-backdrop)');
+                const show = () => {
+                    newFig.style.display = 'block';
+                    requestAnimationFrame(() => { newFig.style.opacity = '1'; });
+                };
+                if (mainImg && !mainImg.complete) {
+                    mainImg.onload = show;
+                    mainImg.onerror = show;
+                } else {
+                    show();
+                }
+            }
+
+            // Scroll thumbnail into view
+            const activeLi = strip.querySelectorAll('li')[idx];
+            if (activeLi) activeLi.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+            // Preload adjacent images
+            _galleryPreloadAdjacent(idx);
+        }
+
+        function _galleryPreloadAdjacent(idx) {
+            const toLoad = [idx - 1, idx + 1, idx + 2].filter(i => i >= 0 && i < _galleryPhotos.length);
+            toLoad.forEach(i => {
+                const src = _galleryPhotos[i] && _galleryPhotos[i].src;
+                if (src) { const img = new Image(); img.src = src; }
+            });
+        }
+
         function renderGallery() {
             /*************************************************************
              * ✏️ ADD PHOTOS HERE — just add entries to GALLERY_IMAGES
@@ -768,66 +841,84 @@
             if (!wrap || !strip || !stage) return;
 
             // Filter to only photos that have a src
-            const photos = GALLERY_IMAGES.filter(p => p.src && p.src.trim() !== '');
-            if (!photos.length) return;
+            _galleryPhotos = GALLERY_IMAGES.filter(p => p.src && p.src.trim() !== '');
+            if (!_galleryPhotos.length) return;
 
             strip.innerHTML = '';
             stage.innerHTML = '';
 
-            // Build dynamic CSS for :data-selected targeting
-            let css = '';
-            photos.forEach((photo, idx) => {
-                const pid = `photo${idx + 1}`;
-                css += `.gallery-select-wrap[data-selected="${pid}"] .gallery-select-strip li:nth-child(${idx + 1}){border-color:rgba(255,255,255,0.9);box-shadow:0 0 18px rgba(192,132,252,0.55);}`;
-                css += `.gallery-select-wrap[data-selected="${pid}"] .gallery-select-strip li:nth-child(${idx + 1}) label img{filter:grayscale(0);}`;
-                css += `.gallery-select-wrap[data-selected="${pid}"] .gs-fig[data-id="${pid}"]{display:block;}`;
-            });
-            let styleEl = document.getElementById('gallery-dynamic-css');
-            if (!styleEl) {
-                styleEl = document.createElement('style');
-                styleEl.id = 'gallery-dynamic-css';
-                document.head.appendChild(styleEl);
-            }
-            styleEl.textContent = css;
-
             // Build strip thumbnails + stage figures
-            photos.forEach((photo, idx) => {
+            _galleryPhotos.forEach((photo, idx) => {
                 const pid = `photo${idx + 1}`;
                 const shortTitle = photo.title.replace(/[:'"].*/, '').trim();
+                const isFirst = idx === 0;
 
                 // Thumbnail strip item
                 const li = document.createElement('li');
-                li.innerHTML = `<label data-photo="${pid}"><img src="${photo.src}" alt="${photo.title}" loading="lazy" decoding="async"><span>${shortTitle}</span></label>`;
+                li.innerHTML = `<label data-photo="${pid}"><img src="${photo.src}" alt="${photo.title}" loading="${isFirst ? 'eager' : 'lazy'}" decoding="async"><span>${shortTitle}</span></label>`;
                 strip.appendChild(li);
 
                 // Stage figure
                 const fig = document.createElement('figure');
                 fig.className = 'gs-fig';
                 fig.dataset.id = pid;
-                const isFirst = idx === 0;
-                fig.innerHTML = `<img class="gs-backdrop" src="${photo.src}" alt="" aria-hidden="true" loading="${isFirst ? 'eager' : 'lazy'}" decoding="async"><img src="${photo.src}" alt="${photo.title}" loading="${isFirst ? 'eager' : 'lazy'}" decoding="async"><figcaption><h3>${photo.title}</h3><p>${photo.sub}</p></figcaption>`;
+                fig.style.display = isFirst ? 'block' : 'none';
+                fig.style.opacity = isFirst ? '1' : '0';
+                const fetchPriority = isFirst ? ' fetchpriority="high"' : '';
+                fig.innerHTML = `<img class="gs-backdrop" src="${photo.src}" alt="" aria-hidden="true" loading="${isFirst ? 'eager' : 'lazy'}" decoding="async"${fetchPriority}><img src="${photo.src}" alt="${photo.title}" loading="${isFirst ? 'eager' : 'lazy'}" decoding="async"${fetchPriority}><figcaption><h3>${photo.title}</h3><p>${photo.sub}</p></figcaption>`;
                 stage.appendChild(fig);
             });
 
-            // Set first photo selected
-            wrap.dataset.selected = 'photo1';
+            // Set first thumbnail active
+            const firstLi = strip.querySelector('li');
+            if (firstLi) {
+                firstLi.style.borderColor = 'rgba(255,255,255,0.9)';
+                firstLi.style.boxShadow = '0 0 18px rgba(192,132,252,0.55)';
+                const firstImg = firstLi.querySelector('img');
+                if (firstImg) firstImg.style.filter = 'grayscale(0)';
+            }
+            _galleryCurrentIdx = 0;
 
-            // Wire clicks
-            strip.querySelectorAll('li label[data-photo]').forEach(label => {
+            // Wire thumbnail clicks
+            strip.querySelectorAll('li label[data-photo]').forEach((label, idx) => {
                 label.addEventListener('click', e => {
                     e.preventDefault();
-                    const pid = label.getAttribute('data-photo');
-                    if (pid) {
-                        wrap.dataset.selected = pid;
-                        label.closest('li').scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                    }
+                    _gallerySelectIdx(idx, wrap, strip, stage);
                 });
             });
+
+            // Mobile swipe on main gallery image
+            let _swipeStartX = 0, _swipeStartY = 0;
+            stage.addEventListener('pointerdown', e => {
+                _swipeStartX = e.clientX;
+                _swipeStartY = e.clientY;
+            }, { passive: true });
+            stage.addEventListener('pointerup', e => {
+                const dx = e.clientX - _swipeStartX;
+                const dy = e.clientY - _swipeStartY;
+                if (Math.abs(dx) > 44 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                    if (dx < 0) _gallerySelectIdx(_galleryCurrentIdx + 1, wrap, strip, stage);
+                    else _gallerySelectIdx(_galleryCurrentIdx - 1, wrap, strip, stage);
+                }
+            }, { passive: true });
+
+            // Background preload of remaining images after first paint
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(() => {
+                    _galleryPhotos.slice(1).forEach(photo => {
+                        if (photo.src) { const img = new Image(); img.src = photo.src; }
+                    });
+                }, { timeout: 4000 });
+            } else {
+                setTimeout(() => {
+                    _galleryPhotos.slice(1).forEach(photo => {
+                        if (photo.src) { const img = new Image(); img.src = photo.src; }
+                    });
+                }, 2000);
+            }
         }
 
-        function initGalleryPicker() {
-            // No-op — renderGallery() now handles everything including click wiring
-        }
+        function initGalleryPicker() { /* renderGallery() handles all wiring */ }
 
         function toggleRulesModal(show) {
             const modal = document.getElementById('rulesModal');

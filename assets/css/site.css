@@ -947,7 +947,7 @@
             backdrop-filter: var(--ios-blur);
             -webkit-backdrop-filter: var(--ios-blur);
             box-shadow: 0 20px 45px rgba(0,0,0,0.6);
-            transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out, filter 0.5s ease-in-out;
+            transition: transform 0.28s ease-out, opacity 0.28s ease-out, filter 0.28s ease-out;
         }
 
         .category-carousel-card .stack-card-index {
@@ -964,13 +964,17 @@
         .category-carousel-card .stack-emoji { font-size: 3rem; margin-bottom: 0.9rem; }
 
         .category-carousel-card .stack-card-title {
-            font-size: 1.35rem;
+            font-size: clamp(0.92rem, 2.5vw, 1.2rem);
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             color: #ffffff;
             margin: 0 0 0.5rem 0;
-            line-height: 1.15;
+            line-height: 1.25;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+            hyphens: auto;
         }
 
         .category-carousel-card .stack-card-sub {
@@ -999,8 +1003,8 @@
             transition: opacity 0.2s ease, transform 0.2s ease;
         }
         .category-carousel-btn:hover { opacity: 0.75; }
-        .category-carousel-btn.prev { left: 0; }
-        .category-carousel-btn.next { right: 0; }
+        .category-carousel-btn.prev { left: clamp(8px, 2vw, 32px); }
+        .category-carousel-btn.next { right: clamp(8px, 2vw, 32px); }
         .category-carousel-btn svg { width: 20px; height: 20px; }
 
         .all-categories-inline {
@@ -1067,9 +1071,11 @@
         @media (max-width: 768px) {
             .category-carousel-wrapper { height: 280px; overflow: hidden; }
             .category-carousel-card { width: 10.5rem; height: 15rem; padding: 1.2rem; }
-            .category-carousel-card .stack-card-title { font-size: 1.1rem; }
+            .category-carousel-card .stack-card-title { font-size: clamp(0.85rem, 2.8vw, 1.05rem); }
             .category-carousel-card .stack-emoji { font-size: 2.4rem; }
-            .category-carousel-btn { width: 36px; height: 36px; }
+            .category-carousel-btn { width: 44px; height: 44px; }
+            .category-carousel-btn.prev { left: clamp(4px, 1.5vw, 16px); }
+            .category-carousel-btn.next { right: clamp(4px, 1.5vw, 16px); }
         }
 
         /* ===== FULL-PAGE CLOCK BACKGROUND ===== */
@@ -1201,6 +1207,7 @@
             overflow-y: visible;
             scroll-snap-type: x proximity;
             -webkit-overflow-scrolling: touch;
+            touch-action: pan-x;
             scrollbar-width: none; /* visually hidden, keep touch/mouse scroll */
             scrollbar-color: transparent transparent;
             justify-content: center;
@@ -1298,6 +1305,12 @@
             height: 100%;
             display: none;
             z-index: 2;
+            opacity: 0;
+            transition: opacity 0.18s ease-out;
+        }
+        .gs-fig.gs-visible {
+            display: block;
+            opacity: 1;
         }
 
 
