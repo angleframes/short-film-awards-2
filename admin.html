@@ -225,8 +225,8 @@
         <div class="grid2">
           <div><label>Submission deadline</label><input id="cfgDeadline" type="datetime-local"></div>
           <div><label>Awards event date</label><input id="cfgEvent" type="datetime-local"></div>
-          <div><label>Deadline label (shown)</label><input id="cfgDeadlineLabel" placeholder="31 Dec 2026"></div>
-          <div><label>Event label (shown)</label><input id="cfgEventLabel" placeholder="12 Feb 2027"></div>
+          <div><label>Deadline label (shown)</label><input id="cfgDeadlineLabel" type="text" placeholder="31 Dec 2026"></div>
+          <div><label>Event label (shown)</label><input id="cfgEventLabel" type="text" placeholder="12 Feb 2027"></div>
         </div>
         <button class="btn" onclick="saveConfig(event)">Save settings</button>
         <span id="cfgSaved" class="muted-note" style="margin-left:12px;"></span>
@@ -240,27 +240,51 @@
         <h1 class="sksfa-h1">Gallery</h1>
         <p class="sksfa-page-desc">Upload and manage public gallery photos.</p>
       </div>
+
       <div class="card">
-        <div class="card-head"><div class="sksfa-card-head-left"><h2>Gallery Photos</h2></div></div>
-        <p class="card-desc">JPG / PNG / WEBP, up to 8 MB. Appears in the public Gallery.</p>
-        <div class="grid2">
-          <div><label>Category</label>
-            <div id="csGalCat" class="cselect-wrap" style="width:100%;display:block;"></div>
+        <div class="card-head">
+          <div class="sksfa-card-head-left">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="1" y="2" width="18" height="16" rx="2.5" stroke="currentColor" stroke-width="1.3"/><circle cx="6.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M1 13l5-4.5 3.5 3.5 3-2.5 6.5 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div><h2>Upload Photo</h2><p class="sksfa-card-sub">JPG · PNG · WEBP · Max 8 MB. Appears in the public gallery.</p></div>
           </div>
-          <div><label>Image file</label>
+        </div>
+        <div class="grid2">
+          <div>
+            <label>Category</label>
+            <div id="csGalCat" class="cselect-wrap" style="width:100%;display:block;margin-bottom:18px;"></div>
+          </div>
+          <div>
+            <label>Image file</label>
             <label for="gFile" class="sksfa-file-wrap" id="gFileWrap">
-              <svg class="sksfa-file-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 13.5V15.5a1 1 0 001 1h12a1 1 0 001-1v-2M10 3.5v9M7 6.5l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <svg class="sksfa-file-icon" width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path d="M4 15V17a1 1 0 001 1h12a1 1 0 001-1v-2M11 4v10M8 7l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               <span class="sksfa-file-btn">Choose image</span>
               <span class="sksfa-file-hint">JPG · PNG · WEBP &nbsp;·&nbsp; Max 8 MB</span>
               <span class="sksfa-file-name" id="gFileName">No file selected</span>
             </label>
             <input id="gFile" type="file" accept="image/*" onchange="var w=document.getElementById('gFileWrap'),n=this.files[0];document.getElementById('gFileName').textContent=n?n.name:'No file selected';w.classList.toggle('has-file',!!n)">
           </div>
-          <div><label>Title</label><input id="gTitle" placeholder="e.g. Best Short Film"></div>
-          <div><label>Subtitle</label><input id="gSub" placeholder="e.g. Winner 2025"></div>
+          <div><label>Title</label><input id="gTitle" type="text" placeholder="Photo title"></div>
+          <div><label>Subtitle</label><input id="gSub" type="text" placeholder="Category label or year"></div>
         </div>
-        <button class="btn" onclick="addGallery(event)">Upload photo</button>
-        <div id="galleryList" style="margin-top:14px;"></div>
+        <button class="btn" onclick="addGallery(event)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Upload photo
+        </button>
+        <div id="galleryList" style="margin-top:20px;"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="sksfa-card-head-left">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 5h14M3 10h10M3 15h7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <div><h2>Category Management</h2><p class="sksfa-card-sub">Manage gallery categories. These appear in the upload dropdown above.</p></div>
+          </div>
+        </div>
+        <div id="catManagerList" class="cat-list"></div>
+        <div class="cat-add-row">
+          <input id="newCatInput" type="text" placeholder="New category name (e.g. Jury Meet)" style="margin-bottom:0;flex:1;">
+          <button class="btn" onclick="addGalCategory()" style="flex-shrink:0;">Add category</button>
+        </div>
       </div>
     </div>
 
@@ -275,12 +299,15 @@
         <div class="card-head"><div class="sksfa-card-head-left"><h2>Festival Updates</h2></div></div>
         <p class="card-desc">Shown in the public "Festival Updates" feed, newest first.</p>
         <div class="grid2">
-          <div><label>Date label</label><input id="uDate" placeholder="Now Open / Coming Soon"></div>
-          <div><label>Title</label><input id="uTitle" placeholder="Entries Open"></div>
+          <div><label>Date label</label><input id="uDate" type="text" placeholder="e.g. Now Open · 16 Sept 2026"></div>
+          <div><label>Title</label><input id="uTitle" type="text" placeholder="e.g. Entries Now Open"></div>
         </div>
-        <label>Text</label>
-        <textarea id="uBody" placeholder="Update details…"></textarea>
-        <button class="btn" onclick="addUpdate(event)">Add update</button>
+        <label>Update text</label>
+        <textarea id="uBody" placeholder="Describe this update in full…"></textarea>
+        <button class="btn" onclick="addUpdate(event)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Add update
+        </button>
         <div id="updatesList" style="margin-top:14px;"></div>
       </div>
     </div>
@@ -296,12 +323,15 @@
         <div class="card-head"><div class="sksfa-card-head-left"><h2>Direct Submission Links</h2></div></div>
         <p class="card-desc">Unique links that bypass registration gate. Each link tracks source in entries.</p>
         <div class="grid2">
-          <div><label>Label / Partner name</label><input id="lkLabel" placeholder="e.g. Film School Bangalore"></div>
+          <div><label>Label / Partner name</label><input id="lkLabel" type="text" placeholder="e.g. Film School Bangalore"></div>
           <div><label>Max uses (0 = unlimited)</label><input id="lkMaxUses" type="number" min="0" value="0"></div>
           <div><label>Expires on (optional)</label><input id="lkExpiry" type="datetime-local"></div>
-          <div><label>Note (internal)</label><input id="lkNote" placeholder="e.g. For workshop attendees"></div>
+          <div><label>Note (internal)</label><input id="lkNote" type="text" placeholder="e.g. For workshop attendees"></div>
         </div>
-        <button class="btn" onclick="createLink(event)">Generate Link</button>
+        <button class="btn" onclick="createLink(event)">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M5.5 8.5a3 3 0 004.24 0l2-2a3 3 0 00-4.24-4.24l-1 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M8.5 5.5a3 3 0 00-4.24 0l-2 2a3 3 0 004.24 4.24l1-1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Generate Link
+        </button>
         <div id="linksList" style="margin-top:18px;"></div>
       </div>
     </div>

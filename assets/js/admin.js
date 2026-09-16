@@ -125,6 +125,14 @@ let _allEvals    = [];       // flat list from DB (Awards tab)
 let _evalsLoaded = false;
 let _activeDrawerEntryId = null;
 let _activeCatKey = null;
+let _galCategories = ['events', 'winners2025', 'winners2026'];
+
+function formatCatLabel(slug) {
+  return (slug || '')
+    .replace(/_/g, ' ')
+    .replace(/([a-z])(\d)/g, '$1 $2')
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
 
 /* ═══════════════════════════════════════════════════════
    UTILITIES
@@ -171,7 +179,7 @@ async function gate() {
   if (!isAdmin) { toast('This account is not an admin.', 'err'); await sb.auth.signOut(); return show('login'); }
   document.getElementById('whoami').textContent = ' — ' + session.user.email;
   show('dash');
-  await Promise.all([loadConfig(), loadGallery(), loadUpdates(), loadEntries(), loadLinks()]);
+  await Promise.all([loadConfig(), loadGalleryCategories(), loadGallery(), loadUpdates(), loadEntries(), loadLinks()]);
 }
 function show(v) {
   document.getElementById('loginView').classList.toggle('hidden', v !== 'login');
@@ -203,12 +211,7 @@ function initCSelects() {
     { value: 'applicant', label: 'Applicant A–Z' },
   ], 'newest', () => applyFilters());
 
-  _csel.galCat = new CSelect('csGalCat', [
-    { value: 'events',      label: 'Events' },
-    { value: 'winners2025', label: 'Winners 2025' },
-    { value: 'winners2026', label: 'Winners 2026' },
-  ], 'events', null);
-  // Gallery uses value directly via _csel.galCat.value
+  // galCat is built/rebuilt by loadGalleryCategories() to stay in sync with DB
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -1047,6 +1050,72 @@ async function exportAwardsPdf() {
 }
 
 /* ═══════════════════════════════════════════════════════
+   GALLERY CATEGORIES
+════════════════════════════════════════════════════════ */
+async function loadGalleryCategories() {
+  const { data } = await sb.from('site_config').select('gallery_categories').eq('id', 1).single();
+  if (data && Array.isArray(data.gallery_categories) && data.gallery_categories.length) {
+    _galCategories = data.gallery_categories;
+  }
+  rebuildGalCatSelect();
+  renderCategoryManager();
+}
+
+function rebuildGalCatSelect() {
+  const opts = _galCategories.map(c => ({ value: c, label: formatCatLabel(c) }));
+  if (!opts.length) opts.push({ value: 'general', label: 'General' });
+  if (_csel.galCat) { _csel.galCat.destroy(); delete _csel.galCat; }
+  const wrap = document.getElementById('csGalCat');
+  if (!wrap) return;
+  _csel.galCat = new CSelect(wrap, opts, opts[0].value, null);
+}
+
+async function saveGalleryCategories() {
+  const { error } = await sb.from('site_config').update({ gallery_categories: _galCategories }).eq('id', 1);
+  if (error) toast('Categories save failed: ' + error.message, 'err');
+}
+
+async function addGalCategory() {
+  const input = document.getElementById('newCatInput');
+  const name = (input.value || '').trim();
+  if (!name) return toast('Category name required.', 'err');
+  const slug = name.toLowerCase().replace(/\s+/g, '_').replace(/[^\w]/g, '');
+  if (!slug) return toast('Invalid name — use letters/numbers only.', 'err');
+  if (_galCategories.includes(slug)) return toast('Category already exists.', 'err');
+  _galCategories.push(slug);
+  input.value = '';
+  await saveGalleryCategories();
+  rebuildGalCatSelect();
+  renderCategoryManager();
+  toast('Category added', 'ok');
+}
+
+async function delGalCategory(slug) {
+  if (!confirm(`Remove category "${formatCatLabel(slug)}"? Existing photos in this category will not be deleted.`)) return;
+  _galCategories = _galCategories.filter(c => c !== slug);
+  if (!_galCategories.length) _galCategories = ['general'];
+  await saveGalleryCategories();
+  rebuildGalCatSelect();
+  renderCategoryManager();
+  toast('Category removed', 'ok');
+}
+
+function renderCategoryManager() {
+  const box = document.getElementById('catManagerList');
+  if (!box) return;
+  if (!_galCategories.length) {
+    box.innerHTML = '<p class="muted-note">No categories yet.</p>';
+    return;
+  }
+  box.innerHTML = _galCategories.map(c => `
+    <div class="cat-row">
+      <span class="cat-row-name">${esc(formatCatLabel(c))}</span>
+      <span class="cat-row-slug">${esc(c)}</span>
+      <button class="btn-del" onclick="delGalCategory('${esc(c)}')">Remove</button>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════════
    GALLERY
 ════════════════════════════════════════════════════════ */
 async function loadGallery() {
@@ -1054,12 +1123,16 @@ async function loadGallery() {
   if (error) return toast(error.message, 'err');
   document.getElementById('statPhotos').textContent = (data||[]).length;
   const box = document.getElementById('galleryList');
-  box.innerHTML = (data||[]).map(g => `
-    <div class="item">
-      <img src="${esc(g.src)}" alt="" loading="lazy">
-      <div class="meta"><b>${esc(g.title)||'(untitled)'}</b><span>${esc(g.category)} · ${esc(g.sub)||''}</span></div>
+  if (!data || !data.length) { box.innerHTML = '<div class="empty-state"><span class="em-icon">🖼️</span><h3>No photos yet</h3><p>Upload gallery images above.</p></div>'; return; }
+  box.innerHTML = data.map(g => `
+    <div class="gallery-item">
+      ${g.src ? `<img src="${esc(g.src)}" alt="" loading="lazy">` : '<div class="gallery-item-thumb-placeholder"></div>'}
+      <div class="gallery-item-meta">
+        <div class="gallery-item-title">${esc(g.title)||'(untitled)'}</div>
+        <div class="gallery-item-sub">${esc(formatCatLabel(g.category))} · ${esc(g.sub)||'—'}</div>
+      </div>
       <button class="btn-del" onclick="delGallery(${g.id},'${esc(g.src)}')">Delete</button>
-    </div>`).join('') || '<p class="muted-note">No photos yet.</p>';
+    </div>`).join('');
 }
 async function addGallery(ev) {
   const btn = ev?.target;
@@ -1095,11 +1168,16 @@ async function loadUpdates() {
   const { data, error } = await sb.from('updates_feed').select('*').order('sort_order').order('created_at', { ascending:false });
   if (error) return toast(error.message, 'err');
   const box = document.getElementById('updatesList');
-  box.innerHTML = (data||[]).map(u => `
-    <div class="item">
-      <div class="meta"><b>${esc(u.title)}</b><span>${esc(u.date_label)} — ${esc(u.body)}</span></div>
+  if (!data || !data.length) { box.innerHTML = '<div class="empty-state"><span class="em-icon">📢</span><h3>No updates yet</h3><p>Add a festival update above.</p></div>'; return; }
+  box.innerHTML = data.map(u => `
+    <div class="update-card">
+      <div class="update-card-body">
+        <div class="update-card-date">${esc(u.date_label)||'—'}</div>
+        <div class="update-card-title">${esc(u.title)}</div>
+        <div class="update-card-text">${esc(u.body)}</div>
+      </div>
       <button class="btn-del" onclick="delUpdate(${u.id})">Delete</button>
-    </div>`).join('') || '<p class="muted-note">No updates yet.</p>';
+    </div>`).join('');
 }
 async function addUpdate(ev) {
   const btn = ev?.target;
@@ -1141,13 +1219,15 @@ async function loadLinks() {
     const tokenShort = lk.token.slice(0, 8) + '…';
     const displayUrl = 'sharankrishnashortfilmawards.com/submit.html?token=' + tokenShort;
     return `<div class="link-card">
-      <div class="row" style="justify-content:space-between;gap:8px;">
-        <div><b style="font-size:0.88rem;">${esc(lk.label||'(no label)')}</b>
-          <span class="badge ${status}" style="margin-left:8px;">${statusLabel}</span></div>
-        <div class="row" style="gap:6px;">
+      <div class="link-card-header">
+        <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+          <span class="link-card-label">${esc(lk.label||'(no label)')}</span>
+          <span class="badge ${status}">${statusLabel}</span>
+        </div>
+        <div class="link-card-actions">
           <button class="btn-ghost btn-xs" onclick="copyLink('${esc(fullUrl)}')">Copy</button>
           <button class="btn-ghost btn-xs" onclick="window.open('${esc(fullUrl)}','_blank')">Open ↗</button>
-          ${status==='active'?`<button class="btn-del" style="padding:4px 9px;font-size:0.71rem;" onclick="revokeLink(${lk.id})">Revoke</button>`:''}
+          ${status==='active'?`<button class="btn-del" onclick="revokeLink(${lk.id})">Revoke</button>`:''}
         </div>
       </div>
       <code class="lc-url" title="${esc(fullUrl)}">${esc(displayUrl)}</code>
