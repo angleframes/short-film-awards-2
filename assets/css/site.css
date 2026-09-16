@@ -933,7 +933,7 @@
 
         .category-carousel-card {
             position: absolute !important;
-            width: 13rem;
+            width: 15rem;
             height: 18rem;
             display: flex;
             flex-direction: column;
@@ -964,17 +964,17 @@
         .category-carousel-card .stack-emoji { font-size: 3rem; margin-bottom: 0.9rem; }
 
         .category-carousel-card .stack-card-title {
-            font-size: clamp(0.92rem, 2.5vw, 1.2rem);
+            font-size: clamp(0.9rem, 1.8vw, 1.1rem);
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             color: #ffffff;
             margin: 0 0 0.5rem 0;
             line-height: 1.25;
-            word-break: break-word;
-            overflow-wrap: break-word;
+            word-break: normal;
+            overflow-wrap: normal;
+            hyphens: none;
             max-width: 100%;
-            hyphens: auto;
         }
 
         .category-carousel-card .stack-card-sub {
@@ -1070,8 +1070,8 @@
 
         @media (max-width: 768px) {
             .category-carousel-wrapper { height: 280px; overflow: hidden; }
-            .category-carousel-card { width: 10.5rem; height: 15rem; padding: 1.2rem; }
-            .category-carousel-card .stack-card-title { font-size: clamp(0.85rem, 2.8vw, 1.05rem); }
+            .category-carousel-card { width: 12rem; height: 15rem; padding: 1.2rem; }
+            .category-carousel-card .stack-card-title { font-size: clamp(0.82rem, 3vw, 0.95rem); hyphens: none; word-break: normal; }
             .category-carousel-card .stack-emoji { font-size: 2.4rem; }
             .category-carousel-btn { width: 44px; height: 44px; }
             .category-carousel-btn.prev { left: clamp(4px, 1.5vw, 16px); }
@@ -1223,7 +1223,7 @@
         .gallery-select-strip li {
             flex: 0 0 130px;
             scroll-snap-align: start;
-            transition: 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: transform 0.13s ease, border-color 0.13s ease, box-shadow 0.13s ease, opacity 0.13s ease, z-index 0s;
             cursor: pointer;
             transform-origin: center bottom;
             border-radius: 10px;
@@ -1248,7 +1248,7 @@
             border-radius: 8px;
             /* Default: grayscale. Color reveals on hover or when selected */
             filter: grayscale(1);
-            transition: filter 0.35s ease;
+            transition: filter 0.15s ease;
         }
 
         .gallery-select-strip li label span:not(.thumb-placeholder) {
