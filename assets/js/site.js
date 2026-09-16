@@ -774,13 +774,29 @@
         // Gallery state
         let _galleryPhotos = [];
         let _galleryCurrentIdx = 0;
+        let _galleryPendingIdx = -1;
+        const _imageCache = new Map(); // src → {img, decoded}
+
+        function _galleryPreloadSrc(src) {
+            if (!src || _imageCache.has(src)) return _imageCache.get(src);
+            const entry = { img: new Image(), decoded: false };
+            _imageCache.set(src, entry);
+            entry.img.src = src;
+            if (entry.img.decode) {
+                entry.img.decode().then(() => { entry.decoded = true; }).catch(() => { entry.decoded = true; });
+            } else {
+                entry.decoded = true;
+            }
+            return entry;
+        }
 
         function _gallerySelectIdx(idx, wrap, strip, stage) {
             if (idx < 0 || idx >= _galleryPhotos.length) return;
             _galleryCurrentIdx = idx;
+            _galleryPendingIdx = idx;
             const pid = `photo${idx + 1}`;
 
-            // Update thumbnail active state
+            // Update thumbnail active state immediately
             strip.querySelectorAll('li').forEach((li, i) => {
                 const selected = i === idx;
                 li.style.borderColor = selected ? 'rgba(255,255,255,0.9)' : '';
@@ -789,26 +805,52 @@
                 if (img) img.style.filter = selected ? 'grayscale(0)' : '';
             });
 
-            // Crossfade: show new figure, hide old
+            // Crossfade: fade out old figs
             const figs = stage.querySelectorAll('.gs-fig');
             const newFig = stage.querySelector(`.gs-fig[data-id="${pid}"]`);
             figs.forEach(f => {
                 if (f !== newFig) {
                     f.style.opacity = '0';
-                    setTimeout(() => { if (f !== newFig) f.style.display = 'none'; }, 200);
+                    setTimeout(() => { if (f !== newFig) f.style.display = 'none'; }, 160);
                 }
             });
+
             if (newFig) {
-                const mainImg = newFig.querySelector('img:not(.gs-backdrop)');
+                const src = _galleryPhotos[idx] && _galleryPhotos[idx].src;
+                const entry = src ? _imageCache.get(src) : null;
+                const capturedIdx = idx;
+
                 const show = () => {
+                    if (_galleryPendingIdx !== capturedIdx) return; // stale — newer click won
                     newFig.style.display = 'block';
                     requestAnimationFrame(() => { newFig.style.opacity = '1'; });
                 };
-                if (mainImg && !mainImg.complete) {
-                    mainImg.onload = show;
-                    mainImg.onerror = show;
-                } else {
+
+                if (entry && entry.decoded) {
                     show();
+                } else if (entry && entry.img) {
+                    // Image loading but not yet decoded — wait for decode
+                    const onReady = () => {
+                        if (_galleryPendingIdx !== capturedIdx) return;
+                        show();
+                    };
+                    if (entry.img.decode) {
+                        entry.img.decode().then(onReady).catch(onReady);
+                    } else {
+                        entry.img.addEventListener('load', onReady, { once: true });
+                        entry.img.addEventListener('error', onReady, { once: true });
+                    }
+                } else {
+                    // Fallback: image not preloaded — show immediately from DOM img
+                    const mainImg = newFig.querySelector('img:not(.gs-backdrop)');
+                    if (mainImg && mainImg.complete) {
+                        show();
+                    } else if (mainImg) {
+                        mainImg.addEventListener('load', show, { once: true });
+                        mainImg.addEventListener('error', show, { once: true });
+                    } else {
+                        show();
+                    }
                 }
             }
 
@@ -817,14 +859,11 @@
             if (activeLi) activeLi.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 
             // Preload adjacent images
-            _galleryPreloadAdjacent(idx);
-        }
-
-        function _galleryPreloadAdjacent(idx) {
-            const toLoad = [idx - 1, idx + 1, idx + 2].filter(i => i >= 0 && i < _galleryPhotos.length);
-            toLoad.forEach(i => {
-                const src = _galleryPhotos[i] && _galleryPhotos[i].src;
-                if (src) { const img = new Image(); img.src = src; }
+            [idx - 1, idx + 1, idx + 2].forEach(i => {
+                if (i >= 0 && i < _galleryPhotos.length) {
+                    const s = _galleryPhotos[i] && _galleryPhotos[i].src;
+                    if (s) _galleryPreloadSrc(s);
+                }
             });
         }
 
@@ -902,20 +941,13 @@
                 }
             }, { passive: true });
 
-            // Background preload of remaining images after first paint
-            if ('requestIdleCallback' in window) {
-                requestIdleCallback(() => {
-                    _galleryPhotos.slice(1).forEach(photo => {
-                        if (photo.src) { const img = new Image(); img.src = photo.src; }
-                    });
-                }, { timeout: 4000 });
-            } else {
-                setTimeout(() => {
-                    _galleryPhotos.slice(1).forEach(photo => {
-                        if (photo.src) { const img = new Image(); img.src = photo.src; }
-                    });
-                }, 2000);
-            }
+            // Preload first image immediately (decode-ahead so first click is instant)
+            if (_galleryPhotos[0] && _galleryPhotos[0].src) _galleryPreloadSrc(_galleryPhotos[0].src);
+
+            // Preload all remaining images after 500ms
+            setTimeout(() => {
+                _galleryPhotos.forEach(photo => { if (photo.src) _galleryPreloadSrc(photo.src); });
+            }, 500);
         }
 
         function initGalleryPicker() { /* renderGallery() handles all wiring */ }

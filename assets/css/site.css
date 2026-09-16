@@ -933,7 +933,7 @@
 
         .category-carousel-card {
             position: absolute !important;
-            width: 15rem;
+            width: 17rem;
             height: 18rem;
             display: flex;
             flex-direction: column;
@@ -1070,7 +1070,7 @@
 
         @media (max-width: 768px) {
             .category-carousel-wrapper { height: 280px; overflow: hidden; }
-            .category-carousel-card { width: 12rem; height: 15rem; padding: 1.2rem; }
+            .category-carousel-card { width: 14rem; height: 16rem; padding: 1.2rem; }
             .category-carousel-card .stack-card-title { font-size: clamp(0.82rem, 3vw, 0.95rem); hyphens: none; word-break: normal; }
             .category-carousel-card .stack-emoji { font-size: 2.4rem; }
             .category-carousel-btn { width: 44px; height: 44px; }
