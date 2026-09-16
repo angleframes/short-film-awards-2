@@ -1388,31 +1388,70 @@
         .gallery-select-header .section-heading { margin-bottom: 0; }
 
         @media (max-width: 768px) {
-            .gallery-select-wrap { min-height: 100svh; min-height: 100dvh; }
-            .gallery-select-aside { padding: 44px 0 8px; overflow: visible; }
+            /* Gallery restructure: remove cinematic 100dvh; use flow layout on mobile */
+            .gallery-select-wrap {
+                min-height: auto !important;
+                overflow: visible;
+                display: flex;
+                flex-direction: column;
+            }
+            /* Stage: position:relative with defined height so image centers within it */
+            .gallery-select-stage {
+                position: relative;
+                width: 100%;
+                height: 56vw;
+                min-height: 200px;
+                max-height: 260px;
+                flex-shrink: 0;
+            }
+            /* Aside: pull out of absolute-bottom; flow after stage */
+            .gallery-select-aside {
+                position: relative;
+                bottom: auto;
+                left: auto;
+                width: 100%;
+                background: linear-gradient(rgba(6,6,8,0.6), rgba(6,6,8,0.97) 30%);
+                padding: 14px 0 calc(10px + env(safe-area-inset-bottom, 0px));
+                overflow: visible;
+            }
+            /* Strip: left-aligned so all thumbs reachable; remove fading mask edges */
+            .gallery-select-strip {
+                justify-content: flex-start;
+                padding: 8px 16px 4px;
+                -webkit-mask-image: none;
+                mask-image: none;
+                overscroll-behavior-x: contain;
+            }
             .gallery-select-strip li {
-                flex: 0 0 80px;
+                flex: 0 0 110px;
                 overflow: visible;
             }
             .gallery-select-strip li label img,
-            .thumb-placeholder { aspect-ratio: 3/4; }
-            .gallery-select-strip li label span:not(.thumb-placeholder) { font-size: 0.5rem; }
-            .gallery-select-strip li:hover { transform: scale(1.06); }
+            .thumb-placeholder { aspect-ratio: 16/10; }
+            .gallery-select-strip li label span:not(.thumb-placeholder) { font-size: 0.55rem; }
+            /* Caption: compact overlay at bottom of stage */
             .gs-fig figcaption {
-                bottom: clamp(140px, 20vh, 185px);
+                bottom: 10px;
                 left: 5%;
                 right: 5%;
                 max-width: 90%;
             }
-            .gs-fig figcaption h3 { font-size: clamp(1.1rem, 5vw, 1.5rem); letter-spacing: 1px; }
+            .gs-fig figcaption h3 { font-size: clamp(1rem, 4.5vw, 1.4rem); letter-spacing: 1px; }
             .gs-fig figcaption p { font-size: clamp(0.6rem, 2.5vw, 0.72rem); letter-spacing: 2px; }
-            .gallery-select-header { padding: 36px 5% 14px; }
+            .gallery-select-header { padding: 32px 5% 10px; }
+            /* Reduce heavy backdrop blur on mobile for GPU savings */
+            .gs-fig .gs-backdrop { filter: blur(14px) brightness(0.5) saturate(1.2); }
+            /* Hover effects only on real pointer devices */
+            .gallery-select-strip li:hover { transform: none; }
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .gallery-select-strip li:hover { transform: translateY(-4px) scale(1.04); }
         }
 
         @media (max-width: 430px) {
-            .gallery-select-strip li { flex: 0 0 68px; }
-            .gs-fig figcaption { bottom: 130px; }
-            .gs-fig figcaption h3 { font-size: 1rem; }
+            .gallery-select-strip li { flex: 0 0 96px; }
+            .gallery-select-stage { height: 58vw; }
         }
 
         /* ===== CATEGORIES SECTION ===== */
@@ -2765,8 +2804,18 @@
             100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
         }
         @media (max-width: 600px) {
-            .whatsapp-float-btn { width: 50px; height: 50px; bottom: 18px; right: 18px; }
+            .whatsapp-float-btn {
+                width: 50px;
+                height: 50px;
+                bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+                right: calc(18px + env(safe-area-inset-right, 0px));
+            }
             .whatsapp-float-btn svg { width: 25px; height: 25px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .whatsapp-float-btn::before { animation: none; }
+            .gs-fig { transition: opacity 0.05s; }
+            .gallery-select-strip li { transition: none; }
         }
 
         /* ===== FOOTER ===== */
