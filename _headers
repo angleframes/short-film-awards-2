@@ -1,0 +1,28 @@
+/*
+  X-Content-Type-Options: nosniff
+
+# Long-lived immutable cache for versioned/fingerprinted assets (images, fonts, icons)
+/Gallery/display/*
+  Cache-Control: public, max-age=31536000, immutable
+/Gallery/thumbs/*
+  Cache-Control: public, max-age=31536000, immutable
+/Gallery/*
+  Cache-Control: public, max-age=31536000, immutable
+/assets/css/*
+  Cache-Control: public, max-age=86400, must-revalidate
+/assets/js/*
+  Cache-Control: public, max-age=86400, must-revalidate
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+
+# HTML — short cache so content updates propagate quickly
+/*.html
+  Cache-Control: public, max-age=60, must-revalidate
+/
+  Cache-Control: public, max-age=60, must-revalidate

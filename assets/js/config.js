@@ -41,13 +41,12 @@
         ];
 
         const GALLERY_IMAGES = [
-            { category: "winners2025", src: "Gallery/MRC01071.JPG.webp", title: "Best Short Film: 'Bug'", sub: "Winner 2025" },
-            { category: "winners2025", src: "Gallery/MRC01028.JPG.webp", title: "Campus Category: 'Timeless'", sub: "Winner 2025" },
-            { category: "winners2026", src: "", title: "To Be Announced", sub: "Coming Soon" },
-            { category: "events", src: "Gallery/MRC00596.JPG.webp", title: "Inauguration", sub: "Inauguration" },
-            { category: "events", src: "Gallery/MRC00614.JPG.webp", title: "Inauguration", sub: "Cinema Hall" },
-            { category: "events", src: "Gallery/MRC00625.JPG.webp", title: "Inauguration", sub: "Cinema Hall" },
-            { category: "events", src: "Gallery/MRC00629.JPG.webp", title: "Inauguration", sub: "Cinema Hall" }
+            { category: "winners2025", src: "Gallery/display/MRC01071.webp", thumb: "Gallery/thumbs/MRC01071.webp", title: "Best Short Film: 'Bug'", sub: "Winner 2025" },
+            { category: "winners2025", src: "Gallery/display/MRC01028.webp", thumb: "Gallery/thumbs/MRC01028.webp", title: "Campus Category: 'Timeless'", sub: "Winner 2025" },
+            { category: "winners2026", src: "", thumb: "", title: "To Be Announced", sub: "Coming Soon" },
+            { category: "events", src: "Gallery/display/MRC00596.webp", thumb: "Gallery/thumbs/MRC00596.webp", title: "Inauguration", sub: "Inauguration" },
+            { category: "events", src: "Gallery/display/MRC00614.webp", thumb: "Gallery/thumbs/MRC00614.webp", title: "Inauguration", sub: "Cinema Hall" },
+            { category: "events", src: "Gallery/display/MRC00625.webp", thumb: "Gallery/thumbs/MRC00625.webp", title: "Inauguration", sub: "Cinema Hall" }
         ];
 
         const APP_CONFIG = {

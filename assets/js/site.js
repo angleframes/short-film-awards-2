@@ -867,12 +867,10 @@
             });
         }
 
+        let _galleryInitialized = false;
+
         function renderGallery() {
-            /*************************************************************
-             * ✏️ ADD PHOTOS HERE — just add entries to GALLERY_IMAGES
-             * above. Photos with an empty src="" are automatically hidden.
-             * Only entries WITH a src show up in the gallery.
-             *************************************************************/
+            if (_galleryInitialized) return; // run once — DOM stays alive on scroll away/back
 
             const wrap = document.getElementById('section-gallery');
             const strip = document.getElementById('galleryStrip');
@@ -883,6 +881,7 @@
             _galleryPhotos = GALLERY_IMAGES.filter(p => p.src && p.src.trim() !== '');
             if (!_galleryPhotos.length) return;
 
+            _galleryInitialized = true;
             strip.innerHTML = '';
             stage.innerHTML = '';
 
@@ -892,9 +891,10 @@
                 const shortTitle = photo.title.replace(/[:'"].*/, '').trim();
                 const isFirst = idx === 0;
 
-                // Thumbnail strip item
+                // Thumbnail strip item — use small thumb asset to avoid loading full display image
+                const thumbSrc = photo.thumb || photo.src;
                 const li = document.createElement('li');
-                li.innerHTML = `<label data-photo="${pid}"><img src="${photo.src}" alt="${photo.title}" loading="${isFirst ? 'eager' : 'lazy'}" decoding="async"><span>${shortTitle}</span></label>`;
+                li.innerHTML = `<label data-photo="${pid}"><img src="${thumbSrc}" alt="${photo.title}" loading="${isFirst ? 'eager' : 'lazy'}" decoding="async" width="130" height="87"><span>${shortTitle}</span></label>`;
                 strip.appendChild(li);
 
                 // Stage figure
@@ -941,12 +941,15 @@
                 }
             }, { passive: true });
 
-            // Preload first image immediately (decode-ahead so first click is instant)
+            // Preload first display image immediately
             if (_galleryPhotos[0] && _galleryPhotos[0].src) _galleryPreloadSrc(_galleryPhotos[0].src);
 
-            // Preload all remaining images after 500ms
+            // Preload all display + thumb images after 500ms so first paint isn't blocked
             setTimeout(() => {
-                _galleryPhotos.forEach(photo => { if (photo.src) _galleryPreloadSrc(photo.src); });
+                _galleryPhotos.forEach(photo => {
+                    if (photo.src) _galleryPreloadSrc(photo.src);
+                    if (photo.thumb) _galleryPreloadSrc(photo.thumb);
+                });
             }, 500);
         }
 
