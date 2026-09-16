@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<link rel="stylesheet" href="assets/css/admin.css">
+<link rel="stylesheet" href="assets/css/admin.css?v=3">
 </head>
 <body class="sksfa-admin">
 
@@ -359,17 +359,6 @@
         <div id="tmtList" style="margin-top:4px;"></div>
       </div>
 
-      <!-- Delete confirm modal -->
-      <div id="tmtDelModal" class="modal-overlay hidden" onclick="if(event.target===this)tmtDelModalClose()">
-        <div class="modal-box">
-          <h2 style="margin-bottom:8px;">Delete Testimonial?</h2>
-          <p style="color:var(--mut);font-size:0.87rem;margin-bottom:20px;">This will remove the testimonial from the public website.</p>
-          <div style="display:flex;gap:10px;justify-content:flex-end;">
-            <button class="btn-ghost" onclick="tmtDelModalClose()">Cancel</button>
-            <button class="btn btn-danger" id="tmtDelConfirmBtn">Delete</button>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- ═══ UPDATES TAB ════════════════════════════════════ -->
@@ -424,6 +413,18 @@
 </div><!-- /dashView -->
 
 <!-- ═══ ENTRY DRAWER ══════════════════════════════════════ -->
+<!-- Testimonials delete confirm modal — at body root so fixed positioning is never inside a hidden tab-pane -->
+<div id="tmtDelModal" class="modal-overlay hidden" onclick="if(event.target===this)tmtDelModalClose()">
+  <div class="modal-box">
+    <h2 style="margin-bottom:8px;">Delete Testimonial?</h2>
+    <p style="color:var(--mut);font-size:0.87rem;margin-bottom:20px;">This will remove the testimonial from the public website.</p>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn-ghost" onclick="tmtDelModalClose()">Cancel</button>
+      <button class="btn btn-danger" id="tmtDelConfirmBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer(event)">
   <div class="drawer" id="drawerPanel">
     <div class="drawer-header">
@@ -437,5 +438,5 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="assets/js/admin.js"></script>
+<script src="assets/js/admin.js?v=3"></script>
 </html>
