@@ -176,10 +176,11 @@
             try {
                 if (!window.supabase) return;
                 const SB = window.supabase.createClient(SUPA_URL, SUPA_ANON);
-                const [cfgRes, galRes, updRes] = await Promise.all([
+                const [cfgRes, galRes, updRes, tmtRes] = await Promise.all([
                     SB.from('site_config').select('*').eq('id', 1).single(),
                     SB.from('gallery').select('*').order('sort_order').order('created_at', { ascending: false }),
-                    SB.from('updates_feed').select('*').order('sort_order').order('created_at', { ascending: false })
+                    SB.from('updates_feed').select('*').order('sort_order').order('created_at', { ascending: false }),
+                    SB.from('testimonials').select('*').order('display_order').order('created_at')
                 ]);
                 const cfg = cfgRes.data;
                 if (cfg) {
@@ -197,8 +198,10 @@
                     UPDATES_FEED.length = 0;
                     updRes.data.forEach(u => UPDATES_FEED.push({ date: u.date_label || '', title: u.title || '', text: u.body || '' }));
                 }
+                window._testimonialsData = Array.isArray(tmtRes.data) ? tmtRes.data : [];
             } catch (e) {
                 console.warn('Remote config load failed — using built-in defaults.', e);
+                window._testimonialsData = window._testimonialsData || [];
             }
         }
 
@@ -250,6 +253,7 @@
             renderAboutCards();
             renderGallery();
             initGalleryPicker();
+            renderTestimonials();
             renderUpdatesFeed();
             renderGuidelines();
             renderJuryPanel();
@@ -1013,6 +1017,146 @@
             if (titleEl)   titleEl.textContent  = meta.title   || '';
             if (eyebrowEl) eyebrowEl.textContent = meta.eyebrow || '';
             if (descEl)    descEl.textContent    = meta.desc    || '';
+        }
+
+        /* ===== TESTIMONIALS ===== */
+        let _testimonialsInitialized = false;
+
+        function _tmtEsc(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
+        function _tmtThumbSrc(videoId) {
+            return `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
+        }
+
+        function _tmtThumbFallback(img) {
+            const id = img.dataset.ytid;
+            if (!id) return;
+            if (img.dataset.fallback === '1') { img.src = `https://i.ytimg.com/vi/${id}/mqdefault.jpg`; img.dataset.fallback='done'; return; }
+            if (img.dataset.fallback !== 'done') { img.src = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; img.dataset.fallback='1'; }
+        }
+
+        function _playYouTube(videoId) {
+            const backdrop = document.getElementById('ytModalBackdrop');
+            const frame    = document.getElementById('ytModalFrame');
+            if (!backdrop || !frame) return;
+            frame.innerHTML = `<iframe src="https://www.youtube.com/embed/${_tmtEsc(videoId)}?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            backdrop.classList.add('open');
+            backdrop.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function _closeYtModal() {
+            const backdrop = document.getElementById('ytModalBackdrop');
+            const frame    = document.getElementById('ytModalFrame');
+            if (!backdrop) return;
+            if (frame) frame.innerHTML = '';
+            backdrop.classList.remove('open');
+            backdrop.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        function _setupYtModal() {
+            const backdrop = document.getElementById('ytModalBackdrop');
+            const closeBtn = document.getElementById('ytModalClose');
+            if (!backdrop) return;
+            closeBtn && closeBtn.addEventListener('click', _closeYtModal);
+            backdrop.addEventListener('click', e => { if (e.target === backdrop) _closeYtModal(); });
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') _closeYtModal(); });
+        }
+
+        const _PLAY_SVG = `<svg viewBox="0 0 24 24" fill="white"><polygon points="6,4 20,12 6,20"/></svg>`;
+
+        function renderTestimonials() {
+            if (_testimonialsInitialized) return;
+            _testimonialsInitialized = true;
+            _setupYtModal();
+
+            const data = window._testimonialsData || [];
+            const section = document.getElementById('section-testimonials');
+            if (!section) return;
+
+            if (!data.length) { section.style.display = 'none'; return; }
+            section.style.display = '';
+
+            /* show/hide nav link */
+            const navLink = document.getElementById('navTestimonials');
+            if (navLink) navLink.style.display = '';
+            const moreLink = document.getElementById('navMoreTestimonials');
+            if (moreLink) moreLink.style.display = '';
+
+            const featured  = data.find(t => t.featured) || data[0];
+            const rest      = data.filter(t => t.id !== featured.id);
+
+            /* --- Featured --- */
+            const featEl = document.getElementById('testimonialsFeatured');
+            if (featEl && featured) {
+                const fid   = _tmtEsc(featured.youtube_video_id);
+                const fname = featured.person_name ? _tmtEsc(featured.person_name) : '';
+                const frole = [featured.role, featured.year].filter(Boolean).map(_tmtEsc).join(' | ');
+                const fquote= featured.short_text ? `<p class="tmt-featured-quote">&ldquo;${_tmtEsc(featured.short_text)}&rdquo;</p>` : '';
+                featEl.innerHTML = `
+                    <div class="tmt-featured-grid">
+                        <button class="tmt-featured-thumb" aria-label="Play: ${_tmtEsc(featured.video_title)}" data-ytid="${fid}">
+                            <img src="${_tmtThumbSrc(fid)}" alt="${_tmtEsc(featured.video_title)}" loading="eager" decoding="async" data-ytid="${fid}" onerror="_tmtThumbFallback(this)">
+                            <div class="tmt-play-btn" aria-hidden="true">
+                                <div class="tmt-play-icon">${_PLAY_SVG}</div>
+                            </div>
+                        </button>
+                        <div class="tmt-featured-info">
+                            <span class="tmt-eyebrow">FEATURED TESTIMONIAL</span>
+                            <h3 class="tmt-featured-title">${_tmtEsc(featured.video_title)}</h3>
+                            ${fquote}
+                            ${fname ? `<div class="tmt-featured-person"><strong>${fname}</strong>${frole ? `<span>${frole}</span>` : ''}</div>` : ''}
+                            <button class="tmt-watch-btn" data-ytid="${fid}" aria-label="Watch testimonial: ${_tmtEsc(featured.video_title)}">
+                                ${_PLAY_SVG} Watch Testimonial &#8594;
+                            </button>
+                        </div>
+                    </div>`;
+                featEl.querySelector('.tmt-featured-thumb').addEventListener('click', () => _playYouTube(fid));
+                featEl.querySelector('.tmt-watch-btn').addEventListener('click', () => _playYouTube(fid));
+            }
+
+            /* --- More carousel --- */
+            const moreWrap = document.getElementById('testimonialsMoreWrap');
+            const track    = document.getElementById('testimonialsTrack');
+            if (!moreWrap || !track) return;
+
+            if (!rest.length) { moreWrap.style.display = 'none'; return; }
+            moreWrap.style.display = '';
+
+            track.innerHTML = rest.map(t => {
+                const id    = _tmtEsc(t.youtube_video_id);
+                const name  = t.person_name ? _tmtEsc(t.person_name) : '';
+                const role  = [t.role, t.year].filter(Boolean).map(_tmtEsc).join(' · ');
+                const quote = t.short_text ? `<p class="tmt-card-quote">&ldquo;${_tmtEsc(t.short_text)}&rdquo;</p>` : '';
+                return `<div class="tmt-card" data-ytid="${id}" role="button" tabindex="0" aria-label="Play: ${_tmtEsc(t.video_title)}">
+                    <div class="tmt-card-thumb">
+                        <img src="${_tmtThumbSrc(id)}" alt="${_tmtEsc(t.video_title)}" loading="lazy" decoding="async" data-ytid="${id}" onerror="_tmtThumbFallback(this)">
+                        <div class="tmt-card-play" aria-hidden="true"><div class="tmt-card-play-icon">${_PLAY_SVG}</div></div>
+                    </div>
+                    <div class="tmt-card-body">
+                        <div class="tmt-card-title" title="${_tmtEsc(t.video_title)}">${_tmtEsc(t.video_title)}</div>
+                        ${name ? `<div class="tmt-card-person"><strong>${name}</strong>${role ? `<span>${role}</span>` : ''}</div>` : ''}
+                        ${quote}
+                    </div>
+                </div>`;
+            }).join('');
+
+            track.querySelectorAll('.tmt-card').forEach(card => {
+                const play = () => _playYouTube(card.dataset.ytid);
+                card.addEventListener('click', play);
+                card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); play(); } });
+            });
+
+            /* carousel arrow scroll */
+            const vp   = document.getElementById('testimonialsCarousel');
+            const prev = document.getElementById('tcarouselPrev');
+            const next = document.getElementById('tcarouselNext');
+            const SCROLL_AMT = 240;
+            prev && prev.addEventListener('click', () => vp.scrollBy({ left: -SCROLL_AMT, behavior: 'smooth' }));
+            next && next.addEventListener('click', () => vp.scrollBy({ left:  SCROLL_AMT, behavior: 'smooth' }));
         }
 
         function renderUpdatesFeed() {

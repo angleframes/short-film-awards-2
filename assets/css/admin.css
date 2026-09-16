@@ -1771,3 +1771,56 @@
   .sksfa-admin .update-card .btn-del { align-self: flex-end; }
   .sksfa-admin .gallery-item { flex-wrap: wrap; }
 }
+
+/* ===== TESTIMONIALS ADMIN ===== */
+.sksfa-admin .tmt-admin-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.sksfa-admin .tmt-admin-card:last-child { border-bottom: none; }
+.sksfa-admin .tmt-admin-thumb {
+  flex: 0 0 100px;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  border-radius: 5px;
+  background: #111;
+}
+.sksfa-admin .tmt-admin-info { flex: 1; min-width: 0; }
+.sksfa-admin .tmt-admin-title { font-weight: 600; font-size: 0.88rem; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sksfa-admin .tmt-admin-meta { font-size: 0.76rem; color: var(--mut); margin-bottom: 6px; }
+.sksfa-admin .tmt-admin-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.sksfa-admin .pill-featured { display: inline-block; padding: 1px 8px; border-radius: 100px; font-size: 0.68rem; letter-spacing: 0.06em; font-weight: 600; background: rgba(255,215,0,0.15); color: #ffd700; border: 1px solid rgba(255,215,0,0.3); }
+.sksfa-admin .pill-nonfeatured { display: inline-block; padding: 1px 8px; border-radius: 100px; font-size: 0.68rem; letter-spacing: 0.06em; font-weight: 600; background: rgba(255,255,255,0.05); color: var(--mut); border: 1px solid rgba(255,255,255,0.1); }
+/* Modal */
+.sksfa-admin .modal-overlay {
+  position: fixed; inset: 0; z-index: 8000;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+}
+.sksfa-admin .modal-overlay.hidden { display: none; }
+.sksfa-admin .modal-box {
+  background: var(--surface, #1a1a1f);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 28px;
+  max-width: 420px;
+  width: 90%;
+}
+.sksfa-admin .btn-danger {
+  background: #c0392b;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 9px 18px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.sksfa-admin .btn-danger:hover { background: #e74c3c; }
+@media (max-width: 600px) {
+  .sksfa-admin .tmt-admin-card { flex-direction: column; }
+  .sksfa-admin .tmt-admin-thumb { width: 100%; flex: none; aspect-ratio: 16/9; }
+}

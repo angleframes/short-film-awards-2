@@ -59,11 +59,13 @@
             <a id="navStory" href="#section-story">About</a>
             <a id="navCategories" href="#section-categories">Categories</a>
             <a id="navGallery" href="#section-gallery">Gallery</a>
+            <a id="navTestimonials" href="#section-testimonials" style="display:none;">Testimonials</a>
             <a id="navRegistration" href="#section-registration">Registration</a>
             <a id="navContact" href="#section-contact">Contact Us</a>
             <div class="nav-more-wrapper" id="navMoreWrapper">
                 <a href="javascript:void(0)" id="navMoreTrigger" onclick="toggleMoreDropdown(event)">More &#9662;</a>
                 <div class="nav-more-dropdown" id="navMoreDropdown">
+                    <a id="navMoreTestimonials" onclick="location.href='#section-testimonials';closeMobileMenu&&closeMobileMenu();" style="display:none;">Testimonials</a>
                     <a onclick="selectMoreItem('submit')">How To Submit</a>
                     <a onclick="selectMoreItem('guidelines')">Festival Guidelines</a>
                     <a onclick="selectMoreItem('updates')">Festival Updates</a>
@@ -458,6 +460,36 @@
 
     </section>
 
+
+    <!-- ===== TESTIMONIALS SECTION ===== -->
+    <section id="section-testimonials" class="page-section testimonials-section" style="display:none;">
+        <div class="testimonials-inner">
+            <div class="testimonials-header">
+                <span class="section-eyebrow scroll-reveal">Memories &amp; Moments</span>
+                <h2 class="section-heading scroll-reveal delay-1"><span class="shiny-text">Testimonials</span></h2>
+                <p class="testimonials-sub scroll-reveal delay-2">Real Feedback &bull; Real Experience</p>
+            </div>
+            <div class="testimonials-featured scroll-reveal delay-2" id="testimonialsFeatured"></div>
+            <div class="testimonials-more-wrap" id="testimonialsMoreWrap" style="display:none;">
+                <h3 class="testimonials-more-label">MORE TESTIMONIALS</h3>
+                <div class="testimonials-carousel-outer">
+                    <button class="tcarousel-arrow tcarousel-prev" id="tcarouselPrev" aria-label="Previous testimonials">&#8249;</button>
+                    <div class="testimonials-carousel-viewport" id="testimonialsCarousel">
+                        <div class="testimonials-carousel-track" id="testimonialsTrack"></div>
+                    </div>
+                    <button class="tcarousel-arrow tcarousel-next" id="tcarouselNext" aria-label="Next testimonials">&#8250;</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- YouTube Video Modal -->
+    <div class="yt-modal-backdrop" id="ytModalBackdrop" aria-hidden="true">
+        <div class="yt-modal-box" role="dialog" aria-modal="true" aria-label="Video player">
+            <button class="yt-modal-close" id="ytModalClose" aria-label="Close video">&times;</button>
+            <div class="yt-modal-frame" id="ytModalFrame"></div>
+        </div>
+    </div>
 
     <!-- ===== REGISTRATION SECTION ===== -->
     <section id="section-registration" class="page-section">

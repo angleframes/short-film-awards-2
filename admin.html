@@ -64,6 +64,10 @@
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="5" cy="5.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 9.5l3.5-3 2.5 2.5 2-1.5 4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Gallery
       </button>
+      <button class="tab-btn" data-tab="testimonials" onclick="switchTab('testimonials')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="2" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 5h5M4.5 7h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4 10l-2 2V10" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+        Testimonials
+      </button>
       <button class="tab-btn" data-tab="updates" onclick="switchTab('updates')">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1a5 5 0 015 5c0 1.5-.5 2.7-1.4 3.6L12 13H2L3.4 9.6A5 5 0 017 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.5 13a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.2"/></svg>
         Updates
@@ -284,6 +288,86 @@
         <div class="cat-add-row">
           <input id="newCatInput" type="text" placeholder="New category name (e.g. Jury Meet)" style="margin-bottom:0;flex:1;">
           <button class="btn" onclick="addGalCategory()" style="flex-shrink:0;">Add category</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TESTIMONIALS TAB ═══════════════════════════════ -->
+    <div class="tab-pane" id="tab-testimonials">
+      <div class="sksfa-page-title">
+        <div class="sksfa-eyebrow">ADMIN CONTROL PANEL</div>
+        <h1 class="sksfa-h1">Testimonials</h1>
+        <p class="sksfa-page-desc">Add YouTube video testimonials. Paste a URL — metadata fetches automatically.</p>
+      </div>
+
+      <!-- Add / Edit form -->
+      <div class="card" id="tmtFormCard">
+        <div class="card-head">
+          <div class="sksfa-card-head-left">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <div><h2 id="tmtFormTitle">Add Testimonial</h2><p class="sksfa-card-sub">Paste a YouTube link — video info fetches automatically.</p></div>
+          </div>
+          <button class="btn-ghost btn-sm" id="tmtCancelEdit" style="display:none;" onclick="tmtCancelEdit()">✕ Cancel</button>
+        </div>
+
+        <label>YouTube URL *</label>
+        <input id="tmtUrl" type="url" placeholder="https://www.youtube.com/watch?v=..." oninput="tmtOnUrlInput(this.value)">
+        <div id="tmtFetchState" style="margin:6px 0;font-size:0.8rem;color:var(--mut);min-height:1.2em;"></div>
+
+        <!-- Preview card -->
+        <div id="tmtPreviewCard" style="display:none;margin:12px 0 18px;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:none;">
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <img id="tmtPreviewThumb" src="" alt="Thumbnail" style="width:140px;aspect-ratio:16/9;object-fit:cover;border-radius:6px;background:#111;flex-shrink:0;">
+            <div>
+              <div id="tmtPreviewTitle" style="font-weight:600;font-size:0.9rem;margin-bottom:4px;"></div>
+              <div id="tmtPreviewChannel" style="font-size:0.78rem;color:var(--mut);"></div>
+              <div id="tmtPreviewId" style="font-size:0.72rem;color:var(--mut);margin-top:2px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div><label>Person Name</label><input id="tmtName" type="text" placeholder="e.g. Arjun S Nair"></div>
+          <div><label>Role / Designation</label><input id="tmtRole" type="text" placeholder="e.g. Filmmaker / 2025 Participant"></div>
+        </div>
+        <div class="grid2">
+          <div><label>Year</label><input id="tmtYear" type="text" placeholder="e.g. 2025"></div>
+          <div id="tmtFeaturedWrap"><label>Featured</label>
+            <div id="tmtFeaturedSelect" style="margin-top:6px;"></div>
+          </div>
+        </div>
+        <label>Short Testimonial / Caption</label>
+        <textarea id="tmtShortText" rows="2" placeholder="A short quote or caption shown alongside the video."></textarea>
+
+        <input type="hidden" id="tmtEditId">
+        <input type="hidden" id="tmtEditVideoId">
+        <input type="hidden" id="tmtEditThumb">
+        <input type="hidden" id="tmtEditChannel">
+
+        <button class="btn" style="margin-top:8px;" onclick="tmtSave()" id="tmtSaveBtn">Save Testimonial</button>
+      </div>
+
+      <!-- List -->
+      <div class="card">
+        <div class="card-head">
+          <div class="sksfa-card-head-left">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M6 7h8M6 10.5h6M6 14h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <div><h2>All Testimonials</h2></div>
+          </div>
+          <button class="btn-ghost btn-sm" onclick="loadTestimonials()">↻ Refresh</button>
+        </div>
+        <div id="tmtList" style="margin-top:4px;"></div>
+      </div>
+
+      <!-- Delete confirm modal -->
+      <div id="tmtDelModal" class="modal-overlay hidden" onclick="if(event.target===this)tmtDelModalClose()">
+        <div class="modal-box">
+          <h2 style="margin-bottom:8px;">Delete Testimonial?</h2>
+          <p style="color:var(--mut);font-size:0.87rem;margin-bottom:20px;">This will remove the testimonial from the public website.</p>
+          <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button class="btn-ghost" onclick="tmtDelModalClose()">Cancel</button>
+            <button class="btn btn-danger" id="tmtDelConfirmBtn">Delete</button>
+          </div>
         </div>
       </div>
     </div>

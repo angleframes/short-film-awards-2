@@ -1276,6 +1276,246 @@ function copyLink(url) {
 }
 
 /* ═══════════════════════════════════════════════════════
+   TESTIMONIALS
+════════════════════════════════════════════════════════ */
+let _tmtFetchTimer = null;
+let _tmtFeaturedSel = null;
+
+function _extractYouTubeId(url) {
+    if (!url) return null;
+    const patterns = [
+        /[?&]v=([A-Za-z0-9_-]{11})/,
+        /youtu\.be\/([A-Za-z0-9_-]{11})/,
+        /youtube\.com\/(?:shorts|embed|v)\/([A-Za-z0-9_-]{11})/,
+    ];
+    for (const p of patterns) { const m = url.match(p); if (m) return m[1]; }
+    return null;
+}
+
+async function _fetchYtMeta(videoId) {
+    const oembedUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${encodeURIComponent(videoId)}&format=json`;
+    const res = await fetch(oembedUrl);
+    if (!res.ok) throw new Error(`oEmbed ${res.status}`);
+    return await res.json(); // {title, author_name, thumbnail_url, ...}
+}
+
+function tmtOnUrlInput(val) {
+    clearTimeout(_tmtFetchTimer);
+    const stateEl = document.getElementById('tmtFetchState');
+    const preview = document.getElementById('tmtPreviewCard');
+    const videoIdInput = document.getElementById('tmtEditVideoId');
+    const thumbInput   = document.getElementById('tmtEditThumb');
+    const channelInput = document.getElementById('tmtEditChannel');
+    if (!val.trim()) {
+        stateEl.textContent = '';
+        preview.style.display = 'none';
+        videoIdInput.value = ''; thumbInput.value = ''; channelInput.value = '';
+        return;
+    }
+    const id = _extractYouTubeId(val.trim());
+    if (!id) {
+        stateEl.style.color = '#e74c3c';
+        stateEl.textContent = 'Invalid YouTube URL';
+        preview.style.display = 'none';
+        videoIdInput.value = '';
+        return;
+    }
+    stateEl.style.color = 'var(--mut)';
+    stateEl.textContent = 'Fetching video info…';
+    _tmtFetchTimer = setTimeout(async () => {
+        try {
+            const meta = await _fetchYtMeta(id);
+            videoIdInput.value = id;
+            thumbInput.value   = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+            channelInput.value = meta.author_name || '';
+            document.getElementById('tmtPreviewThumb').src = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+            document.getElementById('tmtPreviewTitle').textContent = meta.title || '';
+            document.getElementById('tmtPreviewChannel').textContent = meta.author_name ? `Channel: ${meta.author_name}` : '';
+            document.getElementById('tmtPreviewId').textContent = `Video ID: ${id}`;
+            preview.style.display = '';
+            stateEl.style.color = '#27ae60';
+            stateEl.textContent = 'Video found ✓';
+        } catch {
+            stateEl.style.color = '#e74c3c';
+            stateEl.textContent = 'Could not fetch video info. Check the URL.';
+            preview.style.display = 'none';
+            videoIdInput.value = '';
+        }
+    }, 600);
+}
+
+function _tmtInitFeaturedSelect() {
+    const wrap = document.getElementById('tmtFeaturedSelect');
+    if (!wrap) return;
+    if (!_tmtFeaturedSel) {
+        _tmtFeaturedSel = new CSelect(wrap, [{value:'false',label:'No'},{value:'true',label:'Yes — Featured'}], 'false', () => {});
+    }
+}
+
+function tmtCancelEdit() {
+    document.getElementById('tmtEditId').value = '';
+    document.getElementById('tmtFormTitle').textContent = 'Add Testimonial';
+    document.getElementById('tmtCancelEdit').style.display = 'none';
+    document.getElementById('tmtUrl').value = '';
+    document.getElementById('tmtUrl').disabled = false;
+    document.getElementById('tmtFetchState').textContent = '';
+    document.getElementById('tmtPreviewCard').style.display = 'none';
+    document.getElementById('tmtName').value = '';
+    document.getElementById('tmtRole').value = '';
+    document.getElementById('tmtYear').value = '';
+    document.getElementById('tmtShortText').value = '';
+    document.getElementById('tmtEditVideoId').value = '';
+    document.getElementById('tmtEditThumb').value = '';
+    document.getElementById('tmtEditChannel').value = '';
+    if (_tmtFeaturedSel) { _tmtFeaturedSel.value = 'false'; _tmtFeaturedSel._render(); }
+}
+
+async function tmtSave() {
+    const editId  = document.getElementById('tmtEditId').value;
+    const videoId = document.getElementById('tmtEditVideoId').value;
+    const url     = document.getElementById('tmtUrl').value.trim();
+    if (!videoId) return toast('Paste a valid YouTube URL and wait for the preview.', 'err');
+
+    const featured = _tmtFeaturedSel ? _tmtFeaturedSel.value === 'true' : false;
+    const payload = {
+        youtube_url:      url,
+        youtube_video_id: videoId,
+        video_title:      document.getElementById('tmtPreviewTitle').textContent || '',
+        thumbnail_url:    document.getElementById('tmtEditThumb').value,
+        channel_name:     document.getElementById('tmtEditChannel').value,
+        person_name:      document.getElementById('tmtName').value.trim(),
+        role:             document.getElementById('tmtRole').value.trim(),
+        year:             document.getElementById('tmtYear').value.trim(),
+        short_text:       document.getElementById('tmtShortText').value.trim(),
+        featured,
+        updated_at:       new Date().toISOString(),
+    };
+
+    /* If featured, unset others first */
+    if (featured) {
+        await sb.from('testimonials').update({ featured: false }).neq('id', editId || 0);
+    }
+
+    let error;
+    if (editId) {
+        ({ error } = await sb.from('testimonials').update(payload).eq('id', editId));
+    } else {
+        const { data: existing } = await sb.from('testimonials').select('display_order').order('display_order', { ascending: false }).limit(1).single();
+        payload.display_order = (existing?.display_order ?? -1) + 1;
+        ({ error } = await sb.from('testimonials').insert(payload));
+    }
+    if (error) return toast(error.message, 'err');
+    toast(editId ? 'Testimonial updated' : 'Testimonial saved', 'ok');
+    tmtCancelEdit();
+    loadTestimonials();
+}
+
+async function tmtEdit(id) {
+    const { data, error } = await sb.from('testimonials').select('*').eq('id', id).single();
+    if (error || !data) return toast('Could not load testimonial', 'err');
+    document.getElementById('tmtEditId').value   = data.id;
+    document.getElementById('tmtFormTitle').textContent = 'Edit Testimonial';
+    document.getElementById('tmtCancelEdit').style.display = '';
+    document.getElementById('tmtUrl').value   = data.youtube_url;
+    document.getElementById('tmtUrl').disabled = false;
+    document.getElementById('tmtEditVideoId').value = data.youtube_video_id;
+    document.getElementById('tmtEditThumb').value   = data.thumbnail_url;
+    document.getElementById('tmtEditChannel').value = data.channel_name;
+    document.getElementById('tmtName').value      = data.person_name || '';
+    document.getElementById('tmtRole').value      = data.role || '';
+    document.getElementById('tmtYear').value      = data.year || '';
+    document.getElementById('tmtShortText').value = data.short_text || '';
+    /* show preview */
+    const preview = document.getElementById('tmtPreviewCard');
+    document.getElementById('tmtPreviewThumb').src     = data.thumbnail_url;
+    document.getElementById('tmtPreviewTitle').textContent   = data.video_title;
+    document.getElementById('tmtPreviewChannel').textContent = data.channel_name ? `Channel: ${data.channel_name}` : '';
+    document.getElementById('tmtPreviewId').textContent      = `Video ID: ${data.youtube_video_id}`;
+    preview.style.display = '';
+    document.getElementById('tmtFetchState').style.color = '#27ae60';
+    document.getElementById('tmtFetchState').textContent = 'Video found ✓';
+    if (_tmtFeaturedSel) { _tmtFeaturedSel.value = data.featured ? 'true' : 'false'; _tmtFeaturedSel._render(); }
+    document.getElementById('tmtFormCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+let _tmtPendingDeleteId = null;
+function tmtConfirmDelete(id) {
+    _tmtPendingDeleteId = id;
+    document.getElementById('tmtDelModal').classList.remove('hidden');
+    document.getElementById('tmtDelConfirmBtn').onclick = tmtDoDelete;
+}
+function tmtDelModalClose() {
+    _tmtPendingDeleteId = null;
+    document.getElementById('tmtDelModal').classList.add('hidden');
+}
+async function tmtDoDelete() {
+    if (!_tmtPendingDeleteId) return;
+    const { error } = await sb.from('testimonials').delete().eq('id', _tmtPendingDeleteId);
+    tmtDelModalClose();
+    if (error) return toast(error.message, 'err');
+    toast('Testimonial deleted', 'ok');
+    loadTestimonials();
+}
+
+async function tmtSetFeatured(id) {
+    await sb.from('testimonials').update({ featured: false }).neq('id', id);
+    const { error } = await sb.from('testimonials').update({ featured: true }).eq('id', id);
+    if (error) return toast(error.message, 'err');
+    toast('Featured testimonial set', 'ok');
+    loadTestimonials();
+}
+
+async function tmtMove(id, direction) {
+    const { data: all } = await sb.from('testimonials').select('id,display_order').order('display_order');
+    if (!all) return;
+    const idx = all.findIndex(t => t.id === id);
+    const swapIdx = idx + direction;
+    if (swapIdx < 0 || swapIdx >= all.length) return;
+    const a = all[idx], b = all[swapIdx];
+    const aOrder = a.display_order, bOrder = b.display_order;
+    await sb.from('testimonials').update({ display_order: bOrder }).eq('id', a.id);
+    await sb.from('testimonials').update({ display_order: aOrder }).eq('id', b.id);
+    loadTestimonials();
+}
+
+async function loadTestimonials() {
+    _tmtInitFeaturedSelect();
+    const list = document.getElementById('tmtList');
+    if (!list) return;
+    list.innerHTML = '<p style="color:var(--mut);padding:12px 0;">Loading…</p>';
+    const { data, error } = await sb.from('testimonials').select('*').order('display_order').order('created_at');
+    if (error) { list.innerHTML = `<p style="color:#e74c3c;">${esc(error.message)}</p>`; return; }
+    if (!data || !data.length) { list.innerHTML = '<p style="color:var(--mut);padding:12px 0;">No testimonials yet.</p>'; return; }
+    list.innerHTML = data.map((t, i) => `
+        <div class="tmt-admin-card">
+            <img class="tmt-admin-thumb" src="${esc(t.thumbnail_url)}" alt="${esc(t.video_title)}" onerror="this.style.opacity='0.3'">
+            <div class="tmt-admin-info">
+                <div class="tmt-admin-title" title="${esc(t.video_title)}">${esc(t.video_title)}</div>
+                <div class="tmt-admin-meta">
+                    ${t.person_name ? `${esc(t.person_name)}${t.role ? ' · ' + esc(t.role) : ''}` : '—'}
+                    ${t.featured ? '<span class="pill-featured" style="margin-left:8px;">⭐ Featured</span>' : '<span class="pill-nonfeatured" style="margin-left:8px;">Not Featured</span>'}
+                    &nbsp;·&nbsp; Order: ${t.display_order}
+                </div>
+                <div class="tmt-admin-actions">
+                    <button class="btn-ghost btn-sm" onclick="tmtEdit(${t.id})">✎ Edit</button>
+                    ${!t.featured ? `<button class="btn-ghost btn-sm" onclick="tmtSetFeatured(${t.id})">⭐ Set Featured</button>` : ''}
+                    ${i > 0 ? `<button class="btn-ghost btn-sm" onclick="tmtMove(${t.id},-1)">↑</button>` : ''}
+                    ${i < data.length-1 ? `<button class="btn-ghost btn-sm" onclick="tmtMove(${t.id},1)">↓</button>` : ''}
+                    <a class="btn-ghost btn-sm" href="https://www.youtube.com/watch?v=${esc(t.youtube_video_id)}" target="_blank" rel="noopener">▶ YouTube ↗</a>
+                    <button class="btn-ghost btn-sm" style="color:#e74c3c;" onclick="tmtConfirmDelete(${t.id})">✕ Delete</button>
+                </div>
+            </div>
+        </div>`).join('');
+}
+
+/* Hook tab switch to load testimonials */
+const _origSwitchTab = switchTab;
+function switchTab(name) {
+    _origSwitchTab(name);
+    if (name === 'testimonials') loadTestimonials();
+}
+
+/* ═══════════════════════════════════════════════════════
    BOOTSTRAP
 ════════════════════════════════════════════════════════ */
 gate();
