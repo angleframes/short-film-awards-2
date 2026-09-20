@@ -1404,7 +1404,11 @@
         function backendCall(payload) {
             return fetch(APP_CONFIG.backendUrl, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + SUPA_ANON,
+                    "apikey": SUPA_ANON
+                },
                 body: JSON.stringify(payload)
             }).then(res => res.json());
         }
