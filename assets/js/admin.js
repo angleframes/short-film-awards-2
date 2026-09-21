@@ -181,6 +181,7 @@ async function gate() {
   document.getElementById('whoami').textContent = ' — ' + session.user.email;
   show('dash');
   await Promise.all([loadConfig(), loadGalleryCategories(), loadGallery(), loadUpdates(), loadEntries(), loadLinks()]);
+  _initAdminRealtime();
 }
 function show(v) {
   document.getElementById('loginView').classList.toggle('hidden', v !== 'login');
@@ -1554,6 +1555,79 @@ async function loadTestimonials() {
                 </div>
             </div>
         </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════════
+   ADMIN REALTIME — live updates without refresh
+════════════════════════════════════════════════════════ */
+let _adminRtInit = false;
+function _initAdminRealtime() {
+  if (_adminRtInit) return;
+  _adminRtInit = true;
+  let _rtDebounce = {};
+  function debounced(key, fn, delay) {
+    clearTimeout(_rtDebounce[key]);
+    _rtDebounce[key] = setTimeout(fn, delay || 400);
+  }
+
+  sb.channel('admin_live')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'film_entries' }, (payload) => {
+      if (payload.eventType === 'INSERT') {
+        _allEntries.unshift(payload.new);
+        debounced('entries', () => {
+          const today = new Date().toISOString().slice(0,10);
+          const stPaid    = _allEntries.filter(r => (r.payment_status||'').toUpperCase() === 'PAID').length;
+          const stPending = _allEntries.filter(r => { const s=(r.payment_status||'').toUpperCase(); return s==='PENDING'||s===''; }).length;
+          const stFailed  = _allEntries.filter(r => (r.payment_status||'').toUpperCase() === 'FAILED').length;
+          const stGeneral = _allEntries.filter(r => (r.category||'').toLowerCase().includes('general')).length;
+          const stCampus  = _allEntries.filter(r => (r.category||'').toLowerCase().includes('campus')).length;
+          const stToday   = _allEntries.filter(r => r.created_at && r.created_at.startsWith(today)).length;
+          document.getElementById('statEntries').textContent = _allEntries.length;
+          document.getElementById('stTotal').textContent   = _allEntries.length;
+          document.getElementById('stPaid').textContent    = stPaid;
+          document.getElementById('stPending').textContent = stPending;
+          document.getElementById('stFailed').textContent  = stFailed;
+          document.getElementById('stGeneral').textContent = stGeneral;
+          document.getElementById('stCampus').textContent  = stCampus;
+          document.getElementById('stToday').textContent   = stToday;
+          applyFilters();
+          toast('New film entry: ' + (payload.new.film_name || 'unknown'), 'ok');
+        }, 300);
+      } else if (payload.eventType === 'UPDATE') {
+        const idx = _allEntries.findIndex(e => e.id === payload.new.id);
+        if (idx >= 0) _allEntries[idx] = { ..._allEntries[idx], ...payload.new };
+        debounced('entries', () => applyFilters(), 300);
+      }
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'submission_links' }, () => {
+      debounced('links', loadLinks, 500);
+    })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'site_config', filter: 'id=eq.1' }, (payload) => {
+      if (payload.new) applyConfig(payload.new);
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'gallery' }, () => {
+      debounced('gallery', loadGallery, 500);
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'updates_feed' }, () => {
+      debounced('updates', loadUpdates, 400);
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'testimonials' }, () => {
+      debounced('testimonials', () => { if (document.getElementById('tab-testimonials')?.classList.contains('active')) loadTestimonials(); }, 500);
+    })
+    .subscribe((status) => {
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+        console.warn('Admin realtime issue:', status);
+      }
+    });
+
+  // Re-sync on tab visibility
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      debounced('resync', () => {
+        Promise.allSettled([loadConfig(), loadEntries(), loadLinks(), loadGallery(), loadUpdates()]);
+      }, 1500);
+    }
+  });
 }
 
 /* ═══════════════════════════════════════════════════════
