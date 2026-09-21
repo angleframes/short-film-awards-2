@@ -9,7 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<link rel="stylesheet" href="assets/css/admin.css?v=3">
+<link rel="stylesheet" href="assets/css/admin.css?v=4">
 </head>
 <body class="sksfa-admin">
 
@@ -427,18 +427,23 @@
   </div>
 </div>
 
-<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer(event)">
-  <div class="drawer" id="drawerPanel">
-    <div class="drawer-header">
-      <h2 id="drawerTitle">Entry Details</h2>
-      <button class="drawer-close" onclick="closeDrawerDirect()">✕</button>
+<div class="entry-modal-overlay" id="entryModalOverlay" onclick="if(event.target===this)closeEntryModal()">
+  <div class="entry-modal" id="entryModalPanel">
+    <div class="entry-modal-header">
+      <div class="entry-modal-header-left">
+        <div class="entry-modal-eyebrow">ENTRY DETAILS</div>
+        <h2 id="entryModalTitle">Entry Details</h2>
+      </div>
+      <div class="entry-modal-header-right">
+        <button class="btn-ghost btn-sm" id="entryModalPdfBtn">⬇ Download PDF</button>
+        <button class="entry-modal-close" onclick="closeEntryModal()">✕</button>
+      </div>
     </div>
-    <div class="drawer-body" id="drawerBody"></div>
-    <div class="d-footer" id="drawerFooter"></div>
+    <div class="entry-modal-body" id="entryModalBody"></div>
   </div>
 </div>
 
 <div id="toast" class="toast"></div>
 
-<script src="assets/js/admin.js?v=3"></script>
+<script src="assets/js/admin.js?v=4"></script>
 </html>
