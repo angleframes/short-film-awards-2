@@ -87,8 +87,8 @@
       <div class="step-dot" id="sd1"><div class="sn">01</div><div class="sl">Applicant</div></div>
       <div class="step-dot" id="sd2"><div class="sn">02</div><div class="sl">Film</div></div>
       <div class="step-dot" id="sd3"><div class="sn">03</div><div class="sl">Cast &amp; Crew</div></div>
-      <div class="step-dot" id="sd4"><div class="sn">04</div><div class="sl">Payment</div></div>
-      <div class="step-dot" id="sd5"><div class="sn">05</div><div class="sl">Review</div></div>
+      <div class="step-dot" id="sd4"><div class="sn">04</div><div class="sl">Review</div></div>
+      <div class="step-dot" id="sd5"><div class="sn">05</div><div class="sl">Payment</div></div>
     </div>
 
     <!-- Two-column layout: form + info panel -->
@@ -209,10 +209,24 @@
           </div>
         </div>
 
-        <!-- STEP 4 — Payment -->
+        <!-- STEP 4 — Review & Confirm -->
         <div class="step-panel" id="step4">
           <div class="card">
             <div class="card-title">Step 04 of 05</div>
+            <h2 class="sksfa-step-heading">Review &amp; Confirm</h2>
+            <p class="sksfa-step-sub">Please review your entry details before proceeding to payment.</p>
+            <div id="reviewContent"><!-- injected by JS --></div>
+          </div>
+          <div class="nav-row">
+            <button class="btn-back" onclick="goStep(3)">← Back</button>
+            <button class="btn-primary" onclick="goStep(5)">Confirm &amp; Pay →</button>
+          </div>
+        </div>
+
+        <!-- STEP 5 — Payment -->
+        <div class="step-panel" id="step5">
+          <div class="card">
+            <div class="card-title">Step 05 of 05</div>
             <h2 class="sksfa-step-heading">Entry Fee Payment</h2>
             <p class="sksfa-step-sub">Secure payment via Cashfree. Non-refundable.</p>
             <div class="pay-box">
@@ -224,14 +238,8 @@
             <button id="retryBtn" class="btn-primary" style="margin-top:12px;display:none;" onclick="doPayment()">Retry Payment</button>
           </div>
           <div class="nav-row" style="margin-top:0;">
-            <button class="btn-back" onclick="goStep(3)">← Back</button>
+            <button class="btn-back" onclick="goStep(4)">← Back</button>
           </div>
-        </div>
-
-        <!-- STEP 5 — Review & Submit -->
-        <div class="step-panel" id="step5">
-          <div id="reviewContent"><!-- injected by JS --></div>
-          <button id="submitBtn" class="btn-primary" onclick="doSubmit()">Submit Film Entry →</button>
         </div>
 
       </div><!-- /sksfa-form-col -->
