@@ -522,11 +522,11 @@
                             </div>
                             <div class="pipeline-node" id="node4">
                                 <div class="node-circle">4</div>
-                                <div class="node-label">Payment<br>Console</div>
+                                <div class="node-label">Review &<br>Confirm</div>
                             </div>
                             <div class="pipeline-node" id="node5">
                                 <div class="node-circle">5</div>
-                                <div class="node-label">Review &<br>Submit</div>
+                                <div class="node-label">Payment</div>
                             </div>
                         </div>
 
@@ -640,6 +640,18 @@
                             </div>
 
                             <div class="wizard-step-panel" id="wizardStep4">
+                                <h3 class="wizard-step-subheading">Review & Confirm</h3>
+                                <p style="font-size:0.85rem; color:rgba(255,255,255,0.8); margin-bottom:15px;">Please review your entry details before proceeding to payment.</p>
+
+                                <div class="review-data-matrix" id="reviewSummaryMatrix"></div>
+
+                                <div class="wizard-nav-row">
+                                    <button type="button" class="btn-wizard-action back" onclick="goToWizardStep(3)">Back</button>
+                                    <button type="button" class="btn-wizard-action continue" onclick="goToWizardStep(5)">Confirm &amp; Pay &rarr;</button>
+                                </div>
+                            </div>
+
+                            <div class="wizard-step-panel" id="wizardStep5">
                                 <h3 class="wizard-step-subheading">Payment</h3>
                                 <div class="payment-view">
                                     <p style="font-size: 0.9rem; margin-bottom:6px;">Registration entry fee</p>
@@ -655,20 +667,7 @@
                                 </div>
 
                                 <div class="wizard-nav-row">
-                                    <button type="button" class="btn-wizard-action back" onclick="goToWizardStep(3)">Back</button>
-                                    <button type="button" id="toReviewBtn" class="btn-wizard-action continue" onclick="goToWizardStep(5)" disabled style="opacity:0.45; cursor:not-allowed;">Review Entry &rarr;</button>
-                                </div>
-                            </div>
-
-                            <div class="wizard-step-panel" id="wizardStep5">
-                                <h3 class="wizard-step-subheading">Review & Submit</h3>
-                                <p style="font-size:0.85rem; color:rgba(255,255,255,0.8); margin-bottom:15px;">Please inspect field data points metrics prior to transmitting onto the main application server core ledger.</p>
-                                
-                                <div class="review-data-matrix" id="reviewSummaryMatrix"></div>
-
-                                <div class="wizard-nav-row">
                                     <button type="button" class="btn-wizard-action back" onclick="goToWizardStep(4)">Back</button>
-                                    <button id="submitBtn" class="btn-wizard-action continue">Submit Film Entry</button>
                                 </div>
                             </div>
 
