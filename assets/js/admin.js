@@ -418,7 +418,7 @@ function renderPagination(total, pages, current) {
 function changePage(n) { _page = n; renderEntriesPage(); window.scrollTo({top:0,behavior:'smooth'}); }
 
 /* ═══════════════════════════════════════════════════════
-   ENTRY DRAWER
+   ENTRY DETAIL MODAL
 ════════════════════════════════════════════════════════ */
 async function openDrawer(idx) {
   const r = _filtered[idx];
@@ -427,83 +427,131 @@ async function openDrawer(idx) {
 
   const ps = (r.payment_status || '').toUpperCase();
   const filmLinkHtml = isUrl(r.film_link)
-    ? `<a href="${esc(r.film_link)}" target="_blank" rel="noopener noreferrer" style="color:var(--txt);text-decoration:underline;text-underline-offset:2px;">Open Film ↗</a>`
+    ? `<a href="${esc(r.film_link)}" target="_blank" rel="noopener noreferrer" style="color:#ccc;text-decoration:underline;text-underline-offset:2px;">Open Film ↗</a>`
     : esc(r.film_link || '—');
 
-  const section = (title, rows) => {
-    const validRows = rows.filter(([,v]) => v && v !== '—');
-    if (!validRows.length) return '';
-    return `<div class="d-section">
-      <h4>${title}</h4>
-      ${rows.map(([k,v]) => v && v !== '—' ? `<div class="d-row"><span class="d-key">${k}</span><span class="d-val">${v}</span></div>` : '').join('')}
-    </div>`;
-  };
+  const row = (k, v) => v && v !== '—'
+    ? `<div class="d-row"><span class="d-key">${k}</span><span class="d-val">${v}</span></div>` : '';
 
   const payStatusHtml = ps === 'PAID' ? '<span class="tag paid">Paid</span>'
     : ps === 'FAILED' ? '<span class="tag failed">Failed</span>'
     : '<span class="tag pending">Pending</span>';
 
-  const isCampus = (r.category||'').toLowerCase().includes('campus');
+  const trackTag = (r.category||'').toLowerCase().includes('campus')
+    ? '<span class="tag campus">Campus</span>' : '<span class="tag general">General</span>';
 
-  // Load evaluations for this entry
   const evals = await loadEntryEvals(r.id);
 
-  document.getElementById('drawerTitle').textContent = r.film_name || 'Entry Details';
-  document.getElementById('drawerBody').innerHTML = `
-    ${section('Applicant Details', [
-      ['Entry ID', String(r.id)],
-      ['Applied Date', fmtDateTime(r.created_at)],
-      ['Full Name', esc(r.applicant_name||'—')],
-      ['Email', r.email ? `<a href="mailto:${esc(r.email)}" style="color:var(--txt);">${esc(r.email)}</a>` : '—'],
-      ['Phone', esc(r.phone||'—')],
-      ['City', esc(r.city||'—')],
-    ])}
-    ${section('Film Details', [
-      ['Film Name', esc(r.film_name||'—')],
-      ['Submission Track', esc(r.category||'—')],
-      ['Film Link', filmLinkHtml],
-      ['Duration', esc(r.duration||'—')],
-      ['Source', esc(r.source||'—')],
-    ])}
-    ${section('Cast & Crew', [
-      ['Director', esc(r.director||'—')],
-      ['Producer', esc(r.producer||'—')],
-      ['Writer / Screenplay', esc(r.writer||'—')],
-      ['Cinematographer / DP', esc(r.cinematographer||'—')],
-      ['Editor', esc(r.editor||'—')],
-      ['Music Director', esc(r.music_director||'—')],
-      ['Lead Actor', esc(r.actor||'—')],
-      ['Lead Actress', esc(r.actress||'—')],
-      ['Child Artist', esc(r.child_artist||'—')],
-    ])}
-    ${section('Payment Details', [
-      ['Status', payStatusHtml],
-      ['Amount', '₹' + safe(r.amount||'1000')],
-      ['Currency', esc(r.currency||'INR')],
-      ['Cashfree Order ID', esc(r.cashfree_order_id||'—')],
-      ['Cashfree Payment ID', esc(r.cashfree_payment_id||'—')],
-      ['Payment Method', esc(r.payment_method||'—')],
-      ['Paid At', fmtDateTime(r.paid_at)],
-      ['Payment Verified At', fmtDateTime(r.payment_verified_at)],
-      ['Confirmation Email', r.confirmation_sent ? 'Sent ✓' : 'Not sent'],
-    ])}
-    ${section('Technical', [
-      ['Created At', fmtDateTime(r.created_at)],
-      ['Submission Source', esc(r.source||'—')],
-      ['Direct Link ID', esc(r.link_id ? String(r.link_id) : '—')],
-    ])}
-    <div class="d-section">
-      <h4>Award Evaluation</h4>
-      ${renderEvalSection(r, evals)}
+  document.getElementById('entryModalTitle').textContent = r.film_name || 'Entry Details';
+
+  const pdfBtn = document.getElementById('entryModalPdfBtn');
+  pdfBtn.onclick = () => exportSinglePdf(idx);
+
+  document.getElementById('entryModalBody').innerHTML = `
+    <div class="em-overview">
+      <div class="em-overview-item">
+        <span class="em-overview-label">Entry ID</span>
+        <span class="em-overview-value">#${r.id}</span>
+      </div>
+      <div class="em-overview-divider"></div>
+      <div class="em-overview-item">
+        <span class="em-overview-label">Track</span>
+        <span class="em-overview-value">${trackTag}</span>
+      </div>
+      <div class="em-overview-divider"></div>
+      <div class="em-overview-item">
+        <span class="em-overview-label">Payment</span>
+        <span class="em-overview-value">${payStatusHtml}</span>
+      </div>
+      <div class="em-overview-divider"></div>
+      <div class="em-overview-item">
+        <span class="em-overview-label">Applied</span>
+        <span class="em-overview-value" style="font-size:13px;">${fmtDateTime(r.created_at)||'—'}</span>
+      </div>
+    </div>
+
+    <div class="em-sections">
+      <div class="em-section">
+        <div class="em-section-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="4.5" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M2 12.5c0-2.5 2.2-4.5 5-4.5s5 2 5 4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          APPLICANT DETAILS
+        </div>
+        ${row('Full Name', esc(r.applicant_name||'—'))}
+        ${row('Email', r.email ? `<a href="mailto:${esc(r.email)}" style="color:#ccc;">${esc(r.email)}</a>` : '—')}
+        ${row('Phone', esc(r.phone||'—'))}
+        ${row('City', esc(r.city||'—'))}
+      </div>
+
+      <div class="em-section">
+        <div class="em-section-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 5h12" stroke="currentColor" stroke-width="1.2"/><circle cx="5" cy="8" r="1" fill="currentColor"/></svg>
+          FILM DETAILS
+        </div>
+        ${row('Film Name', esc(r.film_name||'—'))}
+        ${row('Film Link', filmLinkHtml)}
+        ${row('Duration', esc(r.duration||'—'))}
+        ${row('Source', esc(r.source||'—'))}
+      </div>
+
+      <div class="em-section em-full">
+        <div class="em-section-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="5" cy="4" r="2" stroke="currentColor" stroke-width="1.1"/><circle cx="9.5" cy="4" r="2" stroke="currentColor" stroke-width="1.1"/><path d="M1 11c0-2 1.8-3.5 4-3.5.7 0 1.4.1 2 .4M7 11c0-2 1.5-3.5 3.5-3.5S14 9 14 11" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+          CAST &amp; CREW
+        </div>
+        <div class="em-sections" style="padding:0;border:none;">
+          <div style="padding:0;">
+            ${row('Director', esc(r.director||'—'))}
+            ${row('Producer', esc(r.producer||'—'))}
+            ${row('Writer / Screenplay', esc(r.writer||'—'))}
+            ${row('Cinematographer / DP', esc(r.cinematographer||'—'))}
+            ${row('Editor', esc(r.editor||'—'))}
+          </div>
+          <div style="padding:0;">
+            ${row('Music Director', esc(r.music_director||'—'))}
+            ${row('Lead Actor', esc(r.actor||'—'))}
+            ${row('Lead Actress', esc(r.actress||'—'))}
+            ${row('Child Artist', esc(r.child_artist||'—'))}
+          </div>
+        </div>
+      </div>
+
+      <div class="em-section">
+        <div class="em-section-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 6h12" stroke="currentColor" stroke-width="1.2"/><path d="M4 9h2M8 9h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          PAYMENT INFO
+        </div>
+        ${row('Status', payStatusHtml)}
+        ${row('Amount', '₹' + safe(r.amount||'1000'))}
+        ${row('Currency', esc(r.currency||'INR'))}
+        ${row('Order ID', esc(r.cashfree_order_id||'—'))}
+        ${row('Payment ID', esc(r.cashfree_payment_id||'—'))}
+        ${row('Method', esc(r.payment_method||'—'))}
+        ${row('Paid At', fmtDateTime(r.paid_at))}
+        ${row('Verified At', fmtDateTime(r.payment_verified_at))}
+        ${row('Confirmation', r.confirmation_sent ? 'Sent ✓' : 'Not sent')}
+      </div>
+
+      <div class="em-section">
+        <div class="em-section-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5.5 8.5a3 3 0 004.24 0l2-2a3 3 0 00-4.24-4.24l-1 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M8.5 5.5a3 3 0 00-4.24 0l-2 2a3 3 0 004.24 4.24l1-1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          SUBMISSION INFO
+        </div>
+        ${row('Created At', fmtDateTime(r.created_at))}
+        ${row('Source', esc(r.source||'—'))}
+        ${row('Direct Link ID', esc(r.link_id ? String(r.link_id) : '—'))}
+      </div>
+
+      <div class="em-section em-full">
+        <div class="em-section-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5l1.4 2.8 3.1.45-2.25 2.2.53 3.1L7 8.5 4.22 10.05l.53-3.1L2.5 4.75l3.1-.45L7 1.5z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
+          AWARD EVALUATION
+        </div>
+        ${renderEvalSection(r, evals)}
+      </div>
     </div>
   `;
 
-  document.getElementById('drawerFooter').innerHTML = `
-    <button class="btn-ghost btn-sm" onclick="exportSinglePdf(${idx})">⬇ Download PDF</button>
-    <button class="btn-ghost btn-sm" onclick="closeDrawerDirect()">Close</button>
-  `;
-
-  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('entryModalOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
 
@@ -614,34 +662,33 @@ async function setEval(entryId, category, status, candidateName, candidateType, 
   _evalsLoaded = false;
   const labelStatus = STATUS_LABELS[status] || status;
   toast(`${AWARD_CATS.find(c=>c.key===category)?.label} → ${labelStatus}`, 'ok');
-  // Refresh eval section in open drawer
+  // Refresh eval section in open modal
   if (_activeDrawerEntryId === entryId) {
     const evals = _evaluations[entryId];
     const r = _allEntries.find(x => x.id === entryId);
     if (r) {
-      const evalSection = document.querySelector('#drawerBody .d-section:last-child div.d-section, #drawerBody .d-section:last-child');
-      // Re-render entire award eval section
-      const evalDiv = document.querySelector('#drawerBody .d-section:last-child');
-      if (evalDiv) evalDiv.querySelector('div[style], div.eval-row')?.closest('.d-section');
-      // Full re-render of eval HTML
-      const sections = document.querySelectorAll('#drawerBody .d-section');
+      const sections = document.querySelectorAll('#entryModalBody .em-section');
       const lastSection = sections[sections.length - 1];
-      if (lastSection && lastSection.querySelector('h4')?.textContent === 'Award Evaluation') {
-        lastSection.innerHTML = `<h4>Award Evaluation</h4>${renderEvalSection(r, evals)}`;
+      if (lastSection) {
+        const titleEl = lastSection.querySelector('.em-section-title');
+        if (titleEl && titleEl.textContent.includes('AWARD EVALUATION')) {
+          lastSection.innerHTML = `<div class="em-section-title"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5l1.4 2.8 3.1.45-2.25 2.2.53 3.1L7 8.5 4.22 10.05l.53-3.1L2.5 4.75l3.1-.45L7 1.5z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>AWARD EVALUATION</div>${renderEvalSection(r, evals)}`;
+        }
       }
     }
   }
 }
 
-function closeDrawer(e) {
-  if (e && e.target !== document.getElementById('drawerOverlay')) return;
-  closeDrawerDirect();
-}
-function closeDrawerDirect() {
-  document.getElementById('drawerOverlay').classList.remove('open');
+function closeEntryModal() {
+  document.getElementById('entryModalOverlay').classList.remove('open');
   document.body.style.overflow = '';
   _activeDrawerEntryId = null;
 }
+function closeDrawer(e) { closeEntryModal(); }
+function closeDrawerDirect() { closeEntryModal(); }
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('entryModalOverlay')?.classList.contains('open')) closeEntryModal();
+});
 
 /* ═══════════════════════════════════════════════════════
    AWARDS TAB
