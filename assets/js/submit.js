@@ -37,6 +37,7 @@ async function init() {
   document.getElementById('linkLabelDisplay').textContent = _linkLabel;
   showState('form');
   goStep(1);
+  _watchLinkRevocation();
 }
 
 function showState(s) {
@@ -258,6 +259,39 @@ async function doSubmit() {
   } catch(err) {
     showPayStatus('err', 'Network error during submission. Your payment is safe — please retry or contact us.');
   }
+}
+
+// ── Realtime link revocation watch ──────────────────────────────────────────
+function _watchLinkRevocation() {
+  if (!_linkId) return;
+  sb.channel('link_watch_' + _linkId)
+    .on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'submission_links',
+      filter: 'id=eq.' + _linkId
+    }, (payload) => {
+      const row = payload.new;
+      if (row.revoked) {
+        showState('revoked');
+      } else if (row.max_uses > 0 && row.use_count >= row.max_uses) {
+        showState('usedUp');
+      } else if (row.expires_at && new Date(row.expires_at) < new Date()) {
+        showState('expired');
+      }
+    })
+    .subscribe();
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && _linkId) {
+      sb.rpc('validate_submission_token', { token_input: _token }).single().then(({ data }) => {
+        if (!data) return;
+        if (data.revoked) showState('revoked');
+        else if (data.max_uses > 0 && data.use_count >= data.max_uses) showState('usedUp');
+        else if (data.expires_at && new Date(data.expires_at) < new Date()) showState('expired');
+      });
+    }
+  });
 }
 
 function backendCall(payload) {
