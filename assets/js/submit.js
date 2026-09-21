@@ -76,6 +76,7 @@ function nextStep(from) {
   } else if (from === 3) {
     const fields = ['director','producer','writer','cinematographer','editor','musicDirector','actor','actress'];
     if (fields.find(id => !req(id))) return alert('Please fill in all required crew fields.');
+    buildReview();
     goStep(4);
   }
 }
@@ -92,7 +93,7 @@ function showPayStatus(cls, msg) {
 
 // ── Payment ─────────────────────────────────────────────────────────────────────
 async function doPayment() {
-  if (_payState.verified) { goStep(5); buildReview(); return; }
+  if (_payState.verified) return;
 
   if (typeof Cashfree !== 'function') {
     showPayStatus('err', 'Payment library not loaded. Check your connection and reload.'); return;
@@ -113,6 +114,19 @@ async function doPayment() {
       throw new Error(orderResp?.message || 'Could not create order.');
     }
     _payState.orderId = orderResp.order_id;
+
+    // Pre-payment save for browser-close recovery.
+    try {
+      await backendCall({
+        action: 'saveFormData',
+        applicantName: req('applicantName'), email: req('email'), phone: req('phone'), city: req('city'),
+        filmName: req('filmName'), category: req('category'), filmLink: req('filmLink'), duration: req('duration'),
+        director: req('director'), producer: req('producer'), writer: req('writer'),
+        cinematographer: req('cinematographer'), editor: req('editor'), musicDirector: req('musicDirector'),
+        actor: req('actor'), actress: req('actress'), childArtist: req('childArtist') || 'None',
+        cashfreeOrderId: orderResp.order_id, link_id: _linkId
+      });
+    } catch(e) { console.warn('Pre-payment save failed (non-blocking):', e); }
 
     const cashfree = Cashfree({ mode: CASHFREE_MODE });
     showPayStatus('pending', 'Opening Cashfree checkout…');
@@ -140,10 +154,9 @@ async function verifyPayment() {
       _payState.amount       = resp.order_amount   || 1000;
       _payState.paidAt       = resp.paid_at        || new Date().toISOString();
       _payState.paymentMethod= resp.payment_method || null;
-      showPayStatus('ok', '✓ Payment of ₹' + (_payState.amount||1000) + ' confirmed. Please continue to review your entry.');
+      showPayStatus('ok', '✓ Payment confirmed. Submitting your entry…');
       document.getElementById('payBtn').style.display = 'none';
-      // Auto-advance to review step
-      setTimeout(() => { buildReview(); goStep(5); }, 800);
+      await doSubmit();
     } else if (ps === 'ACTIVE' || ps === 'PENDING') {
       showPayStatus('pending', 'Payment still processing — wait a moment then retry.');
       document.getElementById('payBtn').disabled = false;
@@ -169,8 +182,6 @@ function buildReview() {
     return `<div class="review-section"><h4>${title}</h4>${html}</div>`;
   };
   document.getElementById('reviewContent').innerHTML = `
-    <div class="card">
-      <div class="card-title">Step 5 of 5 · Review &amp; Submit</div>
       ${section('Applicant',[
         ['Full Name',  req('applicantName')],
         ['Email',      req('email')],
@@ -194,21 +205,19 @@ function buildReview() {
         ['Lead Actress',    req('actress')],
         ['Child Artist',    req('childArtist') || 'None'],
       ])}
-      ${section('Payment',[
-        ['Status',   '✓ Paid'],
-        ['Amount',   '₹' + (_payState.amount||1000) + ' INR'],
-        ['Order ID', _payState.orderId || '—'],
-      ])}
-    </div>`;
+      ${section('Entry Fee',[
+        ['Amount', '₹1,000 INR (payable next step)'],
+      ])}`;
 }
 
 // ── Final submit ────────────────────────────────────────────────────────────────
 async function doSubmit() {
   if (!_payState.verified) { alert('Payment not yet verified. Please complete payment first.'); return; }
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true; btn.textContent = 'Submitting…';
+
+  showPayStatus('pending', 'Submitting your film entry…');
 
   const payload = {
+    action:          'handleSubmission',
     applicantName:   req('applicantName'),
     phone:           req('phone'),
     email:           req('email'),
@@ -233,24 +242,21 @@ async function doSubmit() {
     currency:        'INR',
     paidAt:          _payState.paidAt,
     paymentMethod:   _payState.paymentMethod,
-    // Direct link tracking
     source:          'direct_link',
     linkToken:       _token,
-    linkId:          _linkId
+    link_id:         _linkId
   };
 
   try {
     const resp = await backendCall(payload);
-    if (resp.status === 'success') {
+    if (resp.status === 'success' || resp.status === 'already_registered') {
       document.getElementById('successOrderId').textContent = _payState.orderId || '—';
       showState('success');
     } else {
-      alert('Submission error: ' + (resp.message || 'Unknown error'));
-      btn.disabled = false; btn.textContent = 'Submit Film Entry →';
+      showPayStatus('err', 'Submission failed: ' + (resp.message || 'Unknown error') + '. Your payment is safe — please retry.');
     }
   } catch(err) {
-    alert('Network error. Please try again: ' + (err.message||''));
-    btn.disabled = false; btn.textContent = 'Submit Film Entry →';
+    showPayStatus('err', 'Network error during submission. Your payment is safe — please retry or contact us.');
   }
 }
 
