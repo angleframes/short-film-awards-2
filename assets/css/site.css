@@ -2546,8 +2546,8 @@
             padding-left: 10px;
         }
 
-        .form-group { margin-bottom: 24px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 28px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 
         label { 
             display: block; 
