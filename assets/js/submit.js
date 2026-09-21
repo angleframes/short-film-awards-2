@@ -1,7 +1,7 @@
 const SUPA_URL    = "https://flwlbraeyyrofkhxnvwt.supabase.co";
 const SUPA_ANON   = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZsd2xicmFleXlyb2ZraHhudnd0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg4MDQzNDEsImV4cCI6MjEwNDM4MDM0MX0.0apM1gnHcYzTSLs0wTfi1fgaNCf0RKbeginWPXg5EbY";
 const BACKEND_URL = "https://flwlbraeyyrofkhxnvwt.supabase.co/functions/v1/payment";
-const CASHFREE_MODE = "sandbox"; // change to "production" when live
+const CASHFREE_MODE = "production";
 
 const sb = supabase.createClient(SUPA_URL, SUPA_ANON);
 
@@ -19,9 +19,7 @@ async function init() {
   if (!_token) { showState('invalid'); return; }
 
   const { data, error } = await sb
-    .from('submission_links')
-    .select('id,label,max_uses,use_count,expires_at,revoked')
-    .eq('token', _token)
+    .rpc('validate_submission_token', { token_input: _token })
     .single();
 
   if (error || !data) { showState('invalid'); return; }
