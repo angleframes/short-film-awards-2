@@ -1253,12 +1253,6 @@
             if (!REGISTRATION_GATE.isOpen) return;
             if (stepNumber > currentWizardStep && !validateStepInputs(currentWizardStep)) return;
 
-            // Cannot reach Review & Submit until payment is verified by the backend.
-            if (stepNumber === 5 && !paymentState.verified) {
-                showPaymentStatus('is-error', 'Please complete payment before reviewing your entry.');
-                return;
-            }
-
             document.querySelectorAll('.wizard-step-panel').forEach(panel => panel.classList.remove('active'));
             document.querySelectorAll('.pipeline-node').forEach(node => node.classList.remove('active', 'completed'));
 
@@ -1274,7 +1268,7 @@
                 if (i === stepNumber) node.classList.add('active');
             }
 
-            if (stepNumber === 5) generateReviewSummary();
+            if (stepNumber === 4) generateReviewSummary();
         }
 
         function validateStepInputs(step) {
@@ -1330,20 +1324,10 @@
                 }
             });
 
-            // Payment summary (verified via Cashfree, server-side).
-            const payRows = [
-                { label: "Payment Status", value: "✓ Paid" },
-                { label: "Amount", value: "₹" + (paymentState.amount || APP_CONFIG.registrationFee) + " INR" },
-                { label: "Payment Method", value: paymentState.paymentMethod || "Online Payment" },
-                { label: "Cashfree Order ID", value: paymentState.orderId || "—" },
-                { label: "Payment ID", value: paymentState.cfPaymentId || "—" }
-            ];
-            payRows.forEach(item => {
-                const row = document.createElement('div');
-                row.className = 'review-row';
-                row.innerHTML = `<span>${escapeHtml(item.label)}</span><span>${escapeHtml(item.value)}</span>`;
-                matrix.appendChild(row);
-            });
+            const feeRow = document.createElement('div');
+            feeRow.className = 'review-row';
+            feeRow.innerHTML = `<span>Registration Fee</span><span>₹${APP_CONFIG.registrationFee} INR (payable next step)</span>`;
+            matrix.appendChild(feeRow);
         }
 
         /****************************************************************
@@ -1374,7 +1358,6 @@
             const payBtn = document.getElementById('payNowBtn');
             const payLabel = document.getElementById('payNowBtnLabel');
             const retryBtn = document.getElementById('paymentRetryBtn');
-            const toReviewBtn = document.getElementById('toReviewBtn');
 
             if (state === 'idle') {
                 payBtn.style.display = 'block';
@@ -1393,11 +1376,6 @@
             } else if (state === 'paid') {
                 payBtn.style.display = 'none';
                 retryBtn.style.display = 'none';
-                if (toReviewBtn) {
-                    toReviewBtn.disabled = false;
-                    toReviewBtn.style.opacity = '1';
-                    toReviewBtn.style.cursor = 'pointer';
-                }
             }
         }
 
@@ -1449,6 +1427,35 @@
 
                 paymentState.orderId = orderResp.order_id;
 
+                // Pre-payment save: persist form data so webhook can finalize if browser closes.
+                try {
+                    const formSnapshot = {
+                        action: 'saveFormData',
+                        applicantName: document.getElementById('applicantName').value.trim(),
+                        email: document.getElementById('email').value.trim(),
+                        phone: document.getElementById('phone').value.trim(),
+                        city: document.getElementById('city').value.trim(),
+                        filmName: document.getElementById('filmName').value.trim(),
+                        category: document.getElementById('category').value,
+                        filmLink: document.getElementById('filmLink').value.trim(),
+                        director: document.getElementById('director').value.trim(),
+                        duration: document.getElementById('duration').value.trim(),
+                        producer: document.getElementById('producer').value.trim(),
+                        writer: document.getElementById('writer').value.trim(),
+                        cinematographer: document.getElementById('cinematographer').value.trim(),
+                        editor: document.getElementById('editor').value.trim(),
+                        musicDirector: document.getElementById('musicDirector').value.trim(),
+                        actor: document.getElementById('actor').value.trim(),
+                        actress: document.getElementById('actress').value.trim(),
+                        childArtist: document.getElementById('childArtist').value.trim() || 'None',
+                        cashfreeOrderId: orderResp.order_id
+                    };
+                    if (window._linkId) formSnapshot.link_id = window._linkId;
+                    await backendCall(formSnapshot);
+                } catch (saveErr) {
+                    console.warn('Pre-payment save failed (non-blocking):', saveErr);
+                }
+
                 const cashfree = Cashfree({ mode: APP_CONFIG.cashfreeMode });
                 showPaymentStatus('is-pending', 'Opening secure Cashfree checkout…');
 
@@ -1492,8 +1499,10 @@
                     paymentState.currency = resp.order_currency || APP_CONFIG.currency;
                     paymentState.paidAt = resp.paid_at || new Date().toISOString();
                     paymentState.paymentMethod = resp.payment_method || null;
-                    showPaymentStatus('is-success', '✓ Payment received (₹' + escapeHtml(paymentState.amount) + '). Order ' + escapeHtml(paymentState.orderId) + '. You can now review &amp; submit.');
+                    showPaymentStatus('is-success', '✓ Payment received (₹' + escapeHtml(paymentState.amount) + '). Submitting your entry…');
                     setPayUiState('paid');
+                    // Auto-submit after successful payment.
+                    await handleFinalSubmit();
                 } else if (payStatus === 'ACTIVE' || payStatus === 'PENDING') {
                     showPaymentStatus('is-pending', 'Payment is still pending. If you completed it, wait a moment and press Retry to re-check.');
                     setPayUiState('failed');
@@ -1508,24 +1517,18 @@
             }
         }
 
-        function handleFinalSubmit(event) {
-            event.preventDefault();
+        async function handleFinalSubmit(event) {
+            if (event) event.preventDefault();
             if (!REGISTRATION_GATE.isOpen) return;
 
-            const submitBtn = document.getElementById('submitBtn');
-
-            // Hard gate: never submit unless payment is server-verified.
             if (!paymentState.verified) {
                 alert("Please complete and verify payment before submitting.");
-                goToWizardStep(4);
+                goToWizardStep(5);
                 return;
             }
-            if (submitBtn.disabled) return; // guard against double-submit
-
-            submitBtn.disabled = true;
-            submitBtn.textContent = "Processing Submission...";
 
             const formData = {
+                action: 'handleSubmission',
                 applicantName: document.getElementById('applicantName').value,
                 phone: document.getElementById('phone').value,
                 email: document.getElementById('email').value,
@@ -1543,34 +1546,28 @@
                 actor: document.getElementById('actor').value,
                 actress: document.getElementById('actress').value,
                 childArtist: document.getElementById('childArtist').value || "None",
-                // Cashfree payment info stored with the registration:
                 paymentStatus: "Paid",
                 cashfreeOrderId: paymentState.orderId,
                 cashfreePaymentId: paymentState.cfPaymentId,
-                // amount/currency are server-enforced; sent here only as metadata hint
-                // Backend always uses server-verified values from Cashfree
                 amount: paymentState.amount,
                 currency: paymentState.currency,
                 paidAt: paymentState.paidAt,
                 paymentMethod: paymentState.paymentMethod
             };
+            if (window._linkId) formData.link_id = window._linkId;
 
-            backendCall(formData)
-            .then(response => {
-                if (response.status === "success") {
+            try {
+                showPaymentStatus('is-pending', 'Submitting your film entry…');
+                const response = await backendCall(formData);
+                if (response.status === "success" || response.status === "already_registered") {
                     document.getElementById('activeFormContainer').style.display = 'none';
                     document.getElementById('successScreen').style.display = 'block';
                 } else {
-                    alert("Submission rejection code: " + response.message);
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = "Submit Film Entry";
+                    showPaymentStatus('is-error', 'Submission failed: ' + escapeHtml(response.message || 'Unknown error') + '. Your payment is safe — please retry.');
                 }
-            })
-            .catch(() => {
-                alert("Network ledger processing fault.");
-                submitBtn.disabled = false;
-                submitBtn.textContent = "Submit Film Entry";
-            });
+            } catch (err) {
+                showPaymentStatus('is-error', 'Network error during submission. Your payment is safe — please retry or contact us.');
+            }
         }
 
         function resetPortalView() {
