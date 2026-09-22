@@ -205,13 +205,6 @@ function initCSelects() {
     { value: 'campus',  label: 'Campus' },
   ], '', () => applyFilters());
 
-  _csel.status = new CSelect('csStatus', [
-    { value: '',        label: 'All Payments' },
-    { value: 'PAID',    label: 'Paid' },
-    { value: 'PENDING', label: 'Pending' },
-    { value: 'FAILED',  label: 'Failed' },
-  ], '', () => applyFilters());
-
   _csel.sort = new CSelect('csSort', [
     { value: 'newest',    label: 'Newest first' },
     { value: 'oldest',    label: 'Oldest first' },
@@ -284,32 +277,33 @@ async function saveConfig(ev) {
 ════════════════════════════════════════════════════════ */
 async function loadEntries() {
   const body = document.getElementById('entriesBody');
-  body.innerHTML = '<tr><td colspan="6" class="skeleton">Loading…</td></tr>';
+  body.innerHTML = '<tr><td colspan="7" class="skeleton">Loading…</td></tr>';
   const { data, error } = await sb.from('film_entries').select('*').order('created_at', { ascending: false });
   if (error) {
-    body.innerHTML = `<tr><td colspan="6" class="skeleton">Cannot load: ${esc(error.message)}</td></tr>`;
+    body.innerHTML = `<tr><td colspan="7" class="skeleton">Cannot load: ${esc(error.message)}</td></tr>`;
     return;
   }
-  _allEntries = data || [];
-  document.getElementById('statEntries').textContent = _allEntries.length;
-
-  const today = new Date().toISOString().slice(0,10);
-  const stPaid    = _allEntries.filter(r => (r.payment_status||'').toUpperCase() === 'PAID').length;
-  const stPending = _allEntries.filter(r => { const s=(r.payment_status||'').toUpperCase(); return s==='PENDING'||s===''; }).length;
-  const stFailed  = _allEntries.filter(r => (r.payment_status||'').toUpperCase() === 'FAILED').length;
-  const stGeneral = _allEntries.filter(r => (r.category||'').toLowerCase().includes('general')).length;
-  const stCampus  = _allEntries.filter(r => (r.category||'').toLowerCase().includes('campus')).length;
-  const stToday   = _allEntries.filter(r => r.created_at && r.created_at.startsWith(today)).length;
-  document.getElementById('stTotal').textContent   = _allEntries.length;
-  document.getElementById('stPaid').textContent    = stPaid;
-  document.getElementById('stPending').textContent = stPending;
-  document.getElementById('stFailed').textContent  = stFailed;
-  document.getElementById('stGeneral').textContent = stGeneral;
-  document.getElementById('stCampus').textContent  = stCampus;
-  document.getElementById('stToday').textContent   = stToday;
-
+  // Show only paid + non-archived entries
+  _allEntries = (data || []).filter(r =>
+    (r.payment_status || '').toUpperCase() === 'PAID' && !r.archived
+  );
+  updatePaidCounters();
   _page = 1;
   applyFilters();
+}
+
+function updatePaidCounters() {
+  const today = new Date().toISOString().slice(0,10);
+  const total   = _allEntries.length;
+  const general = _allEntries.filter(r => (r.category||'').toLowerCase().includes('general')).length;
+  const campus  = _allEntries.filter(r => (r.category||'').toLowerCase().includes('campus')).length;
+  const todayN  = _allEntries.filter(r => r.created_at && r.created_at.startsWith(today)).length;
+  document.getElementById('stTotal').textContent   = total;
+  const el = document.getElementById('statEntries');
+  if (el) el.textContent = total;
+  document.getElementById('stGeneral').textContent = general;
+  document.getElementById('stCampus').textContent  = campus;
+  document.getElementById('stToday').textContent   = todayN;
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -318,17 +312,10 @@ async function loadEntries() {
 function applyFilters() {
   const q    = (document.getElementById('entSearch').value || '').toLowerCase().trim();
   const track= (_csel.track ? _csel.track.value : '').toLowerCase();
-  const sta  = (_csel.status ? _csel.status.value : '').toUpperCase();
   const sort = _csel.sort ? _csel.sort.value : 'newest';
 
   _filtered = _allEntries.filter(r => {
     if (track && !(r.category||'').toLowerCase().includes(track)) return false;
-    if (sta) {
-      const ps = (r.payment_status||'').toUpperCase();
-      if (sta === 'PAID' && ps !== 'PAID') return false;
-      if (sta === 'PENDING' && ps !== 'PENDING' && ps !== '') return false;
-      if (sta === 'FAILED' && ps !== 'FAILED') return false;
-    }
     if (q) {
       const haystack = [
         r.applicant_name, r.email, r.phone, r.film_name,
@@ -365,17 +352,11 @@ function renderEntriesPage() {
   document.getElementById('entriesCount').textContent = `${total} result${total !== 1 ? 's' : ''} (${_allEntries.length} total)`;
 
   if (!slice.length) {
-    body.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="em-icon">🎞️</div><h3>No film entries yet</h3><p>New submissions will appear here automatically.</p></div></td></tr>';
+    body.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="em-icon">🎞️</div><h3>No film entries yet</h3><p>New submissions will appear here automatically.</p></div></td></tr>';
     cards.innerHTML = '<div class="empty-state"><div class="em-icon">🎞️</div><h3>No film entries yet</h3><p>New submissions will appear here automatically.</p></div>';
     renderPagination(0,1,1); return;
   }
 
-  const payTag = r => {
-    const ps = (r.payment_status||'').toUpperCase();
-    if (ps==='PAID')    return '<span class="tag paid">Paid</span>';
-    if (ps==='FAILED')  return '<span class="tag failed">Failed</span>';
-    return '<span class="tag pending">Pending</span>';
-  };
   const trackTag = r => {
     if ((r.category||'').toLowerCase().includes('campus')) return '<span class="tag campus">Campus</span>';
     return '<span class="tag general">General</span>';
@@ -392,9 +373,10 @@ function renderEntriesPage() {
       </td>
       <td style="font-weight:500;">${esc(r.film_name||'—')}</td>
       <td>${trackTag(r)}</td>
-      <td>${payTag(r)}</td>
+      <td><span class="tag paid">Paid</span></td>
       <td>
         <button class="btn-ghost btn-xs" onclick="openDrawer(${gIdx})">View Details</button>
+        <button class="btn-ghost btn-xs btn-del" onclick="archiveEntry(${r.id}, '${esc(r.film_name||'')}', '${esc(r.applicant_name||'')}')">Delete</button>
       </td>
     </tr>`;
   }).join('');
@@ -405,8 +387,9 @@ function renderEntriesPage() {
     return `<div class="entry-card">
       <div class="ec-film">${esc(r.film_name||'—')}</div>
       <div class="ec-meta">${esc(r.applicant_name||'—')} · ${fmtDate(r.created_at)}</div>
-      <div class="ec-row">${trackTag(r)} ${payTag(r)}
+      <div class="ec-row">${trackTag(r)} <span class="tag paid">Paid</span>
         <button class="btn-ghost btn-xs" style="margin-left:auto;" onclick="openDrawer(${gIdx})">View Details</button>
+        <button class="btn-ghost btn-xs btn-del" onclick="archiveEntry(${r.id}, '${esc(r.film_name||'')}', '${esc(r.applicant_name||'')}')">Delete</button>
       </div>
     </div>`;
   }).join('');
@@ -423,6 +406,27 @@ function renderPagination(total, pages, current) {
   box.innerHTML = html;
 }
 function changePage(n) { _page = n; renderEntriesPage(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+/* ═══════════════════════════════════════════════════════
+   ARCHIVE (SOFT-DELETE) ENTRY
+════════════════════════════════════════════════════════ */
+async function archiveEntry(id, filmName, applicantName) {
+  const confirmed = window.UI
+    ? await UI.confirm(
+        `Are you sure you want to delete this film entry?<br><br><strong>Film:</strong> ${filmName}<br><strong>Applicant:</strong> ${applicantName}<br><br>This action cannot be undone from this panel.`,
+        { title: 'Delete Film Entry?', okText: 'Delete Entry', cancelText: 'Cancel', danger: true }
+      )
+    : confirm(`Delete "${filmName}" by ${applicantName}? This cannot be undone from this panel.`);
+  if (!confirmed) return;
+
+  const { error } = await sb.from('film_entries').update({ archived: true }).eq('id', id);
+  if (error) return toast('Delete failed: ' + error.message, 'err');
+
+  _allEntries = _allEntries.filter(r => r.id !== id);
+  updatePaidCounters();
+  applyFilters();
+  toast('Entry archived: ' + filmName, 'ok');
+}
 
 /* ═══════════════════════════════════════════════════════
    ENTRY DETAIL MODAL
@@ -1582,31 +1586,25 @@ function _initAdminRealtime() {
 
   sb.channel('admin_live')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'film_entries' }, (payload) => {
-      if (payload.eventType === 'INSERT') {
-        _allEntries.unshift(payload.new);
+      const row = payload.new;
+      const isPaid = row && (row.payment_status || '').toUpperCase() === 'PAID' && !row.archived;
+      if (payload.eventType === 'INSERT' && isPaid) {
+        _allEntries.unshift(row);
         debounced('entries', () => {
-          const today = new Date().toISOString().slice(0,10);
-          const stPaid    = _allEntries.filter(r => (r.payment_status||'').toUpperCase() === 'PAID').length;
-          const stPending = _allEntries.filter(r => { const s=(r.payment_status||'').toUpperCase(); return s==='PENDING'||s===''; }).length;
-          const stFailed  = _allEntries.filter(r => (r.payment_status||'').toUpperCase() === 'FAILED').length;
-          const stGeneral = _allEntries.filter(r => (r.category||'').toLowerCase().includes('general')).length;
-          const stCampus  = _allEntries.filter(r => (r.category||'').toLowerCase().includes('campus')).length;
-          const stToday   = _allEntries.filter(r => r.created_at && r.created_at.startsWith(today)).length;
-          document.getElementById('statEntries').textContent = _allEntries.length;
-          document.getElementById('stTotal').textContent   = _allEntries.length;
-          document.getElementById('stPaid').textContent    = stPaid;
-          document.getElementById('stPending').textContent = stPending;
-          document.getElementById('stFailed').textContent  = stFailed;
-          document.getElementById('stGeneral').textContent = stGeneral;
-          document.getElementById('stCampus').textContent  = stCampus;
-          document.getElementById('stToday').textContent   = stToday;
+          updatePaidCounters();
           applyFilters();
-          toast('New film entry: ' + (payload.new.film_name || 'unknown'), 'ok');
+          toast('New film entry: ' + (row.film_name || 'unknown'), 'ok');
         }, 300);
       } else if (payload.eventType === 'UPDATE') {
-        const idx = _allEntries.findIndex(e => e.id === payload.new.id);
-        if (idx >= 0) _allEntries[idx] = { ..._allEntries[idx], ...payload.new };
-        debounced('entries', () => applyFilters(), 300);
+        const idx = _allEntries.findIndex(e => e.id === row.id);
+        if (row.archived || (row.payment_status || '').toUpperCase() !== 'PAID') {
+          if (idx >= 0) _allEntries.splice(idx, 1);
+        } else if (idx >= 0) {
+          _allEntries[idx] = { ..._allEntries[idx], ...row };
+        } else if (isPaid) {
+          _allEntries.unshift(row);
+        }
+        debounced('entries', () => { updatePaidCounters(); applyFilters(); }, 300);
       }
     })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'submission_links' }, () => {
