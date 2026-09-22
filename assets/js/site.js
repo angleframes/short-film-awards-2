@@ -176,11 +176,12 @@
             try {
                 if (!window.supabase) return;
                 const SB = window.supabase.createClient(SUPA_URL, SUPA_ANON);
-                const [cfgRes, galRes, updRes, tmtRes] = await Promise.all([
+                const [cfgRes, galRes, updRes, tmtRes, vcRes] = await Promise.all([
                     SB.from('site_config').select('*').eq('id', 1).single(),
                     SB.from('gallery').select('*').order('sort_order').order('created_at', { ascending: false }),
                     SB.from('updates_feed').select('*').order('sort_order').order('created_at', { ascending: false }),
-                    SB.from('testimonials').select('*').order('display_order').order('created_at')
+                    SB.from('testimonials').select('*').order('display_order').order('created_at'),
+                    SB.from('video_categories').select('*').order('sort_order')
                 ]);
                 const cfg = cfgRes.data;
                 if (cfg) {
@@ -199,9 +200,11 @@
                     updRes.data.forEach(u => UPDATES_FEED.push({ date: u.date_label || '', title: u.title || '', text: u.body || '' }));
                 }
                 window._testimonialsData = Array.isArray(tmtRes.data) ? tmtRes.data : [];
+                window._videoCategoriesData = Array.isArray(vcRes && vcRes.data) ? vcRes.data : [];
             } catch (e) {
                 console.warn('Remote config load failed — using built-in defaults.', e);
                 window._testimonialsData = window._testimonialsData || [];
+                window._videoCategoriesData = window._videoCategoriesData || [];
             }
         }
 
@@ -230,7 +233,28 @@
             if (window.supabase) {
                 try {
                     const SB_RT = window.supabase.createClient(SUPA_URL, SUPA_ANON);
-                    SB_RT.channel('site_config_live')
+                    let _rtDebounce = {};
+                    function _rtDebounced(key, fn, delay) {
+                        clearTimeout(_rtDebounce[key]);
+                        _rtDebounce[key] = setTimeout(fn, delay || 500);
+                    }
+                    async function _rtRefreshVideos() {
+                        try {
+                            const [vRes, cRes] = await Promise.all([
+                                SB_RT.from('testimonials').select('*').order('display_order').order('created_at'),
+                                SB_RT.from('video_categories').select('*').order('sort_order')
+                            ]);
+                            if (vRes.data) window._testimonialsData = vRes.data;
+                            if (cRes.data) window._videoCategoriesData = cRes.data;
+                            _videosInitialized = false;
+                            var sec = document.getElementById('section-videos');
+                            if (sec) { sec.innerHTML = ''; }
+                            var filtersEl = document.getElementById('vidFilters');
+                            /* rebuild section from scratch */
+                            _rebuildVideoSection();
+                        } catch(e) { console.warn('Video realtime refresh error', e); }
+                    }
+                    SB_RT.channel('site_live')
                         .on('postgres_changes', {
                             event: 'UPDATE',
                             schema: 'public',
@@ -241,6 +265,12 @@
                                 REGISTRATION_GATE.isOpen = !!payload.new.registration_open;
                                 evaluateRegistrationGateState();
                             }
+                        })
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'testimonials' }, () => {
+                            _rtDebounced('videos', _rtRefreshVideos, 600);
+                        })
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'video_categories' }, () => {
+                            _rtDebounced('videos', _rtRefreshVideos, 600);
                         })
                         .subscribe();
                 } catch (e) {
@@ -253,7 +283,7 @@
             renderAboutCards();
             renderGallery();
             initGalleryPicker();
-            renderTestimonials();
+            renderVideos();
             renderUpdatesFeed();
             renderGuidelines();
             renderJuryPanel();
@@ -1025,18 +1055,20 @@
             if (descEl)    descEl.textContent    = meta.desc    || '';
         }
 
-        /* ===== TESTIMONIALS ===== */
-        let _testimonialsInitialized = false;
+        /* ===== VIDEOS & MEDIA UPDATES ===== */
+        let _videosInitialized = false;
+        let _vidActiveFilter = 'all';
+        let _vidShowAll = false;
 
-        function _tmtEsc(s) {
+        function _vidEsc(s) {
             return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         }
 
-        function _tmtThumbSrc(videoId) {
+        function _vidThumbSrc(videoId) {
             return `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
         }
 
-        function _tmtThumbFallback(img) {
+        function _vidThumbFallback(img) {
             const id = img.dataset.ytid;
             if (!id) return;
             if (img.dataset.fallback === '1') { img.src = `https://i.ytimg.com/vi/${id}/mqdefault.jpg`; img.dataset.fallback='done'; return; }
@@ -1047,7 +1079,7 @@
             const backdrop = document.getElementById('ytModalBackdrop');
             const frame    = document.getElementById('ytModalFrame');
             if (!backdrop || !frame) return;
-            frame.innerHTML = `<iframe src="https://www.youtube.com/embed/${_tmtEsc(videoId)}?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            frame.innerHTML = `<iframe src="https://www.youtube.com/embed/${_vidEsc(videoId)}?autoplay=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
             backdrop.classList.add('open');
             backdrop.setAttribute('aria-hidden', 'false');
             document.body.style.overflow = 'hidden';
@@ -1074,95 +1106,176 @@
 
         const _PLAY_SVG = `<svg viewBox="0 0 24 24" fill="white"><polygon points="6,4 20,12 6,20"/></svg>`;
 
-        function renderTestimonials() {
-            if (_testimonialsInitialized) return;
-            _testimonialsInitialized = true;
+        function _vidGetCategoryName(catId) {
+            const cats = window._videoCategoriesData || [];
+            const cat = cats.find(c => c.id === catId);
+            return cat ? cat.name : '';
+        }
+
+        function _vidBuildCard(v, isFeatured) {
+            const vid = _vidEsc(v.youtube_video_id);
+            const catName = v.category_id ? _vidGetCategoryName(v.category_id) : (v.role || '');
+            const year = v.year || '';
+            const desc = v.short_text || '';
+            const dur  = v.duration || '';
+            return `<div class="vid-card${isFeatured ? ' featured' : ''}" data-ytid="${vid}" data-catid="${v.category_id || ''}" role="button" tabindex="0" aria-label="Play: ${_vidEsc(v.video_title)}">
+                <div class="vid-card-thumb">
+                    <img src="${_vidThumbSrc(vid)}" alt="${_vidEsc(v.video_title)}" loading="${isFeatured ? 'eager' : 'lazy'}" decoding="async" data-ytid="${vid}" onerror="_vidThumbFallback(this)">
+                    <div class="vid-card-overlay">
+                        <div class="vid-play-icon">${_PLAY_SVG}</div>
+                    </div>
+                    ${dur ? `<span class="vid-duration">${_vidEsc(dur)}</span>` : ''}
+                    ${isFeatured ? '<span class="vid-featured-badge">FEATURED VIDEO</span>' : ''}
+                </div>
+                <div class="vid-card-body">
+                    <div class="vid-card-title">${_vidEsc(v.video_title)}</div>
+                    ${desc ? `<div class="vid-card-desc">${_vidEsc(desc)}</div>` : ''}
+                    <div class="vid-card-meta">
+                        ${catName ? `<span>${_vidEsc(catName).toUpperCase()}</span>` : ''}
+                        ${catName && year ? '<span class="vid-meta-sep">|</span>' : ''}
+                        ${year ? `<span>${_vidEsc(year)}</span>` : ''}
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function _vidBindCards(container) {
+            container.querySelectorAll('.vid-card').forEach(card => {
+                const play = () => _playYouTube(card.dataset.ytid);
+                card.addEventListener('click', play);
+                card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); play(); } });
+            });
+        }
+
+        function _vidFilteredData() {
+            const data = (window._testimonialsData || []).filter(v => v.active !== false);
+            if (_vidActiveFilter === 'all') return data;
+            return data.filter(v => String(v.category_id) === String(_vidActiveFilter));
+        }
+
+        function _vidRenderCards() {
+            const filtered = _vidFilteredData();
+            const track    = document.getElementById('vidTrack');
+            const allGrid  = document.getElementById('vidAllGrid');
+            const carousel = document.querySelector('.vid-carousel-wrap');
+
+            if (_vidShowAll) {
+                if (carousel) carousel.style.display = 'none';
+                if (allGrid) {
+                    allGrid.style.display = '';
+                    const featured = filtered.find(v => v.featured);
+                    const rest = filtered.filter(v => v !== featured);
+                    const sorted = featured ? [featured, ...rest] : filtered;
+                    allGrid.innerHTML = sorted.map((v, i) => _vidBuildCard(v, i === 0 && v.featured)).join('');
+                    _vidBindCards(allGrid);
+                }
+            } else {
+                if (allGrid) allGrid.style.display = 'none';
+                if (carousel) carousel.style.display = '';
+                if (track) {
+                    const featured = filtered.find(v => v.featured);
+                    const rest = filtered.filter(v => v !== featured);
+                    const sorted = featured ? [featured, ...rest] : filtered;
+                    track.innerHTML = sorted.map((v, i) => _vidBuildCard(v, i === 0 && v.featured)).join('');
+                    _vidBindCards(track);
+                }
+            }
+
+            const viewAllBtn = document.getElementById('vidViewAll');
+            if (viewAllBtn) {
+                viewAllBtn.innerHTML = _vidShowAll
+                    ? `${_PLAY_SVG} SHOW LESS <span class="vid-cta-arrow">&uarr;</span>`
+                    : `${_PLAY_SVG} VIEW ALL VIDEOS <span class="vid-cta-arrow">&rarr;</span>`;
+            }
+        }
+
+        function renderVideos() {
+            if (_videosInitialized) return;
+            _videosInitialized = true;
             _setupYtModal();
 
-            const data = window._testimonialsData || [];
-            const section = document.getElementById('section-testimonials');
+            const data = (window._testimonialsData || []).filter(v => v.active !== false);
+            const section = document.getElementById('section-videos');
             if (!section) return;
 
             if (!data.length) { section.style.display = 'none'; return; }
             section.style.display = '';
 
-            /* show/hide nav link */
-            const navLink = document.getElementById('navTestimonials');
+            const navLink = document.getElementById('navVideos');
             if (navLink) navLink.style.display = '';
-            const moreLink = document.getElementById('navMoreTestimonials');
+            const moreLink = document.getElementById('navMoreVideos');
             if (moreLink) moreLink.style.display = '';
 
-            const featured  = data.find(t => t.featured) || data[0];
-            const rest      = data.filter(t => t.id !== featured.id);
+            /* Category filter tabs */
+            const filtersEl = document.getElementById('vidFilters');
+            if (filtersEl) {
+                const cats = (window._videoCategoriesData || []).filter(c => c.active !== false);
+                let html = `<button class="vid-filter-btn active" data-catid="all"><span class="vid-filter-icon">&#9654;</span> All Videos</button>`;
+                cats.forEach(c => {
+                    html += `<button class="vid-filter-btn" data-catid="${c.id}"><span class="vid-filter-icon">${_vidEsc(c.icon || '')}</span> ${_vidEsc(c.name)}</button>`;
+                });
+                filtersEl.innerHTML = html;
 
-            /* --- Featured --- */
-            const featEl = document.getElementById('testimonialsFeatured');
-            if (featEl && featured) {
-                const fid   = _tmtEsc(featured.youtube_video_id);
-                const fname = featured.person_name ? _tmtEsc(featured.person_name) : '';
-                const frole = [featured.role, featured.year].filter(Boolean).map(_tmtEsc).join(' | ');
-                const fquote= featured.short_text ? `<p class="tmt-featured-quote">&ldquo;${_tmtEsc(featured.short_text)}&rdquo;</p>` : '';
-                featEl.innerHTML = `
-                    <div class="tmt-featured-grid">
-                        <button class="tmt-featured-thumb" aria-label="Play: ${_tmtEsc(featured.video_title)}" data-ytid="${fid}">
-                            <img src="${_tmtThumbSrc(fid)}" alt="${_tmtEsc(featured.video_title)}" loading="eager" decoding="async" data-ytid="${fid}" onerror="_tmtThumbFallback(this)">
-                            <div class="tmt-play-btn" aria-hidden="true">
-                                <div class="tmt-play-icon">${_PLAY_SVG}</div>
-                            </div>
-                        </button>
-                        <div class="tmt-featured-info">
-                            <span class="tmt-eyebrow">FEATURED TESTIMONIAL</span>
-                            <h3 class="tmt-featured-title">${_tmtEsc(featured.video_title)}</h3>
-                            ${fquote}
-                            ${fname ? `<div class="tmt-featured-person"><strong>${fname}</strong>${frole ? `<span>${frole}</span>` : ''}</div>` : ''}
-                            <button class="tmt-watch-btn" data-ytid="${fid}" aria-label="Watch testimonial: ${_tmtEsc(featured.video_title)}">
-                                ${_PLAY_SVG} Watch Testimonial &#8594;
-                            </button>
-                        </div>
-                    </div>`;
-                featEl.querySelector('.tmt-featured-thumb').addEventListener('click', () => _playYouTube(fid));
-                featEl.querySelector('.tmt-watch-btn').addEventListener('click', () => _playYouTube(fid));
+                filtersEl.addEventListener('click', e => {
+                    const btn = e.target.closest('.vid-filter-btn');
+                    if (!btn) return;
+                    filtersEl.querySelectorAll('.vid-filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    _vidActiveFilter = btn.dataset.catid;
+                    _vidRenderCards();
+                });
             }
 
-            /* --- More carousel --- */
-            const moreWrap = document.getElementById('testimonialsMoreWrap');
-            const track    = document.getElementById('testimonialsTrack');
-            if (!moreWrap || !track) return;
+            /* Render cards */
+            _vidRenderCards();
 
-            if (!rest.length) { moreWrap.style.display = 'none'; return; }
-            moreWrap.style.display = '';
-
-            track.innerHTML = rest.map(t => {
-                const id    = _tmtEsc(t.youtube_video_id);
-                const name  = t.person_name ? _tmtEsc(t.person_name) : '';
-                const role  = [t.role, t.year].filter(Boolean).map(_tmtEsc).join(' · ');
-                const quote = t.short_text ? `<p class="tmt-card-quote">&ldquo;${_tmtEsc(t.short_text)}&rdquo;</p>` : '';
-                return `<div class="tmt-card" data-ytid="${id}" role="button" tabindex="0" aria-label="Play: ${_tmtEsc(t.video_title)}">
-                    <div class="tmt-card-thumb">
-                        <img src="${_tmtThumbSrc(id)}" alt="${_tmtEsc(t.video_title)}" loading="lazy" decoding="async" data-ytid="${id}" onerror="_tmtThumbFallback(this)">
-                        <div class="tmt-card-play" aria-hidden="true"><div class="tmt-card-play-icon">${_PLAY_SVG}</div></div>
-                    </div>
-                    <div class="tmt-card-body">
-                        <div class="tmt-card-title" title="${_tmtEsc(t.video_title)}">${_tmtEsc(t.video_title)}</div>
-                        ${name ? `<div class="tmt-card-person"><strong>${name}</strong>${role ? `<span>${role}</span>` : ''}</div>` : ''}
-                        ${quote}
-                    </div>
-                </div>`;
-            }).join('');
-
-            track.querySelectorAll('.tmt-card').forEach(card => {
-                const play = () => _playYouTube(card.dataset.ytid);
-                card.addEventListener('click', play);
-                card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); play(); } });
-            });
-
-            /* carousel arrow scroll */
-            const vp   = document.getElementById('testimonialsCarousel');
-            const prev = document.getElementById('tcarouselPrev');
-            const next = document.getElementById('tcarouselNext');
-            const SCROLL_AMT = 240;
+            /* Carousel arrows */
+            const vp   = document.getElementById('vidCarousel');
+            const prev = document.getElementById('vidPrev');
+            const next = document.getElementById('vidNext');
+            const SCROLL_AMT = 300;
             prev && prev.addEventListener('click', () => vp.scrollBy({ left: -SCROLL_AMT, behavior: 'smooth' }));
             next && next.addEventListener('click', () => vp.scrollBy({ left:  SCROLL_AMT, behavior: 'smooth' }));
+
+            /* VIEW ALL toggle */
+            const viewAllBtn = document.getElementById('vidViewAll');
+            if (viewAllBtn) {
+                viewAllBtn.addEventListener('click', () => {
+                    _vidShowAll = !_vidShowAll;
+                    _vidRenderCards();
+                    if (!_vidShowAll) {
+                        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            }
+        }
+
+        function _rebuildVideoSection() {
+            _videosInitialized = false;
+            _vidShowAll = false;
+            const section = document.getElementById('section-videos');
+            if (!section) return;
+            const data = (window._testimonialsData || []).filter(v => v.active !== false);
+            if (!data.length) { section.style.display = 'none'; return; }
+            section.style.display = '';
+            const filtersEl = document.getElementById('vidFilters');
+            if (filtersEl) {
+                const cats = (window._videoCategoriesData || []).filter(c => c.active !== false);
+                let html = `<button class="vid-filter-btn${_vidActiveFilter==='all'?' active':''}" data-catid="all"><span class="vid-filter-icon">&#9654;</span> All Videos</button>`;
+                cats.forEach(c => {
+                    html += `<button class="vid-filter-btn${String(c.id)===String(_vidActiveFilter)?' active':''}" data-catid="${c.id}"><span class="vid-filter-icon">${_vidEsc(c.icon||'')}</span> ${_vidEsc(c.name)}</button>`;
+                });
+                filtersEl.innerHTML = html;
+                filtersEl.querySelectorAll('.vid-filter-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        filtersEl.querySelectorAll('.vid-filter-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        _vidActiveFilter = btn.dataset.catid;
+                        _vidRenderCards();
+                    });
+                });
+            }
+            _vidRenderCards();
         }
 
         function renderUpdatesFeed() {
