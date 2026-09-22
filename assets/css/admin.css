@@ -1780,6 +1780,20 @@
 }
 
 /* ════════════════════════════════════════════════════════
+   DELETE BUTTON
+   ════════════════════════════════════════════════════════ */
+.sksfa-admin .btn-del {
+  color: #ff4d4d;
+  border-color: rgba(255,77,77,0.2);
+  margin-left: 4px;
+}
+.sksfa-admin .btn-del:hover {
+  color: #fff;
+  background: rgba(255,77,77,0.15);
+  border-color: rgba(255,77,77,0.4);
+}
+
+/* ════════════════════════════════════════════════════════
    LINK CARD — stronger structure
    ════════════════════════════════════════════════════════ */
 .sksfa-admin .link-card-header {
