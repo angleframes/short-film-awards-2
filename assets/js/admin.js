@@ -706,7 +706,7 @@ document.addEventListener('keydown', e => {
 ════════════════════════════════════════════════════════ */
 async function refreshAwardsTab() {
   _evalsLoaded = false;
-  await loadAllEvals();
+  await Promise.all([loadAllEvals(), loadAwardCategories()]);
   renderAwardGrid();
 }
 
@@ -806,6 +806,145 @@ function closeAwardCatDetail() {
   _activeCatKey = null;
   document.getElementById('awardCatDetail').classList.add('hidden');
   renderAwardGrid();
+}
+
+/* ─── AWARD CATEGORY CRUD ─────────────────────────── */
+let _awardCats = [];
+
+async function loadAwardCategories() {
+  const { data, error } = await sb.from('award_categories').select('*').order('sort_order');
+  if (error) { toast('Failed to load award categories: ' + error.message, 'err'); return; }
+  _awardCats = data || [];
+  renderAcList();
+}
+
+function renderAcList() {
+  const tbody = document.getElementById('acListBody');
+  if (!_awardCats.length) {
+    tbody.innerHTML = '<tr><td colspan="5" style="padding:16px;color:var(--mut);">No categories yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = _awardCats.map((c, i) => {
+    const iconPreview = c.icon_svg ? `<div style="width:28px;height:28px;color:#fff;">${c.icon_svg}</div>` : '—';
+    const statusPill = c.active
+      ? '<span class="pill open" style="font-size:0.7rem;">Active</span>'
+      : '<span class="pill closed" style="font-size:0.7rem;">Inactive</span>';
+    const upBtn = i > 0
+      ? `<button class="btn-ghost btn-xs" onclick="acMove(${c.id},'up')" title="Move up"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>`
+      : '';
+    const downBtn = i < _awardCats.length - 1
+      ? `<button class="btn-ghost btn-xs" onclick="acMove(${c.id},'down')" title="Move down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>`
+      : '';
+    return `<tr>
+      <td style="color:var(--mut);font-size:0.78rem;">${c.sort_order}</td>
+      <td style="font-weight:500;">${esc(c.name)}</td>
+      <td>${iconPreview}</td>
+      <td>${statusPill}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn-ghost btn-xs" onclick="acEdit(${c.id})" title="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3l4 4L7 21H3v-4L17 3z"/></svg></button>
+        ${upBtn}${downBtn}
+        <button class="btn-ghost btn-xs" onclick="acToggleActive(${c.id})" title="${c.active?'Deactivate':'Activate'}">${c.active
+          ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>'
+          : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5,3 19,12 5,21"/></svg>'
+        }</button>
+        <button class="btn-ghost btn-xs" onclick="acDelete(${c.id})" title="Delete" style="color:var(--err);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg></button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function acToggleForm() {
+  const form = document.getElementById('acForm');
+  if (!form.classList.contains('hidden')) { acCancelForm(); return; }
+  document.getElementById('acFormTitle').textContent = 'Add Award Category';
+  document.getElementById('acEditId').value = '';
+  document.getElementById('acNameInput').value = '';
+  document.getElementById('acKeyInput').value = '';
+  document.getElementById('acIconInput').value = '';
+  document.getElementById('acSortInput').value = _awardCats.length;
+  document.getElementById('acActiveInput').value = 'true';
+  form.classList.remove('hidden');
+  document.getElementById('acNameInput').focus();
+}
+
+function acCancelForm() {
+  document.getElementById('acForm').classList.add('hidden');
+  document.getElementById('acEditId').value = '';
+}
+
+function acEdit(id) {
+  const cat = _awardCats.find(c => c.id === id);
+  if (!cat) return;
+  document.getElementById('acFormTitle').textContent = 'Edit Award Category';
+  document.getElementById('acEditId').value = id;
+  document.getElementById('acNameInput').value = cat.name;
+  document.getElementById('acKeyInput').value = cat.key;
+  document.getElementById('acIconInput').value = cat.icon_svg || '';
+  document.getElementById('acSortInput').value = cat.sort_order;
+  document.getElementById('acActiveInput').value = String(cat.active);
+  document.getElementById('acForm').classList.remove('hidden');
+  document.getElementById('acNameInput').focus();
+}
+
+async function acSave() {
+  const name = document.getElementById('acNameInput').value.trim();
+  if (!name) { toast('Category name required', 'err'); return; }
+  const editId = document.getElementById('acEditId').value;
+  const key = editId
+    ? document.getElementById('acKeyInput').value
+    : name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+  const icon_svg = document.getElementById('acIconInput').value.trim();
+  const sort_order = parseInt(document.getElementById('acSortInput').value) || 0;
+  const active = document.getElementById('acActiveInput').value === 'true';
+
+  if (!editId) {
+    const dup = _awardCats.find(c => c.key === key);
+    if (dup) { toast('Category with key "' + key + '" already exists', 'err'); return; }
+    const { error } = await sb.from('award_categories').insert({ key, name, icon_svg, sort_order, active });
+    if (error) { toast('Failed to add: ' + error.message, 'err'); return; }
+    toast('Category added');
+  } else {
+    const payload = { name, icon_svg, sort_order, active };
+    const { error } = await sb.from('award_categories').update(payload).eq('id', parseInt(editId));
+    if (error) { toast('Failed to update: ' + error.message, 'err'); return; }
+    toast('Category updated');
+  }
+  acCancelForm();
+  await loadAwardCategories();
+}
+
+async function acMove(id, dir) {
+  const idx = _awardCats.findIndex(c => c.id === id);
+  if (idx < 0) return;
+  const swapIdx = dir === 'up' ? idx - 1 : idx + 1;
+  if (swapIdx < 0 || swapIdx >= _awardCats.length) return;
+  const a = _awardCats[idx], b = _awardCats[swapIdx];
+  const { error: e1 } = await sb.from('award_categories').update({ sort_order: b.sort_order }).eq('id', a.id);
+  const { error: e2 } = await sb.from('award_categories').update({ sort_order: a.sort_order }).eq('id', b.id);
+  if (e1 || e2) { toast('Reorder failed', 'err'); return; }
+  await loadAwardCategories();
+}
+
+async function acToggleActive(id) {
+  const cat = _awardCats.find(c => c.id === id);
+  if (!cat) return;
+  const { error } = await sb.from('award_categories').update({ active: !cat.active }).eq('id', id);
+  if (error) { toast('Toggle failed: ' + error.message, 'err'); return; }
+  toast(cat.name + (cat.active ? ' deactivated' : ' activated'));
+  await loadAwardCategories();
+}
+
+async function acDelete(id) {
+  const cat = _awardCats.find(c => c.id === id);
+  if (!cat) return;
+  const hasEvals = _allEvals.some(e => e.award_category === cat.key);
+  let msg = `Delete "${cat.name}"?`;
+  if (hasEvals) msg += '\n\nThis category has existing evaluations. Consider deactivating instead. Delete anyway?';
+  if (!confirm(msg)) return;
+  const { error } = await sb.from('award_categories').delete().eq('id', id);
+  if (error) { toast('Delete failed: ' + error.message, 'err'); return; }
+  toast(cat.name + ' deleted');
+  await loadAwardCategories();
 }
 
 // Open drawer for entry found by entry_id (for Awards tab → View button)
