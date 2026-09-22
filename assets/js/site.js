@@ -263,6 +263,12 @@
             document.querySelectorAll('.glow-card').forEach(initCardGlow);
             initNavHighlight();
 
+            // Init custom UI components
+            if (window.UI) {
+                var catSel = document.getElementById('category');
+                if (catSel) UI.CSelect(catSel, { placeholder: 'Select category…' });
+            }
+
             // Trigger hero animations immediately
             document.querySelectorAll('#section-home .scroll-reveal').forEach(el => {
                 setTimeout(() => el.classList.add('visible'), 100);
@@ -1522,7 +1528,7 @@
             if (!REGISTRATION_GATE.isOpen) return;
 
             if (!paymentState.verified) {
-                alert("Please complete and verify payment before submitting.");
+                UI.alert("Please complete and verify payment before submitting.", "warn");
                 goToWizardStep(5);
                 return;
             }
