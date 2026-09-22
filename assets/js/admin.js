@@ -162,7 +162,7 @@ function switchTab(name) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
   if (name === 'awards') refreshAwardsTab();
-  if (name === 'testimonials') loadTestimonials();
+  if (name === 'videos') { loadVideoCategories(); loadTestimonials(); }
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -1343,6 +1343,74 @@ function copyLink(url) {
 ════════════════════════════════════════════════════════ */
 let _tmtFetchTimer = null;
 let _tmtFeaturedSel = null;
+let _tmtCategorySel = null;
+let _tmtActiveSel = null;
+let _videoCatsCache = [];
+
+/* ── VIDEO CATEGORIES ── */
+async function loadVideoCategories() {
+    const list = document.getElementById('vcList');
+    if (!list) return;
+    list.innerHTML = '<p style="color:var(--mut);padding:8px 0;">Loading…</p>';
+    const { data, error } = await sb.from('video_categories').select('*').order('sort_order');
+    if (error) { list.innerHTML = `<p style="color:#e74c3c;">${esc(error.message)}</p>`; return; }
+    _videoCatsCache = data || [];
+    _tmtInitCategorySelect();
+    if (!data || !data.length) { list.innerHTML = '<p style="color:var(--mut);padding:8px 0;">No categories yet.</p>'; return; }
+    list.innerHTML = data.map((c, i) => `
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line2);">
+            <span style="font-size:1.2rem;width:28px;text-align:center;">${esc(c.icon || '📁')}</span>
+            <span style="flex:1;font-weight:500;">${esc(c.name)}</span>
+            <span style="color:var(--mut);font-size:0.78rem;">Order: ${c.sort_order}</span>
+            <button class="btn-ghost btn-sm" onclick="vcRename(${c.id},'${esc(c.name).replace(/'/g,"\\'")}')">✎</button>
+            ${i > 0 ? `<button class="btn-ghost btn-sm" onclick="vcMove(${c.id},-1)">↑</button>` : ''}
+            ${i < data.length-1 ? `<button class="btn-ghost btn-sm" onclick="vcMove(${c.id},1)">↓</button>` : ''}
+            <button class="btn-ghost btn-sm" style="color:#e74c3c;" onclick="vcDelete(${c.id})">✕</button>
+        </div>`).join('');
+}
+
+async function vcAdd() {
+    const name = document.getElementById('vcNewName').value.trim();
+    const icon = document.getElementById('vcNewIcon').value.trim() || '📁';
+    if (!name) return toast('Category name required', 'err');
+    const { data: existing } = await sb.from('video_categories').select('sort_order').order('sort_order', { ascending: false }).limit(1).single();
+    const nextOrder = (existing?.sort_order ?? -1) + 1;
+    const { error } = await sb.from('video_categories').insert({ name, icon, sort_order: nextOrder });
+    if (error) return toast(error.message, 'err');
+    toast('Category added', 'ok');
+    document.getElementById('vcNewName').value = '';
+    document.getElementById('vcNewIcon').value = '';
+    loadVideoCategories();
+}
+
+async function vcRename(id, currentName) {
+    const newName = prompt('Rename category:', currentName);
+    if (!newName || newName.trim() === currentName) return;
+    const { error } = await sb.from('video_categories').update({ name: newName.trim() }).eq('id', id);
+    if (error) return toast(error.message, 'err');
+    toast('Category renamed', 'ok');
+    loadVideoCategories();
+}
+
+async function vcDelete(id) {
+    if (!confirm('Delete this category? Videos in it will become uncategorized.')) return;
+    const { error } = await sb.from('video_categories').delete().eq('id', id);
+    if (error) return toast(error.message, 'err');
+    toast('Category deleted', 'ok');
+    loadVideoCategories();
+}
+
+async function vcMove(id, direction) {
+    const { data: all } = await sb.from('video_categories').select('id,sort_order').order('sort_order');
+    if (!all) return;
+    const idx = all.findIndex(c => c.id === id);
+    const swapIdx = idx + direction;
+    if (swapIdx < 0 || swapIdx >= all.length) return;
+    const a = all[idx], b = all[swapIdx];
+    await sb.from('video_categories').update({ sort_order: b.sort_order }).eq('id', a.id);
+    await sb.from('video_categories').update({ sort_order: a.sort_order }).eq('id', b.id);
+    loadVideoCategories();
+}
 
 function _extractYouTubeId(url) {
     if (!url) return null;
@@ -1409,15 +1477,33 @@ function tmtOnUrlInput(val) {
 
 function _tmtInitFeaturedSelect() {
     const wrap = document.getElementById('tmtFeaturedSelect');
-    if (!wrap) return;
-    if (!_tmtFeaturedSel) {
+    if (wrap && !_tmtFeaturedSel) {
         _tmtFeaturedSel = new CSelect(wrap, [{value:'false',label:'No'},{value:'true',label:'Yes — Featured'}], 'false', () => {});
+    }
+    const activeWrap = document.getElementById('tmtActiveSelect');
+    if (activeWrap && !_tmtActiveSel) {
+        _tmtActiveSel = new CSelect(activeWrap, [{value:'true',label:'Active'},{value:'false',label:'Inactive'}], 'true', () => {});
+    }
+    _tmtInitCategorySelect();
+}
+
+function _tmtInitCategorySelect() {
+    const wrap = document.getElementById('tmtCategorySelect');
+    if (!wrap) return;
+    const opts = [{value:'',label:'— No category —'}];
+    _videoCatsCache.forEach(c => opts.push({value:String(c.id),label:c.name}));
+    if (_tmtCategorySel) {
+        const prev = _tmtCategorySel.value;
+        wrap.innerHTML = '';
+        _tmtCategorySel = new CSelect(wrap, opts, prev, () => {});
+    } else {
+        _tmtCategorySel = new CSelect(wrap, opts, '', () => {});
     }
 }
 
 function tmtCancelEdit() {
     document.getElementById('tmtEditId').value = '';
-    document.getElementById('tmtFormTitle').textContent = 'Add Testimonial';
+    document.getElementById('tmtFormTitle').textContent = 'Add Video';
     document.getElementById('tmtCancelEdit').style.display = 'none';
     document.getElementById('tmtUrl').value = '';
     document.getElementById('tmtUrl').disabled = false;
@@ -1430,7 +1516,11 @@ function tmtCancelEdit() {
     document.getElementById('tmtEditVideoId').value = '';
     document.getElementById('tmtEditThumb').value = '';
     document.getElementById('tmtEditChannel').value = '';
+    var durEl = document.getElementById('tmtDuration');
+    if (durEl) durEl.value = '';
     if (_tmtFeaturedSel) { _tmtFeaturedSel.value = 'false'; _tmtFeaturedSel._render(); }
+    if (_tmtCategorySel) { _tmtCategorySel.value = ''; _tmtCategorySel._render(); }
+    if (_tmtActiveSel) { _tmtActiveSel.value = 'true'; _tmtActiveSel._render(); }
 }
 
 async function tmtSave() {
@@ -1440,6 +1530,8 @@ async function tmtSave() {
     if (!videoId) return toast('Paste a valid YouTube URL and wait for the preview.', 'err');
 
     const featured = _tmtFeaturedSel ? _tmtFeaturedSel.value === 'true' : false;
+    const catVal = _tmtCategorySel ? _tmtCategorySel.value : '';
+    const activeVal = _tmtActiveSel ? _tmtActiveSel.value !== 'false' : true;
     const payload = {
         youtube_url:      url,
         youtube_video_id: videoId,
@@ -1450,6 +1542,9 @@ async function tmtSave() {
         role:             document.getElementById('tmtRole').value.trim(),
         year:             document.getElementById('tmtYear').value.trim(),
         short_text:       document.getElementById('tmtShortText').value.trim(),
+        duration:         document.getElementById('tmtDuration').value.trim(),
+        category_id:      catVal ? parseInt(catVal) : null,
+        active:           activeVal,
         featured,
         updated_at:       new Date().toISOString(),
     };
@@ -1468,16 +1563,16 @@ async function tmtSave() {
         ({ error } = await sb.from('testimonials').insert(payload));
     }
     if (error) return toast(error.message, 'err');
-    toast(editId ? 'Testimonial updated' : 'Testimonial saved', 'ok');
+    toast(editId ? 'Video updated' : 'Video saved', 'ok');
     tmtCancelEdit();
     loadTestimonials();
 }
 
 async function tmtEdit(id) {
     const { data, error } = await sb.from('testimonials').select('*').eq('id', id).single();
-    if (error || !data) return toast('Could not load testimonial', 'err');
+    if (error || !data) return toast('Could not load video', 'err');
     document.getElementById('tmtEditId').value   = data.id;
-    document.getElementById('tmtFormTitle').textContent = 'Edit Testimonial';
+    document.getElementById('tmtFormTitle').textContent = 'Edit Video';
     document.getElementById('tmtCancelEdit').style.display = '';
     document.getElementById('tmtUrl').value   = data.youtube_url;
     document.getElementById('tmtUrl').disabled = false;
@@ -1488,7 +1583,8 @@ async function tmtEdit(id) {
     document.getElementById('tmtRole').value      = data.role || '';
     document.getElementById('tmtYear').value      = data.year || '';
     document.getElementById('tmtShortText').value = data.short_text || '';
-    /* show preview */
+    var durEl = document.getElementById('tmtDuration');
+    if (durEl) durEl.value = data.duration || '';
     const preview = document.getElementById('tmtPreviewCard');
     document.getElementById('tmtPreviewThumb').src     = data.thumbnail_url;
     document.getElementById('tmtPreviewTitle').textContent   = data.video_title;
@@ -1498,6 +1594,8 @@ async function tmtEdit(id) {
     document.getElementById('tmtFetchState').style.color = '#27ae60';
     document.getElementById('tmtFetchState').textContent = 'Video found ✓';
     if (_tmtFeaturedSel) { _tmtFeaturedSel.value = data.featured ? 'true' : 'false'; _tmtFeaturedSel._render(); }
+    if (_tmtCategorySel) { _tmtCategorySel.value = data.category_id ? String(data.category_id) : ''; _tmtCategorySel._render(); }
+    if (_tmtActiveSel) { _tmtActiveSel.value = data.active === false ? 'false' : 'true'; _tmtActiveSel._render(); }
     document.getElementById('tmtFormCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -1516,7 +1614,7 @@ async function tmtDoDelete() {
     const { error } = await sb.from('testimonials').delete().eq('id', _tmtPendingDeleteId);
     tmtDelModalClose();
     if (error) return toast(error.message, 'err');
-    toast('Testimonial deleted', 'ok');
+    toast('Video deleted', 'ok');
     loadTestimonials();
 }
 
@@ -1524,7 +1622,7 @@ async function tmtSetFeatured(id) {
     await sb.from('testimonials').update({ featured: false }).neq('id', id);
     const { error } = await sb.from('testimonials').update({ featured: true }).eq('id', id);
     if (error) return toast(error.message, 'err');
-    toast('Featured testimonial set', 'ok');
+    toast('Featured video set', 'ok');
     loadTestimonials();
 }
 
@@ -1548,27 +1646,44 @@ async function loadTestimonials() {
     list.innerHTML = '<p style="color:var(--mut);padding:12px 0;">Loading…</p>';
     const { data, error } = await sb.from('testimonials').select('*').order('display_order').order('created_at');
     if (error) { list.innerHTML = `<p style="color:#e74c3c;">${esc(error.message)}</p>`; return; }
-    if (!data || !data.length) { list.innerHTML = '<p style="color:var(--mut);padding:12px 0;">No testimonials yet.</p>'; return; }
-    list.innerHTML = data.map((t, i) => `
-        <div class="tmt-admin-card">
+    if (!data || !data.length) { list.innerHTML = '<p style="color:var(--mut);padding:12px 0;">No videos yet.</p>'; return; }
+    const catMap = {};
+    _videoCatsCache.forEach(c => { catMap[c.id] = c.name; });
+    list.innerHTML = data.map((t, i) => {
+        const catLabel = t.category_id && catMap[t.category_id] ? catMap[t.category_id] : '';
+        const isActive = t.active !== false;
+        return `
+        <div class="tmt-admin-card" style="${!isActive ? 'opacity:0.5;' : ''}">
             <img class="tmt-admin-thumb" src="${esc(t.thumbnail_url)}" alt="${esc(t.video_title)}" onerror="this.style.opacity='0.3'">
             <div class="tmt-admin-info">
                 <div class="tmt-admin-title" title="${esc(t.video_title)}">${esc(t.video_title)}</div>
                 <div class="tmt-admin-meta">
                     ${t.person_name ? `${esc(t.person_name)}${t.role ? ' · ' + esc(t.role) : ''}` : '—'}
-                    ${t.featured ? '<span class="pill-featured" style="margin-left:8px;">⭐ Featured</span>' : '<span class="pill-nonfeatured" style="margin-left:8px;">Not Featured</span>'}
+                    ${catLabel ? ` · <span style="color:rgba(255,255,255,0.55);">${esc(catLabel)}</span>` : ''}
+                    ${t.duration ? ` · ${esc(t.duration)}` : ''}
+                    ${t.featured ? '<span class="pill-featured" style="margin-left:8px;">⭐ Featured</span>' : ''}
+                    ${!isActive ? '<span style="margin-left:8px;color:#e74c3c;font-size:0.75rem;">INACTIVE</span>' : ''}
                     &nbsp;·&nbsp; Order: ${t.display_order}
                 </div>
                 <div class="tmt-admin-actions">
                     <button class="btn-ghost btn-sm" onclick="tmtEdit(${t.id})">✎ Edit</button>
-                    ${!t.featured ? `<button class="btn-ghost btn-sm" onclick="tmtSetFeatured(${t.id})">⭐ Set Featured</button>` : ''}
+                    ${!t.featured ? `<button class="btn-ghost btn-sm" onclick="tmtSetFeatured(${t.id})">⭐ Featured</button>` : ''}
+                    <button class="btn-ghost btn-sm" onclick="tmtToggleActive(${t.id},${isActive})">${isActive ? '⏸ Deactivate' : '▶ Activate'}</button>
                     ${i > 0 ? `<button class="btn-ghost btn-sm" onclick="tmtMove(${t.id},-1)">↑</button>` : ''}
                     ${i < data.length-1 ? `<button class="btn-ghost btn-sm" onclick="tmtMove(${t.id},1)">↓</button>` : ''}
                     <a class="btn-ghost btn-sm" href="https://www.youtube.com/watch?v=${esc(t.youtube_video_id)}" target="_blank" rel="noopener">▶ YouTube ↗</a>
                     <button class="btn-ghost btn-sm" style="color:#e74c3c;" onclick="tmtConfirmDelete(${t.id})">✕ Delete</button>
                 </div>
             </div>
-        </div>`).join('');
+        </div>`;
+    }).join('');
+}
+
+async function tmtToggleActive(id, currentlyActive) {
+    const { error } = await sb.from('testimonials').update({ active: !currentlyActive }).eq('id', id);
+    if (error) return toast(error.message, 'err');
+    toast(currentlyActive ? 'Video deactivated' : 'Video activated', 'ok');
+    loadTestimonials();
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -1620,7 +1735,10 @@ function _initAdminRealtime() {
       debounced('updates', loadUpdates, 400);
     })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'testimonials' }, () => {
-      debounced('testimonials', () => { if (document.getElementById('tab-testimonials')?.classList.contains('active')) loadTestimonials(); }, 500);
+      debounced('videos', () => { if (document.getElementById('tab-videos')?.classList.contains('active')) loadTestimonials(); }, 500);
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'video_categories' }, () => {
+      debounced('videocats', () => { if (document.getElementById('tab-videos')?.classList.contains('active')) loadVideoCategories(); }, 500);
     })
     .subscribe((status) => {
       if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
@@ -1632,7 +1750,7 @@ function _initAdminRealtime() {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
       debounced('resync', () => {
-        Promise.allSettled([loadConfig(), loadEntries(), loadLinks(), loadGallery(), loadUpdates()]);
+        Promise.allSettled([loadConfig(), loadEntries(), loadLinks(), loadGallery(), loadUpdates(), loadVideoCategories()]);
       }, 1500);
     }
   });
