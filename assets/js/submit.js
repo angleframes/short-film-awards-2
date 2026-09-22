@@ -38,6 +38,10 @@ async function init() {
   showState('form');
   goStep(1);
   _watchLinkRevocation();
+  if (window.UI) {
+    var catSel = document.getElementById('category');
+    if (catSel) UI.CSelect(catSel, { placeholder: 'Select category…' });
+  }
 }
 
 function showState(s) {
@@ -68,15 +72,15 @@ function nextStep(from) {
   if (from === 1) {
     const fields = ['applicantName','phone','email','city'];
     const missing = fields.find(id => !req(id));
-    if (missing) { return alert('Please fill in all required fields.'); }
+    if (missing) { return UI.alert('Please fill in all required fields.', 'warn'); }
     goStep(2);
   } else if (from === 2) {
     const fields = ['filmName','category','filmLink','duration'];
-    if (fields.find(id => !req(id))) return alert('Please fill in all required fields.');
+    if (fields.find(id => !req(id))) return UI.alert('Please fill in all required fields.', 'warn');
     goStep(3);
   } else if (from === 3) {
     const fields = ['director','producer','writer','cinematographer','editor','musicDirector','actor','actress'];
-    if (fields.find(id => !req(id))) return alert('Please fill in all required crew fields.');
+    if (fields.find(id => !req(id))) return UI.alert('Please fill in all required crew fields.', 'warn');
     buildReview();
     goStep(4);
   }
@@ -213,7 +217,7 @@ function buildReview() {
 
 // ── Final submit ────────────────────────────────────────────────────────────────
 async function doSubmit() {
-  if (!_payState.verified) { alert('Payment not yet verified. Please complete payment first.'); return; }
+  if (!_payState.verified) { UI.alert('Payment not yet verified. Please complete payment first.', 'warn'); return; }
 
   showPayStatus('pending', 'Submitting your film entry…');
 
