@@ -1362,10 +1362,10 @@ async function loadVideoCategories() {
             <span style="font-size:1.2rem;width:28px;text-align:center;">${esc(c.icon || '📁')}</span>
             <span style="flex:1;font-weight:500;">${esc(c.name)}</span>
             <span style="color:var(--mut);font-size:0.78rem;">Order: ${c.sort_order}</span>
-            <button class="btn-ghost btn-sm" onclick="vcRename(${c.id},'${esc(c.name).replace(/'/g,"\\'")}')">✎</button>
-            ${i > 0 ? `<button class="btn-ghost btn-sm" onclick="vcMove(${c.id},-1)">↑</button>` : ''}
-            ${i < data.length-1 ? `<button class="btn-ghost btn-sm" onclick="vcMove(${c.id},1)">↓</button>` : ''}
-            <button class="btn-ghost btn-sm" style="color:#e74c3c;" onclick="vcDelete(${c.id})">✕</button>
+            <button class="btn-ghost btn-sm" onclick="vcRename(${c.id},'${esc(c.name).replace(/'/g,"\\'")}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16.5 3.5l4 4L7 21H3v-4L16.5 3.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M13.5 6.5l4 4" stroke="currentColor" stroke-width="1.5"/></svg></button>
+            ${i > 0 ? `<button class="btn-ghost btn-sm" onclick="vcMove(${c.id},-1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M7 10l5-5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` : ''}
+            ${i < data.length-1 ? `<button class="btn-ghost btn-sm" onclick="vcMove(${c.id},1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M7 14l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` : ''}
+            <button class="btn-ghost btn-sm" style="color:#e74c3c;" onclick="vcDelete(${c.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 13a2 2 0 002 2h8a2 2 0 002-2l1-13M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>`).join('');
 }
 
@@ -1661,18 +1661,18 @@ async function loadTestimonials() {
                     ${t.person_name ? `${esc(t.person_name)}${t.role ? ' · ' + esc(t.role) : ''}` : '—'}
                     ${catLabel ? ` · <span style="color:rgba(255,255,255,0.55);">${esc(catLabel)}</span>` : ''}
                     ${t.duration ? ` · ${esc(t.duration)}` : ''}
-                    ${t.featured ? '<span class="pill-featured" style="margin-left:8px;">⭐ Featured</span>' : ''}
+                    ${t.featured ? '<span class="pill-featured" style="margin-left:8px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-1px;margin-right:2px;"><path d="M12 2l2.4 4.8 5.3.8-3.85 3.7.9 5.3L12 14.1l-4.75 2.5.9-5.3L4.3 7.6l5.3-.8L12 2z"/></svg>Featured</span>' : ''}
                     ${!isActive ? '<span style="margin-left:8px;color:#e74c3c;font-size:0.75rem;">INACTIVE</span>' : ''}
                     &nbsp;·&nbsp; Order: ${t.display_order}
                 </div>
                 <div class="tmt-admin-actions">
-                    <button class="btn-ghost btn-sm" onclick="tmtEdit(${t.id})">✎ Edit</button>
-                    ${!t.featured ? `<button class="btn-ghost btn-sm" onclick="tmtSetFeatured(${t.id})">⭐ Featured</button>` : ''}
-                    <button class="btn-ghost btn-sm" onclick="tmtToggleActive(${t.id},${isActive})">${isActive ? '⏸ Deactivate' : '▶ Activate'}</button>
-                    ${i > 0 ? `<button class="btn-ghost btn-sm" onclick="tmtMove(${t.id},-1)">↑</button>` : ''}
-                    ${i < data.length-1 ? `<button class="btn-ghost btn-sm" onclick="tmtMove(${t.id},1)">↓</button>` : ''}
-                    <a class="btn-ghost btn-sm" href="https://www.youtube.com/watch?v=${esc(t.youtube_video_id)}" target="_blank" rel="noopener">▶ YouTube ↗</a>
-                    <button class="btn-ghost btn-sm" style="color:#e74c3c;" onclick="tmtConfirmDelete(${t.id})">✕ Delete</button>
+                    <button class="btn-ghost btn-sm" onclick="tmtEdit(${t.id})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="vertical-align:-1px;margin-right:3px;"><path d="M16.5 3.5l4 4L7 21H3v-4L16.5 3.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Edit</button>
+                    ${!t.featured ? `<button class="btn-ghost btn-sm" onclick="tmtSetFeatured(${t.id})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="vertical-align:-1px;margin-right:3px;"><path d="M12 2l2.4 4.8 5.3.8-3.85 3.7.9 5.3L12 14.1l-4.75 2.5.9-5.3L4.3 7.6l5.3-.8L12 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Featured</button>` : ''}
+                    <button class="btn-ghost btn-sm" onclick="tmtToggleActive(${t.id},${isActive})">${isActive ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="vertical-align:-1px;margin-right:3px;"><rect x="6" y="4" width="4" height="16" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="14" y="4" width="4" height="16" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>Deactivate' : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="vertical-align:-1px;margin-right:3px;"><path d="M6 4l14 8-14 8V4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Activate'}</button>
+                    ${i > 0 ? `<button class="btn-ghost btn-sm" onclick="tmtMove(${t.id},-1)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="vertical-align:-1px;"><path d="M12 5v14M7 10l5-5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` : ''}
+                    ${i < data.length-1 ? `<button class="btn-ghost btn-sm" onclick="tmtMove(${t.id},1)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="vertical-align:-1px;"><path d="M12 19V5M7 14l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` : ''}
+                    <a class="btn-ghost btn-sm" href="https://www.youtube.com/watch?v=${esc(t.youtube_video_id)}" target="_blank" rel="noopener"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="vertical-align:-1px;margin-right:3px;"><rect x="2" y="4" width="20" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M10 8.5l6 3.5-6 3.5v-7z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>YouTube</a>
+                    <button class="btn-ghost btn-sm" style="color:#e74c3c;" onclick="tmtConfirmDelete(${t.id})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" style="vertical-align:-1px;margin-right:3px;"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 13a2 2 0 002 2h8a2 2 0 002-2l1-13M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Delete</button>
                 </div>
             </div>
         </div>`;
