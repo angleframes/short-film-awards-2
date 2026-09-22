@@ -206,7 +206,7 @@
                     CATEGORY_ITEMS = acRes.data.map(c => ({
                         title: c.name.replace(/^(Best)\s+/i, '$1<br>').replace(/^(Special)\s+/i, '$1<br>').replace(/^(Campus)\s+/i, '$1<br>'),
                         emoji: '',
-                        image: '',
+                        image: 'assets/icons/' + c.key + '.png',
                         icon_svg: c.icon_svg || ''
                     }));
                     window._awardCategoriesData = acRes.data;
@@ -290,7 +290,7 @@
                                         CATEGORY_ITEMS = acr.data.map(function(c) {
                                             return {
                                                 title: c.name.replace(/^(Best)\s+/i, '$1<br>').replace(/^(Special)\s+/i, '$1<br>').replace(/^(Campus)\s+/i, '$1<br>'),
-                                                emoji: '', image: '', icon_svg: c.icon_svg || ''
+                                                emoji: '', image: 'assets/icons/' + c.key + '.png', icon_svg: c.icon_svg || ''
                                             };
                                         });
                                         window._awardCategoriesData = acr.data;
@@ -648,7 +648,7 @@
             if (!grid.dataset.built) {
                 grid.innerHTML = CATEGORY_ITEMS.map((item, idx) => `
                     <div class="category-grid-item">
-                        ${item.icon_svg ? `<div class="grid-item-svg-icon">${item.icon_svg}</div>` : `<div class="grid-item-emoji">${item.emoji || ''}</div>`}
+                        ${item.image ? `<div class="grid-item-img"><img src="${item.image}" alt="${item.title.replace('<br>',' ')}" loading="lazy"></div>` : item.icon_svg ? `<div class="grid-item-svg-icon">${item.icon_svg}</div>` : `<div class="grid-item-emoji">${item.emoji || ''}</div>`}
                         <h4 class="grid-item-title">${item.title.replace('<br>', ' ')}</h4>
                     </div>
                 `).join('');
@@ -681,10 +681,10 @@
                 card.className = 'category-carousel-card glow-card';
 
                 let iconMarkup = '';
-                if (item.icon_svg && item.icon_svg.trim() !== '') {
+                if (item.image && item.image.trim() !== '') {
+                    iconMarkup = `<div class="stack-card-media"><img src="${item.image}" alt="${item.title.replace('<br>', ' ')}" loading="lazy"></div>`;
+                } else if (item.icon_svg && item.icon_svg.trim() !== '') {
                     iconMarkup = `<div class="stack-card-svg-icon">${item.icon_svg}</div>`;
-                } else if (item.image && item.image.trim() !== '') {
-                    iconMarkup = `<div class="stack-card-media"><img src="${item.image}" alt="${item.title.replace('<br>', ' ')}"></div>`;
                 } else if (item.emoji) {
                     iconMarkup = `<div class="stack-emoji">${item.emoji}</div>`;
                 }
