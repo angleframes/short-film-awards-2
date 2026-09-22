@@ -61,13 +61,13 @@
             <a id="navStory" href="#section-story">About</a>
             <a id="navCategories" href="#section-categories">Categories</a>
             <a id="navGallery" href="#section-gallery">Gallery</a>
-            <a id="navTestimonials" href="#section-testimonials" style="display:none;">Testimonials</a>
+            <a id="navVideos" href="#section-videos" style="display:none;">Videos</a>
             <a id="navRegistration" href="#section-registration">Registration</a>
             <a id="navContact" href="#section-contact">Contact Us</a>
             <div class="nav-more-wrapper" id="navMoreWrapper">
                 <a href="javascript:void(0)" id="navMoreTrigger" onclick="toggleMoreDropdown(event)">More &#9662;</a>
                 <div class="nav-more-dropdown" id="navMoreDropdown">
-                    <a id="navMoreTestimonials" onclick="location.href='#section-testimonials';closeMobileMenu&&closeMobileMenu();" style="display:none;">Testimonials</a>
+                    <a id="navMoreVideos" onclick="location.href='#section-videos';closeMobileMenu&&closeMobileMenu();" style="display:none;">Videos</a>
                     <a onclick="selectMoreItem('submit')">How To Submit</a>
                     <a onclick="selectMoreItem('guidelines')">Festival Guidelines</a>
                     <a onclick="selectMoreItem('updates')">Festival Updates</a>
@@ -463,24 +463,54 @@
     </section>
 
 
-    <!-- ===== TESTIMONIALS SECTION ===== -->
-    <section id="section-testimonials" class="page-section testimonials-section" style="display:none;">
-        <div class="testimonials-inner">
-            <div class="testimonials-header">
-                <span class="section-eyebrow scroll-reveal">Memories &amp; Moments</span>
-                <h2 class="section-heading scroll-reveal delay-1"><span class="shiny-text">Testimonials</span></h2>
-                <p class="testimonials-sub scroll-reveal delay-2">Real Feedback &bull; Real Experience</p>
-            </div>
-            <div class="testimonials-featured scroll-reveal delay-2" id="testimonialsFeatured"></div>
-            <div class="testimonials-more-wrap" id="testimonialsMoreWrap" style="display:none;">
-                <h3 class="testimonials-more-label">MORE TESTIMONIALS</h3>
-                <div class="testimonials-carousel-outer">
-                    <button class="tcarousel-arrow tcarousel-prev" id="tcarouselPrev" aria-label="Previous testimonials">&#8249;</button>
-                    <div class="testimonials-carousel-viewport" id="testimonialsCarousel">
-                        <div class="testimonials-carousel-track" id="testimonialsTrack"></div>
-                    </div>
-                    <button class="tcarousel-arrow tcarousel-next" id="tcarouselNext" aria-label="Next testimonials">&#8250;</button>
+    <!-- ===== VIDEOS & MEDIA UPDATES SECTION ===== -->
+    <section id="section-videos" class="page-section vid-section" style="display:none;">
+        <div class="vid-inner">
+            <!-- Header row -->
+            <div class="vid-header">
+                <div class="vid-header-left">
+                    <div class="vid-line-accent scroll-reveal"></div>
+                    <span class="section-eyebrow scroll-reveal">MEMORIES &amp; MOMENTS</span>
+                    <h2 class="vid-heading scroll-reveal delay-1">VIDEOS &amp; MEDIA UPDATES</h2>
+                    <p class="vid-sub scroll-reveal delay-2">Real People &bull; Real Stories &bull; A Brighter Tomorrow</p>
                 </div>
+                <div class="vid-header-right scroll-reveal delay-2">
+                    <div class="vid-quote">
+                        <span class="vid-quote-mark">&ldquo;</span>
+                        <p>Stories move people.<br>Films create change.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category filter tabs — built dynamically by JS -->
+            <div class="vid-filters scroll-reveal delay-3" id="vidFilters"></div>
+
+            <!-- Video cards carousel -->
+            <div class="vid-carousel-wrap scroll-reveal delay-3">
+                <button class="vid-arrow vid-arrow-prev" id="vidPrev" aria-label="Previous videos">&#8249;</button>
+                <div class="vid-carousel" id="vidCarousel">
+                    <div class="vid-track" id="vidTrack"></div>
+                </div>
+                <button class="vid-arrow vid-arrow-next" id="vidNext" aria-label="Next videos">&#8250;</button>
+            </div>
+
+            <!-- Expanded grid (for VIEW ALL) -->
+            <div class="vid-all-grid" id="vidAllGrid" style="display:none;"></div>
+
+            <!-- View All CTA -->
+            <div class="vid-cta-wrap scroll-reveal delay-4">
+                <button class="vid-cta-btn" id="vidViewAll" aria-label="View all videos">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5,3 19,12 5,21" fill="currentColor" stroke="none"/></svg>
+                    VIEW ALL VIDEOS
+                    <span class="vid-cta-arrow">&rarr;</span>
+                </button>
+            </div>
+
+            <!-- Bottom tagline -->
+            <div class="vid-bottom-tagline scroll-reveal delay-4">
+                <span class="vid-tagline-line"></span>
+                <span>FILMS CREATE A BRIGHTER TOMORROW</span>
+                <span class="vid-tagline-line"></span>
             </div>
         </div>
     </section>
