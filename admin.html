@@ -10,7 +10,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <link rel="stylesheet" href="assets/css/ui-components.css">
-<link rel="stylesheet" href="assets/css/admin.css?v=5">
+<link rel="stylesheet" href="assets/css/admin.css?v=6">
 </head>
 <body class="sksfa-admin">
 
@@ -177,6 +177,54 @@
         </div>
       </div>
 
+      <!-- ── Manage Award Categories ── -->
+      <div class="card" id="acMgrCard" style="margin-bottom:24px;">
+        <div class="card-head">
+          <div class="sksfa-card-head-left">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+            <h2>Manage Award Categories</h2>
+          </div>
+          <button class="btn-ghost btn-sm" onclick="acToggleForm()">+ Add Category</button>
+        </div>
+        <!-- Add / Edit form (hidden by default) -->
+        <div id="acForm" class="hidden" style="border:1px solid var(--bdr);border-radius:8px;padding:16px;margin-bottom:16px;background:var(--card2);">
+          <h3 id="acFormTitle" style="margin:0 0 12px;">Add Award Category</h3>
+          <div class="grid2">
+            <div class="field"><label>Category Name</label><input id="acNameInput" type="text" placeholder="e.g. Best Child Artist"></div>
+            <div class="field"><label>Key (auto)</label><input id="acKeyInput" type="text" placeholder="auto-generated" readonly style="opacity:0.6;"></div>
+          </div>
+          <div class="field" style="margin-top:8px;">
+            <label>Icon SVG (paste inline SVG)</label>
+            <textarea id="acIconInput" rows="3" placeholder='<svg viewBox="0 0 64 64" ...>...</svg>' style="font-family:monospace;font-size:0.78rem;"></textarea>
+          </div>
+          <div class="grid2" style="margin-top:8px;">
+            <div class="field"><label>Sort Order</label><input id="acSortInput" type="number" value="0" min="0"></div>
+            <div class="field"><label>Status</label>
+              <select id="acActiveInput"><option value="true">Active</option><option value="false">Inactive</option></select>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="btn-primary btn-sm" onclick="acSave()">Save Category</button>
+            <button class="btn-ghost btn-sm" onclick="acCancelForm()">Cancel</button>
+          </div>
+          <input type="hidden" id="acEditId" value="">
+        </div>
+        <!-- Category list -->
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr>
+              <th style="width:40px;">#</th>
+              <th>Name</th>
+              <th style="width:50px;">Icon</th>
+              <th style="width:70px;">Status</th>
+              <th style="width:180px;">Actions</th>
+            </tr></thead>
+            <tbody id="acListBody"><tr><td colspan="5" style="padding:16px;color:var(--mut);">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Evaluation Grid ── -->
       <div class="award-grid" id="awardGrid"></div>
 
       <div class="award-cat-detail hidden" id="awardCatDetail">
@@ -458,5 +506,5 @@
 <div id="toast" class="toast"></div>
 
 <script src="assets/js/ui-components.js"></script>
-<script src="assets/js/admin.js?v=5"></script>
+<script src="assets/js/admin.js?v=6"></script>
 </html>
