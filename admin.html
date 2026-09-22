@@ -9,6 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<link rel="stylesheet" href="assets/css/ui-components.css">
 <link rel="stylesheet" href="assets/css/admin.css?v=4">
 </head>
 <body class="sksfa-admin">
@@ -261,13 +262,13 @@
           </div>
           <div>
             <label>Image file</label>
-            <label for="gFile" class="sksfa-file-wrap" id="gFileWrap">
-              <svg class="sksfa-file-icon" width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path d="M4 15V17a1 1 0 001 1h12a1 1 0 001-1v-2M11 4v10M8 7l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              <span class="sksfa-file-btn">Choose image</span>
-              <span class="sksfa-file-hint">JPG · PNG · WEBP &nbsp;·&nbsp; Max 8 MB</span>
-              <span class="sksfa-file-name" id="gFileName">No file selected</span>
-            </label>
-            <input id="gFile" type="file" accept="image/*" onchange="var w=document.getElementById('gFileWrap'),n=this.files[0];document.getElementById('gFileName').textContent=n?n.name:'No file selected';w.classList.toggle('has-file',!!n)">
+            <div class="cfile-upload" id="gFileWrap">
+              <div class="cfile-upload-icon"><svg viewBox="0 0 24 24"><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12M8 8l4-4 4 4"/></svg></div>
+              <div class="cfile-upload-label">Drop image here or click to browse</div>
+              <div class="cfile-upload-name" id="gFileName"></div>
+              <img class="cfile-upload-preview" id="gFilePreview" alt="">
+              <input id="gFile" type="file" accept="image/*">
+            </div>
           </div>
           <div><label>Title</label><input id="gTitle" type="text" placeholder="Photo title"></div>
           <div><label>Subtitle</label><input id="gSub" type="text" placeholder="Category label or year"></div>
@@ -445,5 +446,6 @@
 
 <div id="toast" class="toast"></div>
 
+<script src="assets/js/ui-components.js"></script>
 <script src="assets/js/admin.js?v=4"></script>
 </html>
