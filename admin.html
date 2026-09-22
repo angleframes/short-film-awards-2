@@ -67,9 +67,9 @@
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="5" cy="5.5" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 9.5l3.5-3 2.5 2.5 2-1.5 4 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Gallery
       </button>
-      <button class="tab-btn" data-tab="testimonials" onclick="switchTab('testimonials')">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="2" width="12" height="8" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 5h5M4.5 7h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M4 10l-2 2V10" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
-        Testimonials
+      <button class="tab-btn" data-tab="videos" onclick="switchTab('videos')">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><rect x="1" y="2" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><polygon points="5.5,4.5 10,7 5.5,9.5" fill="currentColor"/></svg>
+        Videos
       </button>
       <button class="tab-btn" data-tab="updates" onclick="switchTab('updates')">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1a5 5 0 015 5c0 1.5-.5 2.7-1.4 3.6L12 13H2L3.4 9.6A5 5 0 017 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M5.5 13a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.2"/></svg>
@@ -283,19 +283,36 @@
     </div>
 
     <!-- ═══ TESTIMONIALS TAB ═══════════════════════════════ -->
-    <div class="tab-pane" id="tab-testimonials">
+    <div class="tab-pane" id="tab-videos">
       <div class="sksfa-page-title">
         <div class="sksfa-eyebrow">ADMIN CONTROL PANEL</div>
-        <h1 class="sksfa-h1">Testimonials</h1>
-        <p class="sksfa-page-desc">Add YouTube video testimonials. Paste a URL — metadata fetches automatically.</p>
+        <h1 class="sksfa-h1">Videos &amp; Media</h1>
+        <p class="sksfa-page-desc">Add YouTube videos — testimonials, celebrity wishes, invitations, highlights. Metadata auto-fetches.</p>
       </div>
 
-      <!-- Add / Edit form -->
+      <!-- Category management -->
+      <div class="card" id="vidCatCard">
+        <div class="card-head">
+          <div class="sksfa-card-head-left">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="4" width="16" height="4" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="12" width="16" height="4" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+            <div><h2>Video Categories</h2><p class="sksfa-card-sub">Add, rename, reorder or remove video categories.</p></div>
+          </div>
+          <button class="btn-ghost btn-sm" onclick="loadVideoCategories()">↻ Refresh</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <input id="vcNewName" type="text" placeholder="New category name" style="flex:1;">
+          <input id="vcNewIcon" type="text" placeholder="Icon (emoji)" style="width:80px;">
+          <button class="btn btn-sm" onclick="vcAdd()">+ Add</button>
+        </div>
+        <div id="vcList" style="margin-top:4px;"></div>
+      </div>
+
+      <!-- Add / Edit video form -->
       <div class="card" id="tmtFormCard">
         <div class="card-head">
           <div class="sksfa-card-head-left">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-            <div><h2 id="tmtFormTitle">Add Testimonial</h2><p class="sksfa-card-sub">Paste a YouTube link — video info fetches automatically.</p></div>
+            <div><h2 id="tmtFormTitle">Add Video</h2><p class="sksfa-card-sub">Paste a YouTube link — video info fetches automatically.</p></div>
           </div>
           <button class="btn-ghost btn-sm" id="tmtCancelEdit" style="display:none;" onclick="tmtCancelEdit()">✕ Cancel</button>
         </div>
@@ -304,8 +321,7 @@
         <input id="tmtUrl" type="url" placeholder="https://www.youtube.com/watch?v=..." oninput="tmtOnUrlInput(this.value)">
         <div id="tmtFetchState" style="margin:6px 0;font-size:0.8rem;color:var(--mut);min-height:1.2em;"></div>
 
-        <!-- Preview card -->
-        <div id="tmtPreviewCard" style="display:none;margin:12px 0 18px;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:none;">
+        <div id="tmtPreviewCard" style="display:none;margin:12px 0 18px;padding:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;">
           <div style="display:flex;gap:12px;align-items:flex-start;">
             <img id="tmtPreviewThumb" src="" alt="Thumbnail" style="width:140px;aspect-ratio:16/9;object-fit:cover;border-radius:6px;background:#111;flex-shrink:0;">
             <div>
@@ -321,12 +337,20 @@
           <div><label>Role / Designation</label><input id="tmtRole" type="text" placeholder="e.g. Filmmaker / 2025 Participant"></div>
         </div>
         <div class="grid2">
+          <div><label>Category</label><div id="tmtCategorySelect" style="margin-top:6px;"></div></div>
           <div><label>Year</label><input id="tmtYear" type="text" placeholder="e.g. 2025"></div>
+        </div>
+        <div class="grid2">
+          <div><label>Duration</label><input id="tmtDuration" type="text" placeholder="e.g. 02:34"></div>
           <div id="tmtFeaturedWrap"><label>Featured</label>
             <div id="tmtFeaturedSelect" style="margin-top:6px;"></div>
           </div>
         </div>
-        <label>Short Testimonial / Caption</label>
+        <div class="grid2">
+          <div><label>Active</label><div id="tmtActiveSelect" style="margin-top:6px;"></div></div>
+          <div></div>
+        </div>
+        <label>Short Description / Caption</label>
         <textarea id="tmtShortText" rows="2" placeholder="A short quote or caption shown alongside the video."></textarea>
 
         <input type="hidden" id="tmtEditId">
@@ -334,15 +358,15 @@
         <input type="hidden" id="tmtEditThumb">
         <input type="hidden" id="tmtEditChannel">
 
-        <button class="btn" style="margin-top:8px;" onclick="tmtSave()" id="tmtSaveBtn">Save Testimonial</button>
+        <button class="btn" style="margin-top:8px;" onclick="tmtSave()" id="tmtSaveBtn">Save Video</button>
       </div>
 
-      <!-- List -->
+      <!-- Video list -->
       <div class="card">
         <div class="card-head">
           <div class="sksfa-card-head-left">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M6 7h8M6 10.5h6M6 14h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-            <div><h2>All Testimonials</h2></div>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2" y="3" width="16" height="14" rx="2" stroke="currentColor" stroke-width="1.3"/><polygon points="8,7 14,10 8,13" fill="currentColor"/></svg>
+            <div><h2>All Videos</h2></div>
           </div>
           <button class="btn-ghost btn-sm" onclick="loadTestimonials()">↻ Refresh</button>
         </div>
@@ -403,11 +427,11 @@
 </div><!-- /dashView -->
 
 <!-- ═══ ENTRY DRAWER ══════════════════════════════════════ -->
-<!-- Testimonials delete confirm modal — at body root so fixed positioning is never inside a hidden tab-pane -->
+<!-- Video delete confirm modal — at body root so fixed positioning is never inside a hidden tab-pane -->
 <div id="tmtDelModal" class="modal-overlay hidden" onclick="if(event.target===this)tmtDelModalClose()">
   <div class="modal-box">
-    <h2 style="margin-bottom:8px;">Delete Testimonial?</h2>
-    <p style="color:var(--mut);font-size:0.87rem;margin-bottom:20px;">This will remove the testimonial from the public website.</p>
+    <h2 style="margin-bottom:8px;">Delete Video?</h2>
+    <p style="color:var(--mut);font-size:0.87rem;margin-bottom:20px;">This will remove the video from the public website.</p>
     <div style="display:flex;gap:10px;justify-content:flex-end;">
       <button class="btn-ghost" onclick="tmtDelModalClose()">Cancel</button>
       <button class="btn btn-danger" id="tmtDelConfirmBtn">Delete</button>
