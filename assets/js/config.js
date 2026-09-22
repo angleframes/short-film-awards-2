@@ -27,18 +27,7 @@
             sectionBgContact: ""
         };
 
-        const CATEGORY_ITEMS = [
-            { title: "Best<br>Short Film", emoji: "🎬", image: "" },
-            { title: "Best<br>Director", emoji: "👥", image: "" }, 
-            { title: "Best<br>Screenplay", emoji: "📝", image: "" }, 
-            { title: "Best<br>Actor", emoji: "🧍", image: "" },
-            { title: "Best<br>Actress", emoji: "🧍‍♀️", image: "" },
-            { title: "Best<br>Cinematography", emoji: "📷", image: "" },
-            { title: "Best<br>Editing", emoji: "✂️", image: "" },
-            { title: "Best<br>Music", emoji: "🎵", image: "" },
-            { title: "Campus<br>Category", emoji: "🎓", image: "" },
-            { title: "Special Jury<br>Mentions", emoji: "✨", image: "" }
-        ];
+        let CATEGORY_ITEMS = [];
 
         const GALLERY_IMAGES = [
             { category: "winners2025", src: "Gallery/display/MRC01071.webp", thumb: "Gallery/thumbs/MRC01071.webp", title: "Best Short Film: 'Bug'", sub: "Winner 2025" },
