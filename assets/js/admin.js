@@ -138,6 +138,11 @@ function formatCatLabel(slug) {
    UTILITIES
 ════════════════════════════════════════════════════════ */
 function toast(msg, kind) {
+  if (window.UI) {
+    const typeMap = { ok: 'success', err: 'error', warn: 'warn' };
+    UI.toast(msg, typeMap[kind] || 'info');
+    return;
+  }
   const t = document.getElementById('toast');
   t.textContent = msg; t.className = 'toast show ' + (kind || '');
   clearTimeout(t._t); t._t = setTimeout(() => t.className = 'toast ' + (kind || ''), 3500);
@@ -182,6 +187,7 @@ async function gate() {
   show('dash');
   await Promise.all([loadConfig(), loadGalleryCategories(), loadGallery(), loadUpdates(), loadEntries(), loadLinks()]);
   _initAdminRealtime();
+  if (window.UI) UI.CFileUpload('#gFileWrap');
 }
 function show(v) {
   document.getElementById('loginView').classList.toggle('hidden', v !== 'login');
@@ -1140,7 +1146,8 @@ async function addGalCategory() {
 }
 
 async function delGalCategory(slug) {
-  if (!confirm(`Remove category "${formatCatLabel(slug)}"? Existing photos in this category will not be deleted.`)) return;
+  if (window.UI) { if (!await UI.confirm(`Remove category "${formatCatLabel(slug)}"? Existing photos in this category will not be deleted.`, { title: 'Remove Category', danger: true })) return; }
+  else { if (!confirm(`Remove category "${formatCatLabel(slug)}"? Existing photos in this category will not be deleted.`)) return; }
   _galCategories = _galCategories.filter(c => c !== slug);
   if (!_galCategories.length) _galCategories = ['general'];
   await saveGalleryCategories();
@@ -1204,7 +1211,8 @@ async function addGallery(ev) {
   toast('Photo added', 'ok'); loadGallery();
 }
 async function delGallery(id, src) {
-  if (!confirm('Delete this photo?')) return;
+  if (window.UI) { if (!await UI.confirm('Delete this photo?', { title: 'Delete Photo', danger: true })) return; }
+  else { if (!confirm('Delete this photo?')) return; }
   await sb.from('gallery').delete().eq('id', id);
   try { const p = src.split('/gallery/')[1]; if (p) await sb.storage.from('gallery').remove([p]); } catch(_){}
   toast('Deleted', 'ok'); loadGallery();
@@ -1243,7 +1251,8 @@ async function addUpdate(ev) {
   toast('Update added', 'ok'); loadUpdates();
 }
 async function delUpdate(id) {
-  if (!confirm('Delete this update?')) return;
+  if (window.UI) { if (!await UI.confirm('Delete this update?', { title: 'Delete Update', danger: true })) return; }
+  else { if (!confirm('Delete this update?')) return; }
   await sb.from('updates_feed').delete().eq('id', id);
   toast('Deleted', 'ok'); loadUpdates();
 }
@@ -1315,7 +1324,8 @@ async function createLink(ev) {
   toast('Link created', 'ok'); loadLinks();
 }
 async function revokeLink(id) {
-  if (!confirm('Revoke this link? It will stop working immediately.')) return;
+  if (window.UI) { if (!await UI.confirm('Revoke this link? It will stop working immediately.', { title: 'Revoke Link', danger: true })) return; }
+  else { if (!confirm('Revoke this link? It will stop working immediately.')) return; }
   const { error } = await sb.from('submission_links').update({ revoked:true }).eq('id', id);
   if (error) return toast(error.message, 'err');
   toast('Link revoked', 'ok'); loadLinks();
