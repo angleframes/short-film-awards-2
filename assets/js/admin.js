@@ -1315,50 +1315,266 @@ function renderCategoryManager() {
 }
 
 /* ═══════════════════════════════════════════════════════
-   GALLERY
+   GALLERY — Image optimization + drag-and-drop reorder
 ════════════════════════════════════════════════════════ */
-async function loadGallery() {
-  const { data, error } = await sb.from('gallery').select('*').order('sort_order').order('created_at', { ascending: false });
-  if (error) return toast(error.message, 'err');
-  document.getElementById('statPhotos').textContent = (data||[]).length;
-  const box = document.getElementById('galleryList');
-  if (!data || !data.length) { box.innerHTML = '<div class="empty-state"><span class="em-icon">🖼️</span><h3>No photos yet</h3><p>Upload gallery images above.</p></div>'; return; }
-  box.innerHTML = data.map(g => `
-    <div class="gallery-item">
-      ${g.src ? `<img src="${esc(g.src)}" alt="" loading="lazy">` : '<div class="gallery-item-thumb-placeholder"></div>'}
-      <div class="gallery-item-meta">
-        <div class="gallery-item-title">${esc(g.title)||'(untitled)'}</div>
-        <div class="gallery-item-sub">${esc(formatCatLabel(g.category))} · ${esc(g.sub)||'—'}</div>
-      </div>
-      <button class="btn-del" onclick="delGallery(${g.id},'${esc(g.src)}')">Delete</button>
-    </div>`).join('');
+let _galleryData = [];
+let _galDragIdx = -1;
+
+function _optimizeImage(file, maxDim, quality) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.naturalWidth, h = img.naturalHeight;
+      if (w > maxDim || h > maxDim) {
+        const ratio = Math.min(maxDim / w, maxDim / h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      c.toBlob(blob => {
+        if (blob) resolve(blob);
+        else reject(new Error('Canvas export failed'));
+      }, 'image/webp', quality);
+    };
+    img.onerror = () => reject(new Error('Image load failed'));
+    img.src = URL.createObjectURL(file instanceof Blob ? file : new Blob());
+  });
 }
+
 async function addGallery(ev) {
   const btn = ev?.target;
   const file = document.getElementById('gFile').files[0];
   if (!file) return toast('Pick an image first.', 'err');
   if (!['image/jpeg','image/jpg','image/png','image/webp'].includes(file.type)) return toast('JPG, PNG, or WEBP only.', 'err');
-  if (file.size > 8*1024*1024) return toast('Image too large (max 8 MB).', 'err');
-  if (btn) { btn.disabled=true; btn.textContent='Uploading…'; }
-  const path = Date.now() + '_' + file.name.replace(/[^\w.\-]/g,'_');
-  const up = await sb.storage.from('gallery').upload(path, file, { upsert:false });
-  if (up.error) { if (btn){btn.disabled=false;btn.textContent='Upload photo';} return toast('Upload failed: '+up.error.message,'err'); }
-  const pub = sb.storage.from('gallery').getPublicUrl(path).data.publicUrl;
-  const { error } = await sb.from('gallery').insert({
-    category: (_csel.galCat ? _csel.galCat.value : 'events'), src:pub,
-    title: document.getElementById('gTitle').value.trim(), sub: document.getElementById('gSub').value.trim()
-  });
+  if (file.size > 15*1024*1024) return toast('Image too large (max 15 MB).', 'err');
+  if (btn) { btn.disabled=true; btn.textContent='Optimizing…'; }
+  try {
+    const ts = Date.now();
+    const safeName = file.name.replace(/[^\w.\-]/g,'_').replace(/\.[^.]+$/, '');
+    const dispBlob = await _optimizeImage(file, 1920, 0.82);
+    const thumbBlob = await _optimizeImage(file, 400, 0.70);
+    const dispPath = ts + '_disp_' + safeName + '.webp';
+    const thumbPath = ts + '_thumb_' + safeName + '.webp';
+    if (btn) btn.textContent = 'Uploading…';
+    const [dispUp, thumbUp] = await Promise.all([
+      sb.storage.from('gallery').upload(dispPath, dispBlob, { upsert: false, contentType: 'image/webp' }),
+      sb.storage.from('gallery').upload(thumbPath, thumbBlob, { upsert: false, contentType: 'image/webp' })
+    ]);
+    if (dispUp.error) throw new Error('Display upload: ' + dispUp.error.message);
+    if (thumbUp.error) throw new Error('Thumb upload: ' + thumbUp.error.message);
+    const dispUrl = sb.storage.from('gallery').getPublicUrl(dispPath).data.publicUrl;
+    const thumbUrl = sb.storage.from('gallery').getPublicUrl(thumbPath).data.publicUrl;
+    const { data: maxRow } = await sb.from('gallery').select('sort_order').order('sort_order', { ascending: false }).limit(1);
+    const nextOrder = (maxRow && maxRow.length ? maxRow[0].sort_order : 0) + 1;
+    const { error } = await sb.from('gallery').insert({
+      category: (_csel.galCat ? _csel.galCat.value : 'events'),
+      src: dispUrl, thumb: thumbUrl,
+      title: document.getElementById('gTitle').value.trim(),
+      sub: document.getElementById('gSub').value.trim(),
+      sort_order: nextOrder
+    });
+    if (error) throw new Error(error.message);
+    document.getElementById('gFile').value=''; document.getElementById('gTitle').value=''; document.getElementById('gSub').value='';
+    const origKB = (file.size / 1024).toFixed(0);
+    const dispKB = (dispBlob.size / 1024).toFixed(0);
+    const thumbKB = (thumbBlob.size / 1024).toFixed(0);
+    toast(`Photo added — ${origKB} KB → display ${dispKB} KB + thumb ${thumbKB} KB`, 'ok');
+    loadGallery();
+  } catch (e) {
+    toast('Upload failed: ' + e.message, 'err');
+  }
   if (btn) { btn.disabled=false; btn.textContent='Upload photo'; }
-  if (error) return toast('Saved image but metadata failed: '+error.message,'err');
-  document.getElementById('gFile').value=''; document.getElementById('gTitle').value=''; document.getElementById('gSub').value='';
-  toast('Photo added', 'ok'); loadGallery();
 }
-async function delGallery(id, src) {
+
+async function loadGallery() {
+  const { data, error } = await sb.from('gallery').select('*').order('sort_order').order('created_at', { ascending: false });
+  if (error) return toast(error.message, 'err');
+  _galleryData = data || [];
+  document.getElementById('statPhotos').textContent = _galleryData.length;
+  const box = document.getElementById('galleryList');
+  if (!_galleryData.length) {
+    box.innerHTML = '<div class="empty-state"><span class="em-icon">🖼️</span><h3>No photos yet</h3><p>Upload gallery images above.</p></div>';
+    return;
+  }
+  box.innerHTML = _galleryData.map((g, i) => `
+    <div class="gallery-reorder-item" draggable="true" data-gidx="${i}" data-gid="${g.id}">
+      <div class="gri-drag" title="Drag to reorder">☰</div>
+      <div class="gri-pos">${i + 1}</div>
+      ${g.thumb ? `<img src="${esc(g.thumb)}" alt="" class="gri-thumb" loading="lazy">` :
+        g.src ? `<img src="${esc(g.src)}" alt="" class="gri-thumb" loading="lazy">` :
+        '<div class="gri-thumb-placeholder"></div>'}
+      <div class="gri-meta">
+        <div class="gri-title">${esc(g.title) || '(untitled)'}</div>
+        <div class="gri-sub">${esc(formatCatLabel(g.category))} · ${esc(g.sub) || '—'}</div>
+      </div>
+      <div class="gri-actions">
+        <button class="gri-btn" onclick="galMove(${g.id},'first')" title="Move to first" ${i === 0 ? 'disabled' : ''}>⇈</button>
+        <button class="gri-btn" onclick="galMove(${g.id},'up')" title="Move up" ${i === 0 ? 'disabled' : ''}>▲</button>
+        <button class="gri-btn" onclick="galMove(${g.id},'down')" title="Move down" ${i === _galleryData.length - 1 ? 'disabled' : ''}>▼</button>
+        <button class="gri-btn" onclick="galMove(${g.id},'last')" title="Move to last" ${i === _galleryData.length - 1 ? 'disabled' : ''}>⇊</button>
+        <button class="gri-btn gri-btn-del" onclick="delGallery(${g.id},'${esc(g.src)}','${esc(g.thumb||'')}')">✕</button>
+      </div>
+    </div>`).join('');
+  _attachGalDrag(box);
+}
+
+function _attachGalDrag(box) {
+  const items = box.querySelectorAll('.gallery-reorder-item');
+  items.forEach(el => {
+    el.addEventListener('dragstart', e => {
+      _galDragIdx = +el.dataset.gidx;
+      el.classList.add('gri-dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', el.dataset.gid);
+    });
+    el.addEventListener('dragend', () => {
+      el.classList.remove('gri-dragging');
+      box.querySelectorAll('.gri-dragover').forEach(d => d.classList.remove('gri-dragover'));
+      _galDragIdx = -1;
+    });
+    el.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      const target = e.currentTarget;
+      box.querySelectorAll('.gri-dragover').forEach(d => d.classList.remove('gri-dragover'));
+      if (+target.dataset.gidx !== _galDragIdx) target.classList.add('gri-dragover');
+    });
+    el.addEventListener('dragleave', () => el.classList.remove('gri-dragover'));
+    el.addEventListener('drop', async e => {
+      e.preventDefault();
+      el.classList.remove('gri-dragover');
+      const fromIdx = _galDragIdx;
+      const toIdx = +el.dataset.gidx;
+      if (fromIdx < 0 || fromIdx === toIdx) return;
+      const moved = _galleryData.splice(fromIdx, 1)[0];
+      _galleryData.splice(toIdx, 0, moved);
+      await _saveGalleryOrder();
+    });
+    // Touch drag support
+    let _touchY = 0, _touchClone = null, _touchIdx = -1;
+    const dragHandle = el.querySelector('.gri-drag');
+    if (dragHandle) {
+      dragHandle.addEventListener('touchstart', e => {
+        e.preventDefault();
+        _touchIdx = +el.dataset.gidx;
+        _touchY = e.touches[0].clientY;
+        el.classList.add('gri-dragging');
+      }, { passive: false });
+    }
+    el.addEventListener('touchmove', e => {
+      if (_touchIdx < 0) return;
+      e.preventDefault();
+      const touch = e.touches[0];
+      const target = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (target) {
+        const item = target.closest('.gallery-reorder-item');
+        box.querySelectorAll('.gri-dragover').forEach(d => d.classList.remove('gri-dragover'));
+        if (item && +item.dataset.gidx !== _touchIdx) item.classList.add('gri-dragover');
+      }
+    }, { passive: false });
+    el.addEventListener('touchend', async e => {
+      if (_touchIdx < 0) return;
+      el.classList.remove('gri-dragging');
+      const touch = e.changedTouches[0];
+      const target = document.elementFromPoint(touch.clientX, touch.clientY);
+      box.querySelectorAll('.gri-dragover').forEach(d => d.classList.remove('gri-dragover'));
+      if (target) {
+        const item = target.closest('.gallery-reorder-item');
+        if (item) {
+          const toIdx = +item.dataset.gidx;
+          if (_touchIdx !== toIdx) {
+            const moved = _galleryData.splice(_touchIdx, 1)[0];
+            _galleryData.splice(toIdx, 0, moved);
+            await _saveGalleryOrder();
+          }
+        }
+      }
+      _touchIdx = -1;
+    });
+  });
+}
+
+async function galMove(id, dir) {
+  const idx = _galleryData.findIndex(g => g.id === id);
+  if (idx < 0) return;
+  let toIdx;
+  if (dir === 'first') toIdx = 0;
+  else if (dir === 'last') toIdx = _galleryData.length - 1;
+  else if (dir === 'up') toIdx = idx - 1;
+  else toIdx = idx + 1;
+  if (toIdx < 0 || toIdx >= _galleryData.length || toIdx === idx) return;
+  const moved = _galleryData.splice(idx, 1)[0];
+  _galleryData.splice(toIdx, 0, moved);
+  await _saveGalleryOrder();
+}
+
+async function _saveGalleryOrder() {
+  const updates = _galleryData.map((g, i) => ({ id: g.id, sort_order: i + 1 }));
+  let failed = false;
+  for (const u of updates) {
+    const { error } = await sb.from('gallery').update({ sort_order: u.sort_order }).eq('id', u.id);
+    if (error) { failed = true; break; }
+  }
+  if (failed) toast('Reorder save failed', 'err');
+  else toast('Order saved', 'ok');
+  loadGallery();
+}
+
+async function delGallery(id, src, thumb) {
   if (window.UI) { if (!await UI.confirm('Delete this photo?', { title: 'Delete Photo', danger: true })) return; }
   else { if (!confirm('Delete this photo?')) return; }
   await sb.from('gallery').delete().eq('id', id);
-  try { const p = src.split('/gallery/')[1]; if (p) await sb.storage.from('gallery').remove([p]); } catch(_){}
+  try {
+    const paths = [];
+    if (src) { const p = src.split('/gallery/')[1]; if (p) paths.push(p); }
+    if (thumb) { const p = thumb.split('/gallery/')[1]; if (p) paths.push(p); }
+    if (paths.length) await sb.storage.from('gallery').remove(paths);
+  } catch(_){}
   toast('Deleted', 'ok'); loadGallery();
+}
+
+async function optimizeExistingPhotos() {
+  const btn = document.getElementById('btnOptExisting');
+  const prog = document.getElementById('optProgress');
+  if (!_galleryData.length) return toast('No photos to optimize.', 'err');
+  const toOptimize = _galleryData.filter(g => g.src && g.src.includes('/storage/') && !g.thumb);
+  if (!toOptimize.length) return toast('All photos already optimized.', 'ok');
+  if (btn) { btn.disabled = true; btn.textContent = 'Optimizing…'; }
+  let done = 0, failed = 0;
+  for (const g of toOptimize) {
+    if (prog) prog.textContent = `${done + 1} / ${toOptimize.length}…`;
+    try {
+      const resp = await fetch(g.src);
+      if (!resp.ok) throw new Error('Fetch failed');
+      const origBlob = await resp.blob();
+      const dispBlob = await _optimizeImage(origBlob, 1920, 0.82);
+      const thumbBlob = await _optimizeImage(origBlob, 400, 0.70);
+      const ts = Date.now();
+      const baseName = g.src.split('/').pop().replace(/\.[^.]+$/, '');
+      const dispPath = ts + '_disp_' + baseName + '.webp';
+      const thumbPath = ts + '_thumb_' + baseName + '.webp';
+      const [dUp, tUp] = await Promise.all([
+        sb.storage.from('gallery').upload(dispPath, dispBlob, { upsert: false, contentType: 'image/webp' }),
+        sb.storage.from('gallery').upload(thumbPath, thumbBlob, { upsert: false, contentType: 'image/webp' })
+      ]);
+      if (dUp.error || tUp.error) throw new Error('Upload failed');
+      const dispUrl = sb.storage.from('gallery').getPublicUrl(dispPath).data.publicUrl;
+      const thumbUrl = sb.storage.from('gallery').getPublicUrl(thumbPath).data.publicUrl;
+      await sb.from('gallery').update({ src: dispUrl, thumb: thumbUrl }).eq('id', g.id);
+      done++;
+    } catch (e) {
+      console.warn('Optimize failed for id ' + g.id, e);
+      failed++;
+      done++;
+    }
+  }
+  if (btn) { btn.disabled = false; btn.textContent = 'Optimize Existing Photos'; }
+  if (prog) prog.textContent = '';
+  toast(`Optimized ${done - failed} / ${toOptimize.length} photos` + (failed ? ` (${failed} failed)` : ''), failed ? 'err' : 'ok');
+  loadGallery();
 }
 
 /* ═══════════════════════════════════════════════════════
