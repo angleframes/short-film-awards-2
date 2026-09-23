@@ -206,7 +206,7 @@
                     CATEGORY_ITEMS = acRes.data.map(c => ({
                         title: c.name.replace(/^(Best)\s+/i, '$1<br>').replace(/^(Special)\s+/i, '$1<br>').replace(/^(Campus)\s+/i, '$1<br>'),
                         emoji: '',
-                        image: 'assets/icons/' + c.key + '.png?v=6',
+                        image: 'assets/icons/' + c.key + '.png?v=7',
                         icon_svg: c.icon_svg || ''
                     }));
                     window._awardCategoriesData = acRes.data;
@@ -290,7 +290,7 @@
                                         CATEGORY_ITEMS = acr.data.map(function(c) {
                                             return {
                                                 title: c.name.replace(/^(Best)\s+/i, '$1<br>').replace(/^(Special)\s+/i, '$1<br>').replace(/^(Campus)\s+/i, '$1<br>'),
-                                                emoji: '', image: 'assets/icons/' + c.key + '.png?v=6', icon_svg: c.icon_svg || ''
+                                                emoji: '', image: 'assets/icons/' + c.key + '.png?v=7', icon_svg: c.icon_svg || ''
                                             };
                                         });
                                         window._awardCategoriesData = acr.data;
