@@ -194,7 +194,7 @@
                 }
                 if (Array.isArray(galRes.data) && galRes.data.length) {
                     GALLERY_IMAGES.length = 0;
-                    galRes.data.forEach(g => GALLERY_IMAGES.push({ category: g.category, src: g.src, title: g.title || '', sub: g.sub || '' }));
+                    galRes.data.forEach(g => GALLERY_IMAGES.push({ category: g.category, src: g.src, thumb: g.thumb || '', title: g.title || '', sub: g.sub || '' }));
                 }
                 if (Array.isArray(updRes.data) && updRes.data.length) {
                     UPDATES_FEED.length = 0;
@@ -299,6 +299,31 @@
                                         if (grid) { grid.dataset.built = ''; grid.style.display = 'none'; }
                                     }
                                 } catch(e) { console.warn('Award categories realtime refresh error', e); }
+                            }, 600);
+                        })
+                        .on('postgres_changes', { event: '*', schema: 'public', table: 'gallery' }, () => {
+                            _rtDebounced('gallery', async function() {
+                                try {
+                                    var gr = await SB_RT.from('gallery').select('*').order('sort_order').order('created_at', { ascending: false });
+                                    if (gr.data && gr.data.length) {
+                                        var currentSrc = (_galleryPhotos[_galleryCurrentIdx] || {}).src;
+                                        GALLERY_IMAGES.length = 0;
+                                        gr.data.forEach(function(g) {
+                                            GALLERY_IMAGES.push({ category: g.category, src: g.src, thumb: g.thumb || '', title: g.title || '', sub: g.sub || '' });
+                                        });
+                                        _galleryInitialized = false;
+                                        var wrap = document.getElementById('section-gallery');
+                                        var strip = document.getElementById('galleryStrip');
+                                        var stage = document.getElementById('galleryStage');
+                                        if (strip) strip.innerHTML = '';
+                                        if (stage) stage.innerHTML = '';
+                                        renderGallery();
+                                        if (currentSrc) {
+                                            var newIdx = _galleryPhotos.findIndex(function(p) { return p.src === currentSrc; });
+                                            if (newIdx >= 0 && wrap && strip && stage) _gallerySelectIdx(newIdx, wrap, strip, stage);
+                                        }
+                                    }
+                                } catch(e) { console.warn('Gallery realtime refresh error', e); }
                             }, 600);
                         })
                         .subscribe();
