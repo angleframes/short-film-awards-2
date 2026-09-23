@@ -1645,6 +1645,112 @@
 }
 
 /* ════════════════════════════════════════════════════════
+   GALLERY REORDER ITEMS
+   ════════════════════════════════════════════════════════ */
+.sksfa-admin .gallery-reorder-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #131313;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 5px;
+  margin-bottom: 6px;
+  transition: border-color 0.15s, opacity 0.15s, transform 0.15s;
+  cursor: default;
+  user-select: none;
+}
+.sksfa-admin .gallery-reorder-item:hover { border-color: rgba(255,255,255,0.14); }
+.sksfa-admin .gallery-reorder-item.gri-dragging { opacity: 0.4; transform: scale(0.97); }
+.sksfa-admin .gallery-reorder-item.gri-dragover { border-color: #fff; box-shadow: 0 0 8px rgba(255,255,255,0.15); }
+.sksfa-admin .gri-drag {
+  cursor: grab;
+  font-size: 16px;
+  color: #555;
+  flex-shrink: 0;
+  padding: 4px;
+  touch-action: none;
+}
+.sksfa-admin .gri-drag:active { cursor: grabbing; }
+.sksfa-admin .gri-pos {
+  font-size: 11px;
+  font-weight: 700;
+  color: #555;
+  min-width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.sksfa-admin .gri-thumb {
+  width: 56px;
+  height: 38px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: #1a1a1a;
+}
+.sksfa-admin .gri-thumb-placeholder {
+  width: 56px;
+  height: 38px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.sksfa-admin .gri-meta { flex: 1; min-width: 0; }
+.sksfa-admin .gri-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #ddd;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sksfa-admin .gri-sub {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: #555;
+}
+.sksfa-admin .gri-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.sksfa-admin .gri-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 4px;
+  background: transparent;
+  color: #888;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s;
+  padding: 0;
+}
+.sksfa-admin .gri-btn:hover:not(:disabled) { background: rgba(255,255,255,0.08); color: #fff; }
+.sksfa-admin .gri-btn:disabled { opacity: 0.25; cursor: default; }
+.sksfa-admin .gri-btn-del { color: #c44; border-color: rgba(204,68,68,0.2); }
+.sksfa-admin .gri-btn-del:hover { background: rgba(204,68,68,0.15); color: #f66; }
+.sksfa-admin .btn-sm {
+  font-size: 11px;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+@media (max-width: 600px) {
+  .sksfa-admin .gallery-reorder-item { flex-wrap: wrap; gap: 8px; padding: 8px 10px; }
+  .sksfa-admin .gri-actions { width: 100%; justify-content: flex-end; margin-top: 4px; }
+  .sksfa-admin .gri-btn { width: 32px; height: 32px; font-size: 14px; }
+}
+
+/* ════════════════════════════════════════════════════════
    PREMIUM UPDATE CARDS
    ════════════════════════════════════════════════════════ */
 .sksfa-admin .update-card {
