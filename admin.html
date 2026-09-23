@@ -10,7 +10,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <link rel="stylesheet" href="assets/css/ui-components.css">
-<link rel="stylesheet" href="assets/css/admin.css?v=6">
+<link rel="stylesheet" href="assets/css/admin.css?v=7">
 </head>
 <body class="sksfa-admin">
 
@@ -312,7 +312,18 @@
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           Upload photo
         </button>
-        <div id="galleryList" style="margin-top:20px;"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="sksfa-card-head-left">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M2 4h4l2 3h8v9H2V4z" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M6 11l3-2.5 3 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+            <div><h2>Photo Order</h2><p class="sksfa-card-sub">Drag to reorder or use arrow buttons. Order syncs to public site in realtime.</p></div>
+          </div>
+          <button class="btn btn-sm" id="btnOptExisting" onclick="optimizeExistingPhotos()" style="white-space:nowrap;">Optimize Existing Photos</button>
+        </div>
+        <span id="optProgress" style="font-size:12px;color:#888;margin-bottom:8px;display:block;"></span>
+        <div id="galleryList"></div>
       </div>
 
       <div class="card">
@@ -506,5 +517,5 @@
 <div id="toast" class="toast"></div>
 
 <script src="assets/js/ui-components.js"></script>
-<script src="assets/js/admin.js?v=6"></script>
+<script src="assets/js/admin.js?v=7"></script>
 </html>
