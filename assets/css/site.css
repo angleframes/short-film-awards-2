@@ -1358,13 +1358,13 @@
             z-index: 0;
         }
 
-        /* Main photo — contained, full visibility, no crop */
+        /* Main photo — covers stage consistently for all images */
         .gs-fig img:not(.gs-backdrop) {
             position: absolute;
             inset: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;
             object-position: center center;
             opacity: 0.92;
             z-index: 1;
