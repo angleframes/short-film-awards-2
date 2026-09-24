@@ -130,7 +130,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('hero.png');
+            /* background-image: url('hero.png'); — file removed, gradient bg used instead */
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -1358,13 +1358,13 @@
             z-index: 0;
         }
 
-        /* Main photo — covers stage consistently for all images */
+        /* Main photo — contained, full visibility, no crop */
         .gs-fig img:not(.gs-backdrop) {
             position: absolute;
             inset: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             object-position: center center;
             opacity: 0.92;
             z-index: 1;
