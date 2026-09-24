@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sharankrishnashortfilmawards.com/sitemap.xml
