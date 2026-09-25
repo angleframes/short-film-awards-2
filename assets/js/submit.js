@@ -42,6 +42,9 @@ async function init() {
     var catSel = document.getElementById('category');
     if (catSel) UI.CSelect(catSel, { placeholder: 'Select category…' });
   }
+  if (window.CampusProof) {
+    CampusProof.init({ selectId: 'category', endpoint: BACKEND_URL.replace(/\/payment$/, '/campus-proof'), anonKey: SUPA_ANON });
+  }
 }
 
 function showState(s) {
@@ -77,6 +80,8 @@ function nextStep(from) {
   } else if (from === 2) {
     const fields = ['filmName','category','filmLink','duration'];
     if (fields.find(id => !req(id))) return UI.alert('Please fill in all required fields.', 'warn');
+    const campusMsg = window.CampusProof ? CampusProof.check() : null;
+    if (campusMsg) return UI.alert(campusMsg, 'warn');
     goStep(3);
   } else if (from === 3) {
     const fields = ['director','producer','writer','cinematographer','editor','musicDirector','actor','actress'];
@@ -100,6 +105,9 @@ function showPayStatus(cls, msg) {
 async function doPayment() {
   if (_payState.verified) return;
 
+  const campusMsg = window.CampusProof ? CampusProof.check() : null;
+  if (campusMsg) { showPayStatus('err', campusMsg); return; }
+
   if (typeof Cashfree !== 'function') {
     showPayStatus('err', 'Payment library not loaded. Check your connection and reload.'); return;
   }
@@ -109,12 +117,14 @@ async function doPayment() {
   showPayStatus('pending', 'Creating your secure payment order…');
 
   try {
-    const orderResp = await backendCall({
+    const campusExtra = window.CampusProof ? CampusProof.payload() : {};
+    const orderResp = await backendCall(Object.assign({
       action: 'createOrder',
       customerName:  req('applicantName'),
       customerEmail: req('email'),
-      customerPhone: req('phone')
-    });
+      customerPhone: req('phone'),
+      category:      req('category')
+    }, campusExtra));
     if (!orderResp || orderResp.status !== 'success' || !orderResp.payment_session_id) {
       throw new Error(orderResp?.message || 'Could not create order.');
     }
@@ -122,7 +132,7 @@ async function doPayment() {
 
     // Pre-payment save for browser-close recovery.
     try {
-      await backendCall({
+      await backendCall(Object.assign({
         action: 'saveFormData',
         applicantName: req('applicantName'), email: req('email'), phone: req('phone'), city: req('city'),
         filmName: req('filmName'), category: req('category'), filmLink: req('filmLink'), duration: req('duration'),
@@ -130,7 +140,7 @@ async function doPayment() {
         cinematographer: req('cinematographer'), editor: req('editor'), musicDirector: req('musicDirector'),
         actor: req('actor'), actress: req('actress'), childArtist: req('childArtist') || 'None',
         cashfreeOrderId: orderResp.order_id, link_id: _linkId
-      });
+      }, campusExtra));
     } catch(e) { console.warn('Pre-payment save failed (non-blocking):', e); }
 
     const cashfree = Cashfree({ mode: CASHFREE_MODE });
@@ -198,6 +208,7 @@ function buildReview() {
         ['Category',   req('category')],
         ['Film Link',  req('filmLink')],
         ['Duration',   req('duration')],
+        ['Campus Verification', window.CampusProof ? (CampusProof.summary() || '') : ''],
       ])}
       ${section('Cast & Crew',[
         ['Director',        req('director')],
@@ -251,6 +262,7 @@ async function doSubmit() {
     linkToken:       _token,
     link_id:         _linkId
   };
+  if (window.CampusProof) Object.assign(payload, CampusProof.payload());
 
   try {
     const resp = await backendCall(payload);
