@@ -183,7 +183,8 @@ async function gate() {
   const { data: isAdmin, error: adErr } = await sb.rpc('is_admin');
   if (adErr) return toast('Admin check failed: ' + adErr.message, 'err');
   if (!isAdmin) { toast('This account is not an admin.', 'err'); await sb.auth.signOut(); return show('login'); }
-  document.getElementById('whoami').textContent = ' — ' + session.user.email;
+  document.getElementById('whoami').textContent = session.user.email;
+  document.getElementById('whoAvatar').textContent = (session.user.email || '?').charAt(0).toUpperCase();
   show('dash');
   await Promise.all([loadConfig(), loadGalleryCategories(), loadGallery(), loadUpdates(), loadEntries(), loadLinks()]);
   _initAdminRealtime();
@@ -233,7 +234,10 @@ function setGatePill(open) {
     const el = document.getElementById(id); if (!el) return;
     el.textContent = open ? 'Open' : 'Closed'; el.className = 'pill ' + (open ? 'open' : 'closed');
   });
-  document.getElementById('statRegTop').textContent = 'Reg: ' + (open ? 'Open' : 'Closed');
+  const top = document.getElementById('statRegTop');
+  top.textContent = 'Registration ' + (open ? 'open' : 'closed');
+  top.classList.toggle('is-open', open);
+  top.classList.toggle('is-closed', !open);
 }
 async function loadConfig() {
   const { data, error } = await sb.from('site_config').select('*').eq('id', 1).single();
