@@ -2438,6 +2438,35 @@
         .info-tab-pane { display: none; }
         .info-tab-pane.active { display: block; }
 
+        /* ---- Campus Track verification upload ---- */
+        .campus-proof-group[hidden] { display: none; }
+        .campus-proof-help { font-size: 0.85rem; color: #b8b8b8; line-height: 1.55; margin: -2px 0 12px; }
+        .campus-proof-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; clip: rect(0 0 0 0); }
+        .campus-proof-pick {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            min-height: 52px;
+            margin: 0;
+            padding: 14px 18px;
+            background: rgba(6, 6, 8, 0.8);
+            border: 1px dashed rgba(255, 255, 255, 0.28);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border-color 0.25s ease, background 0.25s ease;
+        }
+        .campus-proof-pick:hover { border-color: rgba(255, 255, 255, 0.5); }
+        .campus-proof-input:focus-visible + .campus-proof-pick { border-color: #ffffff; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4); }
+        .campus-proof-group.is-busy .campus-proof-pick { opacity: 0.6; pointer-events: none; }
+        .campus-proof-pick-title { font-size: 0.95rem; font-weight: 600; color: #ffffff; }
+        .campus-proof-pick-sub { font-size: 0.8rem; color: #9a9a9a; }
+        .campus-proof-status { min-height: 1.2em; margin: 10px 0 0; font-size: 0.85rem; line-height: 1.45; color: #bdbdbd; overflow-wrap: anywhere; }
+        .campus-proof-status.is-ok { color: #ffffff; }
+        .campus-proof-status.is-error { color: #ff8a80; }
+        .campus-proof-note { margin: 6px 0 0; font-size: 0.78rem; color: #8a8a8a; line-height: 1.5; }
+
         /* ---- FAQ accordion (info modal tab) ---- */
         .faq-list { display: flex; flex-direction: column; gap: 10px; text-align: left; }
         .faq-item {
