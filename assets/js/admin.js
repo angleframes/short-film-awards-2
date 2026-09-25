@@ -283,27 +283,51 @@ async function loadEntries() {
     body.innerHTML = `<tr><td colspan="7" class="skeleton">Cannot load: ${esc(error.message)}</td></tr>`;
     return;
   }
-  // Show only paid + non-archived entries
-  _allEntries = (data || []).filter(r =>
-    (r.payment_status || '').toUpperCase() === 'PAID' && !r.archived
-  );
+  _allEntries = (data || []).filter(r => !r.archived);
   updatePaidCounters();
   _page = 1;
   applyFilters();
 }
 
+const isPaidEntry = r => (r.payment_status || '').toUpperCase() === 'PAID';
+let _payView = 'paid';
+
+function setPayView(v) {
+  _payView = v;
+  document.querySelectorAll('#payTabs [data-pay]').forEach(b => {
+    const on = b.dataset.pay === v;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  applyFilters();
+}
+
+function payTag(r) {
+  const ps = (r.payment_status || '').toUpperCase();
+  if (ps === 'PAID') return '<span class="tag paid">Paid</span>';
+  if (ps === 'FAILED') return '<span class="tag failed">Failed</span>';
+  return '<span class="tag unpaid">Not Paid</span>';
+}
+
 function updatePaidCounters() {
   const today = new Date().toISOString().slice(0,10);
-  const total   = _allEntries.length;
-  const general = _allEntries.filter(r => (r.category||'').toLowerCase().includes('general')).length;
-  const campus  = _allEntries.filter(r => (r.category||'').toLowerCase().includes('campus')).length;
-  const todayN  = _allEntries.filter(r => r.created_at && r.created_at.startsWith(today)).length;
+  const paid    = _allEntries.filter(isPaidEntry);
+  const unpaidN = _allEntries.length - paid.length;
+  const total   = paid.length;
+  const general = paid.filter(r => (r.category||'').toLowerCase().includes('general')).length;
+  const campus  = paid.filter(r => (r.category||'').toLowerCase().includes('campus')).length;
+  const todayN  = paid.filter(r => r.created_at && r.created_at.startsWith(today)).length;
   document.getElementById('stTotal').textContent   = total;
   const el = document.getElementById('statEntries');
   if (el) el.textContent = total;
   document.getElementById('stGeneral').textContent = general;
   document.getElementById('stCampus').textContent  = campus;
   document.getElementById('stToday').textContent   = todayN;
+  const setN = (id, n) => { const e = document.getElementById(id); if (e) e.textContent = n; };
+  setN('stUnpaid', unpaidN);
+  setN('tabPaidN', total);
+  setN('tabUnpaidN', unpaidN);
+  setN('tabAllN', _allEntries.length);
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -315,7 +339,9 @@ function applyFilters() {
   const sort = _csel.sort ? _csel.sort.value : 'newest';
 
   _filtered = _allEntries.filter(r => {
-    if (track && !(r.category||'').toLowerCase().includes(track)) return false;
+    if (_payView === 'paid' && !isPaidEntry(r)) return false;
+    if (_payView === 'unpaid' && isPaidEntry(r)) return false;
+    if (track &&!(r.category||'').toLowerCase().includes(track)) return false;
     if (q) {
       const haystack = [
         r.applicant_name, r.email, r.phone, r.film_name,
@@ -352,8 +378,11 @@ function renderEntriesPage() {
   document.getElementById('entriesCount').textContent = `${total} result${total !== 1 ? 's' : ''} (${_allEntries.length} total)`;
 
   if (!slice.length) {
-    body.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="em-icon">🎞️</div><h3>No film entries yet</h3><p>New submissions will appear here automatically.</p></div></td></tr>';
-    cards.innerHTML = '<div class="empty-state"><div class="em-icon">🎞️</div><h3>No film entries yet</h3><p>New submissions will appear here automatically.</p></div>';
+    const emptyMsg = _payView === 'unpaid'
+      ? '<h3>No unpaid entries</h3><p>Applicants who start checkout but don\'t finish payment appear here.</p>'
+      : '<h3>No film entries yet</h3><p>New submissions will appear here automatically.</p>';
+    body.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="em-icon">🎞️</div>${emptyMsg}</div></td></tr>`;
+    cards.innerHTML = `<div class="empty-state"><div class="em-icon">🎞️</div>${emptyMsg}</div>`;
     renderPagination(0,1,1); return;
   }
 
@@ -373,7 +402,7 @@ function renderEntriesPage() {
       </td>
       <td style="font-weight:500;">${esc(r.film_name||'—')}</td>
       <td>${trackTag(r)}</td>
-      <td><span class="tag paid">Paid</span></td>
+      <td>${payTag(r)}</td>
       <td>
         <button class="btn-ghost btn-xs" onclick="openDrawer(${gIdx})">View Details</button>
         <button class="btn-ghost btn-xs btn-del" onclick="archiveEntry(${r.id}, '${esc(r.film_name||'')}', '${esc(r.applicant_name||'')}')">Delete</button>
@@ -387,7 +416,7 @@ function renderEntriesPage() {
     return `<div class="entry-card">
       <div class="ec-film">${esc(r.film_name||'—')}</div>
       <div class="ec-meta">${esc(r.applicant_name||'—')} · ${fmtDate(r.created_at)}</div>
-      <div class="ec-row">${trackTag(r)} <span class="tag paid">Paid</span>
+      <div class="ec-row">${trackTag(r)} ${payTag(r)}
         <button class="btn-ghost btn-xs" style="margin-left:auto;" onclick="openDrawer(${gIdx})">View Details</button>
         <button class="btn-ghost btn-xs btn-del" onclick="archiveEntry(${r.id}, '${esc(r.film_name||'')}', '${esc(r.applicant_name||'')}')">Delete</button>
       </div>
@@ -444,9 +473,7 @@ async function openDrawer(idx) {
   const row = (k, v) => v && v !== '—'
     ? `<div class="d-row"><span class="d-key">${k}</span><span class="d-val">${v}</span></div>` : '';
 
-  const payStatusHtml = ps === 'PAID' ? '<span class="tag paid">Paid</span>'
-    : ps === 'FAILED' ? '<span class="tag failed">Failed</span>'
-    : '<span class="tag pending">Pending</span>';
+  const payStatusHtml = payTag(r);
 
   const trackTag = (r.category||'').toLowerCase().includes('campus')
     ? '<span class="tag campus">Campus</span>' : '<span class="tag general">General</span>';
@@ -1003,7 +1030,7 @@ function openDrawerByEntryId(entryId) {
    CSV EXPORT
 ════════════════════════════════════════════════════════ */
 function exportEntriesCsv() {
-  const data = _filtered.length && _filtered.length < _allEntries.length ? _filtered : _allEntries;
+  const data = _filtered;
   if (!data.length) return toast('No entries to export.', 'err');
   const cols = ['id','created_at','applicant_name','email','phone','city','film_name','category',
     'film_link','duration','director','producer','writer','cinematographer','editor',
@@ -1114,7 +1141,7 @@ function buildPdf(entries, title) {
 }
 
 function exportEntriesPdf() {
-  const data = _filtered.length && _filtered.length < _allEntries.length ? _filtered : _allEntries;
+  const data = _filtered;
   if (!data.length) return toast('No entries to export.', 'err');
   toast('Generating PDF…');
   setTimeout(() => {
@@ -2096,24 +2123,24 @@ function _initAdminRealtime() {
   sb.channel('admin_live')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'film_entries' }, (payload) => {
       const row = payload.new;
-      const isPaid = row && (row.payment_status || '').toUpperCase() === 'PAID' && !row.archived;
-      if (payload.eventType === 'INSERT' && isPaid) {
+      if (payload.eventType === 'INSERT' && row && !row.archived) {
         _allEntries.unshift(row);
-        debounced('entries', () => {
-          updatePaidCounters();
-          applyFilters();
-          toast('New film entry: ' + (row.film_name || 'unknown'), 'ok');
-        }, 300);
-      } else if (payload.eventType === 'UPDATE') {
+        debounced('entries', () => { updatePaidCounters(); applyFilters(); }, 300);
+      } else if (payload.eventType === 'UPDATE' && row) {
         const idx = _allEntries.findIndex(e => e.id === row.id);
-        if (row.archived || (row.payment_status || '').toUpperCase() !== 'PAID') {
+        const becamePaid = idx >= 0 && !isPaidEntry(_allEntries[idx]) && isPaidEntry(row);
+        if (row.archived) {
           if (idx >= 0) _allEntries.splice(idx, 1);
         } else if (idx >= 0) {
           _allEntries[idx] = { ..._allEntries[idx], ...row };
-        } else if (isPaid) {
+        } else {
           _allEntries.unshift(row);
         }
-        debounced('entries', () => { updatePaidCounters(); applyFilters(); }, 300);
+        debounced('entries', () => {
+          updatePaidCounters();
+          applyFilters();
+          if (becamePaid) toast('New paid entry: ' + (row.film_name || 'unknown'), 'ok');
+        }, 300);
       }
     })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'submission_links' }, () => {
