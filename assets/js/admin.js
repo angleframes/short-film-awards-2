@@ -478,6 +478,14 @@ async function openDrawer(idx) {
     ? `<div class="d-row"><span class="d-key">${k}</span><span class="d-val">${v}</span></div>` : '';
 
   const payStatusHtml = payTag(r);
+  const copyable = v => v
+    ? `<span class="d-copy"><code>${esc(v)}</code><button type="button" class="copy-btn" onclick="copyText('${esc(v).replace(/'/g, "\\'")}', this)" aria-label="Copy">Copy</button></span>`
+    : '—';
+  const dur = String(r.duration || '').trim();
+  const durationHtml = dur ? esc(/^\d+(\.\d+)?$/.test(dur) ? dur + ' min' : dur) : '—';
+  const amount = r.amount != null && r.amount !== '' ? Number(r.amount) : null;
+  const amountHtml = amount != null && !isNaN(amount)
+    ? '₹' + amount.toLocaleString('en-IN') + ' <span class="d-dim">' + esc(r.currency || 'INR') + '</span>' : '—';
 
   const trackTag = (r.category||'').toLowerCase().includes('campus')
     ? '<span class="tag campus">Campus</span>' : '<span class="tag general">General</span>';
@@ -520,7 +528,7 @@ async function openDrawer(idx) {
         </div>
         ${row('Full Name', esc(r.applicant_name||'—'))}
         ${row('Email', r.email ? `<a href="mailto:${esc(r.email)}" style="color:#ccc;">${esc(r.email)}</a>` : '—')}
-        ${row('Phone', esc(r.phone||'—'))}
+        ${row('Phone', r.phone ? `<a href="tel:${esc(String(r.phone).replace(/[^\d+]/g,''))}">${esc(r.phone)}</a>` : '—')}
         ${row('City', esc(r.city||'—'))}
       </div>
 
@@ -531,8 +539,7 @@ async function openDrawer(idx) {
         </div>
         ${row('Film Name', esc(r.film_name||'—'))}
         ${row('Film Link', filmLinkHtml)}
-        ${row('Duration', esc(r.duration||'—'))}
-        ${row('Source', esc(r.source||'—'))}
+        ${row('Duration', durationHtml)}
       </div>
 
       <div class="em-section em-full">
@@ -559,38 +566,32 @@ async function openDrawer(idx) {
 
       ${campusProofSection(r)}
 
+      <div class="em-section em-full" id="emEvalSection">
+        ${evalSectionInner(r, evals)}
+      </div>
+
       <div class="em-section">
         <div class="em-section-title">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 6h12" stroke="currentColor" stroke-width="1.2"/><path d="M4 9h2M8 9h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-          PAYMENT INFO
+          PAYMENT
         </div>
-        ${row('Status', payStatusHtml)}
-        ${row('Amount', '₹' + safe(r.amount||'1000'))}
-        ${row('Currency', esc(r.currency||'INR'))}
-        ${row('Order ID', esc(r.cashfree_order_id||'—'))}
-        ${row('Payment ID', esc(r.cashfree_payment_id||'—'))}
-        ${row('Method', esc(r.payment_method||'—'))}
-        ${row('Paid At', fmtDateTime(r.paid_at))}
-        ${row('Verified At', fmtDateTime(r.payment_verified_at))}
-        ${row('Confirmation', r.confirmation_sent ? 'Sent ✓' : 'Not sent')}
+        ${row('Amount', amountHtml)}
+        ${row('Method', esc(r.payment_method ? String(r.payment_method).toUpperCase() : '—'))}
+        ${row('Order ID', copyable(r.cashfree_order_id))}
+        ${row('Payment ID', copyable(r.cashfree_payment_id))}
+        ${row('Paid at', fmtDateTime(r.paid_at))}
+        ${row('Verified at', fmtDateTime(r.payment_verified_at))}
       </div>
 
       <div class="em-section">
         <div class="em-section-title">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5.5 8.5a3 3 0 004.24 0l2-2a3 3 0 00-4.24-4.24l-1 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M8.5 5.5a3 3 0 00-4.24 0l-2 2a3 3 0 004.24 4.24l1-1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
-          SUBMISSION INFO
+          SUBMISSION
         </div>
-        ${row('Created At', fmtDateTime(r.created_at))}
+        ${row('Submitted', fmtDateTime(r.created_at))}
         ${row('Source', esc(r.source||'—'))}
-        ${row('Direct Link ID', esc(r.link_id ? String(r.link_id) : '—'))}
-      </div>
-
-      <div class="em-section em-full">
-        <div class="em-section-title">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5l1.4 2.8 3.1.45-2.25 2.2.53 3.1L7 8.5 4.22 10.05l.53-3.1L2.5 4.75l3.1-.45L7 1.5z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>
-          AWARD EVALUATION
-        </div>
-        ${renderEvalSection(r, evals)}
+        ${row('Direct link', r.link_id ? '#' + esc(String(r.link_id)) : 'None (public form)')}
+        ${row('Confirmation email', r.confirmation_sent ? '<span class="d-ok">Sent ✓</span>' : '<span class="d-warn">Not sent</span>')}
       </div>
     </div>
   `;
@@ -636,6 +637,20 @@ async function viewCampusProof(proofId) {
   }
 }
 
+function evalSectionInner(r, evals) {
+  const vals = Object.values(evals || {});
+  const winners = vals.filter(e => e.status === 'winner').length;
+  const shortlisted = vals.filter(e => e.status === 'shortlisted').length;
+  const selected = vals.filter(e => e.status === 'selected').length;
+  const parts = [];
+  if (winners) parts.push(winners + ' winner' + (winners > 1 ? 's' : ''));
+  if (shortlisted) parts.push(shortlisted + ' shortlisted');
+  if (selected) parts.push(selected + ' jury selection');
+  const summary = parts.length ? parts.join(' · ') : 'Not reviewed yet';
+  return `<div class="em-section-title">${'<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5l1.4 2.8 3.1.45-2.25 2.2.53 3.1L7 8.5 4.22 10.05l.53-3.1L2.5 4.75l3.1-.45L7 1.5z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>'}AWARD EVALUATION<span class="em-eval-summary">${summary}</span></div>
+    <div class="eval-list">${renderEvalSection(r, evals)}</div>`;
+}
+
 function renderEvalSection(r, evals) {
   const isCampus = (r.category||'').toLowerCase().includes('campus');
   let html = '';
@@ -647,7 +662,7 @@ function renderEvalSection(r, evals) {
     const currentStatus = ev ? ev.status : 'not_reviewed';
     const candidateName = getCandidateName(r, cat);
     const subLabel = candidateName && candidateName !== r.film_name
-      ? `<small>${esc(candidateName)}</small>` : '';
+      ? `<span class="eval-nominee">${esc(candidateName)}</span>` : '';
 
     const cNameEsc = esc(candidateName).replace(/'/g,"\\'");
     const isJury = cat.key === 'special_jury';
@@ -687,8 +702,8 @@ function renderEvalSection(r, evals) {
       </div>`;
     }
 
-    html += `<div class="eval-row">
-      <div class="eval-label">${esc(cat.label)}${subLabel}</div>
+    html += `<div class="eval-row is-${currentStatus}">
+      <div class="eval-label"><span class="eval-cat">${esc(cat.label)}</span>${subLabel}</div>
       ${btns}
     </div>`;
   }
@@ -747,16 +762,23 @@ async function setEval(entryId, category, status, candidateName, candidateType, 
   if (_activeDrawerEntryId === entryId) {
     const evals = _evaluations[entryId];
     const r = _allEntries.find(x => x.id === entryId);
-    if (r) {
-      const sections = document.querySelectorAll('#entryModalBody .em-section');
-      const lastSection = sections[sections.length - 1];
-      if (lastSection) {
-        const titleEl = lastSection.querySelector('.em-section-title');
-        if (titleEl && titleEl.textContent.includes('AWARD EVALUATION')) {
-          lastSection.innerHTML = `<div class="em-section-title"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.5l1.4 2.8 3.1.45-2.25 2.2.53 3.1L7 8.5 4.22 10.05l.53-3.1L2.5 4.75l3.1-.45L7 1.5z" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round"/></svg>AWARD EVALUATION</div>${renderEvalSection(r, evals)}`;
-        }
-      }
-    }
+    const box = document.getElementById('emEvalSection');
+    if (r && box) box.innerHTML = evalSectionInner(r, evals);
+  }
+}
+
+function copyText(text, btn) {
+  const done = () => {
+    if (!btn) return;
+    const old = btn.textContent;
+    btn.textContent = 'Copied';
+    btn.classList.add('is-done');
+    setTimeout(() => { btn.textContent = old; btn.classList.remove('is-done'); }, 1400);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, () => toast('Copy failed — select the text instead.', 'err'));
+  } else {
+    toast('Copy not supported in this browser.', 'err');
   }
 }
 
