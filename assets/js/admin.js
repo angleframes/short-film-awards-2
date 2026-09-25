@@ -526,6 +526,8 @@ async function openDrawer(idx) {
         </div>
       </div>
 
+      ${campusProofSection(r)}
+
       <div class="em-section">
         <div class="em-section-title">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 6h12" stroke="currentColor" stroke-width="1.2"/><path d="M4 9h2M8 9h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
@@ -564,6 +566,43 @@ async function openDrawer(idx) {
 
   document.getElementById('entryModalOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function campusProofSection(r) {
+  if (!(r.category || '').toLowerCase().includes('campus')) return '';
+  const hasProof = UUID_RE.test(r.campus_proof_id || '');
+  const body = hasProof
+    ? `<div class="d-row"><span class="d-key">Status</span><span class="d-val"><span class="tag paid">Uploaded</span></span></div>
+       <div class="d-row"><span class="d-key">Document</span><span class="d-val"><button type="button" class="btn btn-sm" onclick="viewCampusProof('${r.campus_proof_id}')">View document ↗</button></span></div>
+       <div class="d-row"><span class="d-key">Access</span><span class="d-val" style="color:#888;font-size:12px;">Private · opens a secure link valid for 2 minutes</span></div>`
+    : `<div class="d-row"><span class="d-key">Status</span><span class="d-val"><span class="tag failed">Missing</span></span></div>
+       <div class="d-row"><span class="d-key">Note</span><span class="d-val" style="color:#888;font-size:12px;">No verification document is attached to this Campus entry. Contact the applicant before judging.</span></div>`;
+  return `
+      <div class="em-section em-full">
+        <div class="em-section-title">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="1" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 5h5M4.5 7.5h5M4.5 10h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          CAMPUS VERIFICATION DOCUMENT
+        </div>
+        ${body}
+      </div>`;
+}
+
+async function viewCampusProof(proofId) {
+  if (!UUID_RE.test(proofId || '')) return;
+  const win = window.open('about:blank', '_blank');
+  try {
+    const { data: proof, error } = await sb.from('campus_proof_uploads').select('object_path').eq('id', proofId).single();
+    if (error || !proof) throw new Error(error ? error.message : 'Document not found');
+    const { data: signed, error: signErr } = await sb.storage.from('campus-verification').createSignedUrl(proof.object_path, 120);
+    if (signErr || !signed || !signed.signedUrl) throw new Error(signErr ? signErr.message : 'Could not create a secure link');
+    if (win) { win.opener = null; win.location.href = signed.signedUrl; }
+    else toast('Pop-up blocked — allow pop-ups for this site to view the document.', 'err');
+  } catch (err) {
+    if (win) win.close();
+    toast('Could not open document: ' + err.message, 'err');
+  }
 }
 
 function renderEvalSection(r, evals) {
