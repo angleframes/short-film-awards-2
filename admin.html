@@ -10,7 +10,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <link rel="stylesheet" href="assets/css/ui-components.css">
-<link rel="stylesheet" href="assets/css/admin.css?v=9">
+<link rel="stylesheet" href="assets/css/admin.css?v=10">
 </head>
 <body class="sksfa-admin">
 
@@ -39,12 +39,20 @@
     <div class="topbar-inner">
       <div class="sksfa-brand-wrap">
         <img class="sksfa-logo" src="logo nav.png" alt="SSFA" onerror="this.style.display='none'">
-        <div class="brand">Sharankrishna Short Film Awards<small>CINEMA FOR A KINDER TOMORROW<span id="whoami"></span></small></div>
+        <div class="brand">Sharankrishna Short Film Awards<small>Admin · Cinema for a kinder tomorrow</small></div>
       </div>
       <span class="spacer"></span>
-      <span class="top-badge" id="statRegTop">Reg: —</span>
-      <a class="btn-ghost btn-sm" href="https://sharankrishnashortfilmawards.com" target="_blank" rel="noopener">Live Site ↗</a>
-      <button class="btn-ghost btn-sm" onclick="doLogout()">Log out</button>
+      <button type="button" class="top-badge" id="statRegTop" onclick="switchTab('registration')" title="Registration settings">Registration —</button>
+      <a class="btn-ghost btn-sm top-btn" href="https://sharankrishnashortfilmawards.com" target="_blank" rel="noopener">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Live site</span></a>
+      <div class="user-chip" title="Signed in">
+        <span class="user-avatar" id="whoAvatar" aria-hidden="true">·</span>
+        <span class="user-email" id="whoami"></span>
+        <button type="button" class="user-logout" onclick="doLogout()" aria-label="Log out" title="Log out">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 4h3a2 2 0 012 2v12a2 2 0 01-2 2h-3M10 16l-4-4 4-4M6 12h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
       <div class="sksfa-header-tagline" aria-hidden="true">SHORT<br>FILMS<br>BIGGER<br>HUMANITY</div>
     </div>
   </div>
@@ -542,5 +550,5 @@
 <div id="toast" class="toast"></div>
 
 <script src="assets/js/ui-components.js"></script>
-<script src="assets/js/admin.js?v=9"></script>
+<script src="assets/js/admin.js?v=10"></script>
 </html>
