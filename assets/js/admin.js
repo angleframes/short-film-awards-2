@@ -163,6 +163,7 @@ function switchTab(name) {
   document.getElementById('tab-' + name).classList.add('active');
   if (name === 'awards') refreshAwardsTab();
   if (name === 'videos') { loadVideoCategories(); loadTestimonials(); }
+  if (name === 'certificates' && window.Certs) Certs.renderManagement();
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -183,6 +184,7 @@ async function gate() {
   const { data: isAdmin, error: adErr } = await sb.rpc('is_admin');
   if (adErr) return toast('Admin check failed: ' + adErr.message, 'err');
   if (!isAdmin) { toast('This account is not an admin.', 'err'); await sb.auth.signOut(); return show('login'); }
+  if (window.Certs) Certs.init(sb);
   document.getElementById('whoami').textContent = session.user.email;
   document.getElementById('whoAvatar').textContent = (session.user.email || '?').charAt(0).toUpperCase();
   show('dash');
@@ -288,6 +290,7 @@ async function loadEntries() {
     return;
   }
   _allEntries = (data || []).filter(r => !r.archived);
+  if (window.Certs) { try { await Certs.refreshWinners(); } catch (e) {} }
   updatePaidCounters();
   _page = 1;
   applyFilters();
@@ -409,6 +412,7 @@ function renderEntriesPage() {
       <td>${payTag(r)}</td>
       <td>
         <button class="btn-ghost btn-xs" onclick="openDrawer(${gIdx})">View Details</button>
+        ${window.Certs ? Certs.rowButtonsHtml(r) : ''}
         <button class="btn-ghost btn-xs btn-del" onclick="archiveEntry(${r.id}, '${esc(r.film_name||'')}', '${esc(r.applicant_name||'')}')">Delete</button>
       </td>
     </tr>`;
@@ -422,6 +426,7 @@ function renderEntriesPage() {
       <div class="ec-meta">${esc(r.applicant_name||'—')} · ${fmtDate(r.created_at)}</div>
       <div class="ec-row">${trackTag(r)} ${payTag(r)}
         <button class="btn-ghost btn-xs" style="margin-left:auto;" onclick="openDrawer(${gIdx})">View Details</button>
+        ${window.Certs ? Certs.rowButtonsHtml(r) : ''}
         <button class="btn-ghost btn-xs btn-del" onclick="archiveEntry(${r.id}, '${esc(r.film_name||'')}', '${esc(r.applicant_name||'')}')">Delete</button>
       </div>
     </div>`;
@@ -569,6 +574,8 @@ async function openDrawer(idx) {
       <div class="em-section em-full" id="emEvalSection">
         ${evalSectionInner(r, evals)}
       </div>
+
+      ${window.Certs ? `<div class="em-section em-full" id="emCertSection">${Certs.sectionHtml(r)}</div>` : ''}
 
       <div class="em-section">
         <div class="em-section-title">
@@ -764,6 +771,14 @@ async function setEval(entryId, category, status, candidateName, candidateType, 
     const r = _allEntries.find(x => x.id === entryId);
     const box = document.getElementById('emEvalSection');
     if (r && box) box.innerHTML = evalSectionInner(r, evals);
+  }
+  if (window.Certs) {
+    Certs.refreshWinners().then(() => {
+      const r = _allEntries.find(x => x.id === entryId);
+      const cert = document.getElementById('emCertSection');
+      if (r && cert && _activeDrawerEntryId === entryId) cert.innerHTML = Certs.sectionHtml(r);
+      renderEntriesPage();
+    });
   }
 }
 
