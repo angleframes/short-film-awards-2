@@ -2124,3 +2124,212 @@
   .sksfa-admin .pay-tabs { display: flex; width: 100%; }
   .sksfa-admin .pay-tabs button { flex: 1; justify-content: center; padding: 10px 6px; gap: 6px; white-space: nowrap; font-size: 12px; }
 }
+
+/* ════════════════════════════════════════════════════════
+   DESIGN REFRESH (v9) — layout, rhythm, and component polish.
+   Appended last so it overrides earlier layers; delete this block to revert.
+   ════════════════════════════════════════════════════════ */
+.sksfa-admin {
+  --r-card: 12px;
+  --r-ctl: 8px;
+  --line: rgba(255,255,255,0.08);
+  --line-strong: rgba(255,255,255,0.14);
+  --surface: #121212;
+  --surface-2: #171717;
+  --text-2: #a3a3a3;
+  --text-3: #6b6b6b;
+}
+html { scroll-padding-top: 132px; }
+
+/* Login — the generic .card{position:relative} rule was un-fixing this card */
+.sksfa-admin .card.sksfa-login-card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  width: calc(100% - 32px);
+  max-width: 400px;
+  padding: 40px 36px 32px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #151515 0%, #101010 100%);
+  border: 1px solid var(--line-strong);
+}
+.sksfa-admin .sksfa-login-card label { margin-top: 4px; }
+.sksfa-admin .sksfa-login-card .btn { height: 46px; margin-top: 8px; justify-content: center; font-size: 14px; }
+@media (max-width: 480px) {
+  .sksfa-admin .card.sksfa-login-card { padding: 32px 22px 26px; }
+}
+
+/* Layout width — forms were stretching to 1800px */
+.sksfa-admin .wrap { max-width: 1180px; padding: 32px 28px 64px; }
+.sksfa-admin .topbar-inner,
+.sksfa-admin .tab-bar-inner { max-width: 1236px; }
+
+/* Decorative taglines clip at common widths; keep only where there is room */
+@media (max-width: 1760px) {
+  .sksfa-admin .sksfa-header-tagline,
+  .sksfa-admin .sksfa-nav-tagline { display: none; }
+}
+
+/* Page title */
+.sksfa-admin .sksfa-page-title { margin-bottom: 24px; padding-bottom: 20px; }
+.sksfa-admin .sksfa-h1 { font-size: 30px; letter-spacing: -0.6px; margin: 6px 0 6px; }
+.sksfa-admin .sksfa-page-desc { color: var(--text-2); max-width: 640px; }
+
+/* Stats — fill the row instead of leaving a gap */
+.sksfa-admin .stats {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.sksfa-admin .stat {
+  border-radius: var(--r-card);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 16px 18px;
+  transition: border-color .15s, background .15s;
+}
+.sksfa-admin .stat:hover { border-color: var(--line-strong); }
+
+/* Cards */
+.sksfa-admin .card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: 24px 26px;
+  margin-bottom: 20px;
+  scroll-margin-top: 132px;
+}
+.sksfa-admin .card::before { border-radius: var(--r-card) var(--r-card) 0 0; }
+.sksfa-admin .card-head { margin-bottom: 20px; padding-bottom: 16px; border-bottom-color: var(--line); align-items: center; }
+.sksfa-admin .card-head h2 { font-size: 16px; font-weight: 600; letter-spacing: -0.2px; margin: 0; }
+.sksfa-admin .sksfa-card-head-left { align-items: center; }
+.sksfa-admin .sksfa-card-head-left > svg { color: var(--text-2); flex-shrink: 0; }
+.sksfa-admin .sksfa-card-sub { color: var(--text-3); font-size: 12.5px; margin-top: 2px; }
+
+/* Form controls */
+.sksfa-admin label { color: var(--text-2); font-size: 11px; letter-spacing: 1px; margin-bottom: 7px; }
+.sksfa-admin input,
+.sksfa-admin input[type="text"],
+.sksfa-admin input[type="email"],
+.sksfa-admin input[type="password"],
+.sksfa-admin input[type="number"],
+.sksfa-admin input[type="search"],
+.sksfa-admin input[type="url"],
+.sksfa-admin input[type="datetime-local"],
+.sksfa-admin input:not([type]),
+.sksfa-admin textarea {
+  border-radius: var(--r-ctl);
+  background: #0d0d0d;
+  border: 1px solid var(--line-strong);
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+.sksfa-admin input:hover,
+.sksfa-admin textarea:hover { border-color: rgba(255,255,255,0.22); }
+.sksfa-admin input:focus,
+.sksfa-admin textarea:focus {
+  border-color: rgba(255,255,255,0.45);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.08);
+  background: #0f0f0f;
+  outline: none;
+}
+.sksfa-admin textarea { min-height: 96px; line-height: 1.55; }
+.sksfa-admin .grid2 { gap: 0 18px; }
+.sksfa-admin .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 18px; }
+.sksfa-admin .grid3 > div { min-width: 0; margin-bottom: 18px; }
+@media (max-width: 760px) { .sksfa-admin .grid3 { grid-template-columns: 1fr; } }
+
+/* Buttons */
+.sksfa-admin .btn { border-radius: var(--r-ctl); height: 42px; padding: 0 20px; font-weight: 600; gap: 8px; }
+.sksfa-admin .btn:focus-visible,
+.sksfa-admin .btn-ghost:focus-visible { outline: 2px solid rgba(255,255,255,0.6); outline-offset: 2px; }
+.sksfa-admin .btn-ghost { border-radius: var(--r-ctl); border-color: var(--line-strong); color: #cfcfcf; }
+.sksfa-admin .btn-ghost:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.sksfa-admin .btn-sm { height: 34px; }
+
+/* Tables */
+.sksfa-admin .tbl-wrap { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.sksfa-admin .tbl-wrap table { border-collapse: collapse; width: 100%; }
+.sksfa-admin .tbl-wrap th { background: rgba(255,255,255,0.025); color: var(--text-3); font-size: 10.5px; letter-spacing: 1.4px; }
+.sksfa-admin .tbl-wrap tbody tr { transition: background .12s; }
+.sksfa-admin .tbl-wrap tbody tr:hover { background: rgba(255,255,255,0.025); }
+.sksfa-admin .tbl-wrap td { border-top: 1px solid var(--line); }
+
+/* Videos list — thumbnails were rendering at native 480px */
+.sksfa-admin .tmt-admin-card {
+  align-items: center;
+  gap: 18px;
+  padding: 14px;
+  margin-bottom: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  transition: border-color .15s;
+}
+.sksfa-admin .tmt-admin-card:last-child { border-bottom: 1px solid var(--line); margin-bottom: 0; }
+.sksfa-admin .tmt-admin-card:hover { border-color: var(--line-strong); }
+.sksfa-admin .tmt-admin-thumb { flex: 0 0 200px; width: 200px; height: auto; border-radius: 7px; }
+.sksfa-admin .tmt-admin-title { font-size: 14px; margin-bottom: 4px; }
+.sksfa-admin .tmt-admin-meta { margin-bottom: 10px; color: var(--text-2); }
+.sksfa-admin .tmt-admin-actions .btn-ghost { height: 30px; padding: 0 10px; font-size: 12px; }
+@media (max-width: 600px) {
+  .sksfa-admin .tmt-admin-card { align-items: stretch; }
+  .sksfa-admin .tmt-admin-thumb { width: 100%; flex: none; }
+}
+
+/* Updates + links + gallery rows share one row style */
+.sksfa-admin .update-card,
+.sksfa-admin .link-card,
+.sksfa-admin .gallery-reorder-item,
+.sksfa-admin .cat-row {
+  border-radius: 10px;
+  border-color: var(--line);
+  background: var(--surface-2);
+}
+.sksfa-admin .update-card { padding: 16px 18px; margin-bottom: 10px; }
+.sksfa-admin .update-card-text { color: var(--text-2); line-height: 1.6; }
+.sksfa-admin .link-card { margin-bottom: 10px; }
+.sksfa-admin .lc-url { font-size: 12.5px; }
+.sksfa-admin #updatesList:empty::after,
+.sksfa-admin #linksList:empty::after {
+  content: 'Nothing here yet.';
+  display: block;
+  padding: 18px;
+  text-align: center;
+  color: var(--text-3);
+  border: 1px dashed var(--line-strong);
+  border-radius: 10px;
+}
+
+/* Gallery upload drop zone */
+.sksfa-admin .cfile-upload { border-radius: 10px; transition: border-color .15s, background .15s; }
+.sksfa-admin .cfile-upload:hover { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.02); }
+
+/* Awards evaluation grid */
+.sksfa-admin .award-card { border-radius: 10px; }
+
+/* Tab bar — clearer active state */
+.sksfa-admin .tab-btn { border-radius: 0; }
+.sksfa-admin .tab-btn.active { color: #fff; }
+.sksfa-admin .tab-btn:focus-visible { outline: 2px solid rgba(255,255,255,0.6); outline-offset: -2px; }
+
+@media (max-width: 900px) {
+  .sksfa-admin .wrap { padding: 20px 16px 48px; }
+  .sksfa-admin .card { padding: 18px; }
+  .sksfa-admin .sksfa-h1 { font-size: 24px; }
+}
+.sksfa-admin .btn-ghost.btn-del,
+.sksfa-admin .btn-del { color: #e5534b; border-color: rgba(229,83,75,0.35); }
+.sksfa-admin .btn-ghost.btn-del:hover,
+.sksfa-admin .btn-del:hover { background: rgba(229,83,75,0.1); color: #ff6b62; }
+#vidCatCard .btn-sm { height: 44px; padding: 0 18px; }
+.sksfa-admin .card.sksfa-login-card { box-sizing: border-box; }
+@media (max-width: 900px) {
+  .sksfa-admin .sksfa-panel-tag { display: none; }
+}
+@media (max-width: 640px) {
+  .sksfa-admin .topbar-inner .brand { display: none; }
+  .sksfa-admin .topbar-inner { gap: 8px; padding: 0 14px; }
+  .sksfa-admin .stats { grid-template-columns: 1fr 1fr; }
+}
