@@ -10,7 +10,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <link rel="stylesheet" href="assets/css/ui-components.css">
-<link rel="stylesheet" href="assets/css/admin.css?v=8">
+<link rel="stylesheet" href="assets/css/admin.css?v=9">
 </head>
 <body class="sksfa-admin">
 
@@ -20,7 +20,7 @@
     <img src="logo nav.png" alt="SSFA" onerror="this.style.display='none'">
   </div>
   <h1>Admin Login</h1>
-  <p class="sub">Sharankrishna Short Film Awards — Control Panel</p>
+  <p class="sub">Sharankrishna Short Film Awards · Control Panel</p>
   <label for="lg-email">Email</label>
   <input id="lg-email" type="email" autocomplete="username" placeholder="admin@email.com">
   <label for="lg-pass">Password</label>
@@ -123,7 +123,7 @@
           <div class="sksfa-card-head-left">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="1" y="3" width="18" height="14" rx="2.5" stroke="currentColor" stroke-width="1.3"/><rect x="4" y="1" width="2" height="4" rx="1" fill="currentColor"/><rect x="9" y="1" width="2" height="4" rx="1" fill="currentColor"/><rect x="14" y="1" width="2" height="4" rx="1" fill="currentColor"/></svg>
             <div>
-              <h2>Film Entries</h2>
+              <h2>Submissions</h2>
               <p class="sksfa-card-sub">Search, filter and manage all submitted films.</p>
             </div>
           </div>
@@ -265,8 +265,10 @@
         <div class="stat"><div class="k">Deadline</div><div class="v sm" id="statDeadline">—</div></div>
       </div>
       <div class="card">
-        <div class="card-head"><div class="sksfa-card-head-left"><h2>Registration &amp; Countdown</h2></div></div>
-        <p class="card-desc">Toggle saves instantly. Dates &amp; labels control the public countdown — click Save settings.</p>
+        <div class="card-head"><div class="sksfa-card-head-left">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="13" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M12 9v4l2.5 2M9 2h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div><h2>Registration &amp; Countdown</h2><p class="sksfa-card-sub">The switch saves instantly. Dates and labels need Save settings.</p></div>
+        </div></div>
         <div class="reg-toggle-row">
           <div class="reg-toggle-info">
             <div class="reg-toggle-label">Registrations</div>
@@ -370,7 +372,7 @@
         </div>
         <div style="display:flex;gap:8px;margin-bottom:12px;">
           <input id="vcNewName" type="text" placeholder="New category name" style="flex:1;">
-          <input id="vcNewIcon" type="text" placeholder="Icon (emoji)" style="width:80px;">
+          <input id="vcNewIcon" type="text" placeholder="Emoji" maxlength="4" style="width:96px;text-align:center;" aria-label="Category icon (emoji)">
           <button class="btn btn-sm" onclick="vcAdd()">+ Add</button>
         </div>
         <div id="vcList" style="margin-top:4px;"></div>
@@ -409,15 +411,12 @@
           <div><label>Category</label><div id="tmtCategorySelect" class="cselect-wrap" style="margin-top:6px;"></div></div>
           <div><label>Year</label><input id="tmtYear" type="text" placeholder="e.g. 2025"></div>
         </div>
-        <div class="grid2">
+        <div class="grid3">
           <div><label>Duration</label><input id="tmtDuration" type="text" placeholder="e.g. 02:34"></div>
           <div id="tmtFeaturedWrap"><label>Featured</label>
             <div id="tmtFeaturedSelect" class="cselect-wrap" style="margin-top:6px;"></div>
           </div>
-        </div>
-        <div class="grid2">
           <div><label>Active</label><div id="tmtActiveSelect" class="cselect-wrap" style="margin-top:6px;"></div></div>
-          <div></div>
         </div>
         <label>Short Description / Caption</label>
         <textarea id="tmtShortText" rows="2" placeholder="A short quote or caption shown alongside the video."></textarea>
@@ -452,8 +451,10 @@
         <p class="sksfa-page-desc">Shown in the public Festival Updates feed, newest first.</p>
       </div>
       <div class="card">
-        <div class="card-head"><div class="sksfa-card-head-left"><h2>Festival Updates</h2></div></div>
-        <p class="card-desc">Shown in the public "Festival Updates" feed, newest first.</p>
+        <div class="card-head"><div class="sksfa-card-head-left">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div><h2>New Update</h2><p class="sksfa-card-sub">Appears at the top of the public feed as soon as you add it.</p></div>
+        </div></div>
         <div class="grid2">
           <div><label>Date label</label><input id="uDate" type="text" placeholder="e.g. Now Open · 16 Sept 2026"></div>
           <div><label>Title</label><input id="uTitle" type="text" placeholder="e.g. Entries Now Open"></div>
@@ -464,7 +465,13 @@
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
           Add update
         </button>
-        <div id="updatesList" style="margin-top:14px;"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="sksfa-card-head-left">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div><h2>Published Updates</h2><p class="sksfa-card-sub">Newest first, exactly as visitors see them.</p></div>
+        </div></div>
+        <div id="updatesList"></div>
       </div>
     </div>
 
@@ -476,8 +483,10 @@
         <p class="sksfa-page-desc">Generate direct links that bypass the registration gate.</p>
       </div>
       <div class="card">
-        <div class="card-head"><div class="sksfa-card-head-left"><h2>Direct Submission Links</h2></div></div>
-        <p class="card-desc">Unique links that bypass registration gate. Each link tracks source in entries.</p>
+        <div class="card-head"><div class="sksfa-card-head-left">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10 14a3.5 3.5 0 005 0l3-3a3.5 3.5 0 00-5-5l-1.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M14 10a3.5 3.5 0 00-5 0l-3 3a3.5 3.5 0 005 5l1.5-1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div><h2>Create Link</h2><p class="sksfa-card-sub">Each link works even when registration is closed, and entries record which link was used.</p></div>
+        </div></div>
         <div class="grid2">
           <div><label>Label / Partner name</label><input id="lkLabel" type="text" placeholder="e.g. Film School Bangalore"></div>
           <div><label>Max uses (0 = unlimited)</label><input id="lkMaxUses" type="number" min="0" value="0"></div>
@@ -488,7 +497,13 @@
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M5.5 8.5a3 3 0 004.24 0l2-2a3 3 0 00-4.24-4.24l-1 1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M8.5 5.5a3 3 0 00-4.24 0l-2 2a3 3 0 004.24 4.24l1-1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
           Generate Link
         </button>
-        <div id="linksList" style="margin-top:18px;"></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="sksfa-card-head-left">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div><h2>All Links</h2><p class="sksfa-card-sub">Revoked and expired links stay here for your records.</p></div>
+        </div></div>
+        <div id="linksList"></div>
       </div>
     </div>
 
