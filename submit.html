@@ -9,7 +9,7 @@
 <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="assets/css/ui-components.css">
-<link rel="stylesheet" href="assets/css/submit.css">
+<link rel="stylesheet" href="assets/css/submit.css?v=2">
 </head>
 <body class="sksfa-submit">
 
@@ -170,6 +170,17 @@
                 <option value="Campus">Campus</option>
               </select>
             </div>
+            <div class="field campus-proof-group" id="campusProofGroup" hidden>
+                <label for="campusProofInput">Campus Category Verification <span class="req">*</span></label>
+                <p class="campus-proof-help">Please upload a valid proof of your current student status, such as a college/university ID card or an official verification letter from your institution.</p>
+                <input type="file" id="campusProofInput" class="campus-proof-input" accept=".pdf,.jpg,.jpeg,application/pdf,image/jpeg">
+                <label class="campus-proof-pick" for="campusProofInput">
+                    <span class="campus-proof-pick-title" id="campusProofPickTitle">Choose file</span>
+                    <span class="campus-proof-pick-sub">PDF or JPG · max 5 MB</span>
+                </label>
+                <p class="campus-proof-status" id="campusProofStatus" role="status" aria-live="polite"></p>
+                <p class="campus-proof-note">Required for Campus Category submissions. Your document is stored privately and is seen only by the festival team for verification.</p>
+            </div>
           </div>
           <div class="nav-row">
             <button class="btn-back" onclick="goStep(1)">← Back</button>
@@ -306,6 +317,7 @@ function selectCategory(el) {
   document.querySelectorAll('.sksfa-submit .sksfa-cat-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   document.getElementById('category').value = el.dataset.value;
+  if (window.CampusProof) CampusProof.toggle();
 }
 
 /* Populate info panel dates from site_config (non-blocking, display only) */
@@ -336,5 +348,6 @@ function selectCategory(el) {
 </script>
 
 <script src="assets/js/ui-components.js"></script>
-<script src="assets/js/submit.js"></script>
+<script src="assets/js/campus-proof.js?v=1"></script>
+<script src="assets/js/submit.js?v=2"></script>
 </html>
