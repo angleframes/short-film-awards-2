@@ -2570,3 +2570,81 @@ html { scroll-padding-top: 130px; }
 }
 .sksfa-admin .d-copy { align-items: flex-start; }
 .sksfa-admin .d-copy code { white-space: normal; word-break: break-all; overflow: visible; }
+
+/* ════════════════════════════════════════════════════════
+   CERTIFICATES (v12)
+   ════════════════════════════════════════════════════════ */
+.sksfa-admin .cert-row-btn.is-award { color: #ffd76a; border-color: rgba(255,215,0,0.35); }
+.sksfa-admin .cert-row-btn.is-award:hover { background: rgba(255,215,0,0.1); color: #ffe38f; }
+.sksfa-admin td .btn-xs + .btn-xs { margin-left: 4px; }
+
+.sksfa-admin .cert-list { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.sksfa-admin .cert-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+  border-left: 3px solid transparent;
+}
+.sksfa-admin .cert-item:first-child { border-top: 0; }
+.sksfa-admin .cert-item.is-silver { border-left-color: #b9bcc2; }
+.sksfa-admin .cert-item.is-gold { border-left-color: #d9b44a; background: rgba(255,215,0,0.035); }
+.sksfa-admin .cert-item-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sksfa-admin .cert-item-title { font-size: 13.5px; font-weight: 500; color: #eaeaea; }
+.sksfa-admin .cert-item-sub { font-size: 12px; color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sksfa-admin .cert-item-actions { display: flex; gap: 6px; }
+.sksfa-admin .cert-note { color: var(--text-3); font-size: 12.5px; margin: 10px 0 0; line-height: 1.55; }
+
+.sksfa-admin .cert-tpl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+.sksfa-admin .cert-tpl-card { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface-2); }
+.sksfa-admin .cert-tpl-card.is-silver { border-top: 3px solid #b9bcc2; }
+.sksfa-admin .cert-tpl-card.is-gold { border-top: 3px solid #d9b44a; }
+.sksfa-admin .cert-tpl-thumb {
+  aspect-ratio: 297 / 210;
+  background: #0c0c0c;
+  display: flex; align-items: center; justify-content: center;
+  border-bottom: 1px solid var(--line);
+}
+.sksfa-admin .cert-tpl-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sksfa-admin .cert-tpl-empty { color: var(--text-3); font-size: 12.5px; padding: 12px; text-align: center; }
+.sksfa-admin .cert-tpl-body { padding: 16px; }
+.sksfa-admin .cert-tpl-title { font-weight: 600; font-size: 14px; color: #fff; }
+.sksfa-admin .cert-tpl-meta { font-size: 12px; color: var(--text-3); margin: 3px 0 12px; word-break: break-all; }
+.sksfa-admin .cert-tpl-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.sksfa-admin .cert-upload-btn { cursor: pointer; }
+.sksfa-admin .cert-warn { border-color: rgba(229,83,75,0.45); color: #f1b4ae; }
+.sksfa-admin .cert-check { display: flex; align-items: center; gap: 10px; text-transform: none; letter-spacing: 0; font-size: 13px; color: #d4d4d4; margin: 0 0 16px; }
+.sksfa-admin .cert-check input { width: 16px; height: 16px; margin: 0; }
+.sksfa-admin .cert-adv { border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; }
+.sksfa-admin .cert-adv summary { cursor: pointer; font-weight: 600; font-size: 13px; color: #e2e2e2; }
+.sksfa-admin .cert-adv[open] summary { margin-bottom: 10px; }
+.sksfa-admin .cert-adv textarea { min-height: 64px; margin-bottom: 12px; }
+
+.cert-preview-overlay {
+  position: fixed; inset: 0; z-index: 400;
+  background: rgba(0,0,0,0.78);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.cert-preview-overlay.open { display: flex; }
+.cert-preview-box {
+  width: min(1100px, 100%); max-height: calc(100vh - 40px); overflow: auto;
+  background: #111; border: 1px solid rgba(255,255,255,0.14); border-radius: 14px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #e8e8e8;
+}
+.cert-preview-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); flex-wrap: wrap; }
+.cert-preview-eyebrow { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #6b6b6b; }
+.cert-preview-head h3 { margin: 2px 0 0; font-size: 16px; color: #fff; }
+.cert-preview-actions { display: flex; gap: 8px; }
+.cert-preview-stage { padding: 20px; position: relative; }
+.cert-preview-stage img { width: 100%; display: block; border-radius: 6px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
+.cert-preview-stage img:not([src]) { display: none; }
+.cert-preview-loading { color: #8a8a8a; padding: 60px 0; text-align: center; }
+
+@media (max-width: 640px) {
+  .sksfa-admin .cert-item { grid-template-columns: 1fr; }
+  .sksfa-admin .cert-tpl-grid { grid-template-columns: 1fr; }
+}
+.sksfa-admin label.cert-upload-btn { text-transform: none; letter-spacing: 0; font-size: 13px; color: #000; margin: 0; display: inline-flex; align-items: center; }
