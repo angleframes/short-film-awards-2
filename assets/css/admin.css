@@ -2333,3 +2333,131 @@ html { scroll-padding-top: 132px; }
   .sksfa-admin .topbar-inner { gap: 8px; padding: 0 14px; }
   .sksfa-admin .stats { grid-template-columns: 1fr 1fr; }
 }
+
+/* ════════════════════════════════════════════════════════
+   HEADER + TAB BAR REFRESH (v10)
+   ════════════════════════════════════════════════════════ */
+.sksfa-admin .topbar { background: rgba(9,9,9,0.92); border-bottom-color: var(--line); }
+.sksfa-admin .topbar-inner { height: 64px; gap: 10px; }
+.sksfa-admin .sksfa-brand-wrap { gap: 14px; }
+.sksfa-admin .sksfa-logo { height: 34px; padding-right: 14px; border-right: 1px solid var(--line); }
+.sksfa-admin .brand { font-size: 14px; letter-spacing: -0.1px; }
+.sksfa-admin .brand small { color: var(--text-3); font-size: 9.5px; letter-spacing: 1.6px; margin-top: 3px; }
+
+/* Shared height for every header control */
+.sksfa-admin .topbar .top-badge,
+.sksfa-admin .topbar .top-btn,
+.sksfa-admin .topbar .user-chip { height: 36px; box-sizing: border-box; }
+
+/* Registration status pill */
+.sksfa-admin .top-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px 0 12px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: #d4d4d4;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--line-strong);
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.sksfa-admin .top-badge::before {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #777;
+  flex-shrink: 0;
+}
+.sksfa-admin .top-badge:hover { background: rgba(255,255,255,0.09); }
+.sksfa-admin .top-badge.is-open { color: #bfe8cb; border-color: rgba(111,207,138,0.35); background: rgba(111,207,138,0.08); }
+.sksfa-admin .top-badge.is-open::before { background: #6fcf8a; box-shadow: 0 0 0 3px rgba(111,207,138,0.18); }
+.sksfa-admin .top-badge.is-closed { color: #f1b4ae; border-color: rgba(229,83,75,0.35); background: rgba(229,83,75,0.08); }
+.sksfa-admin .top-badge.is-closed::before { background: #e5534b; box-shadow: 0 0 0 3px rgba(229,83,75,0.18); }
+.sksfa-admin .top-badge:focus-visible { outline: 2px solid rgba(255,255,255,0.6); outline-offset: 2px; }
+
+.sksfa-admin .top-btn { display: inline-flex; align-items: center; gap: 7px; padding: 0 14px; border-radius: 999px; font-size: 12.5px; text-decoration: none; }
+
+/* Signed-in user chip with log-out */
+.sksfa-admin .user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px 0 4px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.03);
+  min-width: 0;
+}
+.sksfa-admin .user-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; color: #000;
+  font-size: 12px; font-weight: 700;
+  flex-shrink: 0;
+}
+.sksfa-admin .user-email {
+  font-size: 12px;
+  color: var(--text-2);
+  max-width: 190px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sksfa-admin .user-logout {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.sksfa-admin .user-logout:hover { background: rgba(229,83,75,0.14); color: #ff6b62; }
+.sksfa-admin .user-logout:focus-visible { outline: 2px solid rgba(255,255,255,0.6); outline-offset: 1px; }
+
+/* Tab bar */
+.sksfa-admin .tab-bar { top: 64px; background: rgba(9,9,9,0.9); border-bottom-color: var(--line); }
+.sksfa-admin .tab-bar-inner { gap: 2px; padding-top: 6px; padding-bottom: 6px; }
+.sksfa-admin .tab-btn {
+  height: 38px;
+  padding: 0 14px;
+  gap: 8px;
+  border-bottom: 0;
+  border-radius: 999px;
+  color: #8a8a8a;
+  font-size: 13px;
+  font-weight: 500;
+  transition: color .15s, background .15s;
+}
+.sksfa-admin .tab-btn:hover { color: #e5e5e5; background: rgba(255,255,255,0.05); }
+.sksfa-admin .tab-btn.active { color: #000; background: #fff; font-weight: 600; border-bottom: 0; }
+.sksfa-admin .tab-btn.active svg { opacity: 1; }
+html { scroll-padding-top: 130px; }
+.sksfa-admin .card { scroll-margin-top: 130px; }
+
+@media (max-width: 900px) {
+  .sksfa-admin .user-email { display: none; }
+  .sksfa-admin .user-chip { padding: 0 3px; }
+}
+@media (max-width: 640px) {
+  .sksfa-admin .topbar-inner { height: 58px; }
+  .sksfa-admin .tab-bar { top: 58px; }
+  .sksfa-admin .sksfa-logo { padding-right: 0; border-right: 0; height: 30px; }
+  .sksfa-admin .top-btn span { display: none; }
+  .sksfa-admin .top-btn { padding: 0 11px; }
+  .sksfa-admin .top-badge { padding: 0 11px 0 10px; font-size: 11px; }
+  .sksfa-admin .tab-btn { height: 34px; padding: 0 12px; font-size: 12px; }
+}
+@media (max-width: 420px) {
+  .sksfa-admin .user-avatar { display: none; }
+  .sksfa-admin .user-chip { padding: 0 3px; }
+  .sksfa-admin .topbar-inner { gap: 6px; padding: 0 12px; }
+  .sksfa-admin .sksfa-logo { height: 26px; }
+}
