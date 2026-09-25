@@ -1099,6 +1099,7 @@
             privacy:    { title: 'Privacy Policy',          eyebrow: 'Data & Privacy',              desc: 'How we collect, use and protect your personal information.' },
             terms:      { title: 'Terms & Conditions',      eyebrow: 'Legal',                       desc: 'The terms governing your participation in the festival.' },
             refunds:    { title: 'Refunds & Cancellations', eyebrow: 'Refund Policy',               desc: 'Understand our refund policy and the circumstances under which refunds may apply.' },
+            faq:        { title: 'Frequently Asked Questions', eyebrow: 'FAQ',                    desc: 'Answers to common questions about eligibility, submission, fees, subtitles, multiple entries and awards.' },
         };
 
         function switchInfoTab(tabId) {
@@ -1755,10 +1756,45 @@
             location.reload(); 
         }
 
-        // Deep links from standalone pages (e.g. /faq) into homepage modals
-        window.addEventListener('load', function () {
+        // Deep links (e.g. /#faq) into homepage modals
+        function openModalFromHash() {
             var h = location.hash;
-            if (h === '#rules') toggleRulesModal(true);
+            if (h === '#rules') { closeInfoModal(); toggleRulesModal(true); }
             else if (h === '#how-to-submit') openInfoModal('submit');
             else if (h === '#updates') openInfoModal('updates');
-        });
+            else if (h === '#faq') openInfoModal('faq');
+        }
+        window.addEventListener('load', openModalFromHash);
+        window.addEventListener('hashchange', openModalFromHash);
+
+        // FAQ accordion (single-open) + in-modal links
+        (function initFaqAccordion() {
+            var root = document.getElementById('faqAccordion');
+            if (!root) return;
+            root.addEventListener('click', function (e) {
+                var link = e.target.closest('a[data-faq-go]');
+                if (link) {
+                    e.preventDefault();
+                    var go = link.dataset.faqGo;
+                    if (go === 'rules') { closeInfoModal(); toggleRulesModal(true); }
+                    else if (go.indexOf('section-') === 0) {
+                        closeInfoModal();
+                        var el = document.getElementById(go);
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    } else switchInfoTab(go);
+                    return;
+                }
+                var btn = e.target.closest('.faq-q');
+                if (!btn) return;
+                var item = btn.closest('.faq-item');
+                var opening = !item.classList.contains('open');
+                root.querySelectorAll('.faq-item.open').forEach(function (i) {
+                    i.classList.remove('open');
+                    i.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+                });
+                if (opening) {
+                    item.classList.add('open');
+                    btn.setAttribute('aria-expanded', 'true');
+                }
+            });
+        })();
