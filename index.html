@@ -92,7 +92,7 @@
     </script>
 
     <link rel="stylesheet" href="assets/css/ui-components.css">
-    <link rel="stylesheet" href="assets/css/site.css?v=7">
+    <link rel="stylesheet" href="assets/css/site.css?v=8">
 </head>
 <body>
 
@@ -135,7 +135,7 @@
                     <a onclick="selectMoreItem('guidelines')">Festival Guidelines</a>
                     <a onclick="selectMoreItem('updates')">Festival Updates</a>
                     <a onclick="selectMoreItem('jury')">Jury Panel</a>
-                    <a href="/faq">FAQ</a>
+                    <a href="/#faq" onclick="selectMoreItem('faq');return false;">FAQ</a>
                     <a href="privacy.html" onclick="selectMoreItem('privacy');return false;">Privacy Policy</a>
                     <a href="terms.html" onclick="selectMoreItem('terms');return false;">Terms &amp; Conditions</a>
                     <a href="refund.html" onclick="selectMoreItem('refunds');return false;">Refunds &amp; Cancellations</a>
@@ -326,6 +326,8 @@
                 <span class="ims-nav-icon">📣</span>Festival Updates</button>
               <button id="infoTabBtn-jury"      class="ims-nav-btn" onclick="switchInfoTab('jury')">
                 <span class="ims-nav-icon">🎬</span>Jury Panel</button>
+              <button id="infoTabBtn-faq"       class="ims-nav-btn" onclick="switchInfoTab('faq')">
+                <span class="ims-nav-icon">?</span>FAQ</button>
               <button id="infoTabBtn-privacy"   class="ims-nav-btn" onclick="switchInfoTab('privacy')">
                 <span class="ims-nav-icon">🔐</span>Privacy Policy</button>
               <button id="infoTabBtn-terms"     class="ims-nav-btn" onclick="switchInfoTab('terms')">
@@ -390,6 +392,68 @@
             <div id="infoTabPane-jury" class="info-tab-pane">
                 <div class="jury-panel-grid" id="juryPanelGrid"></div>
                 <p class="jury-panel-note">Our jury panel for this edition is being finalized and will be announced soon. Follow our social channels for the official reveal.</p>
+            </div>
+
+            <!-- FAQ -->
+            <div id="infoTabPane-faq" class="info-tab-pane">
+                <div class="faq-list" id="faqAccordion">
+                    <div class="faq-item">
+                        <h3><button type="button" class="faq-q" id="faqQ1" aria-expanded="false" aria-controls="faqA1">What is Sharankrishna Short Film Awards?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+                        <div class="faq-a" id="faqA1" role="region" aria-labelledby="faqQ1"><div class="faq-a-inner"><p>Sharankrishna Short Film Awards is a short film competition honoring the legacy of Sharankrishna, open to filmmakers of all nationalities. The festival runs a General Track open to all filmmakers and a Campus Track for college students, hosted by Angle Frames in association with JAIN (Deemed-to-be University), Kochi. <a href="#section-story" data-faq-go="section-story">Read the story behind the awards</a>.</p></div></div>
+                    </div>
+                    <div class="faq-item">
+                        <h3><button type="button" class="faq-q" id="faqQ2" aria-expanded="false" aria-controls="faqA2">Who is eligible to submit a short film?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+                        <div class="faq-a" id="faqA2" role="region" aria-labelledby="faqQ2"><div class="faq-a-inner"><p>The General Track is open to filmmakers of all nationalities. Participants must be at least 18 years of age, or have the consent of a parent or guardian if under 18. The Campus Track is for students and requires proof of active institutional enrollment (a Student ID card scan). Full requirements are listed in the <a href="#rules" data-faq-go="rules">Rules &amp; Guidelines</a>.</p></div></div>
+                    </div>
+                    <div class="faq-item">
+                        <h3><button type="button" class="faq-q" id="faqQ3" aria-expanded="false" aria-controls="faqA3">How do I submit a short film to Sharankrishna Short Film Awards?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+                        <div class="faq-a" id="faqA3" role="region" aria-labelledby="faqQ3"><div class="faq-a-inner"><p>Entries are submitted online through the registration form on this website. You enter your details, your film's title, category, runtime and a working YouTube or Drive link, and your cast &amp; crew credits, then review your entry and pay the entry fee securely online. A step-by-step walkthrough is in <a href="#how-to-submit" data-faq-go="submit">How To Submit</a>, or you can <a href="#section-registration" data-faq-go="section-registration">start your submission</a> now.</p></div></div>
+                    </div>
+                    <div class="faq-item">
+                        <h3><button type="button" class="faq-q" id="faqQ4" aria-expanded="false" aria-controls="faqA4">What is the submission deadline for 2026?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+                        <div class="faq-a" id="faqA4" role="region" aria-labelledby="faqQ4"><div class="faq-a-inner"><p>Entries close on December 31, 2026. Filmmakers are encouraged to follow the steps in <a href="#how-to-submit" data-faq-go="submit">How To Submit</a> well ahead of the deadline.</p></div></div>
+                    </div>
+                    <div class="faq-item">
+                        <h3><button type="button" class="faq-q" id="faqQ5" aria-expanded="false" aria-controls="faqA5">What is the entry fee?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+                        <div class="faq-a" id="faqA5" role="region" aria-labelledby="faqQ5"><div class="faq-a-inner"><p>The entry fee is ₹1,000 per submission, paid securely online via Cashfree (UPI, cards, net banking or wallets). The fee is non-refundable once payment is confirmed — see <a href="refund.html" data-faq-go="refunds">Refunds &amp; Cancellations</a> for details.</p></div></div>
+                    </div>
+                    <div class="faq-item">
+                        <h3><button type="button" class="faq-q" id="faqQ6" aria-expanded="false" aria-controls="faqA6">What is the maximum runtime for a short film?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+                        <div class="faq-a" id="faqA6" role="region" aria-labelledby="faqQ6"><div class="faq-a-inner"><p>Films must not exceed 30 minutes, including opening and closing credits. Films must also have been completed on or after January 1, 2024. See the full <a href="#rules" data-faq-go="rules">Rules &amp; Guidelines</a>.</p></div></div>
+                    </div>
+                    <div class="faq-item">
+                        <h3><button type="button" class="faq-q" id="faqQ7" aria-expanded="false" aria-controls="faqA7">What is the difference between the General Track and Campus Track?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+                        <div class="faq-a" id="faqA7" role="region" aria-labelledby="faqQ7"><div class="faq-a-inner"><p>The General Track is open to any filmmaker. The Campus Track is reserved for currently enrolled students and requires proof of active enrollment. See the <a href="#rules" data-faq-go="rules">Rules &amp; Guidelines</a> for track-specific requirements.</p></div></div>
+                    </div>
+                    <div class="faq-item">
+                        <h3><button type="button" class="faq-q" id="faqQ8" aria-expanded="false" aria-controls="faqA8">What do winners receive?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+                        <div class="faq-a" id="faqA8" role="region" aria-labelledby="faqQ8"><div class="faq-a-inner"><p>Winners across the award categories are honoured at the Grand Function and winners' announcement on February 12, 2027. See all <a href="#section-categories" data-faq-go="section-categories">award categories</a>.</p></div></div>
+                    </div>
+                    <div class="faq-item">
+                        <h3><button type="button" class="faq-q" id="faqQ9" aria-expanded="false" aria-controls="faqA9">Can I submit more than one short film?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+                        <div class="faq-a" id="faqA9" role="region" aria-labelledby="faqQ9"><div class="faq-a-inner"><p>Yes. Filmmakers can submit multiple short films. Each film must be submitted as a separate entry, and the ₹1,000 entry fee must be paid separately for each submission. See <a href="#how-to-submit" data-faq-go="submit">How To Submit</a> for the submission steps.</p></div></div>
+                    </div>
+                    <div class="faq-item">
+                        <h3><button type="button" class="faq-q" id="faqQ10" aria-expanded="false" aria-controls="faqA10">Does my film need English subtitles?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+                        <div class="faq-a" id="faqA10" role="region" aria-labelledby="faqQ10"><div class="faq-a-inner"><p>Yes, if your film is in any language other than Malayalam. Films in any language other than Malayalam must include English subtitles. This allows the jury to understand and evaluate the film properly. Malayalam-language films do not require English subtitles. See the <a href="#rules" data-faq-go="rules">Rules &amp; Guidelines</a> for the other submission requirements.</p></div></div>
+                    </div>
+                    <div class="faq-item">
+                        <h3><button type="button" class="faq-q" id="faqQ11" aria-expanded="false" aria-controls="faqA11">Who judges the submissions?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+                        <div class="faq-a" id="faqA11" role="region" aria-labelledby="faqQ11"><div class="faq-a-inner"><p>Entries are evaluated by the festival's official jury panel. Jury members will be announced in <a href="#updates" data-faq-go="updates">Festival Updates</a> and on the festival's social channels. Decisions of the jury are final.</p></div></div>
+                    </div>
+                    <div class="faq-item">
+                        <h3><button type="button" class="faq-q" id="faqQ12" aria-expanded="false" aria-controls="faqA12">When and where is the awards ceremony?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+                        <div class="faq-a" id="faqA12" role="region" aria-labelledby="faqQ12"><div class="faq-a-inner"><p>The Grand Function and winners' announcement takes place on February 12, 2027, at JAIN (Deemed-to-be University), Kochi Campus, Kerala.</p></div></div>
+                    </div>
+                    <div class="faq-item">
+                        <h3><button type="button" class="faq-q" id="faqQ13" aria-expanded="false" aria-controls="faqA13">Who owns the rights to submitted films?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+                        <div class="faq-a" id="faqA13" role="region" aria-labelledby="faqQ13"><div class="faq-a-inner"><p>Filmmakers keep ownership of their work. By submitting, you confirm that you own, or have all necessary rights and licences for, all content in the film, including footage, music and any third-party material. You grant the festival a non-exclusive, royalty-free licence to screen your film during festival events, use clips and stills for festival promotion, and include your film in festival archives. Read the full <a href="terms.html" data-faq-go="terms">Terms &amp; Conditions</a>.</p></div></div>
+                    </div>
+                    <div class="faq-item">
+                        <h3><button type="button" class="faq-q" id="faqQ14" aria-expanded="false" aria-controls="faqA14">How do I stay updated on announcements and deadline changes?<span class="faq-icon" aria-hidden="true"></span></button></h3>
+                        <div class="faq-a" id="faqA14" role="region" aria-labelledby="faqQ14"><div class="faq-a-inner"><p>Follow <a href="#updates" data-faq-go="updates">Festival Updates</a> or the festival's official channels on <a href="https://www.instagram.com/sharankrishna_shortfilm_awards/" target="_blank" rel="noopener">Instagram</a>, <a href="https://www.youtube.com/@ANGLEFRAMES" target="_blank" rel="noopener">YouTube</a> and <a href="https://www.facebook.com/share/1BRDQLmtVp/" target="_blank" rel="noopener">Facebook</a> for jury reveals, shortlist announcements and any deadline changes.</p></div></div>
+                    </div>
+                </div>
             </div>
 
             <!-- Privacy Policy -->
@@ -825,7 +889,7 @@
                 <a onclick="openInfoModal('guidelines')">Festival Guidelines</a>
                 <a onclick="openInfoModal('updates')">Festival Updates</a>
                 <a onclick="openInfoModal('jury')">Jury Panel</a>
-                <a href="/faq">FAQ</a>
+                <a href="/#faq" onclick="openInfoModal('faq');return false;">FAQ</a>
                 <a href="privacy.html" onclick="openInfoModal('privacy');return false;">Privacy Policy</a>
                 <a href="terms.html" onclick="openInfoModal('terms');return false;">Terms &amp; Conditions</a>
                 <a href="refund.html" onclick="openInfoModal('refunds');return false;">Refunds &amp; Cancellations</a>
@@ -885,10 +949,10 @@
         <div style="background:#111;color:#ccc;text-align:center;padding:32px 16px;font-family:system-ui,sans-serif;">
             <h2 style="color:#fff;margin-bottom:12px;">Sharankrishna Short Film Awards 2026</h2>
             <p>This site requires JavaScript for the full experience — award categories, gallery, film submission, and payment.</p>
-            <p style="margin-top:16px;"><a href="/faq" style="color:#8ab4f8;">FAQ</a> · <a href="privacy.html" style="color:#8ab4f8;">Privacy Policy</a> · <a href="terms.html" style="color:#8ab4f8;">Terms</a> · <a href="refund.html" style="color:#8ab4f8;">Refunds</a></p>
+            <p style="margin-top:16px;"><a href="/#faq" style="color:#8ab4f8;">FAQ</a> · <a href="privacy.html" style="color:#8ab4f8;">Privacy Policy</a> · <a href="terms.html" style="color:#8ab4f8;">Terms</a> · <a href="refund.html" style="color:#8ab4f8;">Refunds</a></p>
         </div>
     </noscript>
     <script src="assets/js/ui-components.js"></script>
-    <script src="assets/js/site.js?v=9"></script>
+    <script src="assets/js/site.js?v=10"></script>
 </body>
 </html>
