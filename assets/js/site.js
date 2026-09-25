@@ -8,13 +8,21 @@
             function wrapChars(node) {
                 if (node.nodeType === Node.TEXT_NODE) {
                     const frag = document.createDocumentFragment();
-                    node.textContent.split('').forEach(ch => {
-                        const span = document.createElement('span');
-                        span.className = 'ta-char';
-                        span.textContent = ch;
-                        span.style.transitionDelay = (charIndex * 0.03) + 's';
-                        charIndex++;
-                        frag.appendChild(span);
+                    // Letters grouped per word so lines only break at spaces
+                    node.textContent.split(/(\s+)/).forEach(part => {
+                        if (!part) return;
+                        if (/^\s+$/.test(part)) { frag.appendChild(document.createTextNode(part)); charIndex++; return; }
+                        const word = document.createElement('span');
+                        word.className = 'ta-word';
+                        part.split('').forEach(ch => {
+                            const span = document.createElement('span');
+                            span.className = 'ta-char';
+                            span.textContent = ch;
+                            span.style.transitionDelay = (charIndex * 0.03) + 's';
+                            charIndex++;
+                            word.appendChild(span);
+                        });
+                        frag.appendChild(word);
                     });
                     node.replaceWith(frag);
                 } else if (node.nodeType === Node.ELEMENT_NODE) {
@@ -388,9 +396,9 @@
 
         // ===== BORDER GLOW ENGINE (exact port from glow component) =====
         const GLOW_CONFIG = {
-            glowColor: '220 80 70',         // blue-ish for film theme
-            glowIntensity: 1.0,
-            colors: ['#c084fc', '#38bdf8', '#f472b6'],
+            glowColor: '0 0 88',            // neutral light grey (monochrome)
+            glowIntensity: 0.8,
+            colors: ['#ffffff', '#b8b8b8', '#6e6e6e'],
             edgeSensitivity: 30
         };
 
@@ -1746,3 +1754,11 @@
         function resetPortalView() {
             location.reload(); 
         }
+
+        // Deep links from standalone pages (e.g. /faq) into homepage modals
+        window.addEventListener('load', function () {
+            var h = location.hash;
+            if (h === '#rules') toggleRulesModal(true);
+            else if (h === '#how-to-submit') openInfoModal('submit');
+            else if (h === '#updates') openInfoModal('updates');
+        });
