@@ -92,7 +92,7 @@
     </script>
 
     <link rel="stylesheet" href="assets/css/ui-components.css">
-    <link rel="stylesheet" href="assets/css/site.css?v=8">
+    <link rel="stylesheet" href="assets/css/site.css?v=9">
 </head>
 <body>
 
@@ -288,7 +288,7 @@
                 </div>
                 <div class="rule-item-box glow-card"><span class="edge-light"></span>
                     <h4>2. Eligibility & Timeline</h4>
-                    <p>Films must have been completed on or after January 1, 2024. Works-in-progress are not accepted.</p>
+                    <p>Films must have been produced between January 1, 2025 and December 31, 2026. Works-in-progress are not accepted.</p>
                 </div>
                 <div class="rule-item-box glow-card"><span class="edge-light"></span>
                     <h4>3. Original Content & Copyright</h4>
@@ -296,7 +296,7 @@
                 </div>
                 <div class="rule-item-box glow-card"><span class="edge-light"></span>
                     <h4>4. Campus Track Requirements</h4>
-                    <p>Submissions for the student division require proof of active institutional enrollment (Student ID Card Scan upload validation).</p>
+                    <p>Campus Track submissions require one valid proof of current student status — a college/university ID card, an official institution verification document, or an official letter on the institution's letterhead — uploaded as a PDF or JPG (max 5 MB) in the submission form.</p>
                 </div>
                 <div class="rule-item-box glow-card"><span class="edge-light"></span>
                     <h4>5. Review Panel Verdicts</h4>
@@ -403,7 +403,7 @@
                     </div>
                     <div class="faq-item">
                         <h3><button type="button" class="faq-q" id="faqQ2" aria-expanded="false" aria-controls="faqA2">Who is eligible to submit a short film?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA2" role="region" aria-labelledby="faqQ2"><div class="faq-a-inner"><p>The General Track is open to filmmakers of all nationalities. Participants must be at least 18 years of age, or have the consent of a parent or guardian if under 18. The Campus Track is for students and requires proof of active institutional enrollment (a Student ID card scan). Full requirements are listed in the <a href="#rules" data-faq-go="rules">Rules &amp; Guidelines</a>.</p></div></div>
+                        <div class="faq-a" id="faqA2" role="region" aria-labelledby="faqQ2"><div class="faq-a-inner"><p>The General Track is open to filmmakers of all nationalities. Participants must be at least 18 years of age, or have the consent of a parent or guardian if under 18. The Campus Track is for students and requires one valid proof of current student status (a college/university ID card, an official institution verification document, or a letter on the institution's letterhead), uploaded as a PDF or JPG in the submission form. Full requirements are listed in the <a href="#rules" data-faq-go="rules">Rules &amp; Guidelines</a>.</p></div></div>
                     </div>
                     <div class="faq-item">
                         <h3><button type="button" class="faq-q" id="faqQ3" aria-expanded="false" aria-controls="faqA3">How do I submit a short film to Sharankrishna Short Film Awards?<span class="faq-icon" aria-hidden="true"></span></button></h3>
@@ -419,11 +419,11 @@
                     </div>
                     <div class="faq-item">
                         <h3><button type="button" class="faq-q" id="faqQ6" aria-expanded="false" aria-controls="faqA6">What is the maximum runtime for a short film?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA6" role="region" aria-labelledby="faqQ6"><div class="faq-a-inner"><p>Films must not exceed 30 minutes, including opening and closing credits. Films must also have been completed on or after January 1, 2024. See the full <a href="#rules" data-faq-go="rules">Rules &amp; Guidelines</a>.</p></div></div>
+                        <div class="faq-a" id="faqA6" role="region" aria-labelledby="faqQ6"><div class="faq-a-inner"><p>Films must not exceed 30 minutes, including opening and closing credits. Films must have been produced between January 1, 2025 and December 31, 2026. See the full <a href="#rules" data-faq-go="rules">Rules &amp; Guidelines</a>.</p></div></div>
                     </div>
                     <div class="faq-item">
                         <h3><button type="button" class="faq-q" id="faqQ7" aria-expanded="false" aria-controls="faqA7">What is the difference between the General Track and Campus Track?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA7" role="region" aria-labelledby="faqQ7"><div class="faq-a-inner"><p>The General Track is open to any filmmaker. The Campus Track is reserved for currently enrolled students and requires proof of active enrollment. See the <a href="#rules" data-faq-go="rules">Rules &amp; Guidelines</a> for track-specific requirements.</p></div></div>
+                        <div class="faq-a" id="faqA7" role="region" aria-labelledby="faqQ7"><div class="faq-a-inner"><p>The General Track is open to any filmmaker. The Campus Track is reserved for currently enrolled students and requires proof of current student status. See the <a href="#rules" data-faq-go="rules">Rules &amp; Guidelines</a> for track-specific requirements.</p></div></div>
                     </div>
                     <div class="faq-item">
                         <h3><button type="button" class="faq-q" id="faqQ8" aria-expanded="false" aria-controls="faqA8">What do winners receive?<span class="faq-icon" aria-hidden="true"></span></button></h3>
@@ -461,7 +461,7 @@
                 <div class="rules-list-content">
                     <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>Information We Collect</h4>
-                        <p>When you register a film entry, we collect details you provide such as your name, email, phone number, city, film and crew information, and payment reference details.</p>
+                        <p>When you register a film entry, we collect details you provide such as your name, email, phone number, city, film and crew information, payment reference details, and — for Campus Track entries — a student verification document, which is stored privately and used only to confirm eligibility.</p>
                     </div>
                     <div class="rule-item-box glow-card"><span class="edge-light"></span>
                         <h4>How We Use Your Information</h4>
@@ -732,6 +732,17 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="form-group campus-proof-group" id="campusProofGroup" hidden>
+                                    <label for="campusProofInput">Campus Category Verification *</label>
+                                    <p class="campus-proof-help">Please upload a valid proof of your current student status, such as a college/university ID card or an official verification letter from your institution.</p>
+                                    <input type="file" id="campusProofInput" class="campus-proof-input" accept=".pdf,.jpg,.jpeg,application/pdf,image/jpeg">
+                                    <label class="campus-proof-pick" for="campusProofInput">
+                                        <span class="campus-proof-pick-title" id="campusProofPickTitle">Choose file</span>
+                                        <span class="campus-proof-pick-sub">PDF or JPG · max 5 MB</span>
+                                    </label>
+                                    <p class="campus-proof-status" id="campusProofStatus" role="status" aria-live="polite"></p>
+                                    <p class="campus-proof-note">Required for Campus Category submissions. Your document is stored privately and is seen only by the festival team for verification.</p>
+                                </div>
                                 <div class="form-group">
                                     <label for="filmLink">Short Film Link (YouTube / Drive) *</label>
                                     <input type="url" id="filmLink" placeholder="https://youtube.com/... or cloud link">
@@ -953,6 +964,7 @@
         </div>
     </noscript>
     <script src="assets/js/ui-components.js"></script>
-    <script src="assets/js/site.js?v=10"></script>
+    <script src="assets/js/campus-proof.js?v=1"></script>
+    <script src="assets/js/site.js?v=11"></script>
 </body>
 </html>
