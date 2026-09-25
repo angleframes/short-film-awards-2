@@ -2461,3 +2461,112 @@ html { scroll-padding-top: 130px; }
   .sksfa-admin .topbar-inner { gap: 6px; padding: 0 12px; }
   .sksfa-admin .sksfa-logo { height: 26px; }
 }
+
+/* ════════════════════════════════════════════════════════
+   ENTRY DETAILS MODAL REFRESH (v11)
+   ════════════════════════════════════════════════════════ */
+.sksfa-admin .em-section { padding: 22px 0; border-bottom-color: var(--line); }
+.sksfa-admin .em-section-title { color: var(--text-3); font-size: 10px; margin-bottom: 16px; }
+.sksfa-admin .em-section-title svg { color: var(--text-3); }
+
+/* Key/value rows — fixed label column, labels may wrap */
+.sksfa-admin .d-row {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 16px;
+  align-items: baseline;
+  margin-bottom: 10px;
+  font-size: 13.5px;
+}
+.sksfa-admin .d-key { min-width: 0; color: var(--text-3); font-size: 10.5px; letter-spacing: 0.8px; line-height: 1.4; }
+.sksfa-admin .d-val { color: #e2e2e2; }
+.sksfa-admin .d-val a { color: #e2e2e2; text-decoration: underline; text-decoration-color: rgba(255,255,255,0.3); text-underline-offset: 3px; }
+.sksfa-admin .d-val a:hover { text-decoration-color: #fff; }
+.sksfa-admin .d-dim { color: var(--text-3); font-size: 12px; margin-left: 2px; }
+.sksfa-admin .d-ok { color: #6fcf8a; }
+.sksfa-admin .d-warn { color: #e0b25a; }
+.sksfa-admin .d-copy { display: inline-flex; align-items: center; gap: 8px; max-width: 100%; }
+.sksfa-admin .d-copy code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  color: #d4d4d4;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 3px 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.sksfa-admin .copy-btn {
+  flex-shrink: 0;
+  height: 24px;
+  padding: 0 9px;
+  font: inherit;
+  font-size: 11px;
+  color: var(--text-2);
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s, background .15s;
+}
+.sksfa-admin .copy-btn:hover { color: #fff; border-color: rgba(255,255,255,0.35); }
+.sksfa-admin .copy-btn.is-done { color: #6fcf8a; border-color: rgba(111,207,138,0.4); }
+
+/* Award evaluation — one clean row per category */
+.sksfa-admin .em-eval-summary {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  text-transform: none;
+  color: var(--text-2);
+}
+.sksfa-admin .eval-list {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.sksfa-admin .eval-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 11px 16px;
+  border-top: 1px solid var(--line);
+  transition: background .12s;
+}
+.sksfa-admin .eval-row:first-child { border-top: 0; }
+.sksfa-admin .eval-row:hover { background: rgba(255,255,255,0.025); }
+.sksfa-admin .eval-row.is-winner { background: rgba(255,215,0,0.05); }
+.sksfa-admin .eval-row.is-shortlisted,
+.sksfa-admin .eval-row.is-selected { background: rgba(255,255,255,0.03); }
+.sksfa-admin .eval-label { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sksfa-admin .eval-cat { font-size: 13.5px; font-weight: 500; color: #eaeaea; }
+.sksfa-admin .eval-nominee { font-size: 12px; color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sksfa-admin .eval-btns { justify-content: flex-end; align-items: center; flex-wrap: nowrap; gap: 6px; }
+.sksfa-admin .eval-btn {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #bdbdbd;
+  border-color: var(--line-strong);
+  white-space: nowrap;
+}
+.sksfa-admin .eval-btn.shortlist:hover { color: #fff; }
+.sksfa-admin .eval-btn.winner { color: #ffd76a; border-color: rgba(255,215,0,0.35); }
+.sksfa-admin .eval-btn.winner:hover { background: rgba(255,215,0,0.1); color: #ffe38f; border-color: rgba(255,215,0,0.55); }
+.sksfa-admin .eval-status-pill { border-radius: 999px; padding: 4px 10px; letter-spacing: 0.6px; }
+.sksfa-admin .eval-status-pill.winner { background: rgba(255,215,0,0.14); color: #ffd76a; border-color: rgba(255,215,0,0.4); }
+
+@media (max-width: 640px) {
+  .sksfa-admin .d-row { grid-template-columns: 1fr; gap: 2px; margin-bottom: 12px; }
+  .sksfa-admin .eval-row { grid-template-columns: 1fr; gap: 8px; }
+  .sksfa-admin .eval-btns { justify-content: flex-start; flex-wrap: wrap; }
+  .sksfa-admin .em-eval-summary { display: none; }
+}
+.sksfa-admin .d-copy { align-items: flex-start; }
+.sksfa-admin .d-copy code { white-space: normal; word-break: break-all; overflow: visible; }
