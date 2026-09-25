@@ -1469,6 +1469,13 @@
                     }
                 }
             });
+            if (step === 2 && window.CampusProof) {
+                const campusMsg = CampusProof.check();
+                if (campusMsg) {
+                    flag = false;
+                    UI.alert(campusMsg, 'warn');
+                }
+            }
             return flag;
         }
 
@@ -1505,6 +1512,14 @@
                     matrix.appendChild(row);
                 }
             });
+
+            const campusSummary = window.CampusProof ? CampusProof.summary() : null;
+            if (campusSummary) {
+                const proofRow = document.createElement('div');
+                proofRow.className = 'review-row';
+                proofRow.innerHTML = `<span>Campus Verification</span><span>${escapeHtml(campusSummary)}</span>`;
+                matrix.appendChild(proofRow);
+            }
 
             const feeRow = document.createElement('div');
             feeRow.className = 'review-row';
@@ -1596,12 +1611,13 @@
             try {
                 // NOTE: amount and currency are enforced server-side (1000 INR).
                 // Only send customer info needed for the Cashfree order.
-                const orderResp = await backendCall({
+                const orderResp = await backendCall(Object.assign({
                     action: 'createOrder',
                     customerName: document.getElementById('applicantName').value.trim(),
                     customerEmail: document.getElementById('email').value.trim(),
-                    customerPhone: document.getElementById('phone').value.trim()
-                });
+                    customerPhone: document.getElementById('phone').value.trim(),
+                    category: document.getElementById('category').value
+                }, window.CampusProof ? CampusProof.payload() : {}));
 
                 if (!orderResp || orderResp.status !== 'success' || !orderResp.payment_session_id || !orderResp.order_id) {
                     throw new Error(orderResp && orderResp.message ? orderResp.message : 'Could not create order.');
@@ -1633,6 +1649,7 @@
                         cashfreeOrderId: orderResp.order_id
                     };
                     if (window._linkId) formSnapshot.link_id = window._linkId;
+                    if (window.CampusProof) Object.assign(formSnapshot, CampusProof.payload());
                     await backendCall(formSnapshot);
                 } catch (saveErr) {
                     console.warn('Pre-payment save failed (non-blocking):', saveErr);
@@ -1737,6 +1754,7 @@
                 paymentMethod: paymentState.paymentMethod
             };
             if (window._linkId) formData.link_id = window._linkId;
+            if (window.CampusProof) Object.assign(formData, CampusProof.payload());
 
             try {
                 showPaymentStatus('is-pending', 'Submitting your film entry…');
@@ -1766,6 +1784,14 @@
         }
         window.addEventListener('load', openModalFromHash);
         window.addEventListener('hashchange', openModalFromHash);
+
+        if (window.CampusProof) {
+            CampusProof.init({
+                selectId: 'category',
+                endpoint: APP_CONFIG.backendUrl.replace(/\/payment$/, '/campus-proof'),
+                anonKey: SUPA_ANON
+            });
+        }
 
         // FAQ accordion (single-open) + in-modal links
         (function initFaqAccordion() {
