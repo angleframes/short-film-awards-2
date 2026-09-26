@@ -199,6 +199,7 @@
                     if (cfg.awards_event_date)   PORTAL_TIMELINES.awardsEventDate   = cfg.awards_event_date;
                     if (cfg.deadline_label)      PORTAL_TIMELINES.deadlineLabelText  = cfg.deadline_label;
                     if (cfg.event_label)         PORTAL_TIMELINES.eventLabelText     = cfg.event_label;
+                    applyRecognitionConfig(cfg.recognition);
                 }
                 if (Array.isArray(galRes.data) && galRes.data.length) {
                     GALLERY_IMAGES.length = 0;
@@ -215,7 +216,8 @@
                         title: c.name.replace(/^(Best)\s+/i, '$1<br>').replace(/^(Special)\s+/i, '$1<br>').replace(/^(Campus)\s+/i, '$1<br>'),
                         emoji: '',
                         image: 'assets/icons/' + c.key + '.png?v=7',
-                        icon_svg: c.icon_svg || ''
+                        icon_svg: c.icon_svg || '',
+                        key: c.key
                     }));
                     window._awardCategoriesData = acRes.data;
                 }
@@ -283,6 +285,13 @@
                                 REGISTRATION_GATE.isOpen = !!payload.new.registration_open;
                                 evaluateRegistrationGateState();
                             }
+                            if (payload.new && 'recognition' in payload.new) {
+                                applyRecognitionConfig(payload.new.recognition);
+                                generateDynamicCategories();
+                                renderRecognition();
+                                var rgrid = document.getElementById('allCategoriesGrid');
+                                if (rgrid) { rgrid.dataset.built = ''; if (rgrid.style.display === 'flex') { rgrid.style.display = 'none'; toggleAllCategoriesInline(); } }
+                            }
                         })
                         .on('postgres_changes', { event: '*', schema: 'public', table: 'testimonials' }, () => {
                             _rtDebounced('videos', _rtRefreshVideos, 600);
@@ -298,11 +307,12 @@
                                         CATEGORY_ITEMS = acr.data.map(function(c) {
                                             return {
                                                 title: c.name.replace(/^(Best)\s+/i, '$1<br>').replace(/^(Special)\s+/i, '$1<br>').replace(/^(Campus)\s+/i, '$1<br>'),
-                                                emoji: '', image: 'assets/icons/' + c.key + '.png?v=7', icon_svg: c.icon_svg || ''
+                                                emoji: '', image: 'assets/icons/' + c.key + '.png?v=7', icon_svg: c.icon_svg || '', key: c.key
                                             };
                                         });
                                         window._awardCategoriesData = acr.data;
                                         generateDynamicCategories();
+                                        renderRecognition();
                                         var grid = document.getElementById('allCategoriesGrid');
                                         if (grid) { grid.dataset.built = ''; grid.style.display = 'none'; }
                                     }
@@ -342,6 +352,7 @@
 
             initiateTimersEngine();
             generateDynamicCategories();
+            renderRecognition();
             renderAboutCards();
             renderGallery();
             initGalleryPicker();
@@ -636,6 +647,153 @@
         });
         // ===== END SCROLL STACK ENGINE =====
 
+        /* ===== PRIZES & RECOGNITION =====
+           Defaults below; site_config.recognition (edited in Admin → Awards) overrides them.
+           Cash amounts are only shown when show_amounts is true AND a tier has an amount. */
+        const RECOGNITION_DEFAULT = {
+            show_amounts: false,
+            main: [
+                { key: 'best_campus_film', label: 'Campus Category', tiers: [
+                    { label: '1st Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' },
+                    { label: '2nd Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' }
+                ] },
+                { key: 'best_short_film', label: 'General Category', tiers: [
+                    { label: '1st Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' },
+                    { label: '2nd Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' }
+                ] }
+            ],
+            others: { benefits: ['memento', 'certificate'], byKey: {} },
+            nominee: {
+                enabled: true,
+                title: 'Angle Frames Special Award',
+                subtitle: 'Special recognition for every officially nominated entry',
+                benefits: ['memento', 'certificate'],
+                extra: []
+            }
+        };
+        let RECOGNITION = JSON.parse(JSON.stringify(RECOGNITION_DEFAULT));
+
+        function applyRecognitionConfig(saved) {
+            const base = JSON.parse(JSON.stringify(RECOGNITION_DEFAULT));
+            if (!saved || typeof saved !== 'object') { RECOGNITION = base; return; }
+            if (typeof saved.show_amounts === 'boolean') base.show_amounts = saved.show_amounts;
+            if (Array.isArray(saved.main) && saved.main.length) base.main = saved.main;
+            if (saved.others && typeof saved.others === 'object') {
+                if (Array.isArray(saved.others.benefits)) base.others.benefits = saved.others.benefits;
+                if (saved.others.byKey && typeof saved.others.byKey === 'object') base.others.byKey = saved.others.byKey;
+            }
+            if (saved.nominee && typeof saved.nominee === 'object') Object.assign(base.nominee, saved.nominee);
+            RECOGNITION = base;
+        }
+
+        const _recEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const RECOGNITION_ICONS = {
+            cash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg>',
+            memento: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3.5h8v5.5a4 4 0 01-8 0V3.5z"/><path d="M8 5.5H5.2a2.8 2.8 0 002.9 3.9M16 5.5h2.8a2.8 2.8 0 01-2.9 3.9M12 13v3.5M9 20.5h6M9.8 16.5h4.4"/></svg>',
+            certificate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12.5" rx="1.6"/><path d="M7 8h10M7 11h6"/><circle cx="16.5" cy="15.5" r="2.4"/><path d="M15.3 17.6l-.8 3 2-1 2 1-.8-3"/></svg>',
+            special: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9L12 3z"/></svg>'
+        };
+        const RECOGNITION_LABELS = { cash: 'Cash Prize', memento: 'Memento', certificate: 'Certificate' };
+
+        function recognitionBadges(benefits, opts) {
+            opts = opts || {};
+            const list = (benefits || []).slice();
+            const order = ['cash', 'memento', 'certificate'];
+            list.sort((a, b) => (order.indexOf(a) + 1 || 9) - (order.indexOf(b) + 1 || 9));
+            return '<div class="prize-badges' + (opts.small ? ' is-small' : '') + '">' + list.map(b => {
+                const known = RECOGNITION_LABELS[b];
+                let label = known || String(b);
+                if (b === 'cash' && RECOGNITION.show_amounts && opts.amount) label += ' · ' + opts.amount;
+                const icon = RECOGNITION_ICONS[b] || RECOGNITION_ICONS.special;
+                return '<span class="prize-badge prize-' + (known ? b : 'custom') + '">' + icon + '<span>' + _recEsc(label) + '</span></span>';
+            }).join('') + '</div>';
+        }
+
+        function recognitionForKey(key) {
+            const main = RECOGNITION.main.find(m => m.key === key);
+            if (main) return { main };
+            const byKey = RECOGNITION.others.byKey || {};
+            return { benefits: Array.isArray(byKey[key]) ? byKey[key] : RECOGNITION.others.benefits };
+        }
+
+        function recognitionCardHtml(key, small) {
+            const r = recognitionForKey(key);
+            if (r.main) {
+                const tiers = r.main.tiers || [];
+                const all = Array.from(new Set(tiers.flatMap(t => t.benefits || [])));
+                const tierLabel = tiers.map(t => (t.label || '').replace(/\s*prize$/i, '')).filter(Boolean).join(' & ') + (tiers.length ? ' Prize' : '');
+                return '<div class="cc-prize"><span class="cc-prize-tier">' + _recEsc(tierLabel) + '</span>' + recognitionBadges(all, { small: true }) + '</div>';
+            }
+            return '<div class="cc-prize">' + recognitionBadges(r.benefits, { small: true }) + '</div>';
+        }
+
+        function renderRecognition() {
+            const box = document.getElementById('recognitionBlock');
+            if (!box) return;
+            const cats = (window._awardCategoriesData || []).filter(c => c.active !== false);
+            const mainKeys = RECOGNITION.main.map(m => m.key);
+            const others = cats.filter(c => mainKeys.indexOf(c.key) === -1);
+            const nameOf = key => { const c = cats.find(x => x.key === key); return c ? c.name : ''; };
+
+            const mainCards = RECOGNITION.main.map(m => `
+                <article class="rec-card rec-main">
+                    <span class="edge-light"></span>
+                    <div class="rec-card-head">
+                        <span class="rec-eyebrow">${_recEsc(nameOf(m.key) || 'Main Award')}</span>
+                        <h3 class="rec-title">${_recEsc(m.label)}</h3>
+                    </div>
+                    <div class="rec-tiers">
+                        ${(m.tiers || []).map((t, i) => `
+                            <div class="rec-tier">
+                                <span class="rec-medal ${i === 0 ? 'is-first' : i === 1 ? 'is-second' : ''}" aria-hidden="true">${i + 1}</span>
+                                <div class="rec-tier-body">
+                                    <span class="rec-tier-label">${_recEsc(t.label)}</span>
+                                    ${recognitionBadges(t.benefits, { amount: t.amount })}
+                                </div>
+                            </div>`).join('')}
+                    </div>
+                </article>`).join('');
+
+            const byKey = RECOGNITION.others.byKey || {};
+            const special = others.filter(c => Array.isArray(byKey[c.key]) && byKey[c.key].slice().sort().join() !== RECOGNITION.others.benefits.slice().sort().join());
+            const standard = others.filter(c => special.indexOf(c) === -1);
+            const othersCard = others.length ? `
+                <article class="rec-card rec-others">
+                    <span class="edge-light"></span>
+                    <div class="rec-card-head">
+                        <span class="rec-eyebrow">Individual &amp; Technical Awards</span>
+                        <h3 class="rec-title">Other Award Categories</h3>
+                    </div>
+                    ${standard.length ? `<ul class="rec-chips">${standard.map(c => `<li>${_recEsc(c.name)}</li>`).join('')}</ul>
+                    ${recognitionBadges(RECOGNITION.others.benefits)}` : ''}
+                    ${special.map(c => `<div class="rec-other-row"><span>${_recEsc(c.name)}</span>${recognitionBadges(byKey[c.key], { small: true })}</div>`).join('')}
+                </article>` : '';
+
+            const n = RECOGNITION.nominee || {};
+            const extras = (Array.isArray(n.extra) ? n.extra : []).filter(Boolean);
+            const nomineeCard = n.enabled ? `
+                <article class="rec-card rec-nominee">
+                    <span class="edge-light"></span>
+                    <div class="rec-nominee-icon" aria-hidden="true">${RECOGNITION_ICONS.special}</div>
+                    <div class="rec-card-head">
+                        <span class="rec-eyebrow">Official Nominees</span>
+                        <h3 class="rec-title">${_recEsc(n.title || 'Angle Frames Special Award')}</h3>
+                        ${n.subtitle ? `<p class="rec-sub">${_recEsc(n.subtitle)}</p>` : ''}
+                    </div>
+                    ${recognitionBadges((n.benefits || []).concat(extras))}
+                </article>` : '';
+
+            box.innerHTML = `
+                <div class="rec-head scroll-reveal is-visible">
+                    <span class="section-eyebrow">What Winners Receive</span>
+                    <h3 class="rec-heading">Prizes &amp; Recognition</h3>
+                </div>
+                <div class="rec-grid">${mainCards}${othersCard}${nomineeCard}</div>
+                ${!RECOGNITION.show_amounts ? '<p class="rec-note">Cash prize amounts will be announced soon.</p>' : ''}`;
+            box.querySelectorAll('.rec-card').forEach(c => { if (typeof initCardGlow === 'function') initCardGlow(c); });
+        }
+        /* ===== END PRIZES & RECOGNITION ===== */
+
         let categoryCarouselIndex = 0;
         let categoryCarouselTimer = null;
 
@@ -683,6 +841,7 @@
                     <div class="category-grid-item">
                         ${item.image ? `<div class="grid-item-img"><img src="${item.image}" alt="${item.title.replace('<br>',' ')}" loading="lazy"></div>` : item.icon_svg ? `<div class="grid-item-svg-icon">${item.icon_svg}</div>` : `<div class="grid-item-emoji">${item.emoji || ''}</div>`}
                         <h4 class="grid-item-title">${item.title.replace('<br>', ' ')}</h4>
+                        ${recognitionCardHtml(item.key)}
                     </div>
                 `).join('');
                 grid.dataset.built = '1';
@@ -726,7 +885,7 @@
                     <span class="edge-light"></span>
                     ${iconMarkup}
                     <h3 class="stack-card-title">${item.title}</h3>
-                    <p class="stack-card-sub">Award Category</p>
+                    ${recognitionCardHtml(item.key)}
                 `;
                 track.appendChild(card);
                 initCardGlow(card);
