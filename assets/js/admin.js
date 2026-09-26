@@ -161,9 +161,10 @@ function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
-  if (name === 'awards') refreshAwardsTab();
+  if (name === 'awards') { refreshAwardsTab(); if (window.RecAdmin) (_awardCats.length ? Promise.resolve() : loadAwardCategories()).then(() => RecAdmin.load()); }
   if (name === 'videos') { loadVideoCategories(); loadTestimonials(); }
   if (name === 'certificates' && window.Certs) Certs.renderManagement();
+  if (name === 'about' && window.AboutAdmin) AboutAdmin.load();
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -185,6 +186,8 @@ async function gate() {
   if (adErr) return toast('Admin check failed: ' + adErr.message, 'err');
   if (!isAdmin) { toast('This account is not an admin.', 'err'); await sb.auth.signOut(); return show('login'); }
   if (window.Certs) Certs.init(sb);
+  if (window.RecAdmin) RecAdmin.init(sb);
+  if (window.AboutAdmin) AboutAdmin.init(sb);
   document.getElementById('whoami').textContent = session.user.email;
   document.getElementById('whoAvatar').textContent = (session.user.email || '?').charAt(0).toUpperCase();
   show('dash');
