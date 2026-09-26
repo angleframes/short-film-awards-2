@@ -3743,8 +3743,8 @@
         .ad-overlay.is-open .ad-section:nth-of-type(3) { transition-delay: 0.28s; }
         .ad-overlay.is-open .ad-section:nth-of-type(4) { transition-delay: 0.36s; }
         .ad-num {
-            font-family: Georgia, 'Times New Roman', serif; font-style: italic;
-            font-size: 1.9rem; line-height: 1; color: rgba(255,255,255,0.28); padding-top: 4px;
+            font-family: inherit; font-style: normal; font-weight: 300; letter-spacing: 1px;
+            font-size: 1.7rem; line-height: 1; color: rgba(255,255,255,0.28); padding-top: 4px;
         }
         .ad-kicker { display: block; font-size: 0.66rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
         .ad-title { font-size: clamp(1.3rem, 2.6vw, 1.7rem); font-weight: 800; letter-spacing: 0.2px; text-transform: uppercase; color: #fff; line-height: 1.15; }
@@ -3869,8 +3869,8 @@
         .about-chapter h3 { font-size: clamp(1.6rem, 2.6vw, 2.15rem); text-transform: uppercase; letter-spacing: -0.3px; }
         .about-chapter-sub {
             margin: 10px 0 0 !important;
-            font-family: Georgia, 'Times New Roman', serif; font-style: italic;
-            font-size: 1.02rem !important; line-height: 1.5 !important;
+            font-family: inherit; font-style: normal; font-weight: 500; letter-spacing: 0.3px;
+            font-size: 1rem !important; line-height: 1.5 !important;
             color: rgba(255,255,255,0.62) !important;
         }
         .about-chapter .story-underline { background: linear-gradient(90deg, #ffffff, rgba(255,255,255,0.15)); width: 44px; height: 2px; }
@@ -3901,7 +3901,7 @@
             background: linear-gradient(180deg, #ffffff 30%, #b3b3bb 100%);
             -webkit-background-clip: text; background-clip: text; color: transparent;
         }
-        .ab-sub { margin-top: 10px; font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-size: 1.08rem; color: rgba(255,255,255,0.65); }
+        .ab-sub { margin-top: 10px; font-family: inherit; font-style: normal; font-weight: 500; font-size: 1.02rem; color: rgba(255,255,255,0.65); }
         .ab-rich { max-width: 640px; margin: 8px auto 0; padding: 0 32px; }
         .ab-rich h3 {
             margin: 34px 0 10px; font-size: 0.78rem; font-weight: 700; letter-spacing: 2.6px; text-transform: uppercase;
@@ -3915,7 +3915,7 @@
         .ab-rich li::before { content: ''; position: absolute; left: 2px; top: 0.72em; width: 12px; height: 1px; background: rgba(255,255,255,0.7); }
         .ab-rich blockquote {
             margin: 40px 0 8px; padding: 26px 8px 0; border-top: 1px solid rgba(255,255,255,0.1);
-            text-align: center; font-family: Georgia, 'Times New Roman', serif; font-style: italic;
+            text-align: center; font-family: inherit; font-style: italic; font-weight: 500;
             font-size: clamp(1.15rem, 2.4vw, 1.4rem); line-height: 1.6; color: #ffffff;
         }
         .ab-actions { display: flex; justify-content: center; margin-top: 30px; padding: 0 24px; }
@@ -4121,4 +4121,74 @@
             .ab-hero { height: auto; }
             .ab-hero img { height: auto; max-height: 55svh; object-fit: contain; background: #0a0a0a; }
             .ab-header { margin-top: 18px; }
+        }
+
+        /* ===== ABOUT — brand/logo panels (e.g. Angle Frames): compact, never cropped ===== */
+        .story-block-img.is-logo { position: relative; overflow: hidden; }
+        .story-block-img.is-logo::after { display: none; }
+        .story-block-img.is-logo img,
+        .about-chapter .story-block-img.is-logo img {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: min(52%, 300px); height: auto; max-height: none;
+            object-fit: contain; padding: 0; background: transparent; filter: none;
+        }
+        .story-block:hover .story-block-img.is-logo img { transform: translate(-50%, -50%) scale(1.03); }
+        .ab-hero.is-logo { height: 240px; position: relative; }
+        .ab-hero.is-logo::after { display: none; }
+        .ab-hero.is-logo img { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(40%, 260px); height: auto; max-height: none; object-fit: contain; background: transparent; filter: none; padding: 0; }
+        @media (max-width: 768px) {
+            .about-chapter .story-block-img.is-logo { height: clamp(150px, 44vw, 210px); min-height: 0; }
+            .about-chapter .story-block-img.is-logo img { width: min(58%, 230px); }
+            .ab-hero.is-logo { height: clamp(150px, 42vw, 200px); }
+            .ab-hero.is-logo img { width: min(52%, 210px); max-height: none; }
+        }
+
+        /* ===== VIDEOS — mobile: swipeable filters + snapping card carousel ===== */
+        @media (max-width: 768px) {
+            .vid-heading { font-size: clamp(1.7rem, 8.2vw, 2.4rem); line-height: 1.08; overflow-wrap: anywhere; }
+            .vid-sub { font-size: clamp(0.82rem, 3.6vw, 0.95rem); line-height: 1.6; }
+            .vid-quote { font-size: clamp(1rem, 4.6vw, 1.2rem); }
+
+            /* filters: full-bleed horizontal strip aligned to the page gutter */
+            .vid-filters {
+                margin: 0 -4.35% 30px; padding: 2px 4.35% 6px;
+                scroll-snap-type: x proximity; scroll-padding-inline: 4.35%;
+                overscroll-behavior-x: contain;
+                -webkit-mask-image: linear-gradient(to right, #000 88%, transparent 100%);
+                mask-image: linear-gradient(to right, #000 88%, transparent 100%);
+            }
+            .vid-filters::after { content: ''; flex: 0 0 8px; }
+            .vid-filter-btn { scroll-snap-align: start; padding: 9px 16px; font-size: 0.8rem; min-height: 40px; }
+
+            /* cards: one clear card + intentional peek, all the same size, snap on swipe */
+            .vid-carousel-wrap { margin: 0 -4.35%; }
+            .vid-carousel { scroll-snap-type: x mandatory; scroll-padding-inline: 4.35%; }
+            .vid-track { padding: 8px 4.35% 18px; gap: 14px; align-items: stretch; }
+            .vid-card, .vid-card.featured {
+                flex: 0 0 min(80vw, 330px);
+                scroll-snap-align: start; scroll-snap-stop: always;
+                display: flex; flex-direction: column;
+            }
+            .vid-card-body { flex: 1; min-width: 0; }
+            .vid-card-title, .vid-card.featured .vid-card-title { font-size: 0.95rem; -webkit-line-clamp: 2; }
+            .vid-card-desc { -webkit-line-clamp: 2; }
+            .vid-card-meta { flex-wrap: wrap; row-gap: 2px; }
+            .vid-card:hover { transform: none; }
+            .vid-cta-btn { max-width: 100%; padding: 14px 28px; }
+        }
+
+        /* ===== FOOTER — tablet 2 columns, phone stacked; long email wraps ===== */
+        .footer-col { min-width: 0; }
+        .footer-col a, .footer-static-text { overflow-wrap: anywhere; }
+        @media (max-width: 900px) {
+            .footer-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px 32px; }
+        }
+        @media (max-width: 600px) {
+            .footer-columns { grid-template-columns: 1fr; gap: 34px; margin-bottom: 40px; }
+            .footer-col h4 { margin-bottom: 14px; }
+            .footer-col a { margin-bottom: 12px; font-size: 0.9rem; }
+            .footer-static-text { font-size: 0.9rem; }
+            .footer-bottom-bar { flex-direction: column; align-items: flex-start; gap: 18px; }
+            /* leave room so the floating WhatsApp button never covers the last row */
+            .support-footer { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
         }
