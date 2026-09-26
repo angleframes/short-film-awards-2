@@ -3933,3 +3933,77 @@
             .ab-header { padding: 0 22px; margin-top: -40px; }
             .ab-rich { padding: 0 22px; }
         }
+
+        /* ===== DESIGN PASS: hero · gallery · videos (monochrome) ===== */
+        /* Hero — equal countdown cards, monochrome ribbon icons */
+        .countdown-dashboard-container { align-items: stretch; }
+        .countdown-card-block { min-height: 128px; padding: 24px 22px; }
+        .countdown-title-tag { font-size: 0.68rem; letter-spacing: 2.4px; color: rgba(255,255,255,0.6); white-space: nowrap; margin-bottom: 14px; }
+        .time-number { font-family: inherit; font-variant-numeric: tabular-nums; font-size: 1.6rem; font-weight: 700; letter-spacing: 0.5px; }
+        .time-label { letter-spacing: 1.5px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+        .countdown-timer-digits-row { gap: 18px; }
+        .ribbon-icon {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 0;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14);
+        }
+        .ribbon-icon svg { width: 20px; height: 20px; }
+        @media (min-width: 769px) {
+            .hero-metric-ribbon { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            .ribbon-item { min-width: 0; padding: 0 clamp(14px, 2vw, 32px); gap: 14px; }
+            .ribbon-item:first-child { padding-left: 0; }
+            .ribbon-item:last-child { padding-right: 0; }
+        }
+        .ribbon-text { min-width: 0; }
+        .ribbon-label { white-space: normal; line-height: 1.35; }
+
+        /* Gallery — readable caption, clean thumbnails */
+        .gs-fig::after {
+            content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+            background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.7) 22%, rgba(0,0,0,0.15) 48%, transparent 62%);
+        }
+        .gs-fig figcaption { max-width: min(760px, 70%); }
+        .gs-fig figcaption h3 { font-size: clamp(1.3rem, 2.8vw, 2.5rem); letter-spacing: 1px; text-shadow: 0 2px 18px rgba(0,0,0,0.7); margin-bottom: 12px; }
+        .gs-fig figcaption p {
+            display: inline-block; padding: 5px 12px; border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.35); background: rgba(0,0,0,0.35);
+            color: rgba(255,255,255,0.85); letter-spacing: 2.5px; font-weight: 600;
+        }
+        .gs-fig figcaption p:empty { display: none; }
+        .gallery-select-strip { justify-content: flex-start; padding-left: 64px; padding-right: 64px; scroll-padding-inline: 64px; }
+        @media (max-width: 768px) { .gallery-select-strip { padding-left: 28px; padding-right: 28px; scroll-padding-inline: 28px; } }
+        .gallery-select-strip li:first-child { margin-left: auto; }
+        .gallery-select-strip li:last-child { margin-right: auto; }
+        .gallery-select-strip li label span:not(.thumb-placeholder) {
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            background: transparent; color: rgba(255,255,255,0.55);
+            font-size: 0.58rem; letter-spacing: 1.2px; padding: 6px 4px 2px;
+        }
+
+        /* Videos — monochrome filters, unobtrusive play button */
+        .vid-filter-icon { filter: grayscale(1) brightness(1.4); }
+        .vid-card-desc, .vid-card-title { filter: grayscale(1); }
+        .vid-card-overlay {
+            align-items: flex-end; justify-content: flex-start; padding: 12px;
+            background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 45%);
+        }
+        .vid-card:hover .vid-card-overlay { background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 60%); }
+        .vid-play-icon { width: 40px; height: 40px; background: rgba(0,0,0,0.55); border-color: rgba(255,255,255,0.4); }
+        .vid-play-icon svg { width: 15px; height: 15px; margin-left: 2px; }
+        .vid-card.featured .vid-play-icon { width: 48px; height: 48px; }
+        .vid-card.featured .vid-play-icon svg { width: 18px; height: 18px; margin-left: 3px; }
+        .vid-card:hover .vid-play-icon { background: #fff; transform: scale(1.06); }
+        .vid-card:hover .vid-play-icon svg { fill: #000; }
+        .vid-duration { left: auto; right: 10px; }
+
+        @media (max-width: 768px) {
+            .countdown-title-tag { white-space: normal; }
+            .gs-fig figcaption { max-width: 88%; }
+            .ribbon-icon { width: 38px; height: 38px; }
+            .ribbon-icon svg { width: 18px; height: 18px; }
+        }
+        @media (max-width: 480px) {
+            .hero-metric-ribbon .ribbon-item,
+            .hero-metric-ribbon .ribbon-item:nth-child(odd) { border-right: none; }
+        }
