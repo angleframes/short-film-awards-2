@@ -243,6 +243,10 @@
             document.getElementById('labelDeadlineDate').textContent = PORTAL_TIMELINES.deadlineLabelText;
             const ctaDl = document.getElementById('ctaDeadlineDate'); if (ctaDl) ctaDl.textContent = PORTAL_TIMELINES.deadlineLabelText;
             document.getElementById('labelEventDate').textContent = PORTAL_TIMELINES.eventLabelText;
+            // Important Dates section — same admin-controlled dates, written out in full
+            const _fullDate = (v, fallback) => { const d = new Date(v); return isNaN(d) ? fallback : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }); };
+            const datesDl = document.getElementById('datesDeadline'); if (datesDl) datesDl.textContent = _fullDate(PORTAL_TIMELINES.submissionDeadline, PORTAL_TIMELINES.deadlineLabelText);
+            const datesEv = document.getElementById('datesEvent'); if (datesEv) datesEv.textContent = _fullDate(PORTAL_TIMELINES.eventLabelText, PORTAL_TIMELINES.eventLabelText);
 
             applySectionBackground('section-story', SITE_IMAGES.sectionBgStory);
             applySectionBackground('section-categories', SITE_IMAGES.sectionBgCategories);
@@ -977,6 +981,12 @@
                 ctaBtn.innerHTML = open ? 'Submit Your Film <span aria-hidden="true">&rarr;</span>' : 'Registrations Closed';
                 if (open) ctaBtn.removeAttribute('aria-disabled'); else ctaBtn.setAttribute('aria-disabled', 'true');
                 ctaBtn.tabIndex = open ? 0 : -1;
+            }
+            const howBtn = document.getElementById('howStartBtn');
+            if (howBtn) {
+                howBtn.innerHTML = open ? 'Start Your Submission <span aria-hidden="true">&rarr;</span>' : 'Registrations Closed';
+                if (open) howBtn.removeAttribute('aria-disabled'); else howBtn.setAttribute('aria-disabled', 'true');
+                howBtn.tabIndex = open ? 0 : -1;
             }
 
             if (open) {
