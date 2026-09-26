@@ -112,24 +112,32 @@ The emblem blends three layers into one continuous story. Anti-clockwise spiral 
                 kicker: "The Inspiration",
                 title: "Remembering Sharankrishna",
                 subtitle: "The inspiration behind the name",
-                intro: "A visual artist, director and designer whose creativity and warmth left a lasting mark on everyone he met. The awards carry his name so that his spirit keeps finding new stories to tell.",
+                intro: "A filmmaker, visual artist and designer whose creativity and warmth left a lasting mark on everyone he met. The awards carry his name so that his spirit keeps finding new stories to tell.",
                 image: "IMG_20240317_202624_864.webp",
-                imageAlt: "Sharankrishna",
+                imageAlt: "Sharankrishna V.P.",
                 imageFit: "cover",
                 cta: "Read His Story",
-                linkLabel: "",
-                linkUrl: "",
+                linkLabel: "Read the WordCamp Kerala tribute",
+                linkUrl: "https://kerala.wordcamp.org/2024/goodbye-sharan/",
                 body: `## Who He Was
-Sharan Krishna was a visual artist, director and designer. A graduate in IT from Jain University, he worked as a designer at Midnay (Kozhikode Cyberpark) and was the co-founder and CEO of Angle Frames.
+Sharankrishna V.P. — Sharan, to those who knew him — was a filmmaker, visual artist and designer from Thenhipalam in Malappuram. He studied at Thenhipalam AUP School and Chelari GVHSS, and graduated with a B.Sc in Information Technology from JAIN (Deemed-to-be University). He worked as a UI/UX designer at Midnay, and was the co-founder and CEO of Angle Frames.
 
 ## A Life in Stories
-In a short span of years he directed sixteen short films — among them award-winning works such as *Vidya*, *No*, *Karutham Naalaykkaay*, *Nirbhaya*, *Lisa Bhramam* and *Three Minutes* — along with a web series and a documentary. He also gave his time and design work as a volunteer for WordCamp Kerala.
+His relationship with the screen began early: during his school years he shone as a child artist. He went on to direct sixteen short films — among them *Vidya*, *No*, *Karutham Naalaykkaay*, *Nirbhaya*, *Lisa Bhramam* and *Three Minutes* — along with the web series *Ikkachakka* and a documentary, sharing much of his work through the Angle Frames YouTube channel.
+
+*Nirbhaya* won first place at a short film festival organised by the Kozhikode Film Society and Mahatma Gandhi College of Mass Communication.
+
+## Behind the Lens
+Photography, videography and editing were his constant companions. He contributed more than 250 of his photographs to the WordPress Photo Directory, where they remain freely available for anyone to use.
+
+## A Gift to the Community
+Sharan volunteered with the Kerala WordPress community and spent two months creating the designs, videos and creative art for WordCamp Kerala 2024. Its organisers later wrote: "WordCamp Kerala 2024 would simply not have happened, had it not been for Sharan."
 
 ## The Person Behind the Work
-Those who knew him remember his infectious smile, his humility and his selfless love for people — and the quiet "Midas touch" he brought to everything he created.
+Those who knew him remember a selfless, kind and endlessly warm person — "a jolly human being that simply loved to share a laugh," and "a beacon of positivity and inspiration." They remember his infectious smile, his humility, and the quiet "Midas touch" he brought to everything he created.
 
 ## Why the Awards Carry His Name
-Sharan Krishna passed away on 12 November 2024, at the age of 23. To keep his light alive, his family, friends and teachers instituted the Sharankrishna Short Film Awards. The festival is held on 12 February, a date that was deeply special to him.
+Sharan passed away on 12 November 2024, at the age of 23. To keep his light alive, his family, friends and teachers instituted the Sharankrishna Short Film Awards. The festival is held on 12 February, a date that was deeply special to him.
 
 > Every story that finds its audience here carries a little of him forward — the kindness, the passion and the boundless creativity he lived by.`
             },
@@ -187,7 +195,7 @@ Programmes span Commerce, Management, Humanities & Social Sciences, Sciences, En
 The university emphasises interdisciplinary learning, research, innovation and entrepreneurship, connecting students with industry through internships, professional certifications and hands-on experience — with the aim of developing industry-ready professionals.
 
 ## Why JAIN and the Awards
-Sharankrishna was himself a graduate of Jain University. The association brings the festival into an academic community, creating a space where students, educators and filmmakers can meet around cinema.
+Sharankrishna was himself a B.Sc Information Technology graduate of JAIN (Deemed-to-be University). The association brings the festival into an academic community, creating a space where students, educators and filmmakers can meet around cinema.
 
 *Institutional details are as published by the university. For current programmes, accreditations and admissions, please visit the official website.*`
             }
