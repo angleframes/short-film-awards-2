@@ -184,14 +184,16 @@
             try {
                 if (!window.supabase) return;
                 const SB = window.supabase.createClient(SUPA_URL, SUPA_ANON);
-                const [cfgRes, galRes, updRes, tmtRes, vcRes, acRes] = await Promise.all([
+                const [cfgRes, galRes, updRes, tmtRes, vcRes, acRes, abRes] = await Promise.all([
                     SB.from('site_config').select('*').eq('id', 1).single(),
                     SB.from('gallery').select('*').order('sort_order').order('created_at', { ascending: false }),
                     SB.from('updates_feed').select('*').order('sort_order').order('created_at', { ascending: false }),
                     SB.from('testimonials').select('*').order('display_order').order('created_at'),
                     SB.from('video_categories').select('*').order('sort_order'),
-                    SB.from('award_categories').select('*').eq('active', true).order('sort_order')
+                    SB.from('award_categories').select('*').eq('active', true).order('sort_order'),
+                    SB.from('about_sections').select('*').order('sort_order')
                 ]);
+                if (abRes && !abRes.error) applyAboutRows(abRes.data);
                 const cfg = cfgRes.data;
                 if (cfg) {
                     REGISTRATION_GATE.isOpen = !!cfg.registration_open;
@@ -1033,31 +1035,118 @@
             setInterval(updateClocks, 1000);
         }
 
+        /* ===== ABOUT — chapters + "Know More" detail ===== */
+        let ABOUT_DATA = (typeof ABOUT_SECTIONS !== 'undefined' ? ABOUT_SECTIONS : []);
+        const _abEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const _abInline = s => _abEsc(s)
+            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        const _abSafeUrl = u => /^(https?:\/\/|#|mailto:|tel:)/i.test(String(u || '').trim()) ? String(u).trim() : '';
+
+        // Minimal, escaped markdown: ## heading, - list, > quote, blank-line paragraphs.
+        function _abRichText(src) {
+            const lines = String(src || '').replace(/\r/g, '').split('\n');
+            let html = '', para = [], list = [];
+            const flushPara = () => { if (para.length) { html += '<p>' + _abInline(para.join(' ')) + '</p>'; para = []; } };
+            const flushList = () => { if (list.length) { html += '<ul>' + list.map(li => '<li>' + _abInline(li) + '</li>').join('') + '</ul>'; list = []; } };
+            lines.forEach(raw => {
+                const line = raw.trim();
+                if (!line) { flushPara(); flushList(); return; }
+                if (line.startsWith('## ')) { flushPara(); flushList(); html += '<h3>' + _abInline(line.slice(3)) + '</h3>'; return; }
+                if (line.startsWith('> ')) { flushPara(); flushList(); html += '<blockquote>' + _abInline(line.slice(2)) + '</blockquote>'; return; }
+                if (line.startsWith('- ')) { flushPara(); list.push(line.slice(2)); return; }
+                flushList(); para.push(line);
+            });
+            flushPara(); flushList();
+            return html;
+        }
+
         function renderAboutCards() {
             const container = document.getElementById('aboutCardsContainer');
-            if (!container || !ABOUT_CARDS || !ABOUT_CARDS.length) return;
-            container.innerHTML = '';
-            ABOUT_CARDS.forEach((card, idx) => {
+            if (!container) return;
+            const items = (ABOUT_DATA || []).filter(s => s && s.visible !== false);
+            container.innerHTML = items.map((s, idx) => {
                 const num = String(idx + 1).padStart(2, '0');
-                const isReverse = idx % 2 !== 0;
-                const isLogo = card.image && card.image.match(/\.(png|svg)$/i) && idx === ABOUT_CARDS.length - 1;
-                const imgStyle = isLogo ? 'style="object-fit:contain;padding:40px;background:#0a0a0a;"' : '';
-                const el = document.createElement('div');
-                el.className = 'story-block scroll-reveal delay-1' + (isReverse ? ' reverse' : '');
-                el.innerHTML = `
-                    <span class="story-block-num">${num}</span>
+                const fit = s.imageFit === 'contain' ? ' is-contain' : '';
+                return `
+                <article class="story-block about-chapter scroll-reveal delay-1${idx % 2 ? ' reverse' : ''}" data-about="${_abEsc(s.key)}">
+                    <span class="story-block-num" aria-hidden="true">${num}</span>
                     <div class="story-block-text">
-                        <span class="story-block-eyebrow">${card.eyebrow}</span>
-                        <h3>${card.heading}</h3>
+                        <span class="story-block-eyebrow">${_abEsc(s.kicker || '')}</span>
+                        <h3>${_abEsc(s.title || '')}</h3>
+                        ${s.subtitle ? `<p class="about-chapter-sub">${_abEsc(s.subtitle)}</p>` : ''}
                         <span class="story-underline"></span>
-                        <p>${card.text}</p>
+                        <p>${_abInline(s.intro || '')}</p>
+                        ${s.body ? `<button type="button" class="about-chapter-cta" onclick="openAboutDetail('${_abEsc(s.key)}')" aria-haspopup="dialog">${_abEsc(s.cta || 'Know More')} <span aria-hidden="true">&rarr;</span></button>` : ''}
                     </div>
-                    <div class="story-block-img">
-                        <img src="${card.image}" alt="${card.heading}" ${imgStyle} onerror="this.parentElement.classList.add('no-img');this.style.display='none';">
-                    </div>`;
-                container.appendChild(el);
-            });
+                    <div class="story-block-img${fit}">
+                        ${s.image ? `<img src="${_abEsc(s.image)}" alt="${_abEsc(s.imageAlt || s.title || '')}" loading="lazy" decoding="async" onerror="this.parentElement.classList.add('no-img');this.style.display='none';">` : ''}
+                    </div>
+                </article>`;
+            }).join('');
+            if (typeof initCardGlow === 'function') container.querySelectorAll('.story-block').forEach(el => initCardGlow(el));
+            const reveal = container.querySelectorAll('.scroll-reveal');
+            if ('IntersectionObserver' in window) {
+                const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } }), { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+                reveal.forEach(el => io.observe(el));
+            } else reveal.forEach(el => el.classList.add('visible'));
         }
+
+        function renderAboutDetail(key) {
+            const s = (ABOUT_DATA || []).find(x => x.key === key);
+            const body = document.getElementById('aboutDetailBody');
+            if (!s || !body) return false;
+            const link = _abSafeUrl(s.linkUrl);
+            const external = /^https?:/i.test(link);
+            body.innerHTML = `
+                ${s.image ? `<figure class="ab-hero${s.imageFit === 'contain' ? ' is-contain' : ''}"><img src="${_abEsc(s.image)}" alt="${_abEsc(s.imageAlt || s.title || '')}"></figure>` : ''}
+                <header class="ab-header">
+                    <span class="ad-eyebrow">${_abEsc(s.kicker || '')}</span>
+                    <h2 class="ab-title" id="aboutDetailTitle">${_abEsc(s.title || '')}</h2>
+                    ${s.subtitle ? `<p class="ab-sub">${_abEsc(s.subtitle)}</p>` : ''}
+                    <div class="ad-rule" aria-hidden="true"><span>★</span></div>
+                </header>
+                <div class="ab-rich">${_abRichText(s.body)}</div>
+                ${link && s.linkLabel ? `<div class="ab-actions"><a class="btn-award-details ab-link" href="${_abEsc(link)}"${external ? ' target="_blank" rel="noopener noreferrer"' : ''}${link === '#prizes' ? ' onclick="closeAboutDetail();setTimeout(openAwardDetails,380);return false;"' : ''}>${_abEsc(s.linkLabel)} <span aria-hidden="true">${external ? '&#8599;' : '&rarr;'}</span></a></div>` : ''}`;
+            return true;
+        }
+
+        let _abLastFocus = null;
+        function openAboutDetail(key) {
+            const m = document.getElementById('aboutDetailModal');
+            if (!m || !renderAboutDetail(key)) return;
+            _abLastFocus = document.activeElement;
+            m.hidden = false;
+            requestAnimationFrame(() => requestAnimationFrame(() => m.classList.add('is-open')));
+            document.body.style.overflow = 'hidden';
+            const sc = m.querySelector('.ad-scroll'); if (sc) sc.scrollTop = 0;
+            if (location.hash !== '#about-' + key) history.replaceState(null, '', '#about-' + key);
+            setTimeout(() => { const c = m.querySelector('.ad-close'); if (c) c.focus(); }, 60);
+        }
+        function closeAboutDetail() {
+            const m = document.getElementById('aboutDetailModal');
+            if (!m || m.hidden) return;
+            m.classList.remove('is-open');
+            document.body.style.overflow = '';
+            setTimeout(() => { m.hidden = true; }, 420);
+            if (/^#about-/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
+            if (_abLastFocus && _abLastFocus.focus) _abLastFocus.focus();
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAboutDetail(); });
+
+        function applyAboutRows(rows) {
+            if (!Array.isArray(rows) || !rows.length) return;
+            const byKey = {};
+            (typeof ABOUT_SECTIONS !== 'undefined' ? ABOUT_SECTIONS : []).forEach(s => { byKey[s.key] = s; });
+            ABOUT_DATA = rows.slice().sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)).map(r => Object.assign({}, byKey[r.key] || {}, {
+                key: r.key,
+                visible: r.visible !== false,
+                kicker: r.kicker, title: r.title, subtitle: r.subtitle, intro: r.intro,
+                image: r.image_url, imageAlt: r.image_alt, imageFit: r.image_fit || 'cover',
+                cta: r.cta_label, body: r.body, linkLabel: r.link_label, linkUrl: r.link_url
+            }));
+        }
+        /* ===== END ABOUT ===== */
 
         // Gallery state
         let _galleryPhotos = [];
@@ -1968,6 +2057,7 @@
             else if (h === '#updates') openInfoModal('updates');
             else if (h === '#faq') openInfoModal('faq');
             else if (h === '#prizes') openAwardDetails();
+            else if (/^#about-[a-z0-9_-]+$/i.test(h)) openAboutDetail(h.slice(7));
         }
         window.addEventListener('load', openModalFromHash);
         window.addEventListener('hashchange', openModalFromHash);
