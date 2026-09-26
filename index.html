@@ -92,7 +92,7 @@
     </script>
 
     <link rel="stylesheet" href="assets/css/ui-components.css">
-    <link rel="stylesheet" href="assets/css/site.css?v=10">
+    <link rel="stylesheet" href="assets/css/site.css?v=11">
 </head>
 <body>
 
@@ -260,7 +260,12 @@
                 </button>
             </div>
 
-            <div class="recognition-block" id="recognitionBlock" aria-label="Prizes and recognition"></div>
+            <div class="rules-guidelines-trigger-row scroll-reveal delay-2">
+                <button class="btn-award-details" type="button" onclick="openAwardDetails()" aria-haspopup="dialog" aria-controls="awardDetailsModal">
+                    <span class="btn-award-details-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3.5h8v5.5a4 4 0 01-8 0V3.5z"/><path d="M8 5.5H5.2a2.8 2.8 0 002.9 3.9M16 5.5h2.8a2.8 2.8 0 01-2.9 3.9M12 13v3.5M9 20.5h6M9.8 16.5h4.4"/></svg></span>
+                    View Award Details <span>&rarr;</span>
+                </button>
+            </div>
 
             <div class="rules-guidelines-trigger-row scroll-reveal delay-2">
                 <button class="btn-rules-guidelines" id="viewAllCategoriesBtn" onclick="toggleAllCategoriesInline()">
@@ -277,6 +282,16 @@
             </div>
         </div>
     </section>
+
+    <!-- Award Details (Prizes & Recognition) -->
+    <div id="awardDetailsModal" class="ad-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="awardDetailsTitle" onclick="if(event.target===this)closeAwardDetails()">
+        <div class="ad-panel">
+            <button type="button" class="ad-close" onclick="closeAwardDetails()" aria-label="Close award details">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+            <div class="ad-scroll"><article class="ad-body" id="awardDetailsBody"></article></div>
+        </div>
+    </div>
 
     <!-- Rules Modal -->
     <div id="rulesModal" class="rules-modal-overlay" onclick="toggleRulesModal(false)">
@@ -967,6 +982,6 @@
     </noscript>
     <script src="assets/js/ui-components.js"></script>
     <script src="assets/js/campus-proof.js?v=1"></script>
-    <script src="assets/js/site.js?v=12"></script>
+    <script src="assets/js/site.js?v=13"></script>
 </body>
 </html>
