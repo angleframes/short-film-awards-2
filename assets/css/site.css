@@ -4052,3 +4052,11 @@
             .submit-cta__button { padding: 16px 28px; }
             .submit-cta::before { width: 640px; }
         }
+
+        /* Gallery thumbnails — identical size regardless of label length */
+        .gallery-select-strip li { min-width: 0; flex: 0 0 164px; }
+        .gallery-select-strip li label { overflow: hidden; border-radius: 8px; }
+        .gallery-select-strip li label span:not(.thumb-placeholder) { max-width: 100%; }
+        @media (max-width: 768px) { .gallery-select-strip li { flex-basis: 118px; } }
+        @media (max-width: 430px) { .gallery-select-strip li { flex-basis: 104px; } }
+        @media (min-width: 769px) { .gs-fig figcaption { text-align: left; } }
