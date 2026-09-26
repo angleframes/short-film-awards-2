@@ -1072,7 +1072,7 @@
                 <article class="story-block about-chapter scroll-reveal delay-1${idx % 2 ? ' reverse' : ''}" data-about="${_abEsc(s.key)}">
                     <span class="story-block-num" aria-hidden="true">${num}</span>
                     <div class="story-block-text">
-                        <span class="story-block-eyebrow">${_abEsc(s.kicker || '')}</span>
+                        <span class="story-block-eyebrow">${num}${s.kicker ? ' — ' + _abEsc(String(s.kicker).replace(/^\s*\d+\s*[—–-]\s*/, '')) : ''}</span>
                         <h3>${_abEsc(s.title || '')}</h3>
                         ${s.subtitle ? `<p class="about-chapter-sub">${_abEsc(s.subtitle)}</p>` : ''}
                         <span class="story-underline"></span>
@@ -1093,15 +1093,18 @@
         }
 
         function renderAboutDetail(key) {
-            const s = (ABOUT_DATA || []).find(x => x.key === key);
+            const visible = (ABOUT_DATA || []).filter(x => x && x.visible !== false);
+            const s = visible.find(x => x.key === key);
             const body = document.getElementById('aboutDetailBody');
             if (!s || !body) return false;
+            const num = String(visible.indexOf(s) + 1).padStart(2, '0');
+            const kicker = num + (s.kicker ? ' — ' + String(s.kicker).replace(/^\s*\d+\s*[—–-]\s*/, '') : '');
             const link = _abSafeUrl(s.linkUrl);
             const external = /^https?:/i.test(link);
             body.innerHTML = `
                 ${s.image ? `<figure class="ab-hero${s.imageFit === 'contain' ? ' is-contain' : ''}"><img src="${_abEsc(s.image)}" alt="${_abEsc(s.imageAlt || s.title || '')}"></figure>` : ''}
                 <header class="ab-header">
-                    <span class="ad-eyebrow">${_abEsc(s.kicker || '')}</span>
+                    <span class="ad-eyebrow">${_abEsc(kicker)}</span>
                     <h2 class="ab-title" id="aboutDetailTitle">${_abEsc(s.title || '')}</h2>
                     ${s.subtitle ? `<p class="ab-sub">${_abEsc(s.subtitle)}</p>` : ''}
                     <div class="ad-rule" aria-hidden="true"><span>★</span></div>
