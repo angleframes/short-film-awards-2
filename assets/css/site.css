@@ -3759,7 +3759,11 @@
             content: ''; position: absolute; left: -4px; top: 9px; width: 7px; height: 7px; border-radius: 50%;
             background: #d8d8de; box-shadow: 0 0 0 4px rgba(255,255,255,0.06);
         }
-        .ad-prize:first-child::before { background: #e7c66d; box-shadow: 0 0 0 4px rgba(231,198,109,0.14); }
+        .ad-prize.is-first::before { background: #e7c66d; box-shadow: 0 0 0 4px rgba(231,198,109,0.14); }
+        .ad-prize.is-jury::before {
+            content: '★'; width: auto; height: auto; left: -7px; top: 1px; border-radius: 0;
+            background: #0c0c0f; box-shadow: none; color: #e7c66d; font-size: 0.8rem; line-height: 1; padding: 2px 0;
+        }
         .ad-prize dt { font-size: 0.74rem; font-weight: 700; letter-spacing: 2.4px; text-transform: uppercase; color: #fff; margin-bottom: 6px; }
         .ad-prize dd { margin: 0; font-size: 0.97rem; line-height: 1.7; color: rgba(255,255,255,0.75); }
 
