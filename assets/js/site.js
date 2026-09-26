@@ -241,6 +241,7 @@
             document.getElementById('socialIconFacebook').src = SITE_IMAGES.socialFacebook;
 
             document.getElementById('labelDeadlineDate').textContent = PORTAL_TIMELINES.deadlineLabelText;
+            const ctaDl = document.getElementById('ctaDeadlineDate'); if (ctaDl) ctaDl.textContent = PORTAL_TIMELINES.deadlineLabelText;
             document.getElementById('labelEventDate').textContent = PORTAL_TIMELINES.eventLabelText;
 
             applySectionBackground('section-story', SITE_IMAGES.sectionBgStory);
@@ -965,6 +966,14 @@
             }
 
             const open = computeGateOpen();
+            const ctaSection = document.getElementById('submitCta');
+            const ctaBtn = document.getElementById('ctaSubmitBtn');
+            if (ctaSection) ctaSection.classList.toggle('is-closed', !open);
+            if (ctaBtn) {
+                ctaBtn.innerHTML = open ? 'Register Your Film <span aria-hidden="true">&rarr;</span>' : 'Registrations Closed';
+                if (open) ctaBtn.removeAttribute('aria-disabled'); else ctaBtn.setAttribute('aria-disabled', 'true');
+                ctaBtn.tabIndex = open ? 0 : -1;
+            }
 
             if (open) {
                 if (browserTitleEl) browserTitleEl.textContent = "Sharankrishna Short Film Awards 2026";
