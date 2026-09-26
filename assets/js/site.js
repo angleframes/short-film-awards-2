@@ -287,10 +287,6 @@
                             }
                             if (payload.new && 'recognition' in payload.new) {
                                 applyRecognitionConfig(payload.new.recognition);
-                                generateDynamicCategories();
-                                renderRecognition();
-                                var rgrid = document.getElementById('allCategoriesGrid');
-                                if (rgrid) { rgrid.dataset.built = ''; if (rgrid.style.display === 'flex') { rgrid.style.display = 'none'; toggleAllCategoriesInline(); } }
                             }
                         })
                         .on('postgres_changes', { event: '*', schema: 'public', table: 'testimonials' }, () => {
@@ -312,7 +308,7 @@
                                         });
                                         window._awardCategoriesData = acr.data;
                                         generateDynamicCategories();
-                                        renderRecognition();
+                                        renderAwardDetails();
                                         var grid = document.getElementById('allCategoriesGrid');
                                         if (grid) { grid.dataset.built = ''; grid.style.display = 'none'; }
                                     }
@@ -352,7 +348,6 @@
 
             initiateTimersEngine();
             generateDynamicCategories();
-            renderRecognition();
             renderAboutCards();
             renderGallery();
             initGalleryPicker();
@@ -647,26 +642,37 @@
         });
         // ===== END SCROLL STACK ENGINE =====
 
-        /* ===== PRIZES & RECOGNITION =====
-           Defaults below; site_config.recognition (edited in Admin → Awards) overrides them.
-           Cash amounts are only shown when show_amounts is true AND a tier has an amount. */
+        /* ===== PRIZES & RECOGNITION (award details modal) =====
+           Defaults below; site_config.recognition (Admin → Awards) overrides them.
+           Cash amounts appear only when show_amounts is true AND a tier has an amount. */
         const RECOGNITION_DEFAULT = {
             show_amounts: false,
+            intro: 'The Sharankrishna Short Film Awards celebrates outstanding filmmaking across both the Campus and General categories, recognising exceptional films, performances, storytelling and technical excellence.',
             main: [
-                { key: 'best_campus_film', label: 'Campus Category', tiers: [
-                    { label: '1st Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' },
-                    { label: '2nd Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' }
+                { key: 'best_campus_film', label: 'Campus Category',
+                  description: 'The Campus Category is dedicated to recognising outstanding filmmaking talent from student and campus filmmakers.',
+                  tiers: [
+                    { label: 'First Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' },
+                    { label: 'Second Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' }
                 ] },
-                { key: 'best_short_film', label: 'General Category', tiers: [
-                    { label: '1st Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' },
-                    { label: '2nd Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' }
+                { key: 'best_short_film', label: 'General Category',
+                  description: 'The General Category recognises outstanding independent and professional short films participating in the festival.',
+                  tiers: [
+                    { label: 'First Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' },
+                    { label: 'Second Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' }
                 ] }
             ],
-            others: { benefits: ['memento', 'certificate'], byKey: {} },
+            others: {
+                title: 'Individual & Technical Awards',
+                description: 'Honouring the artists and craftspeople whose work brings each film to life.',
+                benefits: ['memento', 'certificate'],
+                byKey: {}
+            },
             nominee: {
                 enabled: true,
                 title: 'Angle Frames Special Award',
-                subtitle: 'Special recognition for every officially nominated entry',
+                subtitle: 'For every officially nominated entry',
+                description: 'Every officially nominated entry will receive special recognition from Angle Frames, celebrating the films that earn a place in the festival’s official selection.',
                 benefits: ['memento', 'certificate'],
                 extra: []
             }
@@ -675,123 +681,143 @@
 
         function applyRecognitionConfig(saved) {
             const base = JSON.parse(JSON.stringify(RECOGNITION_DEFAULT));
-            if (!saved || typeof saved !== 'object') { RECOGNITION = base; return; }
-            if (typeof saved.show_amounts === 'boolean') base.show_amounts = saved.show_amounts;
-            if (Array.isArray(saved.main) && saved.main.length) base.main = saved.main;
-            if (saved.others && typeof saved.others === 'object') {
-                if (Array.isArray(saved.others.benefits)) base.others.benefits = saved.others.benefits;
-                if (saved.others.byKey && typeof saved.others.byKey === 'object') base.others.byKey = saved.others.byKey;
+            if (saved && typeof saved === 'object') {
+                if (typeof saved.show_amounts === 'boolean') base.show_amounts = saved.show_amounts;
+                if (saved.intro) base.intro = saved.intro;
+                if (Array.isArray(saved.main) && saved.main.length) {
+                    base.main = saved.main.map((m, i) => Object.assign({}, RECOGNITION_DEFAULT.main[i] || {}, m));
+                }
+                if (saved.others && typeof saved.others === 'object') Object.assign(base.others, saved.others);
+                if (saved.nominee && typeof saved.nominee === 'object') Object.assign(base.nominee, saved.nominee);
             }
-            if (saved.nominee && typeof saved.nominee === 'object') Object.assign(base.nominee, saved.nominee);
             RECOGNITION = base;
+            if (document.getElementById('awardDetailsModal')) renderAwardDetails();
         }
 
         const _recEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-        const RECOGNITION_ICONS = {
-            cash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg>',
-            memento: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3.5h8v5.5a4 4 0 01-8 0V3.5z"/><path d="M8 5.5H5.2a2.8 2.8 0 002.9 3.9M16 5.5h2.8a2.8 2.8 0 01-2.9 3.9M12 13v3.5M9 20.5h6M9.8 16.5h4.4"/></svg>',
-            certificate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12.5" rx="1.6"/><path d="M7 8h10M7 11h6"/><circle cx="16.5" cy="15.5" r="2.4"/><path d="M15.3 17.6l-.8 3 2-1 2 1-.8-3"/></svg>',
-            special: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9L12 3z"/></svg>'
-        };
-        const RECOGNITION_LABELS = { cash: 'Cash Prize', memento: 'Memento', certificate: 'Certificate' };
 
-        function recognitionBadges(benefits, opts) {
-            opts = opts || {};
-            const list = (benefits || []).slice();
+        function _recList(items) {
+            if (items.length <= 1) return items.join('');
+            return items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1];
+        }
+
+        // ['cash','memento','certificate'] -> "a Cash Prize, an official Memento and a Certificate of Achievement"
+        function _recBenefitsProse(benefits, amount) {
+            const map = {
+                cash: (RECOGNITION.show_amounts && amount) ? 'a Cash Prize of ' + _recEsc(amount) : 'a Cash Prize',
+                memento: 'an official Memento',
+                certificate: 'a Certificate of Achievement'
+            };
             const order = ['cash', 'memento', 'certificate'];
-            list.sort((a, b) => (order.indexOf(a) + 1 || 9) - (order.indexOf(b) + 1 || 9));
-            return '<div class="prize-badges' + (opts.small ? ' is-small' : '') + '">' + list.map(b => {
-                const known = RECOGNITION_LABELS[b];
-                let label = known || String(b);
-                if (b === 'cash' && RECOGNITION.show_amounts && opts.amount) label += ' · ' + opts.amount;
-                const icon = RECOGNITION_ICONS[b] || RECOGNITION_ICONS.special;
-                return '<span class="prize-badge prize-' + (known ? b : 'custom') + '">' + icon + '<span>' + _recEsc(label) + '</span></span>';
-            }).join('') + '</div>';
+            const list = (benefits || []).slice().sort((a, b) => (order.indexOf(a) + 1 || 9) - (order.indexOf(b) + 1 || 9));
+            return _recList(list.map(b => map[b] || _recEsc(b)));
         }
 
-        function recognitionForKey(key) {
-            const main = RECOGNITION.main.find(m => m.key === key);
-            if (main) return { main };
-            const byKey = RECOGNITION.others.byKey || {};
-            return { benefits: Array.isArray(byKey[key]) ? byKey[key] : RECOGNITION.others.benefits };
+        function _recTierSentence(tier, i) {
+            const what = _recBenefitsProse(tier.benefits, tier.amount);
+            if (!what) return '';
+            if (i === 0) return 'The winner will receive ' + what + '.';
+            if (i === 1) return 'The second-place winner will also receive ' + what + '.';
+            return 'The ' + _recEsc(String(tier.label || '').toLowerCase()) + ' winner will receive ' + what + '.';
         }
 
-        function recognitionCardHtml(key, small) {
-            const r = recognitionForKey(key);
-            if (r.main) {
-                const tiers = r.main.tiers || [];
-                const all = Array.from(new Set(tiers.flatMap(t => t.benefits || [])));
-                const tierLabel = tiers.map(t => (t.label || '').replace(/\s*prize$/i, '')).filter(Boolean).join(' & ') + (tiers.length ? ' Prize' : '');
-                return '<div class="cc-prize"><span class="cc-prize-tier">' + _recEsc(tierLabel) + '</span>' + recognitionBadges(all, { small: true }) + '</div>';
-            }
-            return '<div class="cc-prize">' + recognitionBadges(r.benefits, { small: true }) + '</div>';
-        }
-
-        function renderRecognition() {
-            const box = document.getElementById('recognitionBlock');
-            if (!box) return;
+        function renderAwardDetails() {
+            const body = document.getElementById('awardDetailsBody');
+            if (!body) return;
+            const R = RECOGNITION;
             const cats = (window._awardCategoriesData || []).filter(c => c.active !== false);
-            const mainKeys = RECOGNITION.main.map(m => m.key);
-            const others = cats.filter(c => mainKeys.indexOf(c.key) === -1);
             const nameOf = key => { const c = cats.find(x => x.key === key); return c ? c.name : ''; };
+            const mainKeys = R.main.map(m => m.key);
+            const others = cats.filter(c => mainKeys.indexOf(c.key) === -1);
+            const byKey = R.others.byKey || {};
+            const sameSet = (a, b) => (a || []).slice().sort().join() === (b || []).slice().sort().join();
+            const standard = others.filter(c => !Array.isArray(byKey[c.key]) || sameSet(byKey[c.key], R.others.benefits));
+            const differing = others.filter(c => standard.indexOf(c) === -1);
+            const roman = ['I', 'II', 'III', 'IV', 'V', 'VI'];
+            let n = 0;
 
-            const mainCards = RECOGNITION.main.map(m => `
-                <article class="rec-card rec-main">
-                    <span class="edge-light"></span>
-                    <div class="rec-card-head">
-                        <span class="rec-eyebrow">${_recEsc(nameOf(m.key) || 'Main Award')}</span>
-                        <h3 class="rec-title">${_recEsc(m.label)}</h3>
+            const mainHtml = R.main.map(m => {
+                const award = nameOf(m.key);
+                return `
+                <section class="ad-section">
+                    <div class="ad-num" aria-hidden="true">${roman[n++] || n}</div>
+                    <div class="ad-content">
+                        <span class="ad-kicker">${_recEsc(m.label)}</span>
+                        <h3 class="ad-title">${_recEsc(award || m.label)}</h3>
+                        ${m.description ? `<p class="ad-lead">${_recEsc(m.description)}</p>` : ''}
+                        <dl class="ad-prizes">
+                            ${(m.tiers || []).map((t, i) => `
+                                <div class="ad-prize">
+                                    <dt>${_recEsc(t.label)}</dt>
+                                    <dd>${_recTierSentence(t, i)}</dd>
+                                </div>`).join('')}
+                        </dl>
                     </div>
-                    <div class="rec-tiers">
-                        ${(m.tiers || []).map((t, i) => `
-                            <div class="rec-tier">
-                                <span class="rec-medal ${i === 0 ? 'is-first' : i === 1 ? 'is-second' : ''}" aria-hidden="true">${i + 1}</span>
-                                <div class="rec-tier-body">
-                                    <span class="rec-tier-label">${_recEsc(t.label)}</span>
-                                    ${recognitionBadges(t.benefits, { amount: t.amount })}
-                                </div>
-                            </div>`).join('')}
-                    </div>
-                </article>`).join('');
+                </section>`;
+            }).join('');
 
-            const byKey = RECOGNITION.others.byKey || {};
-            const special = others.filter(c => Array.isArray(byKey[c.key]) && byKey[c.key].slice().sort().join() !== RECOGNITION.others.benefits.slice().sort().join());
-            const standard = others.filter(c => special.indexOf(c) === -1);
-            const othersCard = others.length ? `
-                <article class="rec-card rec-others">
-                    <span class="edge-light"></span>
-                    <div class="rec-card-head">
-                        <span class="rec-eyebrow">Individual &amp; Technical Awards</span>
-                        <h3 class="rec-title">Other Award Categories</h3>
+            const othersHtml = others.length ? `
+                <section class="ad-section">
+                    <div class="ad-num" aria-hidden="true">${roman[n++] || n}</div>
+                    <div class="ad-content">
+                        <span class="ad-kicker">Individual &amp; Technical</span>
+                        <h3 class="ad-title">${_recEsc(R.others.title || 'Individual & Technical Awards')}</h3>
+                        ${R.others.description ? `<p class="ad-lead">${_recEsc(R.others.description)}</p>` : ''}
+                        ${standard.length ? `<p class="ad-text">Winners of ${_recList(standard.map(c => '<em>' + _recEsc(c.name) + '</em>'))}, and other applicable festival awards, will each receive ${_recBenefitsProse(R.others.benefits)}.</p>` : ''}
+                        ${differing.map(c => `<p class="ad-text">The <em>${_recEsc(c.name)}</em> winner will receive ${_recBenefitsProse(byKey[c.key])}.</p>`).join('')}
                     </div>
-                    ${standard.length ? `<ul class="rec-chips">${standard.map(c => `<li>${_recEsc(c.name)}</li>`).join('')}</ul>
-                    ${recognitionBadges(RECOGNITION.others.benefits)}` : ''}
-                    ${special.map(c => `<div class="rec-other-row"><span>${_recEsc(c.name)}</span>${recognitionBadges(byKey[c.key], { small: true })}</div>`).join('')}
-                </article>` : '';
+                </section>` : '';
 
-            const n = RECOGNITION.nominee || {};
-            const extras = (Array.isArray(n.extra) ? n.extra : []).filter(Boolean);
-            const nomineeCard = n.enabled ? `
-                <article class="rec-card rec-nominee">
-                    <span class="edge-light"></span>
-                    <div class="rec-nominee-icon" aria-hidden="true">${RECOGNITION_ICONS.special}</div>
-                    <div class="rec-card-head">
-                        <span class="rec-eyebrow">Official Nominees</span>
-                        <h3 class="rec-title">${_recEsc(n.title || 'Angle Frames Special Award')}</h3>
-                        ${n.subtitle ? `<p class="rec-sub">${_recEsc(n.subtitle)}</p>` : ''}
+            const nom = R.nominee || {};
+            const nomBenefits = [_recEsc(nom.title || 'Angle Frames Special Award')]
+                .concat((nom.benefits || []).map(b => ({ cash: 'Cash Prize', memento: 'Memento', certificate: 'Certificate' }[b] || _recEsc(b))))
+                .concat((Array.isArray(nom.extra) ? nom.extra : []).filter(Boolean).map(_recEsc));
+            const nomineeHtml = nom.enabled ? `
+                <section class="ad-section ad-nominee">
+                    <div class="ad-num" aria-hidden="true">${roman[n++] || n}</div>
+                    <div class="ad-content">
+                        <span class="ad-kicker">${_recEsc(nom.subtitle || 'For every officially nominated entry')}</span>
+                        <h3 class="ad-title">${_recEsc(nom.title || 'Angle Frames Special Award')}</h3>
+                        ${nom.description ? `<p class="ad-lead">${_recEsc(nom.description)}</p>` : ''}
+                        <p class="ad-text">Official nominees will receive:</p>
+                        <ul class="ad-list">${nomBenefits.map(b => `<li>${b}</li>`).join('')}</ul>
                     </div>
-                    ${recognitionBadges((n.benefits || []).concat(extras))}
-                </article>` : '';
+                </section>` : '';
 
-            box.innerHTML = `
-                <div class="rec-head scroll-reveal is-visible">
-                    <span class="section-eyebrow">What Winners Receive</span>
-                    <h3 class="rec-heading">Prizes &amp; Recognition</h3>
-                </div>
-                <div class="rec-grid">${mainCards}${othersCard}${nomineeCard}</div>
-                ${!RECOGNITION.show_amounts ? '<p class="rec-note">Cash prize amounts will be announced soon.</p>' : ''}`;
-            box.querySelectorAll('.rec-card').forEach(c => { if (typeof initCardGlow === 'function') initCardGlow(c); });
+            body.innerHTML = `
+                <header class="ad-header">
+                    <span class="ad-eyebrow">Sharankrishna Short Film Awards</span>
+                    <h2 class="ad-heading" id="awardDetailsTitle">Prizes &amp; Recognition</h2>
+                    <div class="ad-rule" aria-hidden="true"><span>★</span></div>
+                    ${R.intro ? `<p class="ad-intro">${_recEsc(R.intro)}</p>` : ''}
+                </header>
+                ${mainHtml}${othersHtml}${nomineeHtml}
+                ${!R.show_amounts ? '<p class="ad-footnote">Cash prize amounts will be announced closer to the festival.</p>' : ''}`;
         }
+
+        let _adLastFocus = null;
+        function openAwardDetails() {
+            const m = document.getElementById('awardDetailsModal');
+            if (!m) return;
+            renderAwardDetails();
+            _adLastFocus = document.activeElement;
+            m.hidden = false;
+            requestAnimationFrame(() => requestAnimationFrame(() => m.classList.add('is-open')));
+            document.body.style.overflow = 'hidden';
+            const scroller = m.querySelector('.ad-scroll');
+            if (scroller) scroller.scrollTop = 0;
+            setTimeout(() => { const c = m.querySelector('.ad-close'); if (c) c.focus(); }, 60);
+        }
+        function closeAwardDetails() {
+            const m = document.getElementById('awardDetailsModal');
+            if (!m || m.hidden) return;
+            m.classList.remove('is-open');
+            document.body.style.overflow = '';
+            setTimeout(() => { m.hidden = true; }, 420);
+            if (location.hash === '#prizes') history.replaceState(null, '', location.pathname + location.search);
+            if (_adLastFocus && _adLastFocus.focus) _adLastFocus.focus();
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAwardDetails(); });
         /* ===== END PRIZES & RECOGNITION ===== */
 
         let categoryCarouselIndex = 0;
@@ -841,7 +867,6 @@
                     <div class="category-grid-item">
                         ${item.image ? `<div class="grid-item-img"><img src="${item.image}" alt="${item.title.replace('<br>',' ')}" loading="lazy"></div>` : item.icon_svg ? `<div class="grid-item-svg-icon">${item.icon_svg}</div>` : `<div class="grid-item-emoji">${item.emoji || ''}</div>`}
                         <h4 class="grid-item-title">${item.title.replace('<br>', ' ')}</h4>
-                        ${recognitionCardHtml(item.key)}
                     </div>
                 `).join('');
                 grid.dataset.built = '1';
@@ -885,7 +910,7 @@
                     <span class="edge-light"></span>
                     ${iconMarkup}
                     <h3 class="stack-card-title">${item.title}</h3>
-                    ${recognitionCardHtml(item.key)}
+                    <p class="stack-card-sub">Award Category</p>
                 `;
                 track.appendChild(card);
                 initCardGlow(card);
@@ -1940,6 +1965,7 @@
             else if (h === '#how-to-submit') openInfoModal('submit');
             else if (h === '#updates') openInfoModal('updates');
             else if (h === '#faq') openInfoModal('faq');
+            else if (h === '#prizes') openAwardDetails();
         }
         window.addEventListener('load', openModalFromHash);
         window.addEventListener('hashchange', openModalFromHash);
