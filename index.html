@@ -3,7 +3,7 @@
          ⚙️  MASTER CONFIGURATION — Edit everything here
          All site content, images, dates, cards live in this block.
          ============================================================ -->
-    <script src="assets/js/config.js?v=3"></script>
+    <script src="assets/js/config.js?v=4"></script>
 
 <html lang="en">
 <head>
@@ -92,7 +92,7 @@
     </script>
 
     <link rel="stylesheet" href="assets/css/ui-components.css">
-    <link rel="stylesheet" href="assets/css/site.css?v=13">
+    <link rel="stylesheet" href="assets/css/site.css?v=14">
 </head>
 <body>
 
@@ -232,10 +232,11 @@
     <!-- ===== ABOUT SECTION ===== -->
     <section id="section-story" class="page-section">
         <div class="section-inner">
-            <span class="section-eyebrow scroll-reveal">Our Story</span>
-            <h2 class="section-heading scroll-reveal delay-1"><span class="shiny-text">About the<br>Awards</span></h2>
+            <span class="section-eyebrow scroll-reveal">About</span>
+            <h2 class="section-heading scroll-reveal delay-1"><span class="shiny-text">Our Story</span></h2>
+            <p class="about-lead scroll-reveal delay-2">An award born from remembrance and built for new voices — the story of the festival, the person it honours, and the partners who make it possible.</p>
             <div class="story-grid" id="aboutCardsContainer">
-                <!-- rendered by renderAboutCards() from ABOUT_CARDS config -->
+                <!-- rendered by renderAboutCards() from ABOUT_SECTIONS (config.js) or Admin → About -->
             </div>
         </div>
     </section>
@@ -282,6 +283,16 @@
             </div>
         </div>
     </section>
+
+    <!-- About chapter detail ("Know More") -->
+    <div id="aboutDetailModal" class="ad-overlay ab-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="aboutDetailTitle" onclick="if(event.target===this)closeAboutDetail()">
+        <div class="ad-panel">
+            <button type="button" class="ad-close" onclick="closeAboutDetail()" aria-label="Close">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+            <div class="ad-scroll"><article class="ad-body ab-body" id="aboutDetailBody"></article></div>
+        </div>
+    </div>
 
     <!-- Award Details (Prizes & Recognition) -->
     <div id="awardDetailsModal" class="ad-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="awardDetailsTitle" onclick="if(event.target===this)closeAwardDetails()">
@@ -995,6 +1006,6 @@
     </noscript>
     <script src="assets/js/ui-components.js"></script>
     <script src="assets/js/campus-proof.js?v=1"></script>
-    <script src="assets/js/site.js?v=14"></script>
+    <script src="assets/js/site.js?v=15"></script>
 </body>
 </html>
