@@ -92,7 +92,7 @@
     </script>
 
     <link rel="stylesheet" href="assets/css/ui-components.css">
-    <link rel="stylesheet" href="assets/css/site.css?v=22">
+    <link rel="stylesheet" href="assets/css/site.css?v=23">
 </head>
 <body>
 
@@ -128,7 +128,7 @@
             <a id="navRegistration" href="#section-registration">Registration</a>
             <a id="navContact" href="#section-contact">Contact Us</a>
             <div class="nav-more-wrapper" id="navMoreWrapper">
-                <a href="javascript:void(0)" id="navMoreTrigger" onclick="toggleMoreDropdown(event)">More &#9662;</a>
+                <a href="javascript:void(0)" id="navMoreTrigger" aria-haspopup="true" onclick="toggleMoreDropdown(event)">More<span class="nav-caret" aria-hidden="true">&#9662;</span></a>
                 <div class="nav-more-dropdown" id="navMoreDropdown">
                     <a id="navMoreVideos" onclick="location.href='#section-videos';closeMobileMenu&&closeMobileMenu();" style="display:none;">Videos</a>
                     <a onclick="selectMoreItem('submit')">How To Submit</a>
