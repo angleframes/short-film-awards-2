@@ -92,7 +92,7 @@
     </script>
 
     <link rel="stylesheet" href="assets/css/ui-components.css">
-    <link rel="stylesheet" href="assets/css/site.css?v=18">
+    <link rel="stylesheet" href="assets/css/site.css?v=19">
 </head>
 <body>
 
@@ -600,17 +600,36 @@
 
 
     <!-- ===== SUBMIT CTA (after categories) ===== -->
-    <section class="submit-cta" id="submitCta" aria-labelledby="submitCtaHeading">
-        <div class="submit-cta__inner scroll-reveal">
-            <div class="submit-cta__rule" aria-hidden="true"></div>
-            <h2 class="submit-cta__heading" id="submitCtaHeading">Your story deserves the screen.</h2>
-            <p class="submit-cta__text" id="submitCtaText">
-                Submit your short film to the Sharankrishna Short Film Awards 2026.
-                Entries for the General and Campus categories close
-                <span class="submit-cta__deadline" id="ctaDeadlineDate">31 Dec 2026</span>.
-            </p>
-            <a class="submit-cta__button" id="ctaSubmitBtn" href="#section-registration">Register Your Film <span aria-hidden="true">&rarr;</span></a>
-            <span class="submit-cta__note">₹1,000 entry fee &middot; Open to all filmmakers</span>
+    <section class="submit-cta page-section" id="submitCta" aria-labelledby="submitCtaHeading">
+        <div class="submit-cta__inner">
+            <span class="section-eyebrow scroll-reveal" id="ctaEyebrow">Submissions Open</span>
+            <h2 class="section-heading scroll-reveal delay-1" id="submitCtaHeading"><span class="shiny-text">Your Story Deserves<br>the Screen.</span></h2>
+            <p class="submit-cta__lead scroll-reveal delay-2">Bring your story to the Sharankrishna Short Film Awards 2026 and showcase your work alongside emerging and independent filmmakers.</p>
+
+            <p class="submit-cta__kicker scroll-reveal delay-2" id="ctaKicker">Entries are open across</p>
+            <dl class="submit-cta__facts scroll-reveal delay-3">
+                <div class="submit-cta__fact">
+                    <dt>General Category</dt>
+                    <dd>For independent filmmakers and eligible general entries.</dd>
+                </div>
+                <div class="submit-cta__fact">
+                    <dt>Campus Category</dt>
+                    <dd>For student and campus filmmakers.</dd>
+                </div>
+                <div class="submit-cta__fact">
+                    <dt>Entry Deadline</dt>
+                    <dd class="is-value" id="ctaDeadlineDate">31 Dec 2026</dd>
+                </div>
+                <div class="submit-cta__fact">
+                    <dt>Entry Fee</dt>
+                    <dd class="is-value">₹1,000</dd>
+                </div>
+            </dl>
+
+            <div class="submit-cta__action scroll-reveal delay-4">
+                <a class="submit-cta__button" id="ctaSubmitBtn" href="#section-registration">Register Your Film <span aria-hidden="true">&rarr;</span></a>
+                <span class="submit-cta__note">General &amp; Campus Categories &middot; Official Recognition &middot; Awards &amp; Certificates</span>
+            </div>
         </div>
     </section>
 
@@ -1021,6 +1040,6 @@
     </noscript>
     <script src="assets/js/ui-components.js"></script>
     <script src="assets/js/campus-proof.js?v=1"></script>
-    <script src="assets/js/site.js?v=17"></script>
+    <script src="assets/js/site.js?v=18"></script>
 </body>
 </html>
