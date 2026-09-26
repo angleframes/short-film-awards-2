@@ -653,13 +653,13 @@
                   description: 'The Campus Category is dedicated to recognising outstanding filmmaking talent from student and campus filmmakers.',
                   tiers: [
                     { label: 'First Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' },
-                    { label: 'Second Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' }
+                    { label: 'Special Jury Mention', benefits: ['cash', 'memento', 'certificate'], amount: '' }
                 ] },
                 { key: 'best_short_film', label: 'General Category',
                   description: 'The General Category recognises outstanding independent and professional short films participating in the festival.',
                   tiers: [
                     { label: 'First Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' },
-                    { label: 'Second Prize', benefits: ['cash', 'memento', 'certificate'], amount: '' }
+                    { label: 'Special Jury Mention', benefits: ['cash', 'memento', 'certificate'], amount: '' }
                 ] }
             ],
             others: {
@@ -716,9 +716,10 @@
         function _recTierSentence(tier, i) {
             const what = _recBenefitsProse(tier.benefits, tier.amount);
             if (!what) return '';
+            const label = String(tier.label || '');
+            if (/jury/i.test(label)) return 'A distinct honour conferred at the discretion of the jury, the ' + _recEsc(label) + ' will be accompanied by ' + what + '.';
             if (i === 0) return 'The winner will receive ' + what + '.';
-            if (i === 1) return 'The second-place winner will also receive ' + what + '.';
-            return 'The ' + _recEsc(String(tier.label || '').toLowerCase()) + ' winner will receive ' + what + '.';
+            return 'The ' + _recEsc(label) + ' recipient will receive ' + what + '.';
         }
 
         function renderAwardDetails() {
@@ -728,7 +729,8 @@
             const cats = (window._awardCategoriesData || []).filter(c => c.active !== false);
             const nameOf = key => { const c = cats.find(x => x.key === key); return c ? c.name : ''; };
             const mainKeys = R.main.map(m => m.key);
-            const others = cats.filter(c => mainKeys.indexOf(c.key) === -1);
+            const tierNames = R.main.flatMap(m => (m.tiers || []).map(t => String(t.label || '').toLowerCase()));
+            const others = cats.filter(c => mainKeys.indexOf(c.key) === -1 && tierNames.indexOf(String(c.name || '').toLowerCase()) === -1);
             const byKey = R.others.byKey || {};
             const sameSet = (a, b) => (a || []).slice().sort().join() === (b || []).slice().sort().join();
             const standard = others.filter(c => !Array.isArray(byKey[c.key]) || sameSet(byKey[c.key], R.others.benefits));
@@ -747,7 +749,7 @@
                         ${m.description ? `<p class="ad-lead">${_recEsc(m.description)}</p>` : ''}
                         <dl class="ad-prizes">
                             ${(m.tiers || []).map((t, i) => `
-                                <div class="ad-prize">
+                                <div class="ad-prize${/jury/i.test(t.label || '') ? ' is-jury' : (i === 0 ? ' is-first' : '')}">
                                     <dt>${_recEsc(t.label)}</dt>
                                     <dd>${_recTierSentence(t, i)}</dd>
                                 </div>`).join('')}
