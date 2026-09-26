@@ -4083,3 +4083,42 @@
         @media (max-width: 768px) { .gallery-select-strip li { flex-basis: 118px; } }
         @media (max-width: 430px) { .gallery-select-strip li { flex-basis: 104px; } }
         @media (min-width: 769px) { .gs-fig figcaption { text-align: left; } }
+
+        /* ===== RESPONSIVE IMAGES (phones & tablets) =====
+           Photos keep their own aspect ratio: full width, natural height, never stretched,
+           never cropped to fill a fixed box. Applies automatically to every uploaded photo. */
+        .gs-fig { overflow: hidden; }                       /* keeps the blurred backdrop inside */
+        .gallery-select-strip li label img { height: auto; } /* ignore HTML height attr; keep 16:10 thumbs */
+
+        @media (max-width: 768px) {
+            /* Gallery — featured photo sets its own height instead of a 260px-capped box */
+            .gallery-select-wrap .gallery-select-stage { height: auto; min-height: 0; max-height: none; }
+            .gallery-select-wrap .gs-fig { position: absolute; top: 0; left: 0; width: 100%; height: auto; }
+            .gallery-select-wrap .gs-fig.is-current { position: relative; }
+            .gallery-select-wrap .gs-fig img:not(.gs-backdrop) {
+                position: relative; inset: auto; display: block;
+                width: 100%; height: auto; max-height: 82svh;
+                object-fit: contain; opacity: 1;
+            }
+            /* caption sits under the photo on small screens so it never covers faces */
+            .gallery-select-wrap .gs-fig::after { display: none; }
+            .gallery-select-wrap .gs-fig figcaption {
+                position: relative; left: auto; right: auto; bottom: auto;
+                max-width: none; padding: 16px 5% 6px; text-align: center;
+                background: linear-gradient(to bottom, rgba(6,6,8,0.9), rgba(6,6,8,0));
+            }
+            .gallery-select-wrap .gs-fig figcaption h3 { text-shadow: none; margin-bottom: 10px; }
+
+            /* About chapters — show the whole image (portraits and posters included) */
+            .about-chapter .story-block-img { height: auto; min-height: 0; }
+            .about-chapter .story-block-img img {
+                width: 100%; height: auto; max-height: 80svh;
+                object-fit: contain; object-position: center; background: #0a0a0a;
+            }
+            .about-chapter .story-block-img::after { background: linear-gradient(to bottom, transparent 75%, rgba(10,10,10,0.6) 100%); }
+
+            /* About "Know More" banner — full picture, no crop */
+            .ab-hero { height: auto; }
+            .ab-hero img { height: auto; max-height: 55svh; object-fit: contain; background: #0a0a0a; }
+            .ab-header { margin-top: 18px; }
+        }
