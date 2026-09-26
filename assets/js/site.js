@@ -1080,7 +1080,9 @@
             const items = (ABOUT_DATA || []).filter(s => s && s.visible !== false);
             container.innerHTML = items.map((s, idx) => {
                 const num = String(idx + 1).padStart(2, '0');
-                const fit = s.imageFit === 'contain' ? ' is-contain' : '';
+                const bg = /^#[0-9a-f]{3,8}$/i.test(s.imageBg || '') ? s.imageBg : '';
+                const fit = s.imageFit === 'contain' ? (bg ? ' is-contain is-logo' : ' is-contain') : '';
+                const bgStyle = bg ? ` style="background:${bg}"` : '';
                 return `
                 <article class="story-block about-chapter scroll-reveal delay-1${idx % 2 ? ' reverse' : ''}" data-about="${_abEsc(s.key)}">
                     <span class="story-block-num" aria-hidden="true">${num}</span>
@@ -1092,7 +1094,7 @@
                         <p>${_abInline(s.intro || '')}</p>
                         ${s.body ? `<button type="button" class="about-chapter-cta" onclick="openAboutDetail('${_abEsc(s.key)}')" aria-haspopup="dialog">${_abEsc(s.cta || 'Know More')} <span aria-hidden="true">&rarr;</span></button>` : ''}
                     </div>
-                    <div class="story-block-img${fit}">
+                    <div class="story-block-img${fit}"${bgStyle}>
                         ${s.image ? `<img src="${_abEsc(s.image)}" alt="${_abEsc(s.imageAlt || s.title || '')}" loading="lazy" decoding="async" onerror="this.parentElement.classList.add('no-img');this.style.display='none';">` : ''}
                     </div>
                 </article>`;
@@ -1115,7 +1117,7 @@
             const link = _abSafeUrl(s.linkUrl);
             const external = /^https?:/i.test(link);
             body.innerHTML = `
-                ${s.image ? `<figure class="ab-hero${s.imageFit === 'contain' ? ' is-contain' : ''}"><img src="${_abEsc(s.image)}" alt="${_abEsc(s.imageAlt || s.title || '')}"></figure>` : ''}
+                ${s.image ? `<figure class="ab-hero${s.imageFit === 'contain' ? ' is-contain' : ''}${/^#[0-9a-f]{3,8}$/i.test(s.imageBg || '') ? ' is-logo" style="background:' + s.imageBg : ''}"><img src="${_abEsc(s.image)}" alt="${_abEsc(s.imageAlt || s.title || '')}"></figure>` : ''}
                 <header class="ab-header">
                     <span class="ad-eyebrow">${_abEsc(kicker)}</span>
                     <h2 class="ab-title" id="aboutDetailTitle">${_abEsc(s.title || '')}</h2>
