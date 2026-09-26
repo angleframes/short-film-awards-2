@@ -71,7 +71,7 @@
             {
                 key: "awards",
                 visible: true,
-                kicker: "01 — About the Awards",
+                kicker: "About the Awards",
                 title: "Sharankrishna Short Film Awards",
                 subtitle: "Celebrating Stories. Recognising Talent. Inspiring the Next Generation.",
                 intro: "A platform created to celebrate the filmmakers, storytellers, performers and technicians whose creativity brings stories to life — bringing emerging campus talent and independent filmmakers onto one stage.",
@@ -109,7 +109,7 @@ The emblem blends three layers into one continuous story. Anti-clockwise spiral 
             {
                 key: "inspiration",
                 visible: true,
-                kicker: "02 — The Inspiration",
+                kicker: "The Inspiration",
                 title: "Remembering Sharankrishna",
                 subtitle: "The inspiration behind the name",
                 intro: "A visual artist, director and designer whose creativity and warmth left a lasting mark on everyone he met. The awards carry his name so that his spirit keeps finding new stories to tell.",
@@ -136,7 +136,7 @@ Sharan Krishna passed away on 12 November 2024, at the age of 23. To keep his li
             {
                 key: "organizer",
                 visible: true,
-                kicker: "03 — The Organizer",
+                kicker: "The Organizer",
                 title: "Angle Frames",
                 subtitle: "The creative force behind the festival",
                 intro: "Founded by Anal Chandran and Sharankrishna, Angle Frames is an independent, multi-disciplinary digital media studio based in Kerala — and the organiser of the Sharankrishna Short Film Awards.",
@@ -164,7 +164,7 @@ Angle Frames was co-founded by Sharankrishna. Organising the awards is the studi
             {
                 key: "jain",
                 visible: true,
-                kicker: "04 — Academic Association",
+                kicker: "Academic Association",
                 title: "JAIN (Deemed-to-be University), Kochi",
                 subtitle: "A space for education, innovation and emerging talent",
                 intro: "A centre for education, leadership and entrepreneurship, JAIN (Deemed-to-be University), Kochi brings academic communities and creative filmmaking together as the festival's academic partner.",
