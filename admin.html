@@ -10,7 +10,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <link rel="stylesheet" href="assets/css/ui-components.css">
-<link rel="stylesheet" href="assets/css/admin.css?v=12">
+<link rel="stylesheet" href="assets/css/admin.css?v=14">
 </head>
 <body class="sksfa-admin">
 
@@ -66,6 +66,10 @@
       <button class="tab-btn" data-tab="awards" onclick="switchTab('awards')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2l2.4 4.8 5.3.8-3.85 3.7.9 5.3L12 14.1l-4.75 2.5.9-5.3L4.3 7.6l5.3-.8L12 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8.5 17.5L7 22l5-2.5L17 22l-1.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Awards
+      </button>
+      <button class="tab-btn" data-tab="about" onclick="switchTab('about')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3V4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 17a3 3 0 013-3h11M9 8h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        About
       </button>
       <button class="tab-btn" data-tab="registration" onclick="switchTab('registration')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M9 7h6M9 11h6M9 15h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M8 1v4M16 1v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -246,6 +250,15 @@
         </div>
       </div>
 
+      <!-- ── Prizes & Recognition (public website) ── -->
+      <div class="card" id="recAdminCard">
+        <div class="card-head"><div class="sksfa-card-head-left">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 3.5h8v5.5a4 4 0 01-8 0V3.5z" stroke="currentColor" stroke-width="1.5"/><path d="M8 5.5H5.2a2.8 2.8 0 002.9 3.9M16 5.5h2.8a2.8 2.8 0 01-2.9 3.9M12 13v3.5M9 20.5h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div><h2>Prizes &amp; Recognition</h2><p class="sksfa-card-sub">Wording and prizes shown in the website's “View Award Details”. Changes go live instantly.</p></div>
+        </div></div>
+        <div id="recAdmin"><p class="muted-note">Loading…</p></div>
+      </div>
+
       <!-- ── Evaluation Grid ── -->
       <div class="award-grid" id="awardGrid"></div>
 
@@ -260,6 +273,22 @@
             <tbody id="awardCatBody"></tbody>
           </table>
         </div>
+      </div>
+    </div>
+
+    <!-- ═══ ABOUT TAB ═════════════════════════════════════ -->
+    <div class="tab-pane" id="tab-about">
+      <div class="sksfa-page-title">
+        <div class="sksfa-eyebrow">ADMIN CONTROL PANEL</div>
+        <h1 class="sksfa-h1">About Content</h1>
+        <p class="sksfa-page-desc">The four chapters of the homepage About section and their “Know More” stories. Changes go live on save.</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="sksfa-card-head-left">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3V4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 17a3 3 0 013-3h11M9 8h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div><h2>Chapters</h2><p class="sksfa-card-sub">Click a chapter to edit it. Use the arrows to change the order.</p></div>
+        </div></div>
+        <div id="aboutAdmin"><p class="muted-note">Loading…</p></div>
       </div>
     </div>
 
@@ -565,5 +594,7 @@
 
 <script src="assets/js/ui-components.js"></script>
 <script src="assets/js/certificates.js?v=1"></script>
-<script src="assets/js/admin.js?v=12"></script>
+<script src="assets/js/recognition-admin.js?v=1"></script>
+<script src="assets/js/about-admin.js?v=1"></script>
+<script src="assets/js/admin.js?v=14"></script>
 </html>
