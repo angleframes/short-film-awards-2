@@ -3857,3 +3857,79 @@
         @media (max-width: 480px) {
             .footer-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
+
+        /* ===== ABOUT — chapters & detail ===== */
+        .about-lead {
+            max-width: 620px; margin: 22px auto 0; text-align: center;
+            color: rgba(255,255,255,0.7); font-size: 1rem; line-height: 1.75;
+        }
+        .about-chapter { min-height: 380px; }
+        .about-chapter .story-block-text { padding: 56px 52px; }
+        .about-chapter .story-block-eyebrow { color: rgba(231,198,109,0.85); letter-spacing: 3px; }
+        .about-chapter h3 { font-size: clamp(1.6rem, 2.6vw, 2.15rem); text-transform: uppercase; letter-spacing: -0.3px; }
+        .about-chapter-sub {
+            margin: 10px 0 0 !important;
+            font-family: Georgia, 'Times New Roman', serif; font-style: italic;
+            font-size: 1.02rem !important; line-height: 1.5 !important;
+            color: rgba(255,255,255,0.62) !important;
+        }
+        .about-chapter .story-underline { background: linear-gradient(90deg, #e7c66d, rgba(231,198,109,0.2)); width: 44px; height: 2px; }
+        .about-chapter .story-block-text > p:not(.about-chapter-sub) { font-size: 0.98rem; line-height: 1.8; max-width: 460px; }
+        .about-chapter-cta {
+            margin-top: 26px;
+            display: inline-flex; align-items: center; gap: 12px;
+            padding: 12px 22px; border-radius: 30px;
+            background: rgba(6,6,8,0.6); color: #fff;
+            border: 1px solid rgba(231,198,109,0.45);
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;
+            cursor: pointer; transition: background 0.3s ease, border-color 0.3s ease, gap 0.3s ease;
+        }
+        .about-chapter-cta:hover { background: rgba(231,198,109,0.12); border-color: rgba(231,198,109,0.8); gap: 16px; }
+        .about-chapter-cta:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+        .story-block-img.is-contain img { object-fit: contain; padding: 36px; background: #0a0a0a; }
+
+        .ab-overlay .ad-panel { width: min(900px, 100%); }
+        .ab-body { padding: 0 0 48px; }
+        .ab-hero { margin: 0; height: min(38vh, 340px); position: relative; overflow: hidden; }
+        .ab-hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; filter: brightness(0.85) saturate(0.95); }
+        .ab-hero.is-contain img { object-fit: contain; padding: 30px; background: #0a0a0a; }
+        .ab-hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(10,10,13,0) 55%, #0e0e11 100%); }
+        .ab-header { text-align: center; padding: 0 64px; margin-top: -30px; position: relative; z-index: 1; }
+        .ab-title {
+            margin: 12px 0 0; font-size: clamp(1.7rem, 4vw, 2.6rem); font-weight: 800; text-transform: uppercase;
+            letter-spacing: -0.4px; line-height: 1.08;
+            background: linear-gradient(180deg, #ffffff 30%, #b3b3bb 100%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        .ab-sub { margin-top: 10px; font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-size: 1.08rem; color: rgba(255,255,255,0.65); }
+        .ab-rich { max-width: 640px; margin: 8px auto 0; padding: 0 32px; }
+        .ab-rich h3 {
+            margin: 34px 0 10px; font-size: 0.78rem; font-weight: 700; letter-spacing: 2.6px; text-transform: uppercase;
+            color: rgba(231,198,109,0.9);
+        }
+        .ab-rich p { font-size: 1rem; line-height: 1.85; color: rgba(255,255,255,0.78); margin: 0 0 14px; }
+        .ab-rich strong { color: #fff; }
+        .ab-rich em { color: rgba(255,255,255,0.9); }
+        .ab-rich ul { list-style: none; margin: 6px 0 14px; padding: 0; display: grid; gap: 9px; }
+        .ab-rich li { position: relative; padding-left: 24px; font-size: 1rem; line-height: 1.6; color: rgba(255,255,255,0.82); }
+        .ab-rich li::before { content: ''; position: absolute; left: 2px; top: 0.72em; width: 12px; height: 1px; background: rgba(231,198,109,0.85); }
+        .ab-rich blockquote {
+            margin: 40px 0 8px; padding: 26px 8px 0; border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center; font-family: Georgia, 'Times New Roman', serif; font-style: italic;
+            font-size: clamp(1.15rem, 2.4vw, 1.4rem); line-height: 1.6; color: #f1e3b8;
+        }
+        .ab-actions { display: flex; justify-content: center; margin-top: 30px; padding: 0 24px; }
+        .ab-link { text-decoration: none; }
+        .ab-overlay .ad-close { background: rgba(0,0,0,0.45); }
+
+        @media (max-width: 768px) {
+            .about-chapter .story-block-img { height: clamp(220px, 64vw, 340px); min-height: 0; }
+            .about-chapter .story-block-img img { object-position: center 20%; }
+            .about-chapter .story-block-text { padding: 30px 24px 34px; }
+            .about-chapter-cta { margin-top: 20px; }
+        }
+        @media (max-width: 640px) {
+            .ab-hero { height: 30vh; }
+            .ab-header { padding: 0 22px; margin-top: -40px; }
+            .ab-rich { padding: 0 22px; }
+        }
