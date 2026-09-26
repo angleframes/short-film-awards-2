@@ -1193,10 +1193,17 @@
             strip.querySelectorAll('li').forEach((li, i) => {
                 const selected = i === idx;
                 li.style.borderColor = selected ? 'rgba(255,255,255,0.9)' : '';
-                li.style.boxShadow = selected ? '0 0 18px rgba(192,132,252,0.55)' : '';
+                li.style.boxShadow = selected ? '0 0 18px rgba(255,255,255,0.35)' : '';
                 const img = li.querySelector('img');
                 if (img) img.style.filter = selected ? 'grayscale(0)' : '';
             });
+
+            // Keep the selected thumbnail in view on narrow screens
+            const selLi = strip.children[idx];
+            if (selLi && strip.scrollWidth > strip.clientWidth + 2) {
+                const sr = strip.getBoundingClientRect(), lr = selLi.getBoundingClientRect();
+                strip.scrollTo({ left: strip.scrollLeft + (lr.left - sr.left) - (strip.clientWidth - lr.width) / 2, behavior: 'smooth' });
+            }
 
             // Crossfade: fade out old figs
             const figs = stage.querySelectorAll('.gs-fig');
@@ -1204,7 +1211,8 @@
             figs.forEach(f => {
                 if (f !== newFig) {
                     f.style.opacity = '0';
-                    setTimeout(() => { if (f !== newFig) f.style.display = 'none'; }, 160);
+                    // keep the current figure in place until the new one is ready (stable height on mobile)
+                    setTimeout(() => { if (f !== newFig && !f.classList.contains('is-current')) f.style.display = 'none'; }, 160);
                 }
             });
 
@@ -1215,6 +1223,15 @@
 
                 const show = () => {
                     if (_galleryPendingIdx !== capturedIdx) return; // stale — newer click won
+                    // "is-current" = the figure that sets the stage height on mobile (flow layout)
+                    figs.forEach(f => {
+                        const wasCurrent = f.classList.contains('is-current');
+                        f.classList.toggle('is-current', f === newFig);
+                        if (f !== newFig && wasCurrent) {
+                            f.style.opacity = '0';
+                            setTimeout(() => { if (!f.classList.contains('is-current')) f.style.display = 'none'; }, 160);
+                        }
+                    });
                     newFig.style.display = 'block';
                     requestAnimationFrame(() => { newFig.style.opacity = '1'; });
                 };
@@ -1295,7 +1312,7 @@
 
                 // Stage figure
                 const fig = document.createElement('figure');
-                fig.className = 'gs-fig';
+                fig.className = isFirst ? 'gs-fig is-current' : 'gs-fig';
                 fig.dataset.id = pid;
                 fig.style.display = isFirst ? 'block' : 'none';
                 fig.style.opacity = isFirst ? '1' : '0';
