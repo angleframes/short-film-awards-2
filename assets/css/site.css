@@ -4192,3 +4192,35 @@
             /* leave room so the floating WhatsApp button never covers the last row */
             .support-footer { padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
         }
+
+        /* ===== GALLERY — featured photo fills the full stage width (cover + per-photo focal point) =====
+           The stage spans the full section; the photo fills it edge to edge (no side bars).
+           object-position comes from each photo's focal point (inline style, default centre). */
+        .gs-fig img.gs-photo { object-fit: cover; }
+        @media (max-width: 768px) {
+            /* fixed responsive frame instead of the photo's own height: tablet 4:3, phones square */
+            .gallery-select-wrap .gallery-select-stage { height: auto; min-height: 0; aspect-ratio: 4 / 3; max-height: 78svh; }
+            .gallery-select-wrap .gallery-select-stage .gs-fig,
+            .gallery-select-wrap .gallery-select-stage .gs-fig.is-current { position: absolute; inset: 0; width: 100%; height: 100%; }
+            .gallery-select-wrap .gs-fig img.gs-photo {
+                position: absolute; inset: 0; width: 100%; height: 100%; max-height: none;
+                object-fit: cover;
+            }
+            /* caption back inside the photo, low and compact so faces stay clear */
+            .gallery-select-wrap .gs-fig::after {
+                display: block;
+                background: linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 20%, transparent 42%);
+            }
+            .gallery-select-wrap .gs-fig figcaption {
+                position: absolute; left: 5%; right: 5%; bottom: 14px;
+                max-width: none; padding: 0; text-align: left; background: none;
+            }
+            .gallery-select-wrap .gs-fig figcaption h3 {
+                font-size: clamp(1rem, 4.8vw, 1.45rem); line-height: 1.15;
+                margin-bottom: 8px; text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+            }
+            .gallery-select-wrap .gs-fig figcaption p { font-size: 0.62rem; padding: 4px 10px; letter-spacing: 2px; }
+        }
+        @media (max-width: 480px) {
+            .gallery-select-wrap .gallery-select-stage { aspect-ratio: 1 / 1; }
+        }
