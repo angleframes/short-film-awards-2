@@ -974,7 +974,7 @@
             if (ctaEyebrow) ctaEyebrow.textContent = open ? 'Submissions Open' : 'Submissions Closed';
             if (ctaKicker) ctaKicker.textContent = open ? 'Entries are open across' : 'Categories & key dates';
             if (ctaBtn) {
-                ctaBtn.innerHTML = open ? 'Register Your Film <span aria-hidden="true">&rarr;</span>' : 'Registrations Closed';
+                ctaBtn.innerHTML = open ? 'Submit Your Film <span aria-hidden="true">&rarr;</span>' : 'Registrations Closed';
                 if (open) ctaBtn.removeAttribute('aria-disabled'); else ctaBtn.setAttribute('aria-disabled', 'true');
                 ctaBtn.tabIndex = open ? 0 : -1;
             }
