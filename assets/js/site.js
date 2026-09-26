@@ -205,7 +205,7 @@
                 }
                 if (Array.isArray(galRes.data) && galRes.data.length) {
                     GALLERY_IMAGES.length = 0;
-                    galRes.data.forEach(g => GALLERY_IMAGES.push({ category: g.category, src: g.src, thumb: g.thumb || '', title: g.title || '', sub: g.sub || '' }));
+                    galRes.data.forEach(g => GALLERY_IMAGES.push({ category: g.category, src: g.src, thumb: g.thumb || '', title: g.title || '', sub: g.sub || '', focal: g.focal || '' }));
                 }
                 if (Array.isArray(updRes.data) && updRes.data.length) {
                     UPDATES_FEED.length = 0;
@@ -326,7 +326,7 @@
                                         var currentSrc = (_galleryPhotos[_galleryCurrentIdx] || {}).src;
                                         GALLERY_IMAGES.length = 0;
                                         gr.data.forEach(function(g) {
-                                            GALLERY_IMAGES.push({ category: g.category, src: g.src, thumb: g.thumb || '', title: g.title || '', sub: g.sub || '' });
+                                            GALLERY_IMAGES.push({ category: g.category, src: g.src, thumb: g.thumb || '', title: g.title || '', sub: g.sub || '', focal: g.focal || '' });
                                         });
                                         _galleryInitialized = false;
                                         var wrap = document.getElementById('section-gallery');
@@ -1319,7 +1319,9 @@
                 fig.style.display = isFirst ? 'block' : 'none';
                 fig.style.opacity = isFirst ? '1' : '0';
                 const fetchPriority = isFirst ? ' fetchpriority="high"' : '';
-                fig.innerHTML = `<img class="gs-backdrop" src="${photo.src}" alt="" aria-hidden="true" loading="${isFirst ? 'eager' : 'lazy'}" decoding="async"${fetchPriority}><img src="${photo.src}" alt="${photo.title}" loading="${isFirst ? 'eager' : 'lazy'}" decoding="async"${fetchPriority}><figcaption><h3>${photo.title}</h3><p>${photo.sub}</p></figcaption>`;
+                // focal point ("x% y%") keeps faces in frame when the photo is cropped to fill the stage
+                const focal = /^(100|\d{1,2})% (100|\d{1,2})%$/.test(photo.focal || '') ? photo.focal : '50% 50%';
+                fig.innerHTML = `<img class="gs-backdrop" src="${photo.src}" alt="" aria-hidden="true" loading="${isFirst ? 'eager' : 'lazy'}" decoding="async"${fetchPriority}><img class="gs-photo" style="object-position:${focal}" src="${photo.src}" alt="${photo.title}" loading="${isFirst ? 'eager' : 'lazy'}" decoding="async"${fetchPriority}><figcaption><h3>${photo.title}</h3><p>${photo.sub}</p></figcaption>`;
                 stage.appendChild(fig);
             });
 
