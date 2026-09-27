@@ -4614,3 +4614,87 @@
         .map-link:hover { color: #fff; text-decoration-color: #fff; }
         .map-link:focus-visible { outline: 2px solid #fff; outline-offset: 3px; border-radius: 4px; }
         .support-footer .map-link { margin-top: 12px; }
+
+        /* ===== FOOTER — one continuous surface =====
+           Replaces the translucent + blurred panel (which showed the fixed page artwork twice: sharp above,
+           blurred inside) with a single solid charcoal surface that fades in from the page, one soft spotlight,
+           and no divider lines or boxed blocks. */
+        .support-footer {
+            background: #060608;
+            backdrop-filter: none; -webkit-backdrop-filter: none;
+            border-top: none;
+            padding: 96px 8% 40px;
+            isolation: isolate;
+        }
+        .support-footer::before {                     /* soft blend from the page above — no hard edge */
+            content: ''; position: absolute; left: 0; right: 0; top: -200px; height: 200px; pointer-events: none; z-index: -1;
+            background: linear-gradient(to bottom, rgba(6,6,8,0) 0%, rgba(6,6,8,0.75) 60%, #060608 100%);
+        }
+        .support-footer::after {                      /* single subtle cinematic spotlight */
+            content: ''; position: absolute; inset: 0; pointer-events: none; z-index: -1;
+            background: radial-gradient(ellipse 70% 55% at 50% 0%, rgba(255,255,255,0.045) 0%, transparent 70%);
+        }
+        .footer-columns { margin-bottom: 64px; }
+        .footer-bottom-bar { border-top: none; padding-top: 0; margin-top: 64px; align-items: flex-end; }
+        .footer-social-grid { background: transparent; border: none; padding: 0; gap: 6px; }
+
+        /* ===== FOOTER — location panel (one map, two places) ===== */
+        .footer-location {
+            max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr); gap: 40px; align-items: stretch;
+            padding: 28px; border-radius: 22px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02);
+        }
+        .fl-info { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+        .fl-eyebrow { color: #fff; font-size: 0.95rem; font-weight: 700; margin: 0 0 16px; }
+        .fl-tabs { display: inline-flex; gap: 4px; padding: 4px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.14); margin-bottom: 24px; max-width: 100%; }
+        .fl-tab {
+            font: inherit; cursor: pointer; border: 0; background: transparent; white-space: nowrap;
+            padding: 9px 16px; border-radius: 999px; font-size: 0.66rem; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase;
+            color: rgba(255,255,255,0.65); transition: background 0.25s ease, color 0.25s ease;
+        }
+        .fl-tab:hover { color: #fff; }
+        .fl-tab.is-active { background: #fff; color: #000; }
+        .fl-tab:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+        .fl-place { display: flex; flex-direction: column; gap: 6px; margin-bottom: 22px; }
+        .fl-kicker { font-size: 0.62rem; font-weight: 700; letter-spacing: 2.6px; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+        .fl-name { color: #fff; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.3px; }
+        .fl-address { color: rgba(255,255,255,0.62); font-size: 0.86rem; line-height: 1.65; overflow-wrap: anywhere; }
+        .fl-directions {
+            margin-top: auto; display: inline-flex; align-items: center; gap: 10px; padding: 11px 20px; border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.3); color: #fff; text-decoration: none;
+            font-size: 0.68rem; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; transition: background 0.25s ease, border-color 0.25s ease;
+        }
+        .fl-directions:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.6); }
+        .fl-directions:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+        .fl-map { position: relative; min-height: 300px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #0d0d0f; }
+        .fl-map iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; filter: grayscale(0.9) contrast(1.05); transition: filter 0.45s ease; }
+        .fl-map:hover iframe, .fl-map:focus-within iframe { filter: none; }
+        @media (max-width: 860px) {
+            .footer-location { grid-template-columns: 1fr; gap: 24px; padding: 22px; }
+            .fl-map { min-height: 0; height: 320px; order: 2; }
+            .fl-directions { margin-top: 4px; }
+        }
+        @media (max-width: 480px) {
+            .footer-location { padding: 18px; border-radius: 18px; }
+            .fl-tabs { display: flex; width: 100%; }
+            .fl-tab { flex: 1; padding: 11px 8px; letter-spacing: 1.2px; }
+            .fl-map { height: 300px; }
+        }
+
+        /* ===== Watch & Relive — Festival Moments rotating collage ===== */
+        .fm-collage { position: absolute; inset: 0; display: block; }
+        .fm-set { position: absolute; inset: 0; display: grid; gap: 3px; background: #070708; grid-template-columns: 1.6fr 1fr; grid-template-rows: 1fr 1fr; opacity: 0; transition: opacity 1.4s ease; }
+        .fm-set.is-active { opacity: 1; }
+        .fm-set.n2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
+        .fm-tile { position: relative; overflow: hidden; min-width: 0; min-height: 0; }
+        .fm-tile.is-main { grid-row: 1 / -1; }
+        .fm-tile img { position: absolute; inset: 0; }
+        @media (max-width: 480px) {
+            /* phones: two photos per set — large + one */
+            .fm-set:not(.n2) { grid-template-columns: 1.3fr 1fr; grid-template-rows: 1fr; }
+            .fm-set:not(.n2) .fm-tile:nth-child(3) { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) { .fm-set { transition: none; } }
+        @media (max-width: 480px) {
+            .support-footer { padding-left: 5%; padding-right: 5%; }
+            .footer-location { padding: 14px; }
+        }
