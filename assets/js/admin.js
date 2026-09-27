@@ -165,6 +165,8 @@ function switchTab(name) {
   if (name === 'videos') { loadVideoCategories(); loadTestimonials(); }
   if (name === 'certificates' && window.Certs) Certs.renderManagement();
   if (name === 'about' && window.AboutAdmin) AboutAdmin.load();
+  if (name === 'festival' && window.MediaAdmin) MediaAdmin.load();
+  if (name === 'jury' && window.JuryAdmin) JuryAdmin.load();
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -188,6 +190,8 @@ async function gate() {
   if (window.Certs) Certs.init(sb);
   if (window.RecAdmin) RecAdmin.init(sb);
   if (window.AboutAdmin) AboutAdmin.init(sb);
+  if (window.MediaAdmin) MediaAdmin.init(sb);
+  if (window.JuryAdmin) JuryAdmin.init(sb);
   document.getElementById('whoami').textContent = session.user.email;
   document.getElementById('whoAvatar').textContent = (session.user.email || '?').charAt(0).toUpperCase();
   show('dash');
