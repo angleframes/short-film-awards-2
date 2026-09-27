@@ -2858,3 +2858,13 @@ html { scroll-padding-top: 130px; }
   .mg-pv { padding: 56px 10px 16px; }
   .mg-pv-close { top: -48px; right: 0; }
 }
+/* Festival Gallery — edition / year suggestions */
+.sksfa-admin .mg-req { color: #fff; opacity: 0.55; }
+.sksfa-admin .mg-year-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: -4px; }
+.sksfa-admin .mg-year-chip {
+  font: inherit; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; cursor: pointer;
+  padding: 5px 12px; border-radius: 999px; color: #cfcfcf; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.14);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.sksfa-admin .mg-year-chip:hover { color: #fff; border-color: rgba(255,255,255,0.35); }
+.sksfa-admin .mg-year-chip.is-on { color: #000; background: #fff; border-color: #fff; }
