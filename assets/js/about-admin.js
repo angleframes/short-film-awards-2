@@ -100,7 +100,7 @@ window.AboutAdmin = (function () {
                 ${field(r.key, 'cta_label', 'Button text', r.cta_label, { placeholder: 'Know More' })}
                 <div></div>
                 ${field(r.key, 'body', 'Full story (opens from the button)', r.body, { textarea: true, rows: 14, full: true, mono: true,
-                  hint: '## Heading &nbsp;·&nbsp; blank line = new paragraph &nbsp;·&nbsp; - list item &nbsp;·&nbsp; &gt; closing quote &nbsp;·&nbsp; **bold** &nbsp;·&nbsp; *italic*' })}
+                  hint: '## Heading &nbsp;·&nbsp; blank line = new paragraph &nbsp;·&nbsp; - list item &nbsp;·&nbsp; &gt; closing quote &nbsp;·&nbsp; **bold** &nbsp;·&nbsp; *italic* &nbsp;·&nbsp; @video YouTube-link | caption' })}
                 ${field(r.key, 'link_label', 'Link button text (optional)', r.link_label, { placeholder: 'Visit the official website' })}
                 ${field(r.key, 'link_url', 'Link address (optional)', r.link_url, { placeholder: 'https://… or #prizes' })}
               </div>
