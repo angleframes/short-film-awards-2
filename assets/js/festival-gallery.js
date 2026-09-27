@@ -38,6 +38,16 @@
   // feed state for the current filter
   let view = [];           // loaded items, in display (and lightbox) order
   let offset = 0, hasMore = false, loading = false, token = 0, juryDone = false;
+  let seen = new Set();    // de-duplication for the current view (record id + image file)
+  const fileKey = u => String(u || '').split('?')[0].replace(/^https?:\/\/[^/]+\//, '').replace(/^\/+/, '')
+    .replace(/_(disp|thumb)_/, '_').replace(/Gallery\/(display|thumbs)\//, 'Gallery/').replace(/-(full|md|th)\.webp$/, '.webp').toLowerCase();
+  // true the first time an item is seen; false for a repeat (same record, same image file or same video)
+  function isNew(it) {
+    const keys = [it.id ? 'id:' + it.id : '', it.ytid ? 'yt:' + it.ytid : '', it.full ? 'f:' + fileKey(it.full) : ''].filter(Boolean);
+    if (keys.some(k => seen.has(k))) return false;
+    keys.forEach(k => seen.add(k));
+    return true;
+  }
   let lbIndex = -1;
   let io = null;
 
@@ -79,7 +89,7 @@
   function toItem(m) {
     const id = m.media_type === 'video' ? ytId(m.video_url) : '';
     return {
-      type: m.media_type, category: m.category, title: m.title || '', desc: m.description || '', year: m.edition_year,
+      id: m.id, type: m.media_type, category: m.category, title: m.title || '', desc: m.description || '', year: m.edition_year,
       featured: !!m.is_featured,
       full: m.image_url || '', medium: m.medium_url || '', w: m.width || 0,
       thumb: m.thumbnail_url || m.image_url || (id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : ''),
@@ -149,17 +159,19 @@
     }
     if (my !== token) return;
     const more = rows.length > PAGE;
-    const batch = rows.slice(0, PAGE).map(toItem);
-    offset += batch.length;
+    const page = rows.slice(0, PAGE);
+    offset += page.length;
+    const batch = page.map(toItem).filter(isNew);
     hasMore = more;
     if (!hasMore && !juryDone && wantsJury()) {
       juryDone = true;
-      batch.push(...juryAll.filter(j => j.show_in_gallery && j.photo_url).map(juryItem));
+      batch.push(...juryAll.filter(j => j.show_in_gallery && j.photo_url).map(juryItem).filter(isNew));
     }
     const start = view.length;
     view.push(...batch);
     appendCards(start);
     loading = false; setMoreState();
+    if (!batch.length && hasMore) return loadMore();   // a page of only repeats — fetch the next one
     if (lbPending) { const p = lbPending; lbPending = null; p(); }
   }
 
@@ -267,7 +279,7 @@
   // (re)start the feed for the current filter
   function startFeed() {
     token++;
-    view = []; offset = 0; hasMore = true; loading = false; juryDone = false;
+    view = []; offset = 0; hasMore = true; loading = false; juryDone = false; seen = new Set();
     if (active === 'jury') {
       $('fgContent').innerHTML = '<p class="fg-empty">Loading…</p>';
       // jury sets are small: pull every page, then render grouped
