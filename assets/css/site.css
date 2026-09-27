@@ -4541,3 +4541,18 @@
         /* ===== About / Our Story — centre the eyebrow + heading to match the centred intro ===== */
         #section-story > .section-inner { text-align: center; }
         #section-story .story-grid { text-align: left; }
+
+        /* ===== IMAGE FIDELITY — monochrome by default, never darkened; true colour on hover =====
+           Only grayscale is used for the monochrome look. No brightness/opacity reduction on photos,
+           and decorative overlays fade out completely when the colour is revealed. */
+        .pe-media img { filter: grayscale(1); }
+        .pe-media::after { background: radial-gradient(130% 100% at 50% 30%, transparent 70%, rgba(0,0,0,0.18) 100%); transition: opacity 0.45s ease; }
+        .pe-grain { opacity: 0.05; transition: opacity 0.45s ease; }
+        @media (hover: hover) and (pointer: fine) {
+            .pe-card:hover .pe-media::after, .pe-card:hover .pe-grain { opacity: 0; }
+        }
+        .story-block-img img { filter: grayscale(30%); }
+        .story-block:hover .story-block-img img { filter: grayscale(0%); }
+        .ab-hero img { filter: none; }
+        .gs-fig img:not(.gs-backdrop), .gallery-select-wrap .gs-fig img.gs-photo { opacity: 1; }
+        .jury-member-photo img { filter: grayscale(1); }
