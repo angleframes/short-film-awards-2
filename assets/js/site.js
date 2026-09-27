@@ -1856,7 +1856,9 @@
         }
 
         /* ===== JURY — current + previous members from Admin → Jury (jury_members); config.js JURY_PANEL is only a fallback ===== */
+        const _tidy = t => String(t || '').replace(/\s+/g, ' ').trim();   // collapse stray double spaces from admin input
         function _juryCardHtml(m, opts) {
+            m = Object.assign({}, m, { name: _tidy(m.name), designation: _tidy(m.designation), bio: _tidy(m.bio) });
             const role = m.designation || m.role || '';
             const photo = m.photo_url || m.src || '';
             const year = opts && opts.showYear && m.edition_year ? `<span class="jury-member-edition">${_vidEsc(m.edition_year)} Edition</span>` : '';
@@ -1892,9 +1894,13 @@
             const prevSec = document.getElementById('section-previous-jury');
             const prevGrid = document.getElementById('previousJuryGrid');
             if (prevSec && prevGrid) {
-                const prev = fromDb ? window._juryData.filter(m => m.jury_type === 'previous') : [];
+                const prev = (fromDb ? window._juryData.filter(m => m.jury_type === 'previous') : []).slice(0, 8);
                 prevSec.hidden = !prev.length;
-                prevGrid.innerHTML = prev.slice(0, 8).map(m => _juryCardHtml(m, { compact: true, showYear: true })).join('');
+                // one edition → label it once above the grid; several → label each card
+                const years = [...new Set(prev.map(m => m.edition_year || ''))];
+                const label = document.getElementById('previousJuryEdition');
+                if (label) { label.textContent = years.length === 1 && years[0] ? years[0] + ' Edition' : ''; label.hidden = !label.textContent; }
+                prevGrid.innerHTML = prev.map(m => _juryCardHtml(m, { compact: true, showYear: years.length > 1 })).join('');
             }
         }
 
