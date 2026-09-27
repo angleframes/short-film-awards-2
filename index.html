@@ -1,13 +1,9 @@
 <!DOCTYPE html>
-    <!-- ============================================================
-         ⚙️  MASTER CONFIGURATION — Edit everything here
-         All site content, images, dates, cards live in this block.
-         ============================================================ -->
-    <script src="assets/js/config.js?v=9"></script>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- Master configuration (site content, images, dates) -->
+    <script src="assets/js/config.js?v=9"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <link rel="icon" type="image/png" href="Favicon.png">
@@ -23,27 +19,110 @@
     <!-- Supabase client (reads live site settings/gallery/updates) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <title id="browserTabTitle">Sharankrishna Short Film Awards 2026 | Kochi, Kerala</title>
-    <meta name="description" content="Submit your short film to the Sharankrishna Short Film Awards 2026. Hosted at Jain University Kochi on 12 Feb 2027. 11 award categories including Best Short Film, Best Director, Best Cinematography. Entry fee ₹1,000.">
+    <title id="browserTabTitle">Sharankrishna Short Film Awards</title>
+    <meta name="description" content="Sharankrishna Short Film Awards is a Kerala-based short film awards platform celebrating independent and student filmmakers, with General and Campus categories, jury recognition and online film submissions.">
     <link rel="canonical" href="https://sharankrishnashortfilmawards.com/">
-    <meta property="og:title" content="Sharankrishna Short Film Awards 2026 | Kochi, Kerala">
-    <meta property="og:description" content="Submit your short film to the Sharankrishna Short Film Awards 2026. Hosted at Jain University Kochi on 12 Feb 2027. 11 award categories. Entry fee ₹1,000.">
-    <meta property="og:url" content="https://sharankrishnashortfilmawards.com/">
+    <meta name="robots" content="index, follow, max-image-preview:large">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://sharankrishnashortfilmawards.com/LOGO.webp">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="1200">
     <meta property="og:site_name" content="Sharankrishna Short Film Awards">
+    <meta property="og:title" content="Sharankrishna Short Film Awards">
+    <meta property="og:description" content="A Kerala-based short film awards platform celebrating independent and student filmmakers — General and Campus categories, jury recognition and online submissions.">
+    <meta property="og:url" content="https://sharankrishnashortfilmawards.com/">
+    <meta property="og:locale" content="en_IN">
+    <meta property="og:image" content="https://sharankrishnashortfilmawards.com/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Sharankrishna Short Film Awards logo">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Sharankrishna Short Film Awards 2026 | Kochi, Kerala">
-    <meta name="twitter:description" content="Submit your short film to the Sharankrishna Short Film Awards 2026. 11 award categories. Hosted at Jain University Kochi.">
-    <meta name="twitter:image" content="https://sharankrishnashortfilmawards.com/LOGO.webp">
+    <meta name="twitter:title" content="Sharankrishna Short Film Awards">
+    <meta name="twitter:description" content="A Kerala-based short film awards platform celebrating independent and student filmmakers — General and Campus categories, jury recognition and online submissions.">
+    <meta name="twitter:image" content="https://sharankrishnashortfilmawards.com/og-image.jpg">
+    <meta name="twitter:image:alt" content="Sharankrishna Short Film Awards logo">
     <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
     {
-      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://sharankrishnashortfilmawards.com/#website",
+      "name": "Sharankrishna Short Film Awards",
+      "alternateName": "Sharankrishna",
+      "url": "https://sharankrishnashortfilmawards.com/",
+      "inLanguage": "en-IN",
+      "publisher": {
+        "@id": "https://sharankrishnashortfilmawards.com/#organization"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://sharankrishnashortfilmawards.com/#organization",
+      "name": "Sharankrishna Short Film Awards",
+      "alternateName": "Sharankrishna",
+      "url": "https://sharankrishnashortfilmawards.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://sharankrishnashortfilmawards.com/logo-512.png",
+        "width": 512,
+        "height": 512
+      },
+      "image": "https://sharankrishnashortfilmawards.com/og-image.jpg",
+      "description": "A Kerala-based short film awards platform celebrating independent and student filmmakers.",
+      "email": "sharankrishnashortfilmawards@gmail.com",
+      "telephone": "+91-7902959564",
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "telephone": "+91-7902959564",
+          "contactType": "customer support",
+          "areaServed": "IN",
+          "availableLanguage": "en"
+        },
+        {
+          "@type": "ContactPoint",
+          "telephone": "+91-9745640896",
+          "contactType": "customer support",
+          "areaServed": "IN"
+        }
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "12/399, Krishnalayam, Thenhippalam",
+        "addressLocality": "Malappuram",
+        "addressRegion": "Kerala",
+        "postalCode": "673636",
+        "addressCountry": "IN"
+      },
+      "parentOrganization": {
+        "@id": "https://sharankrishnashortfilmawards.com/#angle-frames"
+      },
+      "sameAs": [
+        "https://www.instagram.com/sharankrishna_shortfilm_awards/",
+        "https://www.youtube.com/@SharankrishnaShortfilmawards",
+        "https://www.facebook.com/share/1BRDQLmtVp/"
+      ]
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://sharankrishnashortfilmawards.com/#angle-frames",
+      "name": "Angle Frames",
+      "url": "https://sharankrishnashortfilmawards.com/",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "12/399, Krishnalayam, Thenhippalam",
+        "addressLocality": "Malappuram",
+        "addressRegion": "Kerala",
+        "postalCode": "673636",
+        "addressCountry": "IN"
+      },
+      "sameAs": [
+        "https://www.youtube.com/@ANGLEFRAMES"
+      ]
+    },
+    {
       "@type": "Event",
+      "@id": "https://sharankrishnashortfilmawards.com/#event-2026",
       "name": "Sharankrishna Short Film Awards 2026",
-      "description": "Sharankrishna Short Film Awards 2026 — honoring the legacy of Sharankrishna. Hosted by Jain University Kochi and Angle Frames. Open to all filmmakers, with a dedicated Campus Track for students.",
+      "description": "Awards ceremony and winners' announcement of the Sharankrishna Short Film Awards 2026 — General and Campus categories for independent and student filmmakers.",
       "startDate": "2027-02-12",
       "endDate": "2027-02-12",
       "eventStatus": "https://schema.org/EventScheduled",
@@ -54,55 +133,39 @@
         "hasMap": "https://share.google/U07SvhrCHIWx0bN92",
         "address": {
           "@type": "PostalAddress",
+          "streetAddress": "Knowledge Park, Nirmal Infopark, Kakkanad",
           "addressLocality": "Kochi",
           "addressRegion": "Kerala",
+          "postalCode": "682042",
           "addressCountry": "IN"
         }
       },
-      "organizer": {
-        "@type": "Organization",
-        "name": "Angle Frames",
-        "url": "https://sharankrishnashortfilmawards.com/",
-        "location": {
-          "@type": "Place",
-          "name": "Angle Frames",
-          "hasMap": "https://share.google/ORlDFZSQ8va4x6Gyv",
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "12/399, Krishnalayam, Thenhippalam",
-            "addressLocality": "Malappuram",
-            "addressRegion": "Kerala",
-            "postalCode": "673636",
-            "addressCountry": "IN"
-          }
-        }
-      },
-      "image": ["https://sharankrishnashortfilmawards.com/LOGO.webp"],
+      "image": [
+        "https://sharankrishnashortfilmawards.com/og-image.jpg"
+      ],
       "url": "https://sharankrishnashortfilmawards.com/",
+      "organizer": [
+        {
+          "@id": "https://sharankrishnashortfilmawards.com/#organization"
+        },
+        {
+          "@id": "https://sharankrishnashortfilmawards.com/#angle-frames"
+        }
+      ],
       "offers": {
         "@type": "Offer",
-        "name": "Short Film Entry",
+        "name": "Short film entry",
+        "description": "Film submission entry fee (General and Campus categories)",
         "price": "1000",
         "priceCurrency": "INR",
         "availability": "https://schema.org/InStock",
         "validFrom": "2026-01-01",
+        "validThrough": "2026-12-31T23:59:59+05:30",
         "url": "https://sharankrishnashortfilmawards.com/#section-registration"
       }
     }
-    </script>
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Sharankrishna Short Film Awards",
-      "url": "https://sharankrishnashortfilmawards.com/",
-      "logo": "https://sharankrishnashortfilmawards.com/LOGO.webp",
-      "sameAs": [
-        "https://www.instagram.com/sharankrishna_shortfilm_awards/",
-        "https://www.youtube.com/@ANGLEFRAMES",
-        "https://www.facebook.com/share/1BRDQLmtVp/"
-      ]
-    }
+  ]
+}
     </script>
 
     <link rel="stylesheet" href="assets/css/ui-components.css">
@@ -180,7 +243,7 @@
 
             <p class="hero-tagline scroll-reveal delay-3">
                 Your Film. Your Voice. Your Moment.<br>
-                <span class="hero-tagline-sub">A platform created to discover, celebrate and recognise emerging filmmakers and powerful stories.</span>
+                <span class="hero-tagline-sub">A Kerala-based short film awards platform created to discover, celebrate and recognise emerging filmmakers and powerful stories.</span>
             </p>
 
             <div class="hero-action-row scroll-reveal delay-4">
@@ -695,7 +758,7 @@
                     <span class="edge-light"></span>
                     <span class="ix-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9L12 4.5 21.5 9 12 13.5 2.5 9z"/><path d="M6.5 11v4.5c0 1.4 2.5 3 5.5 3s5.5-1.6 5.5-3V11M21.5 9v5"/></svg></span>
                     <h3 class="ix-card-title">Campus Category</h3>
-                    <p class="ix-card-text">Created specifically for student filmmakers. If you are currently studying at a recognised college or university, the Campus Category gives you an opportunity to showcase your filmmaking talent on a larger platform.</p>
+                    <p class="ix-card-text">Our campus short film competition is created specifically for student filmmakers. If you are currently studying at a recognised college or university, the Campus Category gives you an opportunity to showcase your filmmaking talent on a larger platform.</p>
                     <p class="ix-card-note">Valid proof of current student status is required.</p>
                     <button type="button" class="contact-card-btn ix-btn" onclick="openAwardDetails()">Explore Campus Category <span aria-hidden="true">&rarr;</span></button>
                 </div>
@@ -1216,6 +1279,6 @@
     <script src="assets/js/ui-components.js"></script>
     <script src="assets/js/campus-proof.js?v=1"></script>
     <script src="assets/js/youtube.js?v=1"></script>
-    <script src="assets/js/site.js?v=32"></script>
+    <script src="assets/js/site.js?v=33"></script>
 </body>
 </html>
