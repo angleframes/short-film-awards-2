@@ -1883,6 +1883,7 @@ async function vcMove(id, direction) {
 
 function _extractYouTubeId(url) {
     if (!url) return null;
+    if (window.SKYouTube) return SKYouTube.id(url);   // shared parser (assets/js/youtube.js)
     const patterns = [
         /[?&]v=([A-Za-z0-9_-]{11})/,
         /youtu\.be\/([A-Za-z0-9_-]{11})/,
@@ -1928,7 +1929,7 @@ function tmtOnUrlInput(val) {
             videoIdInput.value = id;
             thumbInput.value   = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
             channelInput.value = meta.author_name || '';
-            document.getElementById('tmtPreviewThumb').src = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+            document.getElementById('tmtPreviewThumb').src = window.SKYouTube ? SKYouTube.thumb(id) : `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
             document.getElementById('tmtPreviewTitle').textContent = meta.title || '';
             document.getElementById('tmtPreviewChannel').textContent = meta.author_name ? `Channel: ${meta.author_name}` : '';
             document.getElementById('tmtPreviewId').textContent = `Video ID: ${id}`;
