@@ -20,8 +20,11 @@ window.MediaAdmin = (function () {
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const notify = (m, k) => (typeof window.toast === 'function' ? window.toast(m, k) : console.log(m));
   const slug = s => String(s || 'media').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'media';
-  const ytId = url => { const m = String(url || '').match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([\w-]{11})/i); return m ? m[1] : ''; };
-  const thumbOf = r => r.thumbnail_url || r.image_url || (ytId(r.video_url) ? `https://i.ytimg.com/vi/${ytId(r.video_url)}/hqdefault.jpg` : '');
+  // shared YouTube helper (assets/js/youtube.js) — same parsing + thumbnails as the public site
+  const ytId = url => (window.SKYouTube ? SKYouTube.id(url) : null) || '';
+  const thumbOf = r => r.media_type === 'video'
+    ? (window.SKYouTube ? SKYouTube.thumbFor(r.thumbnail_url, r.video_url) : (r.thumbnail_url || ''))
+    : (r.thumbnail_url || r.image_url || '');
   const catLabel = k => (cats.find(c => c.key === k) || {}).label || k;
   const WINNERS = 'award-winners';
   const TRACKS = { general: 'General', campus: 'Campus' };
@@ -107,7 +110,7 @@ window.MediaAdmin = (function () {
   function editorHtml() {
     const r = editing, isVideo = r.media_type === 'video', isWinner = r.category === WINNERS;
     const img = isVideo ? r.thumbnail_url : r.image_url;
-    const preview = img || (isVideo && ytId(r.video_url) ? `https://i.ytimg.com/vi/${ytId(r.video_url)}/hqdefault.jpg` : '');
+    const preview = img || (isVideo && ytId(r.video_url) ? SKYouTube.thumb(ytId(r.video_url)) : '');
     return `<div class="mg-editor" id="mgEditor">
       <div class="mg-editor-head"><h3>${r.id ? 'Edit' : 'Add'} ${isVideo ? 'video' : 'photo'}</h3>
         <div class="mg-type"><label><input type="radio" name="mgType" value="photo" ${!isVideo ? 'checked' : ''}> Photo</label><label><input type="radio" name="mgType" value="video" ${isVideo ? 'checked' : ''}> Video</label></div></div>
@@ -210,6 +213,14 @@ window.MediaAdmin = (function () {
     on('mgFType', 'change', e => { fType = e.target.value; render(); });
     on('mgCancel', 'click', () => { editing = null; orphans = []; render(); });
     on('mgSave', 'click', save);
+    on('mgVideo', 'input', e => {
+      if (!editing || editing.media_type !== 'video' || editing.thumbnail_url) return;   // custom thumbnail wins
+      const box = document.querySelector('#mgEditor .mg-preview');
+      if (!box) return;
+      const vid = ytId(e.target.value);
+      box.innerHTML = vid ? `<img src="${esc(SKYouTube.thumb(vid))}" alt="" data-yt-fallback>`
+        : `<span>${e.target.value.trim() ? 'Not a YouTube link yet — check the URL' : 'Thumbnail comes from YouTube'}</span>`;
+    });
     on('mgFile', 'change', e => upload(e.target));
     on('mgRemoveImg', 'click', () => {
       readEditor();
