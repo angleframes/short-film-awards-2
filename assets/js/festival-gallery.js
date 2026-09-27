@@ -20,7 +20,8 @@
   const $ = id => document.getElementById(id);
   const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="7,4.5 19.5,12 7,19.5" fill="currentColor"/></svg>';
   const ALIASES = { winners: 'award-winners', moments: 'festival-moments', messages: 'messages-of-support', bts: 'behind-the-scenes', highlights: 'festival-highlights', photo: 'photos', video: 'videos' };
-  const CARD_SIZES = '(max-width: 360px) 100vw, (max-width: 700px) 50vw, (max-width: 1240px) 33vw, 300px';
+  // matches the real grid: 1 col ≤360px, 2 cols to ~1100px, then up to 4 cols of ≤~310px in the 1240px container
+  const CARD_SIZES = '(max-width: 360px) 100vw, (max-width: 1100px) 50vw, 380px';
   const FEAT_SIZES = '(max-width: 700px) 100vw, 620px';
   const LB_SIZES = '(max-width: 1200px) 100vw, 1200px';
 
@@ -92,7 +93,9 @@
       id: m.id, type: m.media_type, category: m.category, title: m.title || '', desc: m.description || '', year: m.edition_year,
       featured: !!m.is_featured,
       full: m.image_url || '', medium: m.medium_url || '', w: m.width || 0,
-      thumb: m.thumbnail_url || m.image_url || (id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : ''),
+      // YouTube: use the 1280px preview (hqdefault is only 480px and looks soft in cards); falls back on error
+      thumb: id && (!m.thumbnail_url || /i\.ytimg\.com/.test(m.thumbnail_url)) ? `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`
+           : (m.thumbnail_url || m.image_url || ''),
       video: m.video_url || '', ytid: id,
       winner: m.category === 'award-winners' && (m.award_id || m.award_name) ? winnerInfo(m) : null,
     };
@@ -209,7 +212,7 @@
     const eager = idx < EAGER;
     const feat = it.featured && active === 'all';
     // thumbnail in cards; offer the medium size only for dense screens / wide (featured) cards
-    const set = it.medium && it.thumb !== it.full ? ` srcset="${esc(it.thumb)} 800w, ${esc(it.medium)} 1280w" sizes="${feat ? FEAT_SIZES : CARD_SIZES}"` : '';
+    const set = it.medium && it.thumb !== it.full ? ` srcset="${esc(it.thumb)} 960w, ${esc(it.medium)} 1280w" sizes="${feat ? FEAT_SIZES : CARD_SIZES}"` : '';
     return `<img src="${esc(it.thumb)}"${set} alt="${esc(alt)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async"${idx < 2 ? ' fetchpriority="high"' : ''}${it.ytid ? ` data-ytid="${esc(it.ytid)}"` : ''}>`;
   }
 
@@ -263,7 +266,10 @@
     grid.insertAdjacentHTML('beforeend', view.slice(start).map((it, k) => card(it, start + k)).join(''));
     grid.querySelectorAll('img[data-ytid]:not([data-fb])').forEach(img => {
       img.dataset.fb = 1;
-      img.addEventListener('error', () => { if (!img.dataset.f) { img.dataset.f = 1; img.src = `https://i.ytimg.com/vi/${img.dataset.ytid}/mqdefault.jpg`; } });
+      const fb = () => { if (!img.dataset.f) { img.dataset.f = 1; img.src = `https://i.ytimg.com/vi/${img.dataset.ytid}/hqdefault.jpg`; } };
+      img.addEventListener('error', fb);
+      // YouTube answers a missing 1280px preview with a 120px placeholder instead of an error
+      img.addEventListener('load', () => { if (img.naturalWidth && img.naturalWidth <= 120) fb(); });
     });
   }
 
