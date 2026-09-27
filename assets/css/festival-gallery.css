@@ -183,7 +183,6 @@
 .fg-more:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.5); }
 .fg-more:disabled { opacity: 0.6; cursor: default; }
 .fg-more[hidden] { display: none; }
-.fg-sentinel { height: 1px; }
 
 /* ===== Image fidelity: grayscale is the only treatment; nothing else touches the photo ===== */
 .fg-thumb img { transition: filter 0.45s ease, transform 0.6s ease; transform: translateZ(0); backface-visibility: hidden; }
@@ -229,9 +228,6 @@
 }
 .fg-chip.is-active { background: #fff; box-shadow: none; }
 
-/* edition line on every card */
-.fg-card-edition { font-size: 0.58rem; font-weight: 600; letter-spacing: 2.2px; text-transform: uppercase; color: rgba(255,255,255,0.38); margin-top: -1px; }
-.fg-card-meta + .fg-card-edition { margin-bottom: 2px; }
 
 @media (max-width: 700px) {
   .fg-editions { margin-top: 26px; align-items: stretch; }
@@ -242,4 +238,87 @@
 @media (max-width: 480px) {
   .fg-ed-long { display: none; }
   .fg-ed { padding: 0 12px; gap: 5px; }
+}
+
+/* ===== Award Winners — one compact filter bar: Track pills + custom Award dropdown ===== */
+.fg-subfilters { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px 22px; margin: -12px auto 30px; }
+.fg-sf-group { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.fg-sf-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.42); }
+.fg-sf-pills {
+  display: flex; gap: 2px; padding: 4px; border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 100%);
+  border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+  backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur);
+}
+.fg-sf-pills .fg-subchip { padding: 7px 14px; }
+.fg-subchip.is-active { background: rgba(255,255,255,0.12); box-shadow: inset 0 1px 0 rgba(255,255,255,0.18); }
+
+.fg-dd { position: relative; }
+.fg-dd-btn {
+  display: inline-flex; align-items: center; gap: 10px; min-width: 190px; justify-content: space-between;
+  font: inherit; cursor: pointer; height: 38px; padding: 0 14px 0 18px; border-radius: 999px; white-space: nowrap;
+  font-size: 0.66rem; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase; color: #fff;
+  background: linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 100%);
+  border: 1px solid rgba(255,255,255,0.12); box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+  backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.fg-dd-btn:hover, .fg-dd.is-open .fg-dd-btn { border-color: rgba(255,255,255,0.28); }
+.fg-dd-btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; opacity: 0.7; transition: transform 0.2s ease; }
+.fg-dd.is-open .fg-dd-btn svg { transform: rotate(180deg); }
+.fg-dd-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.fg-dd-list {
+  position: absolute; z-index: 40; top: calc(100% + 8px); left: 0; min-width: 100%; max-height: 300px; overflow-y: auto;
+  list-style: none; margin: 0; padding: 6px; border-radius: 16px; outline: none;
+  background: rgba(16,16,19,0.92); border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 18px 40px rgba(0,0,0,0.55);
+  backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur);
+}
+.fg-dd-list[hidden] { display: none; }
+.fg-dd-opt {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; white-space: nowrap;
+  padding: 10px 14px; border-radius: 10px; font-size: 0.7rem; font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(255,255,255,0.72);
+}
+.fg-dd-opt.is-active { background: rgba(255,255,255,0.08); color: #fff; }
+.fg-dd-opt.is-selected { color: #fff; }
+.fg-dd-opt.is-selected::after { content: ''; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-2px, -1px); flex-shrink: 0; }
+
+/* ===== Cards — one metadata line, consistent heights ===== */
+.fg-grid { grid-auto-flow: row dense; }
+.fg-card-meta {
+  letter-spacing: 1.8px; line-height: 1.5;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.fg-card-text { flex: 1; min-height: 116px; }
+.fg-card.is-winner .fg-card-title { -webkit-line-clamp: 2; }
+.fg-card-sub { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+@media (min-width: 701px) {
+  /* a featured item fills a 2 × 2 block, so neighbouring cards keep their normal height */
+  .fg-card.is-featured { grid-row: span 2; }
+  .fg-card.is-featured .fg-thumb { flex: 1 1 auto; aspect-ratio: auto; min-height: 320px; }
+  .fg-card.is-featured .fg-card-text { flex: 0 0 auto; }
+}
+
+/* ===== Load more + loading state ===== */
+.fg-more { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-width: 200px; min-height: 46px; }
+.fg-spin { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.25); border-top-color: #fff; animation: fg-spin 0.8s linear infinite; }
+@keyframes fg-spin { to { transform: rotate(360deg); } }
+.fg-skel { cursor: default; pointer-events: none; }
+.fg-skel .fg-thumb, .fg-skel-line { background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.03) 100%); background-size: 200% 100%; animation: fg-shimmer 1.4s ease-in-out infinite; }
+.fg-skel-line { display: block; height: 9px; width: 70%; border-radius: 6px; }
+.fg-skel-line.is-short { width: 45%; height: 12px; margin-top: 8px; }
+@keyframes fg-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+@media (max-width: 700px) {
+  .fg-subfilters { flex-direction: column; align-items: stretch; gap: 10px; margin: -10px 0 22px; }
+  .fg-sf-group { justify-content: space-between; }
+  .fg-sf-pills { flex: 0 1 auto; }
+  .fg-dd { flex: 0 1 auto; min-width: 0; }
+  .fg-dd-btn { min-width: 170px; max-width: 100%; }
+  .fg-dd-list { left: auto; right: 0; }
+  .fg-card-text { min-height: 104px; }
+  .fg-more { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fg-spin, .fg-skel .fg-thumb, .fg-skel-line { animation: none; }
 }
