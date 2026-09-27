@@ -2775,3 +2775,4 @@ html { scroll-padding-top: 130px; }
   .sksfa-admin .mg-actions { width: 100%; justify-content: flex-start; }
   .sksfa-admin .mg-checks { padding-top: 0; }
 }
+.sksfa-admin .jm-count { display: block; text-align: right; color: var(--text-3); font-size: 11.5px; margin-top: 4px; }
