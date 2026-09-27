@@ -279,6 +279,7 @@
                             var filtersEl = document.getElementById('vidFilters');
                             /* rebuild section from scratch */
                             _rebuildVideoSection();
+                            renderFestivalShowcase();
                         } catch(e) { console.warn('Video realtime refresh error', e); }
                     }
                     SB_RT.channel('site_live')
@@ -339,6 +340,7 @@
                                         if (strip) strip.innerHTML = '';
                                         if (stage) stage.innerHTML = '';
                                         renderGallery();
+                                        renderFestivalShowcase();
                                         if (currentSrc) {
                                             var newIdx = _galleryPhotos.findIndex(function(p) { return p.src === currentSrc; });
                                             if (newIdx >= 0 && wrap && strip && stage) _gallerySelectIdx(newIdx, wrap, strip, stage);
@@ -362,6 +364,8 @@
             renderUpdatesFeed();
             renderGuidelines();
             renderJuryPanel();
+            renderJurySection();
+            renderFestivalShowcase();
             initScrollAnimations();
             textAnimateBlurInUp(document.getElementById('heroTitleAnimate'));
             // Init glow on all static .glow-card elements (dynamic ones call initCardGlow inline)
@@ -1497,9 +1501,26 @@
             return cat ? cat.name : '';
         }
 
+        // Public media groups. Admin video categories map onto these titles by name:
+        // overview / highlight / presentation style categories → Inside Sharankrishna, everything else → Messages of Support.
+        const MEDIA_GROUPS = { inside: 'Inside Sharankrishna', support: 'Messages of Support' };
+        function _vidGroupOf(v) {
+            const name = v && v.category_id ? _vidGetCategoryName(v.category_id) : '';
+            return /highlight|overview|presentation|aftermovie|after movie|inside|trailer|promo/i.test(name) ? 'inside' : 'support';
+        }
+        function _vidFilterButtonsHtml() {
+            const data = (window._testimonialsData || []).filter(v => v.active !== false);
+            const present = new Set(data.map(_vidGroupOf));
+            let html = `<button class="vid-filter-btn${_vidActiveFilter==='all'?' active':''}" data-catid="all"><span class="vid-filter-icon">&#9654;</span> All Videos</button>`;
+            ['inside', 'support'].forEach(g => {
+                if (present.has(g)) html += `<button class="vid-filter-btn${_vidActiveFilter==='grp:'+g?' active':''}" data-catid="grp:${g}">${MEDIA_GROUPS[g]}</button>`;
+            });
+            return html;
+        }
+
         function _vidBuildCard(v, isFeatured) {
             const vid = _vidEsc(v.youtube_video_id);
-            const catName = v.category_id ? _vidGetCategoryName(v.category_id) : (v.role || '');
+            const catName = MEDIA_GROUPS[_vidGroupOf(v)];
             const year = v.year || '';
             const desc = v.short_text || '';
             const dur  = v.duration || '';
@@ -1535,6 +1556,7 @@
         function _vidFilteredData() {
             const data = (window._testimonialsData || []).filter(v => v.active !== false);
             if (_vidActiveFilter === 'all') return data;
+            if (String(_vidActiveFilter).indexOf('grp:') === 0) { const g = _vidActiveFilter.slice(4); return data.filter(v => _vidGroupOf(v) === g); }
             return data.filter(v => String(v.category_id) === String(_vidActiveFilter));
         }
 
@@ -1594,12 +1616,7 @@
             /* Category filter tabs */
             const filtersEl = document.getElementById('vidFilters');
             if (filtersEl) {
-                const cats = (window._videoCategoriesData || []).filter(c => c.active !== false);
-                let html = `<button class="vid-filter-btn active" data-catid="all"><span class="vid-filter-icon">&#9654;</span> All Videos</button>`;
-                cats.forEach(c => {
-                    html += `<button class="vid-filter-btn" data-catid="${c.id}"><span class="vid-filter-icon">${_vidEsc(c.icon || '')}</span> ${_vidEsc(c.name)}</button>`;
-                });
-                filtersEl.innerHTML = html;
+                filtersEl.innerHTML = _vidFilterButtonsHtml();
 
                 filtersEl.addEventListener('click', e => {
                     const btn = e.target.closest('.vid-filter-btn');
@@ -1645,12 +1662,7 @@
             section.style.display = '';
             const filtersEl = document.getElementById('vidFilters');
             if (filtersEl) {
-                const cats = (window._videoCategoriesData || []).filter(c => c.active !== false);
-                let html = `<button class="vid-filter-btn${_vidActiveFilter==='all'?' active':''}" data-catid="all"><span class="vid-filter-icon">&#9654;</span> All Videos</button>`;
-                cats.forEach(c => {
-                    html += `<button class="vid-filter-btn${String(c.id)===String(_vidActiveFilter)?' active':''}" data-catid="${c.id}"><span class="vid-filter-icon">${_vidEsc(c.icon||'')}</span> ${_vidEsc(c.name)}</button>`;
-                });
-                filtersEl.innerHTML = html;
+                filtersEl.innerHTML = _vidFilterButtonsHtml();
                 filtersEl.querySelectorAll('.vid-filter-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
                         filtersEl.querySelectorAll('.vid-filter-btn').forEach(b => b.classList.remove('active'));
@@ -1729,6 +1741,131 @@
                 container.appendChild(box);
                 initCardGlow(box);
             });
+        }
+
+        /* ===== PREVIOUS EDITION + FESTIVAL MEDIA — built only from real gallery photos and videos ===== */
+        function _showcasePhotoCard(p, opts) {
+            return `<article class="pe-card${opts.wide ? ' is-wide' : ''}">
+                <button type="button" class="pe-media" data-action="${opts.action}" data-src="${_vidEsc(p.src)}" aria-label="${_vidEsc(opts.cta)}: ${_vidEsc(opts.title)}">
+                    <img src="${_vidEsc(opts.useThumb && p.thumb ? p.thumb : p.src)}" alt="${_vidEsc(p.title || opts.title)}" loading="lazy" decoding="async">
+                    <span class="pe-grain" aria-hidden="true"></span>
+                </button>
+                <div class="pe-body">
+                    <span class="pe-kicker">${_vidEsc(opts.kicker)}</span>
+                    <h3 class="pe-title">${_vidEsc(opts.title)}</h3>
+                    ${opts.desc ? `<p class="pe-desc">${opts.desc}</p>` : ''}
+                    <button type="button" class="pe-link" data-action="${opts.action}" data-src="${_vidEsc(p.src)}">${_vidEsc(opts.cta)} <span aria-hidden="true">&rarr;</span></button>
+                </div>
+            </article>`;
+        }
+        function _showcaseVideoCard(v, opts) {
+            const id = _vidEsc(v.youtube_video_id);
+            return `<article class="pe-card${opts.wide ? ' is-wide' : ''}">
+                <button type="button" class="pe-media is-video" data-action="${opts.action || 'play'}" data-ytid="${id}" data-group="${opts.group || ''}" aria-label="${_vidEsc(opts.cta)}: ${_vidEsc(opts.title)}">
+                    <img src="${_vidThumbSrc(id)}" alt="${_vidEsc(v.video_title || opts.title)}" loading="lazy" decoding="async" data-ytid="${id}" onerror="_vidThumbFallback(this)">
+                    <span class="pe-grain" aria-hidden="true"></span>
+                    <span class="pe-play" aria-hidden="true">${_PLAY_SVG}</span>
+                </button>
+                <div class="pe-body">
+                    <span class="pe-kicker">${_vidEsc(opts.kicker)}</span>
+                    <h3 class="pe-title">${_vidEsc(opts.title)}</h3>
+                    ${opts.desc ? `<p class="pe-desc">${opts.desc}</p>` : ''}
+                    <button type="button" class="pe-link" data-action="${opts.action || 'play'}" data-ytid="${id}" data-group="${opts.group || ''}">${_vidEsc(opts.cta)} <span aria-hidden="true">&rarr;</span></button>
+                </div>
+            </article>`;
+        }
+        function _showcaseOpenPhoto(src) {
+            const wrap = document.getElementById('section-gallery');
+            const strip = document.getElementById('galleryStrip');
+            const stage = document.getElementById('galleryStage');
+            if (!wrap) return;
+            renderGallery();
+            const idx = (_galleryPhotos || []).findIndex(p => p.src === src);
+            if (idx >= 0 && strip && stage) _gallerySelectIdx(idx, wrap, strip, stage);
+            const head = document.querySelector('.gallery-select-header') || wrap;
+            head.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        function _showcaseShowVideos(group) {
+            const section = document.getElementById('section-videos');
+            if (!section || section.style.display === 'none') return;
+            _vidActiveFilter = group ? 'grp:' + group : 'all';
+            const filtersEl = document.getElementById('vidFilters');
+            if (filtersEl) filtersEl.querySelectorAll('.vid-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.catid === _vidActiveFilter));
+            _vidRenderCards();
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        function _showcaseBind(root) {
+            if (!root || root.dataset.bound) return;
+            root.dataset.bound = '1';
+            root.addEventListener('click', e => {
+                const el = e.target.closest('[data-action]');
+                if (!el) return;
+                const a = el.dataset.action;
+                if (a === 'photo') _showcaseOpenPhoto(el.dataset.src);
+                else if (a === 'play' && el.dataset.ytid) _playYouTube(el.dataset.ytid); // modal wired once by renderVideos()
+                else if (a === 'videos') _showcaseShowVideos(el.dataset.group);
+            });
+        }
+        function renderFestivalShowcase() {
+            const photos = (GALLERY_IMAGES || []).filter(p => p.src && p.src.trim() !== '');
+            const winners = photos.filter(p => /winner/i.test(p.category || ''));
+            const moments = photos.filter(p => !/winner/i.test(p.category || ''));
+            const vids = (window._testimonialsData || []).filter(v => v.active !== false && v.youtube_video_id);
+            const inside = vids.filter(v => _vidGroupOf(v) === 'inside');
+            const support = vids.filter(v => _vidGroupOf(v) === 'support');
+            const shortTitle = t => String(t || '').trim();
+
+            // Previous Edition
+            const pe = document.getElementById('peGrid');
+            if (pe) {
+                const cards = [];
+                if (winners.length) cards.push(_showcasePhotoCard(winners[0], { kicker: 'Award Winners', title: 'Celebrating the Winners', action: 'photo', cta: 'View Winners',
+                    desc: winners.slice(0, 3).map(w => _vidEsc(shortTitle(w.title))).filter(Boolean).join('<br>') }));
+                if (moments.length) cards.push(_showcasePhotoCard(moments[0], { kicker: 'Festival Moments', title: 'On Stage & In the Audience', action: 'photo', cta: 'View Moments',
+                    desc: 'Ceremony, stage and audience moments from the previous edition.' }));
+                if (support.length) cards.push(_showcaseVideoCard(support[0], { kicker: 'Messages of Support', title: 'Words From Our Guests', cta: 'Play Message',
+                    desc: 'Messages from guests, filmmakers and friends of the festival.' }));
+                if (inside.length) cards.push(_showcaseVideoCard(inside[0], { kicker: 'Festival Highlights', title: 'Relive the Festival', cta: 'Play Highlights',
+                    desc: 'Highlights from the previous edition of the Sharankrishna Short Film Awards.' }));
+                pe.innerHTML = cards.join('');
+                const sec = document.getElementById('section-previous');
+                if (sec) sec.style.display = cards.length ? '' : 'none';
+                _showcaseBind(pe);
+            }
+
+            // Festival Media categories
+            const mg = document.getElementById('mediaGrid');
+            if (mg) {
+                const cards = [];
+                if (inside.length) cards.push(_showcaseVideoCard(inside[0], { kicker: inside.length > 1 ? inside.length + ' videos' : 'Video', title: MEDIA_GROUPS.inside, cta: 'Play',
+                    desc: 'The story of the festival — overview and presentation films.' }));
+                if (support.length) cards.push(_showcaseVideoCard(support[0], { kicker: support.length > 1 ? support.length + ' videos' : 'Video', title: MEDIA_GROUPS.support, cta: 'View All', action: 'videos', group: 'support',
+                    desc: 'Wishes and messages from guests, filmmakers and well-wishers.' }));
+                if (moments.length || winners.length) { const p = moments[0] || winners[0]; cards.push(_showcasePhotoCard(p, { kicker: photos.length + ' photographs', title: 'Festival Moments', action: 'photo', cta: 'View', useThumb: true,
+                    desc: 'Ceremony photographs, stage moments, audience and winners.' })); }
+                mg.innerHTML = cards.join('');
+                const sec = document.getElementById('section-media');
+                if (sec) sec.style.display = cards.length ? '' : 'none';
+                _showcaseBind(mg);
+            }
+        }
+
+        /* ===== JURY — cards render from JURY_PANEL (config.js) once real members are added ===== */
+        function renderJurySection() {
+            const grid = document.getElementById('juryShowcase');
+            const soon = document.getElementById('juryComingSoon');
+            if (!grid) return;
+            const members = (typeof JURY_PANEL !== 'undefined' ? JURY_PANEL : [])
+                .filter(m => m && m.name && !/to be announced/i.test(m.name));
+            if (!members.length) { grid.hidden = true; if (soon) soon.hidden = false; return; }
+            grid.innerHTML = members.map(m => `<article class="jury-member">
+                    <div class="jury-member-photo">${m.src ? `<img src="${_vidEsc(m.src)}" alt="${_vidEsc(m.name)}" loading="lazy" decoding="async">` : '<span class="jury-member-silhouette" aria-hidden="true"></span>'}</div>
+                    <h3 class="jury-member-name">${_vidEsc(m.name)}</h3>
+                    ${m.role ? `<p class="jury-member-role">${_vidEsc(m.role)}</p>` : ''}
+                    ${m.bio ? `<p class="jury-member-bio">${_vidEsc(m.bio)}</p>` : ''}
+                </article>`).join('');
+            grid.hidden = false;
+            if (soon) soon.hidden = true;
         }
 
         function renderJuryPanel() {
