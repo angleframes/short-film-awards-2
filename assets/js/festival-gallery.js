@@ -1,7 +1,9 @@
 /* Full Festival Gallery (/festival-gallery)
    Master gallery: gallery_media (Admin → Festival Gallery) + jury photos flagged "Show in Festival Gallery"
    (Admin → Jury). Jury items reference the jury member's own photo_url, so photo updates carry over.
-   Filters: ?filter=all|photos|videos|<category key>|previous-jury
+   Filters: ?filter=all|photos|videos|<category key>|previous-jury (alias ?category=) · ?edition=all|<year>
+   Editions come from the edition_year the admin assigns (never the upload date); the list is built from the
+   years present in the data plus the current edition, newest first, and filtered server-side.
 
    Scales to large libraries: records are fetched from the database in pages of PAGE items, filtered
    server-side (type / category / track / award), and more load automatically near the bottom.
@@ -32,6 +34,12 @@
   let awardMap = new Map();// award_categories id → { key, name }
   let winnerFacets = { tracks: [], groups: [] };
   let active = 'all';
+  let edition = 'all';     // 'all' or a year string, e.g. '2025'
+  let editions = [];       // years available, newest first
+  let facetRows = [];      // light winner rows (track / award / year) for the sub-filters
+  // current edition = the year of this edition's submission deadline (config.js), else the newest year in the data
+  const CURRENT = (() => { try { const y = new Date(PORTAL_TIMELINES.submissionDeadline).getFullYear(); return y > 2000 ? y : 0; } catch (e) { return 0; } })();
+  const byEdition = y => edition === 'all' || String(y) === edition;
   let subTrack = 'all', subGroup = 'all';
   const TRACKS = { general: 'General', campus: 'Campus' };
   const GROUPS = [['film', 'Best Film'], ['director', 'Director'], ['actor', 'Actor'], ['actress', 'Actress'], ['technical', 'Technical'], ['special', 'Special Jury'], ['other', 'Other Awards']];
@@ -114,14 +122,23 @@
       sb.from('jury_members').select('id,name,designation,bio,photo_url,edition_year,jury_type,display_order,show_in_gallery')
         .order('edition_year', { ascending: false, nullsFirst: false }).order('display_order'),
       sb.from('award_categories').select('id,key,name'),
-      sb.from('gallery_media').select('competition_track,award_id').eq('category', 'award-winners').limit(5000),
+      sb.from('gallery_media').select('category,competition_track,award_id,edition_year').limit(5000),
     ]);
     if (catRes.error) throw catRes.error;
     categories = catRes.data || [];
     (awRes && awRes.data || []).forEach(a => awardMap.set(String(a.id), a));
     juryAll = (juryRes.data || []).map(j => Object.assign(j, { name: tidy(j.name), designation: tidy(j.designation), bio: tidy(j.bio) }));
     previousJury = juryAll.filter(j => j.jury_type === 'previous');
-    const fac = (facRes && facRes.data) || [];
+    const rows = (facRes && facRes.data) || [];
+    facetRows = rows.filter(r => r.category === 'award-winners');
+    const years = new Set([...rows.map(r => r.edition_year), ...juryAll.filter(j => j.show_in_gallery || j.jury_type === 'previous').map(j => j.edition_year)]
+      .filter(y => Number.isInteger(+y) && +y > 2000).map(Number));
+    if (CURRENT) years.add(CURRENT);
+    editions = [...years].sort((a, b) => b - a).map(String);
+  }
+  // track / award chips reflect only the winners of the selected edition
+  function computeFacets() {
+    const fac = facetRows.filter(r => byEdition(r.edition_year));
     winnerFacets.tracks = [...new Set(fac.map(r => r.competition_track).filter(Boolean))];
     const gs = new Set(fac.map(r => { const a = awardMap.get(String(r.award_id)); return a ? awardGroup(a.key, a.name) : 'other'; }));
     winnerFacets.groups = GROUPS.filter(([g]) => gs.has(g));
@@ -134,6 +151,7 @@
     if (active === 'photos') q = q.eq('media_type', 'photo');
     else if (active === 'videos') q = q.eq('media_type', 'video');
     else if (active !== 'all') q = q.eq('category', active);
+    if (edition !== 'all') q = q.eq('edition_year', +edition);
     if (active === 'award-winners') {
       if (subTrack !== 'all') q = q.eq('competition_track', subTrack);
       if (subGroup !== 'all') {
@@ -168,7 +186,7 @@
     hasMore = more;
     if (!hasMore && !juryDone && wantsJury()) {
       juryDone = true;
-      batch.push(...juryAll.filter(j => j.show_in_gallery && j.photo_url).map(juryItem).filter(isNew));
+      batch.push(...juryAll.filter(j => j.show_in_gallery && j.photo_url && byEdition(j.edition_year)).map(juryItem).filter(isNew));
     }
     const start = view.length;
     view.push(...batch);
@@ -186,6 +204,22 @@
     else if (!keys.some(k => k[0] === active)) keys.push([active, catLabel(active) || active]);
     return keys;
   }
+  // Edition selector — custom pills (All editions · newest year first); current / previous marked subtly
+  function renderEditions() {
+    const el = $('fgEditions');
+    if (!el) return;
+    if (!editions.length) { el.hidden = true; return; }
+    const prev = editions.find(y => +y < CURRENT);
+    const note = y => (+y === CURRENT ? 'Current' : y === prev ? 'Previous' : '');
+    const btn = (k, label, sub) => `<button type="button" class="fg-ed${k === edition ? ' is-active' : ''}" aria-pressed="${k === edition}" data-ed="${esc(k)}">` +
+      `<span class="fg-ed-label">${label}</span>${sub ? `<span class="fg-ed-note">${esc(sub)}</span>` : ''}</button>`;
+    el.innerHTML = `<span class="fg-ed-title">Edition</span><div class="fg-ed-track">${btn('all', 'All<span class="fg-ed-long"> editions</span>', '')}${editions.map(y => btn(y, esc(y), note(y))).join('')}</div>`;
+    el.hidden = false;
+  }
+  const emptyMsg = () => edition !== 'all'
+    ? `<p class="fg-empty">More from the ${esc(edition)} edition will be added soon.</p>`
+    : '<p class="fg-empty">Nothing here yet — new photographs and films will appear as they are added.</p>';
+
   function renderFilters() {
     $('fgFilters').innerHTML = filterKeys().map(([k, l]) =>
       `<button type="button" role="tab" class="fg-chip${k === active ? ' is-active' : ''}" aria-selected="${k === active}" data-k="${esc(k)}">${esc(l)}</button>`).join('');
@@ -195,6 +229,7 @@
     let el = $('fgSubFilters');
     if (!el) { el = document.createElement('div'); el.id = 'fgSubFilters'; el.className = 'fg-subfilters'; $('fgFilters').after(el); }
     if (active !== 'award-winners') { el.hidden = true; el.innerHTML = ''; return; }
+    computeFacets();
     const row = (name, cur, opts) => `<div class="fg-subrow" role="group" aria-label="${name}">${opts.map(([k, l]) =>
       `<button type="button" class="fg-subchip${k === cur ? ' is-active' : ''}" aria-pressed="${k === cur}" data-sub="${name}" data-k="${k}">${esc(l)}</button>`).join('')}</div>`;
     let html = '';
@@ -203,9 +238,10 @@
     el.innerHTML = html; el.hidden = !html;
   }
 
-  function metaOf(it) {
-    if (it.winner) return [it.winner.award, TRACKS[it.winner.track], it.year].filter(Boolean).join(' · ');
-    return [catLabel(it.category), it.year].filter(Boolean).join(' · ');
+  function metaOf(it, noYear) {
+    const year = noYear ? '' : (it.year ? it.year + ' Edition' : '');
+    if (it.winner) return [it.winner.award, TRACKS[it.winner.track], year].filter(Boolean).join(' · ');
+    return [catLabel(it.category), year].filter(Boolean).join(' · ');
   }
 
   function imgTag(it, idx, alt) {
@@ -218,19 +254,21 @@
 
   function card(it, idx) {
     const cls = ['fg-card', it.type === 'video' ? 'is-video' : '', it.portrait ? 'is-portrait' : '', it.featured && active === 'all' ? 'is-featured' : '', it.winner ? 'is-winner' : ''].join(' ').replace(/\s+/g, ' ').trim();
-    const meta = metaOf(it);
+    const meta = metaOf(it, true);
     const title = it.winner ? it.winner.primary : it.title;
-    return `<button type="button" class="${cls}" data-i="${idx}" aria-label="${it.type === 'video' ? 'Play' : 'Open'}: ${esc(it.winner ? meta + ' — ' + title : (title || meta))}">
+    const ed = it.year ? `<span class="fg-card-edition">${esc(it.year)} Edition</span>` : '';
+    return `<button type="button" class="${cls}" data-i="${idx}" aria-label="${it.type === 'video' ? 'Play' : 'Open'}: ${esc((it.winner ? meta + ' — ' + title : (title || meta)) + (it.year ? ' (' + it.year + ' Edition)' : ''))}">
         <span class="fg-thumb">${imgTag(it, idx, title)}${it.type === 'video' ? `<span class="fg-play">${PLAY}</span>` : ''}</span>
-        <span class="fg-card-text">${meta ? `<span class="fg-card-meta">${esc(meta)}</span>` : ''}${title ? `<span class="fg-card-title">${esc(title)}</span>` : ''}${it.winner && it.winner.secondary ? `<span class="fg-card-sub">${esc(it.winner.secondary)}</span>` : ''}</span>
+        <span class="fg-card-text">${meta ? `<span class="fg-card-meta">${esc(meta)}</span>` : ''}${ed}${title ? `<span class="fg-card-title">${esc(title)}</span>` : ''}${it.winner && it.winner.secondary ? `<span class="fg-card-sub">${esc(it.winner.secondary)}</span>` : ''}</span>
       </button>`;
   }
 
   function renderRoster() {
     view = [];
-    if (!previousJury.length) { $('fgContent').innerHTML = '<p class="fg-empty">The previous jury will appear here soon.</p>'; return; }
+    const list = previousJury.filter(j => byEdition(j.edition_year));
+    if (!list.length) { $('fgContent').innerHTML = edition !== 'all' ? emptyMsg() : '<p class="fg-empty">The previous jury will appear here soon.</p>'; return; }
     const groups = new Map();
-    previousJury.forEach(j => { const k = j.edition_year || 'Earlier'; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(j); });
+    list.forEach(j => { const k = j.edition_year || 'Earlier'; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(j); });
     let html = '';
     groups.forEach((list, year) => {
       html += `<section class="fg-group"><h2 class="fg-group-title">${esc(year)}${year === 'Earlier' ? ' Editions' : ' Edition'}</h2><div class="fg-roster">` +
@@ -251,7 +289,7 @@
 
   // Jury filter: grouped by current / edition (small set, so rendered in one go after all pages load)
   function renderJuryGroups() {
-    if (!view.length) { $('fgContent').innerHTML = '<p class="fg-empty">Nothing here yet — new photographs and films will appear as they are added.</p>'; return; }
+    if (!view.length) { $('fgContent').innerHTML = emptyMsg(); return; }
     const groups = new Map();
     view.forEach((it, i) => { const k = it.juryType === 'current' ? 'Current Jury' : (it.juryType === 'previous' ? (it.year ? it.year + ' Edition' : 'Previous Jury') : 'Jury Photographs'); if (!groups.has(k)) groups.set(k, []); groups.get(k).push([it, i]); });
     $('fgContent').innerHTML = [...groups].map(([t, list]) =>
@@ -262,7 +300,7 @@
     if (active === 'jury') { if (!hasMore) renderJuryGroups(); return; }
     const grid = $('fgGrid');
     if (!grid) return;
-    if (!view.length) { $('fgContent').innerHTML = '<p class="fg-empty">Nothing here yet — new photographs and films will appear as they are added.</p>'; return; }
+    if (!view.length) { $('fgContent').innerHTML = emptyMsg(); return; }
     grid.insertAdjacentHTML('beforeend', view.slice(start).map((it, k) => card(it, start + k)).join(''));
     // thumbnail fallbacks (maxres → sd → hq → placeholder) are handled globally by SKYouTube
   }
@@ -296,10 +334,11 @@
       io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) loadMore(); }, { rootMargin: '900px 0px' });
       io.observe($('fgSentinel'));
     }
-    loadMore().then(() => { if (!view.length && !hasMore) $('fgContent').innerHTML = '<p class="fg-empty">Nothing here yet — new photographs and films will appear as they are added.</p>'; });
+    loadMore().then(() => { if (!view.length && !hasMore) $('fgContent').innerHTML = emptyMsg(); });
   }
 
   function render() {
+    renderEditions();
     renderFilters();
     renderSubFilters();
     if (active === 'previous-jury') { token++; if (io) io.disconnect(); return renderRoster(); }
@@ -308,6 +347,7 @@
 
   function syncUrl() {
     const q = new URLSearchParams();
+    if (edition !== 'all') q.set('edition', edition);
     if (active !== 'all') q.set('filter', active);
     if (active === 'award-winners' && subTrack !== 'all') q.set('track', subTrack);
     if (active === 'award-winners' && subGroup !== 'all') q.set('award', subGroup);
@@ -370,6 +410,11 @@
 
   function bind() {
     $('fgFilters').addEventListener('click', e => { const b = e.target.closest('.fg-chip'); if (b) setFilter(b.dataset.k); });
+    $('fgEditions').addEventListener('click', e => {
+      const b = e.target.closest('.fg-ed'); if (!b || b.dataset.ed === edition) return;
+      edition = b.dataset.ed; subTrack = 'all'; subGroup = 'all';
+      render(); syncUrl();
+    });
     document.addEventListener('click', e => {
       const b = e.target.closest('.fg-subchip'); if (!b) return;
       if (b.dataset.sub === 'track') subTrack = b.dataset.k; else subGroup = b.dataset.k;
@@ -401,8 +446,10 @@
     const qs = new URLSearchParams(location.search);
     try { await loadMeta(); }
     catch (e) { $('fgContent').innerHTML = '<p class="fg-empty">The gallery could not be loaded right now. Please try again shortly.</p>'; console.warn('Festival gallery load failed', e); return; }
-    const k = ALIASES[qs.get('filter')] || qs.get('filter') || 'all';
-    active = k;
+    const f = qs.get('filter') || qs.get('category');
+    active = ALIASES[f] || f || 'all';
+    const ed = qs.get('edition');
+    edition = ed && editions.includes(ed) ? ed : 'all';
     if (active === 'award-winners') { subTrack = qs.get('track') || 'all'; subGroup = qs.get('award') || 'all'; }
     render();
   });
