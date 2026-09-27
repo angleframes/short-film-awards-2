@@ -322,3 +322,13 @@
 @media (prefers-reduced-motion: reduce) {
   .fg-spin, .fg-skel .fg-thumb, .fg-skel-line { animation: none; }
 }
+
+/* Award dropdown — site scrollbar style (thin, translucent, no system track); tall enough that it rarely scrolls */
+.fg-dd-list {
+  max-height: min(480px, 60vh); overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent;
+}
+.fg-dd-list::-webkit-scrollbar { width: 4px; }
+.fg-dd-list::-webkit-scrollbar-track { background: transparent; margin: 10px 0; }
+.fg-dd-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+.fg-dd-list::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.35); }
