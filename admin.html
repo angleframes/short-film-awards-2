@@ -10,7 +10,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <link rel="stylesheet" href="assets/css/ui-components.css">
-<link rel="stylesheet" href="assets/css/admin.css?v=14">
+<link rel="stylesheet" href="assets/css/admin.css?v=15">
 </head>
 <body class="sksfa-admin">
 
@@ -82,6 +82,14 @@
       <button class="tab-btn" data-tab="videos" onclick="switchTab('videos')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M9.5 8.5v7l6-3.5-6-3.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
         Videos
+      </button>
+      <button class="tab-btn" data-tab="festival" onclick="switchTab('festival')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M15.5 14.5v5l4-2.5-4-2.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        Festival Gallery
+      </button>
+      <button class="tab-btn" data-tab="jury" onclick="switchTab('jury')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 19.5c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="17" cy="9" r="2.4" stroke="currentColor" stroke-width="1.5"/><path d="M15.5 14.3c2.6-.4 4.6 1.2 5 4.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Jury
       </button>
       <button class="tab-btn" data-tab="updates" onclick="switchTab('updates')">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 8l10 6 10-6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M4 16l-2-1.5V7l10 6 10-6v7.5L20 16" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 20v-6M9 17l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -484,6 +492,37 @@
 
     </div>
 
+    <!-- ═══ FESTIVAL GALLERY + JURY TABS ═══════════════ -->
+    <div class="tab-pane" id="tab-festival">
+      <div class="sksfa-page-title">
+        <div class="sksfa-eyebrow">ADMIN CONTROL PANEL</div>
+        <h1 class="sksfa-h1">Gallery Management</h1>
+        <p class="sksfa-page-desc">Everything shown on the Full Festival Gallery page (/festival-gallery): photos, videos, categories, order and visibility. The homepage slideshow is still managed in the Gallery tab.</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="sksfa-card-head-left">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M15.5 14.5v5l4-2.5-4-2.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <div><h2>Festival media</h2><p class="sksfa-card-sub">Upload photos, add videos, edit, reorder, hide or delete.</p></div>
+        </div></div>
+        <div id="mediaAdmin"><p class="muted-note">Loading…</p></div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="tab-jury">
+      <div class="sksfa-page-title">
+        <div class="sksfa-eyebrow">ADMIN CONTROL PANEL</div>
+        <h1 class="sksfa-h1">Jury Management</h1>
+        <p class="sksfa-page-desc">Current and previous jury members. Changes go live on save; photos can also appear in the Festival Gallery.</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="sksfa-card-head-left">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.5"/><path d="M3.5 19.5c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="17" cy="9" r="2.4" stroke="currentColor" stroke-width="1.5"/><path d="M15.5 14.3c2.6-.4 4.6 1.2 5 4.2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div><h2>Jury members</h2><p class="sksfa-card-sub">Switch between Current and Previous jury. Previous jury is grouped by edition.</p></div>
+        </div></div>
+        <div id="juryAdmin"><p class="muted-note">Loading…</p></div>
+      </div>
+    </div>
+
     <!-- ═══ UPDATES TAB ════════════════════════════════════ -->
     <div class="tab-pane" id="tab-updates">
       <div class="sksfa-page-title">
@@ -596,5 +635,7 @@
 <script src="assets/js/certificates.js?v=1"></script>
 <script src="assets/js/recognition-admin.js?v=1"></script>
 <script src="assets/js/about-admin.js?v=1"></script>
-<script src="assets/js/admin.js?v=14"></script>
+<script src="assets/js/media-admin.js?v=1"></script>
+<script src="assets/js/jury-admin.js?v=1"></script>
+<script src="assets/js/admin.js?v=15"></script>
 </html>
