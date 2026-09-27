@@ -9,6 +9,7 @@ window.MediaAdmin = (function () {
   let sb = null;
   let items = [];
   let cats = [];
+  let awards = [];             // award_categories (managed in Admin → Awards) — single source for winner awards
   let fCat = '', fType = '';
   let editing = null;          // working copy of the row being edited (id null = new)
   let orphans = [];            // storage URLs replaced/removed during the current edit
@@ -22,18 +23,46 @@ window.MediaAdmin = (function () {
   const ytId = url => { const m = String(url || '').match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([\w-]{11})/i); return m ? m[1] : ''; };
   const thumbOf = r => r.thumbnail_url || r.image_url || (ytId(r.video_url) ? `https://i.ytimg.com/vi/${ytId(r.video_url)}/hqdefault.jpg` : '');
   const catLabel = k => (cats.find(c => c.key === k) || {}).label || k;
+  const WINNERS = 'award-winners';
+  const TRACKS = { general: 'General', campus: 'Campus' };
+  const awardOf = id => awards.find(a => String(a.id) === String(id));
+
+  // Which fields an award needs, from its key (falls back to the name, then to a generic winner + film form)
+  function awardKind(a) {
+    const k = ((a && (a.key || a.name)) || '').toLowerCase();
+    if (/special/.test(k)) return { kind: 'special' };
+    if (/short_film|campus_film|best short film|best campus film|best film/.test(k)) return { kind: 'film', person: 'Director name (optional)' };
+    const people = [[/director/, 'Director name'], [/actress/, 'Actress name'], [/actor/, 'Actor name'], [/screenplay|writer/, 'Winner name'],
+      [/cinematograph/, 'Cinematographer name'], [/edit/, 'Editor name'], [/music/, 'Music director / composer name'], [/child/, 'Artist name']];
+    const hit = people.find(([re]) => re.test(k));
+    return { kind: 'person', person: hit ? hit[1] : 'Winner name' };
+  }
+
+  // Auto title from structured winner data
+  function winnerTitle(r) {
+    const a = awardOf(r.award_id);
+    const name = (a && a.name) || r.award_name || 'Award';
+    const track = TRACKS[r.competition_track] || '';
+    const withTrack = track && !new RegExp(track, 'i').test(name) ? `${name} (${track})` : name;
+    const film = (r.film_name || '').trim(), person = (r.winner_name || '').trim();
+    const kind = awardKind(a || { name }).kind;
+    if (kind === 'film' || (kind === 'special' && r.recipient_type !== 'person')) return `${withTrack} — ${film || '…'}${person ? ` · ${kind === 'film' ? 'Dir. ' : ''}${person}` : ''}`;
+    return `${withTrack} — ${person || '…'}${film ? ` · Film: ${film}` : ''}`;
+  }
+
   const storagePath = url => { const m = String(url || '').match(/\/storage\/v1\/object\/public\/gallery\/(.+)$/); return m ? decodeURIComponent(m[1].split('?')[0]) : ''; };
 
   async function load() {
     const root = document.getElementById('mediaAdmin');
     if (!root || !sb) return;
     root.innerHTML = '<p class="muted-note">Loading…</p>';
-    const [c, m] = await Promise.all([
+    const [c, m, aw] = await Promise.all([
       sb.from('media_categories').select('*').order('sort_order'),
       sb.from('gallery_media').select('*').order('display_order').order('created_at'),
+      sb.from('award_categories').select('id,key,name,active,sort_order').order('sort_order'),
     ]);
     if (c.error || m.error) { root.innerHTML = `<p class="muted-note">Festival gallery storage isn't available (${esc((c.error || m.error).message)}).</p>`; return; }
-    cats = c.data || []; items = m.data || [];
+    cats = c.data || []; items = m.data || []; awards = (aw && aw.data) || [];
     render();
   }
 
@@ -41,8 +70,42 @@ window.MediaAdmin = (function () {
     return items.filter(r => (!fCat || r.category === fCat) && (!fType || r.media_type === fType));
   }
 
+  // Award Winner block: track → award → only the fields that award needs
+  function winnerFieldsHtml(r) {
+    const a = awardOf(r.award_id);
+    const k = a ? awardKind(a) : null;
+    const activeAwards = awards.filter(x => x.active !== false || String(x.id) === String(r.award_id));
+    let fields = '';
+    if (k && k.kind === 'special') {
+      const isPerson = r.recipient_type === 'person';
+      fields = `
+        <div class="mg-field is-full"><span class="mg-label">Recognition for</span>
+          <div class="mg-seg" role="radiogroup" aria-label="Recognition for">
+            <label><input type="radio" name="mgRecip" value="film" ${!isPerson ? 'checked' : ''}><span>The film</span></label>
+            <label><input type="radio" name="mgRecip" value="person" ${isPerson ? 'checked' : ''}><span>A person</span></label>
+          </div></div>
+        <div class="mg-field"><label for="mgFilm">Film name${isPerson ? ' (optional)' : ''}</label><input type="text" id="mgFilm" value="${esc(r.film_name || '')}" maxlength="120" data-w></div>
+        <div class="mg-field"><label for="mgPerson">${isPerson ? 'Recipient name' : 'Person name (optional)'}</label><input type="text" id="mgPerson" value="${esc(r.winner_name || '')}" maxlength="120" data-w></div>`;
+    } else if (k && k.kind === 'film') {
+      fields = `
+        <div class="mg-field"><label for="mgFilm">Film name</label><input type="text" id="mgFilm" value="${esc(r.film_name || '')}" maxlength="120" data-w></div>
+        <div class="mg-field"><label for="mgPerson">${esc(k.person)}</label><input type="text" id="mgPerson" value="${esc(r.winner_name || '')}" maxlength="120" data-w></div>`;
+    } else if (k) {
+      fields = `
+        <div class="mg-field"><label for="mgPerson">${esc(k.person)}</label><input type="text" id="mgPerson" value="${esc(r.winner_name || '')}" maxlength="120" data-w></div>
+        <div class="mg-field"><label for="mgFilm">Film name</label><input type="text" id="mgFilm" value="${esc(r.film_name || '')}" maxlength="120" data-w></div>`;
+    }
+    return `<div class="mg-winner is-full">
+        <div class="mg-field"><label for="mgTrack">${k && k.kind === 'special' ? 'Special Jury track' : 'Competition track'}</label>
+          <select id="mgTrack"><option value="">Select track</option>${Object.entries(TRACKS).map(([v, l]) => `<option value="${v}" ${r.competition_track === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+        <div class="mg-field"><label for="mgAward">Award category</label>
+          <select id="mgAward"><option value="">Select award</option>${activeAwards.map(x => `<option value="${x.id}" ${String(x.id) === String(r.award_id) ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></div>
+        ${fields || (awards.length ? '<p class="muted-note is-full">Choose the award to see its winner fields.</p>' : '<p class="muted-note is-full">No award categories yet — add them in the Awards tab.</p>')}
+      </div>`;
+  }
+
   function editorHtml() {
-    const r = editing, isVideo = r.media_type === 'video';
+    const r = editing, isVideo = r.media_type === 'video', isWinner = r.category === WINNERS;
     const img = isVideo ? r.thumbnail_url : r.image_url;
     const preview = img || (isVideo && ytId(r.video_url) ? `https://i.ytimg.com/vi/${ytId(r.video_url)}/hqdefault.jpg` : '');
     return `<div class="mg-editor" id="mgEditor">
@@ -58,9 +121,13 @@ window.MediaAdmin = (function () {
           ${isVideo ? '<p class="muted-note">Optional — leave empty to use the YouTube thumbnail.</p>' : ''}
         </div>
         <div class="mg-fields">
-          <div class="mg-field is-full"><label for="mgTitle">Media title</label><input type="text" id="mgTitle" value="${esc(r.title)}" maxlength="140"></div>
+          <div class="mg-field${isWinner ? ' is-full' : ''}"><label for="mgCat">Category</label><select id="mgCat">${cats.map(c => `<option value="${esc(c.key)}" ${c.key === r.category ? 'selected' : ''}>${esc(c.label)}</option>`).join('')}</select></div>
+          ${isWinner ? winnerFieldsHtml(r) : ''}
+          <div class="mg-field is-full"><label for="mgTitle">${isWinner ? 'Display title' : 'Media title'}</label>
+            <input type="text" id="mgTitle" value="${esc(isWinner && !r._customTitle ? winnerTitle(r) : r.title)}" maxlength="160" ${isWinner && !r._customTitle ? 'readonly' : ''}>
+            ${isWinner ? `<label class="mg-inline-check"><input type="checkbox" id="mgTitleCustom" ${r._customTitle ? 'checked' : ''}> Edit title manually <small>(otherwise generated from the winner details)</small></label>` : ''}
+          </div>
           ${isVideo ? `<div class="mg-field is-full"><label for="mgVideo">Video URL (YouTube)</label><input type="url" id="mgVideo" value="${esc(r.video_url || '')}" placeholder="https://www.youtube.com/watch?v=…"></div>` : ''}
-          <div class="mg-field"><label for="mgCat">Category</label><select id="mgCat">${cats.map(c => `<option value="${esc(c.key)}" ${c.key === r.category ? 'selected' : ''}>${esc(c.label)}</option>`).join('')}</select></div>
           <div class="mg-field"><label for="mgYear">Edition / year</label><input type="number" id="mgYear" min="2000" max="2100" value="${esc(r.edition_year || '')}" placeholder="e.g. 2025"></div>
           <div class="mg-field is-full"><label for="mgDesc">Description (optional)</label><textarea id="mgDesc" rows="3" maxlength="600">${esc(r.description || '')}</textarea></div>
           <div class="mg-field"><label for="mgOrder">Display order</label><input type="number" id="mgOrder" value="${esc(r.display_order || 0)}"></div>
@@ -94,7 +161,7 @@ window.MediaAdmin = (function () {
             <span class="mg-num">${String(i + 1).padStart(2, '0')}</span>
             <span class="mg-thumb">${thumbOf(r) ? `<img src="${esc(thumbOf(r))}" alt="" loading="lazy">` : ''}${r.media_type === 'video' ? '<span class="mg-play">▶</span>' : ''}</span>
             <span class="mg-info"><b>${esc(r.title || '(untitled)')}</b>
-              <small>${r.media_type === 'video' ? 'Video' : 'Photo'} · ${esc(catLabel(r.category))}${r.edition_year ? ' · ' + esc(r.edition_year) : ''}${r.is_featured ? ' · Featured' : ''}${r.is_visible ? '' : ' · Hidden'}</small></span>
+              <small>${r.media_type === 'video' ? 'Video' : 'Photo'} · ${esc(catLabel(r.category))}${r.category === WINNERS && (r.award_id || r.award_name) ? ' · ' + esc((awardOf(r.award_id) || {}).name || r.award_name) + (TRACKS[r.competition_track] ? ' · ' + TRACKS[r.competition_track] : '') : ''}${r.edition_year ? ' · ' + esc(r.edition_year) : ''}${r.is_featured ? ' · Featured' : ''}${r.is_visible ? '' : ' · Hidden'}</small></span>
             <span class="mg-actions">
               <label class="mg-vis" title="Show on the website"><input type="checkbox" data-act="vis" ${r.is_visible ? 'checked' : ''}> Visible</label>
               <button type="button" class="btn-ghost btn-xs" data-act="up" ${i === 0 ? 'disabled' : ''} title="Move up">↑</button>
@@ -117,6 +184,14 @@ window.MediaAdmin = (function () {
     const v = id => { const el = document.getElementById(id); return el ? el.value : undefined; };
     if (!editing) return;
     editing.title = (v('mgTitle') || '').trim();
+    if (editing.category === WINNERS) {
+      const tc = document.getElementById('mgTitleCustom'); if (tc) editing._customTitle = tc.checked;
+      if (v('mgTrack') !== undefined) editing.competition_track = v('mgTrack') || null;
+      if (v('mgAward') !== undefined) editing.award_id = v('mgAward') ? +v('mgAward') : null;
+      if (v('mgFilm') !== undefined) editing.film_name = (v('mgFilm') || '').trim();
+      if (v('mgPerson') !== undefined) editing.winner_name = (v('mgPerson') || '').trim();
+      const rc = document.querySelector('input[name="mgRecip"]:checked'); if (rc) editing.recipient_type = rc.value;
+    }
     if (editing.media_type === 'video') editing.video_url = (v('mgVideo') || '').trim();
     editing.category = v('mgCat') || editing.category;
     const y = parseInt(v('mgYear'), 10); editing.edition_year = isNaN(y) ? null : y;
@@ -143,6 +218,23 @@ window.MediaAdmin = (function () {
       render();
     });
     root.querySelectorAll('input[name="mgType"]').forEach(r => r.addEventListener('change', () => { readEditor(); editing.media_type = r.value; render(); }));
+    // category / track / award / recipient changes re-render the form so only relevant fields show
+    ['mgCat', 'mgTrack', 'mgAward'].forEach(id => on(id, 'change', () => { readEditor(); render(); }));
+    root.querySelectorAll('input[name="mgRecip"]').forEach(r => r.addEventListener('change', () => { readEditor(); render(); }));
+    // live auto-title while typing winner details
+    root.querySelectorAll('[data-w]').forEach(inp => inp.addEventListener('input', () => {
+      readEditor();
+      const t = document.getElementById('mgTitle');
+      if (t && !editing._customTitle) t.value = winnerTitle(editing);
+    }));
+    on('mgTitleCustom', 'change', e => {
+      readEditor();
+      const t = document.getElementById('mgTitle');
+      if (!t) return;
+      t.readOnly = !e.target.checked;
+      if (!e.target.checked) t.value = winnerTitle(editing); else t.focus();
+    });
+    if (window.AdminDropdown) AdminDropdown.enhanceAll(root);
     root.querySelectorAll('.mg-row').forEach(row => row.addEventListener('click', e => {
       const b = e.target.closest('[data-act]'); if (!b) return;
       const id = +row.dataset.id, r = items.find(x => x.id === id);
@@ -151,7 +243,7 @@ window.MediaAdmin = (function () {
       else if (act === 'up' || act === 'down') move(r, act === 'up' ? -1 : 1);
       else if (act === 'edit') startEdit(Object.assign({}, r));
       else if (act === 'del') remove(r);
-      else if (act === 'preview') window.open(r.media_type === 'video' ? r.video_url : r.image_url, '_blank', 'noopener');
+      else if (act === 'preview') preview(r);
     }));
     on('mgAddCat', 'click', addCategory);
     on('mgSaveCats', 'click', saveCategories);
@@ -161,6 +253,11 @@ window.MediaAdmin = (function () {
     const nextOrder = items.reduce((m, x) => Math.max(m, x.display_order || 0), 0) + 10;
     editing = Object.assign({ id: null, title: '', category: fCat || (r.media_type === 'video' ? 'messages-of-support' : 'festival-moments'), image_url: '', video_url: '', thumbnail_url: '',
       description: '', edition_year: null, display_order: nextOrder, is_visible: true, is_featured: false }, r);
+    if (editing.category === WINNERS) {
+      editing.recipient_type = editing.recipient_type || 'film';
+      // an existing title that differs from the generated one was written by hand — keep it editable
+      editing._customTitle = !!(editing.id && editing.title && editing.title !== winnerTitle(editing));
+    }
     orphans = [];
     render();
     const el = document.getElementById('mgEditor'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -212,7 +309,27 @@ window.MediaAdmin = (function () {
       if (!/^https:\/\//i.test(r.video_url || '')) return notify('Enter the video link (https://…).', 'err');
       if (!ytId(r.video_url) && !/\.(mp4|webm)(\?|$)/i.test(r.video_url)) return notify('Use a YouTube link or a direct .mp4 / .webm link.', 'err');
     }
+    const isWinner = r.category === WINNERS;
+    if (isWinner) {
+      const a = awardOf(r.award_id), k = a ? awardKind(a) : null;
+      if (!r.competition_track) return notify('Choose the competition track (General or Campus).', 'err');
+      if (!a) return notify('Choose the award category.', 'err');
+      const film = (r.film_name || '').trim(), person = (r.winner_name || '').trim();
+      if (k.kind === 'film' && !film) return notify('Enter the film name.', 'err');
+      if (k.kind === 'person' && !person) return notify(`Enter the ${k.person.toLowerCase()}.`, 'err');
+      if (k.kind === 'person' && !film) return notify('Enter the film name.', 'err');
+      if (k.kind === 'special' && r.recipient_type !== 'person' && !film) return notify('Enter the film name.', 'err');
+      if (k.kind === 'special' && r.recipient_type === 'person' && !person) return notify('Enter the recipient name.', 'err');
+      if (!r._customTitle || !r.title) r.title = winnerTitle(r);
+      r.recipient_type = k.kind === 'person' ? 'person' : k.kind === 'film' ? 'film' : (r.recipient_type || 'film');
+      r.award_name = a.name;
+    }
     const row = {
+      award_id: isWinner ? r.award_id : null, award_name: isWinner ? r.award_name : null,
+      competition_track: isWinner ? r.competition_track : null,
+      winner_name: isWinner ? ((r.winner_name || '').trim() || null) : null,
+      film_name: isWinner ? ((r.film_name || '').trim() || null) : null,
+      recipient_type: isWinner ? r.recipient_type : null,
       title: r.title, media_type: r.media_type, category: r.category,
       image_url: r.media_type === 'photo' ? r.image_url : null,
       video_url: r.media_type === 'video' ? r.video_url : null,
@@ -258,9 +375,8 @@ window.MediaAdmin = (function () {
   }
 
   async function remove(r) {
-    const ok = window.UI && UI.confirm
-      ? await UI.confirm(`Delete “${esc(r.title || 'this item')}” from the festival gallery?`, { title: 'Delete media?', okText: 'Delete', cancelText: 'Cancel', danger: true })
-      : confirm(`Delete “${r.title || 'this item'}” from the festival gallery?`);
+    if (!(window.UI && UI.confirm)) return notify('Confirmation dialog unavailable — reload the page and try again.', 'err');
+    const ok = await UI.confirm(`Delete “${esc(r.title || 'this item')}” from the festival gallery?`, { title: 'Delete media?', okText: 'Delete', cancelText: 'Cancel', danger: true });
     if (!ok) return;
     const { error } = await sb.from('gallery_media').delete().eq('id', r.id);
     if (error) return notify('Delete failed: ' + error.message, 'err');
@@ -268,6 +384,27 @@ window.MediaAdmin = (function () {
     render();
     cleanup([r.image_url, r.thumbnail_url]).catch(() => {});
     notify('Deleted', 'ok');
+  }
+
+  // Styled preview window (no new browser tab)
+  function preview(r) {
+    const id = ytId(r.video_url);
+    const media = r.media_type === 'video'
+      ? (id ? `<div class="mg-pv-video"><iframe src="https://www.youtube.com/embed/${esc(id)}?autoplay=1&rel=0" title="${esc(r.title)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`
+            : `<div class="mg-pv-video"><video src="${esc(r.video_url)}" controls autoplay playsinline></video></div>`)
+      : `<img src="${esc(r.image_url || thumbOf(r))}" alt="${esc(r.title)}">`;
+    const wrap = document.createElement('div');
+    wrap.className = 'mg-pv';
+    wrap.setAttribute('role', 'dialog'); wrap.setAttribute('aria-modal', 'true'); wrap.setAttribute('aria-label', 'Preview');
+    wrap.innerHTML = `<div class="mg-pv-box"><button type="button" class="mg-pv-close" aria-label="Close preview">&times;</button>${media}
+      <div class="mg-pv-cap"><b>${esc(r.title || '(untitled)')}</b><small>${esc(catLabel(r.category))}${r.edition_year ? ' · ' + esc(r.edition_year) : ''}${r.is_visible ? '' : ' · Hidden'}</small></div></div>`;
+    const last = document.activeElement;
+    const close = () => { wrap.remove(); document.removeEventListener('keydown', onKey); if (last) last.focus(); };
+    const onKey = e => { if (e.key === 'Escape') close(); };
+    wrap.addEventListener('click', e => { if (e.target === wrap || e.target.closest('.mg-pv-close')) close(); });
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(wrap);
+    wrap.querySelector('.mg-pv-close').focus();
   }
 
   async function addCategory() {
