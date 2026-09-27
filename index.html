@@ -92,7 +92,7 @@
     </script>
 
     <link rel="stylesheet" href="assets/css/ui-components.css">
-    <link rel="stylesheet" href="assets/css/site.css?v=28">
+    <link rel="stylesheet" href="assets/css/site.css?v=29">
 </head>
 <body>
 
@@ -668,6 +668,18 @@
         </div>
     </section>
 
+    <!-- ===== PREVIOUS JURY (shown once Admin → Jury has visible previous members) ===== -->
+    <section id="section-previous-jury" class="page-section ix-section previous-jury" hidden>
+        <div class="section-inner">
+            <span class="section-eyebrow">The People Behind Our Previous Editions</span>
+            <h2 class="section-heading"><span class="shiny-text">Previous Jury</span></h2>
+            <div class="jury-showcase is-compact" id="previousJuryGrid"></div>
+            <div class="ix-actions">
+                <a class="btn-rules-guidelines ix-inline-btn" href="/festival-gallery?filter=previous-jury">View All Previous Jury <span aria-hidden="true">&rarr;</span></a>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== COMPETITION TRACKS ===== -->
     <section id="section-tracks" class="page-section ix-section">
         <div class="section-inner">
@@ -1202,6 +1214,6 @@
     </noscript>
     <script src="assets/js/ui-components.js"></script>
     <script src="assets/js/campus-proof.js?v=1"></script>
-    <script src="assets/js/site.js?v=24"></script>
+    <script src="assets/js/site.js?v=25"></script>
 </body>
 </html>
