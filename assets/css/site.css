@@ -4461,3 +4461,23 @@
         .jury-member-role { margin: 0 0 8px; font-size: 0.7rem; font-weight: 600; letter-spacing: 2.2px; text-transform: uppercase; color: rgba(255,255,255,0.55); }
         .jury-member-bio { margin: 0; font-size: 0.88rem; line-height: 1.6; color: rgba(255,255,255,0.65); }
         @media (max-width: 480px) { .jury-showcase { grid-template-columns: repeat(2, minmax(0, 1fr)); justify-content: stretch; gap: 16px; } .jury-member-bio { font-size: 0.8rem; } }
+
+        /* ===== Previous Edition — black & white by default, original colour on desktop hover ===== */
+        .pe-media img { filter: grayscale(1); transition: filter 0.45s ease, transform 0.6s ease; }
+        .pe-card:hover .pe-media img { filter: grayscale(1); }
+        @media (hover: hover) and (pointer: fine) {
+            .pe-card:hover .pe-media img, .pe-media:focus-visible img { filter: grayscale(0); transform: scale(1.02); }
+        }
+        .pe-media::after { background: radial-gradient(120% 90% at 50% 20%, transparent 62%, rgba(0,0,0,0.35) 100%); }
+
+        /* ===== Previous Jury + jury card extras ===== */
+        .section-heading[hidden], section[hidden] { display: none !important; }
+        #section-previous-jury { padding-top: 70px; padding-bottom: 90px; }
+        .jury-showcase.is-compact { grid-template-columns: repeat(auto-fill, minmax(170px, 210px)); gap: 20px; }
+        .jury-member-edition { display: block; margin-bottom: 6px; font-size: 0.62rem; font-weight: 700; letter-spacing: 2.4px; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+        .jury-member-links { margin: 10px 0 0; display: flex; gap: 14px; flex-wrap: wrap; }
+        .jury-member-links a { color: rgba(255,255,255,0.75); font-size: 0.72rem; letter-spacing: 1.5px; text-transform: uppercase; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(255,255,255,0.3); }
+        .jury-member-links a:hover { color: #fff; }
+        .jury-member-photo img { transition: filter 0.45s ease; }
+        @media (hover: hover) and (pointer: fine) { .jury-member:hover .jury-member-photo img { filter: grayscale(0); } }
+        @media (max-width: 480px) { .jury-showcase.is-compact { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
