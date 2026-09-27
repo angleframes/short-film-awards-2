@@ -4537,3 +4537,7 @@
             .navbar a.nav-cta { width: auto; align-self: stretch; margin: 12px 18px 14px; border-radius: 999px; text-align: center; justify-content: center; border-bottom: none; }
             .navbar a.nav-cta, .navbar a.nav-cta:hover, .navbar a.nav-cta.active { background: #fff; color: #000; }
         }
+
+        /* ===== About / Our Story — centre the eyebrow + heading to match the centred intro ===== */
+        #section-story > .section-inner { text-align: center; }
+        #section-story .story-grid { text-align: left; }
