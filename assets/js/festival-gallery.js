@@ -5,6 +5,7 @@
 (function () {
   'use strict';
 
+  const tidy = t => String(t || '').replace(/\s+/g, ' ').trim();
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const $ = id => document.getElementById(id);
   const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="7,4.5 19.5,12 7,19.5" fill="currentColor"/></svg>';
@@ -48,7 +49,7 @@
         video: m.video_url || '', ytid: id,
       };
     });
-    const jury = (juryRes.data || []);
+    const jury = (juryRes.data || []).map(j => Object.assign(j, { name: tidy(j.name), designation: tidy(j.designation), bio: tidy(j.bio) }));
     previousJury = jury.filter(j => j.jury_type === 'previous');
     const juryItems = jury.filter(j => j.show_in_gallery && j.photo_url).map(j => ({
       type: 'photo', category: 'jury', title: j.name, desc: [j.designation, j.bio].filter(Boolean).join(' — '),
@@ -100,11 +101,16 @@
           const i = j.photo_url ? view.push({ type: 'photo', category: 'jury', title: j.name, desc: [j.designation, j.bio].filter(Boolean).join(' — '), year: j.edition_year, full: j.photo_url, thumb: j.photo_url }) - 1 : -1;
           return `<article class="fg-person">
             ${i >= 0 ? `<button type="button" class="fg-card is-portrait" data-i="${i}" aria-label="Open: ${esc(j.name)}"><span class="fg-thumb"><img src="${esc(j.photo_url)}" alt="${esc(j.name)}" loading="lazy" decoding="async"></span></button>` : '<span class="fg-thumb fg-thumb-empty" aria-hidden="true"></span>'}
-            <h3>${esc(j.name)}</h3>${j.designation ? `<p class="fg-person-role">${esc(j.designation)}</p>` : ''}${j.bio ? `<p class="fg-person-bio">${esc(j.bio)}</p>` : ''}
+            <h3>${esc(j.name)}</h3>${j.designation ? `<p class="fg-person-role">${esc(j.designation)}</p>` : ''}${j.bio ? `<p class="fg-person-bio">${esc(j.bio)}</p><button type="button" class="fg-bio-toggle" aria-expanded="false" hidden>Read full bio</button>` : ''}
           </article>`;
         }).join('') + '</div></section>';
     });
     $('fgContent').innerHTML = html;
+    // show "Read full bio" only where the clamp actually hides text
+    $('fgContent').querySelectorAll('.fg-person-bio').forEach(p => {
+      const btn = p.nextElementSibling;
+      if (btn && p.scrollHeight > p.clientHeight + 2) btn.hidden = false;
+    });
   }
 
   function render() {
@@ -167,7 +173,11 @@
 
   function bind() {
     $('fgFilters').addEventListener('click', e => { const b = e.target.closest('.fg-chip'); if (b) setFilter(b.dataset.k); });
-    $('fgContent').addEventListener('click', e => { const c = e.target.closest('.fg-card'); if (c) openLb(+c.dataset.i); });
+    $('fgContent').addEventListener('click', e => {
+      const t = e.target.closest('.fg-bio-toggle');
+      if (t) { const open = t.previousElementSibling.classList.toggle('is-open'); t.setAttribute('aria-expanded', open); t.textContent = open ? 'Show less' : 'Read full bio'; return; }
+      const c = e.target.closest('.fg-card'); if (c) openLb(+c.dataset.i);
+    });
     $('fgLbClose').addEventListener('click', closeLb);
     $('fgLbPrev').addEventListener('click', () => step(-1));
     $('fgLbNext').addEventListener('click', () => step(1));
