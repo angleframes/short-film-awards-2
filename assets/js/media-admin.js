@@ -115,7 +115,7 @@ window.MediaAdmin = (function () {
         <div class="mg-preview-col">
           <div class="mg-preview">${preview ? `<img src="${esc(preview)}" alt="">` : `<span>${isVideo ? 'Thumbnail comes from YouTube' : 'No photo yet'}</span>`}</div>
           <div class="mg-preview-actions">
-            <label class="btn-ghost btn-sm mg-upload">${img ? 'Replace' : 'Upload'} ${isVideo ? 'thumbnail' : 'photo'}<input type="file" accept="image/*" hidden id="mgFile"></label>
+            <label class="btn-ghost btn-sm mg-upload">${img ? 'Replace' : 'Upload'} ${isVideo ? 'thumbnail' : 'photo'}<input type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" hidden id="mgFile"></label>
             ${img ? '<button type="button" class="btn-ghost btn-sm" id="mgRemoveImg">Remove</button>' : ''}
           </div>
           ${isVideo ? '<p class="muted-note">Optional — leave empty to use the YouTube thumbnail.</p>' : ''}
@@ -152,6 +152,7 @@ window.MediaAdmin = (function () {
         <span class="mg-spacer"></span>
         <select id="mgFCat" aria-label="Filter by category"><option value="">All categories</option>${cats.map(c => `<option value="${esc(c.key)}" ${c.key === fCat ? 'selected' : ''}>${esc(c.label)}</option>`).join('')}</select>
         <select id="mgFType" aria-label="Filter by type"><option value="">Photos &amp; videos</option><option value="photo" ${fType === 'photo' ? 'selected' : ''}>Photos (${counts.photo})</option><option value="video" ${fType === 'video' ? 'selected' : ''}>Videos (${counts.video})</option></select>
+        ${needsOptimise().length ? `<button type="button" class="btn-ghost btn-sm" id="mgOptimise" title="Create optimised sizes for older photos">Optimise ${needsOptimise().length} older photo${needsOptimise().length > 1 ? 's' : ''}</button>` : ''}
         <a class="btn-ghost btn-sm" href="${SITE}/festival-gallery" target="_blank" rel="noopener">View gallery ↗</a>
       </div>
       ${editing ? editorHtml() : ''}
@@ -214,7 +215,7 @@ window.MediaAdmin = (function () {
       readEditor();
       const key = editing.media_type === 'video' ? 'thumbnail_url' : 'image_url';
       orphans.push(editing[key]); editing[key] = '';
-      if (editing.media_type === 'photo') { orphans.push(editing.thumbnail_url); editing.thumbnail_url = ''; }
+      if (editing.media_type === 'photo') { orphans.push(editing.thumbnail_url, editing.medium_url); editing.thumbnail_url = ''; editing.medium_url = ''; editing.width = editing.height = editing.file_size = null; }
       render();
     });
     root.querySelectorAll('input[name="mgType"]').forEach(r => r.addEventListener('change', () => { readEditor(); editing.media_type = r.value; render(); }));
@@ -246,6 +247,7 @@ window.MediaAdmin = (function () {
       else if (act === 'preview') preview(r);
     }));
     on('mgAddCat', 'click', addCategory);
+    on('mgOptimise', 'click', e => optimiseExisting(e.currentTarget));
     on('mgSaveCats', 'click', saveCategories);
   }
 
@@ -263,41 +265,125 @@ window.MediaAdmin = (function () {
     const el = document.getElementById('mgEditor'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  async function uploadBlob(blob, name) {
-    const path = `media/${Date.now()}-${Math.random().toString(36).slice(2, 7)}-${slug(name)}.webp`;
+  /* ---------- image pipeline: validate → decode once → 3 WebP sizes → storage ---------- */
+  const SIZES = { full: [2200, 0.86], md: [1280, 0.84], th: [800, 0.82] };   // longest side (px), WebP quality
+  const MAX_INPUT = 30 * 1024 * 1024;
+  const OK_TYPES = { 'image/jpeg': 'jpeg', 'image/png': 'png', 'image/webp': 'webp' };
+
+  // Check extension, declared MIME type and the file's real signature (magic bytes)
+  async function validateImage(file) {
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    if (!['jpg', 'jpeg', 'png', 'webp'].includes(ext)) return 'Use a JPG, PNG or WebP image.';
+    if (!OK_TYPES[file.type]) return 'Use a JPG, PNG or WebP image.';
+    if (file.size > MAX_INPUT) return 'Image is larger than 30 MB.';
+    const b = new Uint8Array(await file.slice(0, 12).arrayBuffer());
+    const isJpeg = b[0] === 0xFF && b[1] === 0xD8 && b[2] === 0xFF;
+    const isPng = b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4E && b[3] === 0x47;
+    const isWebp = b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 && b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50;
+    if (!(isJpeg || isPng || isWebp)) return 'This file is not a valid image.';
+    return '';
+  }
+
+  // Resize with step-down halving for clean downscales; output WebP. Aspect ratio preserved.
+  async function encode(bitmap, maxSide, quality) {
+    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+    const tw = Math.round(bitmap.width * scale), th = Math.round(bitmap.height * scale);
+    let src = bitmap, sw = bitmap.width, sh = bitmap.height;
+    while (sw / 2 >= tw * 1.001 && sh / 2 >= th) {
+      const c = document.createElement('canvas'); c.width = Math.round(sw / 2); c.height = Math.round(sh / 2);
+      const x = c.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(src, 0, 0, c.width, c.height);
+      src = c; sw = c.width; sh = c.height;
+    }
+    const out = document.createElement('canvas'); out.width = tw; out.height = th;
+    const ctx = out.getContext('2d'); ctx.imageSmoothingQuality = 'high'; ctx.drawImage(src, 0, 0, tw, th);
+    const blob = await new Promise((res, rej) => out.toBlob(b => (b ? res(b) : rej(new Error('WebP export failed'))), 'image/webp', quality));
+    return { blob, width: tw, height: th };
+  }
+  async function decode(blob) {
+    if (window.createImageBitmap) { try { return await createImageBitmap(blob, { imageOrientation: 'from-image' }); } catch (e) { /* fall through */ } }
+    return await new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('This image could not be read.')); im.src = URL.createObjectURL(blob); });
+  }
+  const uid = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2, 10));
+  // festival-gallery/{edition}/{category}/{uuid}-{size}.webp — never the raw user filename
+  function basePath(r) {
+    const year = /^\d{4}$/.test(String(r.edition_year || '')) ? r.edition_year : 'undated';
+    return `festival-gallery/${year}/${slug(r.category || 'other')}/${uid()}`;
+  }
+  async function put(blob, path) {
     const { error } = await sb.storage.from(BUCKET).upload(path, blob, { upsert: false, contentType: 'image/webp', cacheControl: '31536000' });
     if (error) throw error;
     return sb.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+  }
+  // Build full / medium / thumbnail from one decoded source
+  async function makeVersions(source, r, sizes) {
+    const bmp = await decode(source);
+    const base = basePath(r);
+    const out = { width: bmp.width, height: bmp.height };
+    for (const key of sizes) {
+      const [side, q] = SIZES[key];
+      const enc = await encode(bmp, side, q);
+      out[key] = await put(enc.blob, `${base}-${key}.webp`);
+      if (key === 'full') { out.width = enc.width; out.height = enc.height; out.size = enc.blob.size; }
+    }
+    if (bmp.close) bmp.close();
+    return out;
   }
 
   async function upload(input) {
     const file = input.files && input.files[0]; input.value = '';
     if (!file) return;
-    if (!/^image\//.test(file.type)) return notify('Choose an image file.', 'err');
-    if (file.size > 20 * 1024 * 1024) return notify('Image is larger than 20 MB.', 'err');
+    const bad = await validateImage(file);
+    if (bad) return notify(bad, 'err');
     readEditor();
     notify('Optimising and uploading…');
     try {
-      const isVideo = editing.media_type === 'video';
-      const full = await _optimizeImage(file, isVideo ? 1280 : 2200, 0.86);
-      const url = await uploadBlob(full, editing.title || file.name);
-      if (isVideo) { orphans.push(editing.thumbnail_url); editing.thumbnail_url = url; }
-      else {
-        const small = await _optimizeImage(file, 720, 0.8);
-        const turl = await uploadBlob(small, (editing.title || file.name) + '-thumb');
-        orphans.push(editing.image_url, editing.thumbnail_url);
-        editing.image_url = url; editing.thumbnail_url = turl;
+      if (editing.media_type === 'video') {
+        const v = await makeVersions(file, editing, ['md']);        // poster only
+        orphans.push(editing.thumbnail_url); editing.thumbnail_url = v.md;
+      } else {
+        const v = await makeVersions(file, editing, ['full', 'md', 'th']);
+        orphans.push(editing.image_url, editing.medium_url, editing.thumbnail_url);
+        Object.assign(editing, { image_url: v.full, medium_url: v.md, thumbnail_url: v.th, width: v.width, height: v.height, file_size: v.size, mime_type: 'image/webp' });
       }
       render();
       notify('Uploaded — click save to publish.', 'ok');
     } catch (e) { notify('Upload failed: ' + e.message, 'err'); }
   }
 
-  // Remove storage files under media/ that no gallery row references any more.
+  // Remove storage files this tool uploaded that no gallery row references any more
+  const OWNED = p => p.startsWith('media/') || p.startsWith('festival-gallery/');
   async function cleanup(urls) {
-    const paths = [...new Set(urls.filter(Boolean))].filter(u => storagePath(u).startsWith('media/'))
-      .filter(u => !items.some(r => r.image_url === u || r.thumbnail_url === u)).map(storagePath);
+    const paths = [...new Set(urls.filter(Boolean))].filter(u => OWNED(storagePath(u)))
+      .filter(u => !items.some(r => r.image_url === u || r.thumbnail_url === u || r.medium_url === u)).map(storagePath);
     if (paths.length) await sb.storage.from(BUCKET).remove(paths);
+  }
+
+  // One-time: give older photos a medium + 800px thumbnail (reads the stored display image; nothing re-uploaded by hand)
+  const needsOptimise = () => items.filter(r => r.media_type === 'photo' && r.image_url && !r.medium_url);
+  async function optimiseExisting(btn) {
+    const todo = needsOptimise();
+    if (!todo.length) return;
+    if (!(window.UI && UI.confirm)) return notify('Confirmation dialog unavailable — reload the page and try again.', 'err');
+    const ok = await UI.confirm(`Create optimised thumbnail and medium sizes for ${todo.length} older photo${todo.length > 1 ? 's' : ''}? The original images stay exactly as they are.`,
+      { title: 'Optimise existing photos?', okText: 'Optimise', cancelText: 'Cancel' });
+    if (!ok) return;
+    if (btn) btn.disabled = true;
+    let done = 0, failed = 0;
+    for (const r of todo) {
+      try {
+        if (btn) btn.textContent = `Optimising ${done + failed + 1} / ${todo.length}…`;
+        const res = await fetch(new URL(r.image_url, location.origin).href, { mode: 'cors', cache: 'force-cache' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const blob = await res.blob();
+        const v = await makeVersions(blob, r, ['md', 'th']);
+        const patch = { medium_url: v.md, thumbnail_url: v.th, width: v.width, height: v.height, file_size: blob.size, mime_type: blob.type || 'image/webp', updated_at: new Date().toISOString() };
+        const { error } = await sb.from('gallery_media').update(patch).eq('id', r.id);
+        if (error) throw error;
+        Object.assign(r, patch); done++;
+      } catch (e) { failed++; console.warn('Optimise failed for', r.id, e); }
+    }
+    render();
+    notify(`Optimised ${done} photo${done === 1 ? '' : 's'}${failed ? ` · ${failed} could not be processed` : ''}.`, failed ? 'err' : 'ok');
   }
 
   async function save() {
@@ -334,6 +420,9 @@ window.MediaAdmin = (function () {
       image_url: r.media_type === 'photo' ? r.image_url : null,
       video_url: r.media_type === 'video' ? r.video_url : null,
       thumbnail_url: r.thumbnail_url || null, description: r.description, edition_year: r.edition_year,
+      medium_url: r.media_type === 'photo' ? (r.medium_url || null) : null,
+      width: r.media_type === 'photo' ? (r.width || null) : null, height: r.media_type === 'photo' ? (r.height || null) : null,
+      file_size: r.media_type === 'photo' ? (r.file_size || null) : null, mime_type: r.media_type === 'photo' ? (r.mime_type || null) : null,
       display_order: r.display_order, is_visible: r.is_visible, is_featured: r.is_featured, updated_at: new Date().toISOString(),
     };
     if (r.media_type === 'video' && r.image_url) orphans.push(r.image_url);
@@ -382,7 +471,7 @@ window.MediaAdmin = (function () {
     if (error) return notify('Delete failed: ' + error.message, 'err');
     items = items.filter(x => x.id !== r.id);
     render();
-    cleanup([r.image_url, r.thumbnail_url]).catch(() => {});
+    cleanup([r.image_url, r.thumbnail_url, r.medium_url]).catch(() => {});
     notify('Deleted', 'ok');
   }
 
