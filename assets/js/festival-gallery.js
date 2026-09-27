@@ -73,8 +73,10 @@
   // Structured award-winner display: award · track · year / primary name / secondary line
   function winnerInfo(m) {
     const a = awardMap.get(String(m.award_id)) || {};
-    const award = a.name || m.award_name || 'Award';
+    let award = a.name || m.award_name || 'Award';
     const group = awardGroup(a.key, award);
+    // Special Jury variants ("Special Jury — Best Director") keep their stored label; they stay in the Special Jury filter
+    if (group === 'special' && /^Special Jury — ./.test(m.award_name || '')) award = m.award_name;
     const film = tidy(m.film_name), person = tidy(m.winner_name);
     const filmFirst = group === 'film' || (group === 'special' && m.recipient_type !== 'person');
     const primary = filmFirst ? (film || person) : (person || film);
