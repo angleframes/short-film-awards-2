@@ -21,7 +21,7 @@ window.AdminDropdown = (function () {
     if (!select || select.tagName !== 'SELECT' || select._adEnhanced) return select && select._adEnhanced;
     opts = opts || {};
     const id = 'ad' + (++uid);
-    const options = () => Array.from(select.options).filter(o => !o.hidden).map(o => ({ value: o.value, label: o.textContent, disabled: o.disabled }));
+    const options = () => Array.from(select.options).filter(o => !o.hidden).map(o => ({ value: o.value, label: o.textContent, disabled: o.disabled, group: o.parentElement && o.parentElement.tagName === 'OPTGROUP' ? o.parentElement.label : '' }));
     const searchable = opts.search != null ? opts.search : select.options.length > 7;
 
     const root = document.createElement('div');
@@ -64,7 +64,8 @@ window.AdminDropdown = (function () {
     function renderList() {
       const q = search ? search.value.trim().toLowerCase() : '';
       shown = options().filter(o => !q || o.label.toLowerCase().includes(q));
-      list.innerHTML = shown.length ? shown.map((o, i) => `<li role="option" id="${id}-o${i}" class="ad-opt${o.value === select.value ? ' is-selected' : ''}${o.disabled ? ' is-disabled' : ''}" aria-selected="${o.value === select.value}" data-i="${i}">${esc(o.label)}</li>`).join('')
+      // <optgroup> labels render as non-selectable headings between options
+      list.innerHTML = shown.length ? shown.map((o, i) => (o.group && (i === 0 || shown[i - 1].group !== o.group) ? `<li class="ad-group" role="presentation">${esc(o.group)}</li>` : '') + `<li role="option" id="${id}-o${i}" class="ad-opt${o.value === select.value ? ' is-selected' : ''}${o.disabled ? ' is-disabled' : ''}" aria-selected="${o.value === select.value}" data-i="${i}">${esc(o.label)}</li>`).join('')
         : '<li class="ad-empty" role="presentation">No matches</li>';
       setActive(Math.max(0, shown.findIndex(o => o.value === select.value)));
     }
