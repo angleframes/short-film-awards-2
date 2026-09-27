@@ -4255,10 +4255,10 @@
             .nav-more-dropdown a { height: auto; display: block; padding: 11px 14px; border-radius: 8px; white-space: normal; }
         }
         /* mid widths: tighter links; nav sits right of the logo instead of centred so they never collide */
-        @media (min-width: 769px) and (max-width: 1360px) {
+        @media (min-width: 769px) and (max-width: 1500px) {
             .navbar a { padding: 0 10px; letter-spacing: 1px; font-size: 0.68rem; }
         }
-        @media (min-width: 769px) and (max-width: 1100px) {
+        @media (min-width: 769px) and (max-width: 1240px) {
             .site-header-wrapper { padding-left: 24px; padding-right: 24px; }
             .site-header-wrapper .navbar { position: static; transform: none; margin-left: auto; }
             .navbar a { padding: 0 8px; letter-spacing: 0.8px; font-size: 0.64rem; }
@@ -4400,3 +4400,64 @@
         .footer-presented { color: rgba(255,255,255,0.6); font-size: 0.85rem; line-height: 1.6; margin: 8px 0 0; }
         .footer-presented strong { color: rgba(255,255,255,0.88); font-weight: 600; }
         .footer-tagline { line-height: 1.55; }
+
+        /* ===== PREVIOUS EDITION + FESTIVAL MEDIA — monochrome editorial cards =====
+           Charcoal cards on the page background, black & white photography, light grain, quiet hover. */
+        .pe-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; margin: 48px auto 0; max-width: 1100px; text-align: left; }
+        .media-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+        .pe-card { min-width: 0; display: flex; flex-direction: column; background: #0d0d0f; border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; overflow: hidden; transition: border-color 0.3s ease; }
+        .pe-card:hover { border-color: rgba(255,255,255,0.22); }
+        .pe-media { position: relative; display: block; width: 100%; aspect-ratio: 16 / 10; padding: 0; border: 0; margin: 0; background: #070708; cursor: pointer; overflow: hidden; }
+        .pe-media img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.06) brightness(0.86); transform: scale(1.001); transition: transform 0.6s ease, filter 0.6s ease; }
+        .pe-card:hover .pe-media img { transform: scale(1.035); filter: grayscale(1) contrast(1.08) brightness(0.98); }
+        .pe-media::after { content: ''; position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 20%, transparent 55%, rgba(0,0,0,0.55) 100%); pointer-events: none; }
+        .pe-grain {
+            position: absolute; inset: 0; pointer-events: none; opacity: 0.09; mix-blend-mode: overlay;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+        .pe-play { position: absolute; left: 50%; top: 50%; z-index: 2; width: 56px; height: 56px; transform: translate(-50%, -50%); border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.45); transition: background 0.3s ease; }
+        .pe-play svg { width: 18px; height: 18px; margin-left: 3px; }
+        .pe-card:hover .pe-play { background: #fff; }
+        .pe-card:hover .pe-play svg { fill: #000; }
+        .pe-media:focus-visible, .pe-link:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+        .pe-body { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 22px 24px 24px; flex: 1; }
+        .pe-kicker { font-size: 0.66rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+        .pe-title { margin: 0; font-size: clamp(1.05rem, 1.7vw, 1.35rem); font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: #fff; line-height: 1.25; }
+        .pe-desc { margin: 0; color: rgba(255,255,255,0.62); font-size: 0.9rem; line-height: 1.65; }
+        .pe-link { margin-top: auto; padding: 10px 0 0; background: none; border: 0; cursor: pointer; font: inherit; font-size: 0.72rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #fff; display: inline-flex; gap: 10px; align-items: center; }
+        .pe-link span { transition: transform 0.25s ease; }
+        .pe-card:hover .pe-link span { transform: translateX(4px); }
+        .media-grid .pe-body { padding: 18px 20px 20px; }
+        #section-previous, #section-media { padding-top: 90px; padding-bottom: 90px; }
+        @media (max-width: 900px) {
+            .media-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .media-grid .pe-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+        }
+        @media (max-width: 640px) {
+            .pe-grid, .media-grid { grid-template-columns: 1fr; gap: 18px; margin-top: 32px; }
+            .media-grid .pe-card:last-child:nth-child(odd) { grid-column: auto; }
+            .pe-body { padding: 18px 18px 20px; }
+            #section-previous, #section-media { padding-top: 64px; padding-bottom: 64px; }
+        }
+        @media (hover: none) { .pe-card:hover .pe-media img { transform: none; } }
+
+        /* ===== JURY — featured section with spotlight; cards ready for real members ===== */
+        .jury-feature { position: relative; }
+        .jury-feature::before {
+            content: ''; position: absolute; left: 50%; top: 0; width: min(900px, 100%); height: 70%;
+            transform: translateX(-50%); pointer-events: none; z-index: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.07) 0%, transparent 65%);
+        }
+        .jury-feature .section-heading { font-size: clamp(2.2rem, 6vw, 4.2rem); }
+        .jury-feature-lead { margin: 18px auto 0; max-width: 680px; color: #fff; font-size: clamp(1.1rem, 2.2vw, 1.45rem); font-weight: 500; line-height: 1.45; }
+        .jury-coming-soon { padding: 34px 28px; border-radius: 20px; background: #0d0d0f; border: 1px solid rgba(255,255,255,0.1); }
+        .jury-showcase[hidden], .jury-coming-soon[hidden] { display: none !important; }
+        .jury-showcase { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 250px)); justify-content: center; gap: 24px; max-width: 1100px; margin: 44px auto 0; text-align: left; }
+        .jury-member { min-width: 0; }
+        .jury-member-photo { aspect-ratio: 4 / 5; border-radius: 16px; overflow: hidden; background: #0d0d0f; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 16px; position: relative; }
+        .jury-member-photo img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.05); display: block; }
+        .jury-member-silhouette { position: absolute; inset: 0; background: radial-gradient(circle at 50% 38%, rgba(255,255,255,0.12) 0 17%, transparent 17.5%), radial-gradient(ellipse at 50% 100%, rgba(255,255,255,0.1) 0 38%, transparent 38.5%); }
+        .jury-member-name { margin: 0 0 4px; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #fff; }
+        .jury-member-role { margin: 0 0 8px; font-size: 0.7rem; font-weight: 600; letter-spacing: 2.2px; text-transform: uppercase; color: rgba(255,255,255,0.55); }
+        .jury-member-bio { margin: 0; font-size: 0.88rem; line-height: 1.6; color: rgba(255,255,255,0.65); }
+        @media (max-width: 480px) { .jury-showcase { grid-template-columns: repeat(2, minmax(0, 1fr)); justify-content: stretch; gap: 16px; } .jury-member-bio { font-size: 0.8rem; } }
