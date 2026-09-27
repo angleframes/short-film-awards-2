@@ -447,268 +447,7 @@
     </div>
 
 
-    <!-- Festival Info Modal — premium two-column shell -->
-    <div id="infoModal" class="rules-modal-overlay" onclick="closeInfoModal()">
-        <div class="rules-modal-container info-modal-container" onclick="event.stopPropagation()"
-             role="dialog" aria-modal="true" aria-labelledby="infoModalTitle">
-
-          <!-- LEFT SIDEBAR -->
-          <aside class="ims-sidebar">
-            <div class="ims-logo">
-              <img id="imsLogoImg" src="assets/img/logo-377.webp" srcset="assets/img/logo-189.webp 189w, assets/img/logo-377.webp 377w, assets/img/logo-566.webp 566w" sizes="176px" width="377" height="112" alt="Sharankrishna Short Film Awards logo">
-            </div>
-            <nav class="ims-nav" aria-label="Section navigation">
-              <button id="infoTabBtn-submit"    class="ims-nav-btn active" onclick="switchInfoTab('submit')">
-                <span class="ims-nav-icon">📋</span>How To Submit</button>
-              <button id="infoTabBtn-guidelines" class="ims-nav-btn" onclick="switchInfoTab('guidelines')">
-                <span class="ims-nav-icon">📜</span>Guidelines</button>
-              <button id="infoTabBtn-updates"   class="ims-nav-btn" onclick="switchInfoTab('updates')">
-                <span class="ims-nav-icon">📣</span>Festival Updates</button>
-              <button id="infoTabBtn-jury"      class="ims-nav-btn" onclick="switchInfoTab('jury')">
-                <span class="ims-nav-icon">🎬</span>Jury Panel</button>
-              <button id="infoTabBtn-faq"       class="ims-nav-btn" onclick="switchInfoTab('faq')">
-                <span class="ims-nav-icon">?</span>FAQ</button>
-              <button id="infoTabBtn-privacy"   class="ims-nav-btn" onclick="switchInfoTab('privacy')">
-                <span class="ims-nav-icon">🔐</span>Privacy Policy</button>
-              <button id="infoTabBtn-terms"     class="ims-nav-btn" onclick="switchInfoTab('terms')">
-                <span class="ims-nav-icon">📄</span>Terms &amp; Conditions</button>
-              <button id="infoTabBtn-refunds"   class="ims-nav-btn" onclick="switchInfoTab('refunds')">
-                <span class="ims-nav-icon">↩</span>Refunds &amp; Cancellations</button>
-            </nav>
-            <div class="ims-cinematic">
-              <p class="ims-cinematic-text">Honoring Creativity.<br>Recognizing Talent.<br>Inspiring the Next Generation of Filmmakers.</p>
-            </div>
-          </aside>
-
-          <!-- RIGHT CONTENT -->
-          <div class="ims-content">
-            <div class="ims-content-header">
-              <div class="ims-eyebrow" id="imsEyebrow">Festival Information</div>
-              <h2 class="ims-heading" id="infoModalTitle">How To Submit</h2>
-              <p class="ims-desc" id="imsDesc"></p>
-              <button class="ims-close" onclick="closeInfoModal()" aria-label="Close modal">✕</button>
-            </div>
-            <div class="ims-panes">
-
-            <!-- How To Submit -->
-            <div id="infoTabPane-submit" class="info-tab-pane active">
-                <div class="rules-list-content">
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>1. Your Details</h4>
-                        <p>Start the entry wizard with your name, email, phone number, and city so we can reach you about your submission.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>2. Film Details</h4>
-                        <p>Add your film's title, category, runtime, and a working link to the film hosted on YouTube or a cloud storage service.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>3. Crew & Cast Credits</h4>
-                        <p>List your director, producer, writer, cinematographer, editor, music director, and lead cast members so the credits are accurately recorded.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>4. Entry Fee Payment</h4>
-                        <p>Pay the ₹1,000 entry fee securely inside the portal via Cashfree (UPI, cards, net banking, or wallets). Your payment is verified automatically — no screenshots or reference codes needed.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>5. Review & Confirm</h4>
-                        <p>Double-check your entry summary on the final step, then submit. You'll see an on-screen confirmation once your entry has been received.</p>
-                    </div>
-                </div>
-                <a href="#section-registration" class="modal-link-cta" onclick="closeInfoModal()">Start Your Submission &rarr;</a>
-            </div>
-
-            <!-- Festival Guidelines -->
-            <div id="infoTabPane-guidelines" class="info-tab-pane">
-                <div class="rules-list-content" id="guidelinesListContainer"></div>
-                <span class="modal-link-cta" onclick="closeInfoModal(); toggleRulesModal(true);">View Submission Rules &rarr;</span>
-            </div>
-
-            <!-- Festival Updates -->
-            <div id="infoTabPane-updates" class="info-tab-pane">
-                <div class="updates-timeline" id="updatesListContainer"></div>
-            </div>
-
-            <!-- Jury Panel -->
-            <div id="infoTabPane-jury" class="info-tab-pane">
-                <div class="jury-panel-grid" id="juryPanelGrid"></div>
-                <p class="jury-panel-note">Our jury panel for this edition is being finalized and will be announced soon. Follow our social channels for the official reveal.</p>
-            </div>
-
-            <!-- FAQ -->
-            <div id="infoTabPane-faq" class="info-tab-pane">
-                <div class="faq-list" id="faqAccordion">
-                    <div class="faq-item">
-                        <h3><button type="button" class="faq-q" id="faqQ1" aria-expanded="false" aria-controls="faqA1">What is Sharankrishna Short Film Awards?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA1" role="region" aria-labelledby="faqQ1"><div class="faq-a-inner"><p>Sharankrishna Short Film Awards is a short film competition honoring the legacy of Sharankrishna, open to filmmakers of all nationalities. The festival runs a General Track open to all filmmakers and a Campus Track for college students, hosted by Angle Frames in association with JAIN (Deemed-to-be University), Kochi. <a href="#section-story" data-faq-go="section-story">Read the story behind the awards</a>.</p></div></div>
-                    </div>
-                    <div class="faq-item">
-                        <h3><button type="button" class="faq-q" id="faqQ2" aria-expanded="false" aria-controls="faqA2">Who is eligible to submit a short film?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA2" role="region" aria-labelledby="faqQ2"><div class="faq-a-inner"><p>The General Track is open to filmmakers of all nationalities. Participants must be at least 18 years of age, or have the consent of a parent or guardian if under 18. The Campus Track is for students and requires one valid proof of current student status (a college/university ID card, an official institution verification document, or a letter on the institution's letterhead), uploaded as a PDF or JPG in the submission form. Full requirements are listed in the <a href="#rules" data-faq-go="rules">Rules &amp; Guidelines</a>.</p></div></div>
-                    </div>
-                    <div class="faq-item">
-                        <h3><button type="button" class="faq-q" id="faqQ3" aria-expanded="false" aria-controls="faqA3">How do I submit a short film to Sharankrishna Short Film Awards?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA3" role="region" aria-labelledby="faqQ3"><div class="faq-a-inner"><p>Entries are submitted online through the registration form on this website. You enter your details, your film's title, category, runtime and a working YouTube or Drive link, and your cast &amp; crew credits, then review your entry and pay the entry fee securely online. A step-by-step walkthrough is in <a href="#how-to-submit" data-faq-go="submit">How To Submit</a>, or you can <a href="#section-registration" data-faq-go="section-registration">start your submission</a> now.</p></div></div>
-                    </div>
-                    <div class="faq-item">
-                        <h3><button type="button" class="faq-q" id="faqQ4" aria-expanded="false" aria-controls="faqA4">What is the submission deadline for 2026?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA4" role="region" aria-labelledby="faqQ4"><div class="faq-a-inner"><p>Entries close on December 31, 2026. Filmmakers are encouraged to follow the steps in <a href="#how-to-submit" data-faq-go="submit">How To Submit</a> well ahead of the deadline.</p></div></div>
-                    </div>
-                    <div class="faq-item">
-                        <h3><button type="button" class="faq-q" id="faqQ5" aria-expanded="false" aria-controls="faqA5">What is the entry fee?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA5" role="region" aria-labelledby="faqQ5"><div class="faq-a-inner"><p>The entry fee is ₹1,000 per submission, paid securely online via Cashfree (UPI, cards, net banking or wallets). The fee is non-refundable once payment is confirmed — see <a href="refund.html" data-faq-go="refunds">Refunds &amp; Cancellations</a> for details.</p></div></div>
-                    </div>
-                    <div class="faq-item">
-                        <h3><button type="button" class="faq-q" id="faqQ6" aria-expanded="false" aria-controls="faqA6">What is the maximum runtime for a short film?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA6" role="region" aria-labelledby="faqQ6"><div class="faq-a-inner"><p>Films must not exceed 30 minutes, including opening and closing credits. Films must have been produced between January 1, 2025 and December 31, 2026. See the full <a href="#rules" data-faq-go="rules">Rules &amp; Guidelines</a>.</p></div></div>
-                    </div>
-                    <div class="faq-item">
-                        <h3><button type="button" class="faq-q" id="faqQ7" aria-expanded="false" aria-controls="faqA7">What is the difference between the General Track and Campus Track?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA7" role="region" aria-labelledby="faqQ7"><div class="faq-a-inner"><p>The General Track is open to any filmmaker. The Campus Track is reserved for currently enrolled students and requires proof of current student status. See the <a href="#rules" data-faq-go="rules">Rules &amp; Guidelines</a> for track-specific requirements.</p></div></div>
-                    </div>
-                    <div class="faq-item">
-                        <h3><button type="button" class="faq-q" id="faqQ8" aria-expanded="false" aria-controls="faqA8">What do winners receive?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA8" role="region" aria-labelledby="faqQ8"><div class="faq-a-inner"><p>Winners across the award categories are honoured at the Grand Function and winners' announcement on February 12, 2027. See all <a href="#section-categories" data-faq-go="section-categories">award categories</a>.</p></div></div>
-                    </div>
-                    <div class="faq-item">
-                        <h3><button type="button" class="faq-q" id="faqQ9" aria-expanded="false" aria-controls="faqA9">Can I submit more than one short film?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA9" role="region" aria-labelledby="faqQ9"><div class="faq-a-inner"><p>Yes. Filmmakers can submit multiple short films. Each film must be submitted as a separate entry, and the ₹1,000 entry fee must be paid separately for each submission. See <a href="#how-to-submit" data-faq-go="submit">How To Submit</a> for the submission steps.</p></div></div>
-                    </div>
-                    <div class="faq-item">
-                        <h3><button type="button" class="faq-q" id="faqQ10" aria-expanded="false" aria-controls="faqA10">Does my film need English subtitles?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA10" role="region" aria-labelledby="faqQ10"><div class="faq-a-inner"><p>Yes, if your film is in any language other than Malayalam. Films in any language other than Malayalam must include English subtitles. This allows the jury to understand and evaluate the film properly. Malayalam-language films do not require English subtitles. See the <a href="#rules" data-faq-go="rules">Rules &amp; Guidelines</a> for the other submission requirements.</p></div></div>
-                    </div>
-                    <div class="faq-item">
-                        <h3><button type="button" class="faq-q" id="faqQ11" aria-expanded="false" aria-controls="faqA11">Who judges the submissions?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA11" role="region" aria-labelledby="faqQ11"><div class="faq-a-inner"><p>Entries are evaluated by the festival's official jury panel. Jury members will be announced in <a href="#updates" data-faq-go="updates">Festival Updates</a> and on the festival's social channels. Decisions of the jury are final.</p></div></div>
-                    </div>
-                    <div class="faq-item">
-                        <h3><button type="button" class="faq-q" id="faqQ12" aria-expanded="false" aria-controls="faqA12">When and where is the awards ceremony?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA12" role="region" aria-labelledby="faqQ12"><div class="faq-a-inner"><p>The Grand Function and winners' announcement takes place on February 12, 2027, at JAIN (Deemed-to-be University), Kochi Campus, Kerala.</p></div></div>
-                    </div>
-                    <div class="faq-item">
-                        <h3><button type="button" class="faq-q" id="faqQ13" aria-expanded="false" aria-controls="faqA13">Who owns the rights to submitted films?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA13" role="region" aria-labelledby="faqQ13"><div class="faq-a-inner"><p>Filmmakers keep ownership of their work. By submitting, you confirm that you own, or have all necessary rights and licences for, all content in the film, including footage, music and any third-party material. You grant the festival a non-exclusive, royalty-free licence to screen your film during festival events, use clips and stills for festival promotion, and include your film in festival archives. Read the full <a href="terms.html" data-faq-go="terms">Terms &amp; Conditions</a>.</p></div></div>
-                    </div>
-                    <div class="faq-item">
-                        <h3><button type="button" class="faq-q" id="faqQ14" aria-expanded="false" aria-controls="faqA14">How do I stay updated on announcements and deadline changes?<span class="faq-icon" aria-hidden="true"></span></button></h3>
-                        <div class="faq-a" id="faqA14" role="region" aria-labelledby="faqQ14"><div class="faq-a-inner"><p>Follow <a href="#updates" data-faq-go="updates">Festival Updates</a> or the festival's official channels on <a href="https://www.instagram.com/sharankrishna_shortfilm_awards/" target="_blank" rel="noopener">Instagram</a>, <a href="https://www.youtube.com/@ANGLEFRAMES" target="_blank" rel="noopener">YouTube</a> and <a href="https://www.facebook.com/share/1BRDQLmtVp/" target="_blank" rel="noopener">Facebook</a> for jury reveals, shortlist announcements and any deadline changes.</p></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Privacy Policy -->
-            <div id="infoTabPane-privacy" class="info-tab-pane">
-                <div class="rules-list-content">
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Information We Collect</h4>
-                        <p>When you register a film entry, we collect details you provide such as your name, email, phone number, city, film and crew information, payment reference details, and — for Campus Track entries — a student verification document, which is stored privately and used only to confirm eligibility.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>How We Use Your Information</h4>
-                        <p>Your information is used solely to process your submission, verify entry payments, communicate updates about the festival, and coordinate the judging process.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Data Sharing</h4>
-                        <p>We do not sell or rent your personal information. Limited details may be shared internally with the jury panel and organizing team strictly for evaluation purposes.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Data Security</h4>
-                        <p>We take reasonable technical and organizational measures to protect your information from unauthorized access, alteration, or disclosure.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Your Rights</h4>
-                        <p>You may request access to, correction of, or deletion of your personal data at any time by reaching out through our contact helpdesk.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Contact Us</h4>
-                        <p>For any privacy-related questions, write to us at sharankrishnashortfilmawards@gmail.com.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Terms & Conditions -->
-            <div id="infoTabPane-terms" class="info-tab-pane">
-                <div class="rules-list-content">
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Acceptance of Terms</h4>
-                        <p>By submitting an entry and completing payment for the Sharankrishna Short Film Awards ("Festival"), you ("Participant") agree to be bound by these Terms and Conditions. If you do not agree, do not submit an entry.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Eligibility</h4>
-                        <p>The Festival is open to filmmakers of all nationalities. Films submitted must be short films with a maximum runtime as specified in the submission guidelines. Participants must be at least 18 years of age, or have consent of a parent or guardian if under 18.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Entry Fee</h4>
-                        <p>A non-refundable entry fee of ₹1,000 (Indian Rupees One Thousand) is required per film submission. Payment must be completed via the online payment gateway. Entry is confirmed only after successful payment verification by our server.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Ownership and Rights</h4>
-                        <p>By submitting, you confirm that you are the owner of, or have all necessary rights and licences for, all content in the film including footage, music, dialogue, and any third-party material. You grant the Sharankrishna Short Film Awards a non-exclusive, royalty-free licence to screen your film during Festival events, use clips and stills for Festival promotional materials, and include your film in Festival archives.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Selection and Decisions</h4>
-                        <p>Submission does not guarantee selection or screening. The Festival jury's and organisers' decisions on selection, shortlisting, and awards are final and binding. No correspondence regarding selection outcomes will be entered into.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Content Standards</h4>
-                        <p>Films must not contain content that is unlawful, defamatory, obscene, or that infringes the intellectual property rights of any third party. The Festival reserves the right to disqualify entries that violate these standards without refund.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Limitation of Liability</h4>
-                        <p>The Festival organisers shall not be liable for any loss, damage, or injury arising from participation in the Festival, technical failures, or any reliance on information provided on this website.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Governing Law</h4>
-                        <p>These Terms are governed by the laws of India. Any disputes arising shall be subject to the exclusive jurisdiction of the courts of Tamil Nadu, India.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Changes to Terms</h4>
-                        <p>The Festival reserves the right to amend these Terms at any time. Continued participation after changes constitutes acceptance of the revised Terms. Material changes will be communicated via the Festival Updates section.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Contact</h4>
-                        <p>For queries regarding these Terms, write to us at <a href="mailto:sharankrishnashortfilmawards@gmail.com" style="color:inherit;">sharankrishnashortfilmawards@gmail.com</a>.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Refunds & Cancellations -->
-            <div id="infoTabPane-refunds" class="info-tab-pane">
-                <div class="rules-list-content">
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Non-Refundable Entry Fee</h4>
-                        <p>The entry fee of ₹1,000 is strictly non-refundable once a successful payment has been confirmed by our server and your film entry has been registered. This is standard practice for film festivals worldwide and allows us to cover evaluation, operational, and administrative costs.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Failed Payment / Technical Error</h4>
-                        <p>If your payment is debited from your bank account or card but your entry registration fails due to a technical error on our payment gateway or server, you are entitled to a full refund of ₹1,000. To claim this refund, contact us within 7 days at sharankrishnashortfilmawards@gmail.com with your name, registered email address, and the Cashfree Order ID. Verified refunds will be processed within 7–10 working days to the original payment method.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Duplicate Payment</h4>
-                        <p>If you are charged more than once for the same entry due to a technical error, the duplicate charge will be refunded in full within 7–10 working days upon verification. Contact us with both Order IDs.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Withdrawal by Participant</h4>
-                        <p>If a Participant chooses to withdraw their film entry after successful payment and registration, no refund will be issued. The entry fee is forfeited upon registration.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Festival Cancellation or Postponement</h4>
-                        <p>In the unlikely event that the Festival is cancelled or significantly postponed due to circumstances beyond our control (force majeure, natural disaster, government restrictions, or similar), the organisers will communicate the situation and available options — which may include entry carryover to a rescheduled event — on a case-by-case basis. Refunds in such cases are at the organisers' discretion.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>Disqualification</h4>
-                        <p>Entries disqualified for violation of submission guidelines or content standards are not eligible for a refund of the entry fee.</p>
-                    </div>
-                    <div class="rule-item-box glow-card"><span class="edge-light"></span>
-                        <h4>How to Request a Refund</h4>
-                        <p>Email sharankrishnashortfilmawards@gmail.com with Subject: "Refund Request — [Your Name]". Include your registered email, Cashfree Order ID, and reason. We will respond within 3 working days.</p>
-                    </div>
-                </div>
-            </div><!-- /infoTabPane-refunds -->
-            </div><!-- /ims-panes -->
-          </div><!-- /ims-content -->
-        </div><!-- /info-modal-container -->
-    </div><!-- /infoModal -->
+    <!-- Festival Resources (How To Submit, Guidelines, Updates, Jury, FAQ, policies) → /resources (resources.html) -->
 
 
     <!-- ===== JURY ===== -->
@@ -1129,7 +868,7 @@
             <h2 class="section-heading scroll-reveal delay-1"><span class="shiny-text">Frequently Asked Questions</span></h2>
             <p class="about-lead scroll-reveal delay-2">Everything you need to know before submitting — eligibility, runtime, categories, subtitles, payment, multiple entries, judging and the awards ceremony.</p>
             <div class="ix-actions scroll-reveal delay-3">
-                <a class="btn-rules-guidelines ix-inline-btn" href="/#faq" onclick="openInfoModal('faq');return false;">View All FAQs <span aria-hidden="true">&rarr;</span></a>
+                <a class="btn-rules-guidelines ix-inline-btn" href="/resources?section=faq">View All FAQs <span aria-hidden="true">&rarr;</span></a>
             </div>
         </div>
     </section>
@@ -1173,7 +912,7 @@
 
     <!-- ===== FOOTER — shared component (assets/js/site-chrome.js), same footer on every page ===== -->
     <div id="siteFooter" data-page="home"></div>
-    <script src="assets/js/site-chrome.js?v=1"></script>
+    <script src="assets/js/site-chrome.js?v=2"></script>
 
     <!-- WhatsApp Enquiry Button (always visible) -->
     <a href="https://wa.me/919745640896?text=Hi%2C%20I%20have%20an%20enquiry%20about%20the%20Sharankrishna%20Short%20Film%20Awards."
@@ -1194,6 +933,6 @@
     <script src="assets/js/ui-components.js"></script>
     <script src="assets/js/campus-proof.js?v=1"></script>
     <script src="assets/js/youtube.js?v=1"></script>
-    <script src="assets/js/site.js?v=36"></script>
+    <script src="assets/js/site.js?v=37"></script>
 </body>
 </html>
