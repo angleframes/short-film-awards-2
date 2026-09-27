@@ -4481,3 +4481,29 @@
         .jury-member-photo img { transition: filter 0.45s ease; }
         @media (hover: hover) and (pointer: fine) { .jury-member:hover .jury-member-photo img { filter: grayscale(0); } }
         @media (max-width: 480px) { .jury-showcase.is-compact { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+        /* ===== JURY CARDS — refined: centred grid, balanced text, clamped titles ===== */
+        .jury-showcase { grid-template-columns: repeat(auto-fit, minmax(200px, 250px)); justify-content: center; gap: 32px 28px; }
+        .jury-showcase.is-compact { grid-template-columns: repeat(auto-fit, minmax(190px, 240px)); gap: 32px 28px; margin-top: 36px; }
+        .jury-member { text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .jury-member-photo { width: 100%; margin-bottom: 18px; border-radius: 14px; }
+        .jury-member-name { font-size: 0.98rem; letter-spacing: 0.8px; line-height: 1.35; margin: 0 0 6px; }
+        .jury-member-role {
+            text-transform: none; letter-spacing: 0.2px; font-size: 0.84rem; font-weight: 400; line-height: 1.5;
+            color: rgba(255,255,255,0.6); margin: 0; max-width: 240px;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .jury-member-bio { margin-top: 10px; font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+        .jury-member-links { justify-content: center; }
+        .jury-member-edition { margin-bottom: 8px; }
+        .jury-edition-label {
+            display: inline-flex; align-items: center; gap: 12px; margin: 10px auto 0;
+            font-size: 0.66rem; font-weight: 700; letter-spacing: 3.2px; text-transform: uppercase; color: rgba(255,255,255,0.5);
+        }
+        .jury-edition-label::before, .jury-edition-label::after { content: ''; width: 28px; height: 1px; background: rgba(255,255,255,0.25); }
+        .jury-edition-label[hidden] { display: none; }
+        @media (max-width: 480px) {
+            .jury-showcase, .jury-showcase.is-compact { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px 14px; }
+            .jury-member-name { font-size: 0.86rem; letter-spacing: 0.4px; }
+            .jury-member-role { font-size: 0.76rem; }
+        }
