@@ -1,24 +1,46 @@
 /* Full Festival Gallery (/festival-gallery)
    Master gallery: gallery_media (Admin → Festival Gallery) + jury photos flagged "Show in Festival Gallery"
    (Admin → Jury). Jury items reference the jury member's own photo_url, so photo updates carry over.
-   Filters: ?filter=all|photos|videos|<category key>|previous-jury */
+   Filters: ?filter=all|photos|videos|<category key>|previous-jury
+
+   Scales to large libraries: records are fetched from the database in pages of PAGE items, filtered
+   server-side (type / category / track / award), and more load automatically near the bottom.
+   Cards use the small thumbnail (srcset → medium on dense screens); the full image loads only in the
+   lightbox, which also preloads just the previous and next photo. Videos show a poster until opened. */
 (function () {
   'use strict';
+
+  const PAGE = 18;                       // records per batch
+  const EAGER = 4;                       // first visible cards load eagerly (LCP)
+  const COLS = 'id,title,media_type,category,image_url,medium_url,thumbnail_url,video_url,description,edition_year,is_featured,' +
+               'award_id,award_name,competition_track,winner_name,film_name,recipient_type,width,height';
 
   const tidy = t => String(t || '').replace(/\s+/g, ' ').trim();
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const $ = id => document.getElementById(id);
   const PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><polygon points="7,4.5 19.5,12 7,19.5" fill="currentColor"/></svg>';
   const ALIASES = { winners: 'award-winners', moments: 'festival-moments', messages: 'messages-of-support', bts: 'behind-the-scenes', highlights: 'festival-highlights', photo: 'photos', video: 'videos' };
+  const CARD_SIZES = '(max-width: 360px) 100vw, (max-width: 700px) 50vw, (max-width: 1240px) 33vw, 300px';
+  const FEAT_SIZES = '(max-width: 700px) 100vw, 620px';
+  const LB_SIZES = '(max-width: 1200px) 100vw, 1200px';
 
-  let items = [];          // normalised media
+  let sb = null;
   let categories = [];     // media_categories rows
-  let previousJury = [];   // all visible previous jury (roster view)
+  let juryAll = [];        // visible jury members (small list)
+  let previousJury = [];
+  let awardMap = new Map();// award_categories id → { key, name }
+  let winnerFacets = { tracks: [], groups: [] };
   let active = 'all';
-  let subTrack = 'all', subGroup = 'all';   // extra filters inside Award Winners
-  let awardMap = new Map();                 // award_categories id → { key, name } (live names from Admin → Awards)
+  let subTrack = 'all', subGroup = 'all';
   const TRACKS = { general: 'General', campus: 'Campus' };
   const GROUPS = [['film', 'Best Film'], ['director', 'Director'], ['actor', 'Actor'], ['actress', 'Actress'], ['technical', 'Technical'], ['special', 'Special Jury'], ['other', 'Other Awards']];
+
+  // feed state for the current filter
+  let view = [];           // loaded items, in display (and lightbox) order
+  let offset = 0, hasMore = false, loading = false, token = 0, juryDone = false;
+  let lbIndex = -1;
+  let io = null;
+
   function awardGroup(key, name) {
     const k = String(key || name || '').toLowerCase();
     if (/special/.test(k)) return 'special';
@@ -29,9 +51,6 @@
     if (/screenplay|writer|cinematograph|edit|music|sound|art/.test(k)) return 'technical';
     return 'other';
   }
-  let view = [];           // items in the current filter (lightbox order)
-  let lbIndex = -1;
-
   function ytId(url) {
     const m = String(url || '').match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([\w-]{11})/i);
     return m ? m[1] : (/^[\w-]{11}$/.test(url || '') ? url : '');
@@ -40,39 +59,6 @@
     if (key === 'jury') return 'Jury';
     const c = categories.find(x => x.key === key);
     return c ? c.label : '';
-  }
-
-  async function load() {
-    if (!window.supabase || typeof SUPA_URL === 'undefined') throw new Error('offline');
-    const sb = window.supabase.createClient(SUPA_URL, SUPA_ANON);
-    const [catRes, medRes, juryRes, awRes] = await Promise.all([
-      sb.from('media_categories').select('*').order('sort_order'),
-      sb.from('gallery_media').select('*').order('is_featured', { ascending: false }).order('display_order').order('created_at'),
-      sb.from('jury_members').select('id,name,designation,bio,photo_url,edition_year,jury_type,display_order,show_in_gallery')
-        .order('edition_year', { ascending: false, nullsFirst: false }).order('display_order'),
-      sb.from('award_categories').select('id,key,name'),
-    ]);
-    (awRes && awRes.data || []).forEach(a => awardMap.set(String(a.id), a));
-    if (medRes.error) throw medRes.error;
-    categories = catRes.data || [];
-    const media = (medRes.data || []).map(m => {
-      const id = m.media_type === 'video' ? ytId(m.video_url) : '';
-      return {
-        type: m.media_type, category: m.category, title: m.title || '', desc: m.description || '', year: m.edition_year,
-        featured: !!m.is_featured,
-        full: m.image_url || '',
-        thumb: m.thumbnail_url || m.image_url || (id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : ''),
-        video: m.video_url || '', ytid: id,
-        winner: m.category === 'award-winners' && (m.award_id || m.award_name) ? winnerInfo(m) : null,
-      };
-    });
-    const jury = (juryRes.data || []).map(j => Object.assign(j, { name: tidy(j.name), designation: tidy(j.designation), bio: tidy(j.bio) }));
-    previousJury = jury.filter(j => j.jury_type === 'previous');
-    const juryItems = jury.filter(j => j.show_in_gallery && j.photo_url).map(j => ({
-      type: 'photo', category: 'jury', title: j.name, desc: [j.designation, j.bio].filter(Boolean).join(' — '),
-      year: j.edition_year, juryType: j.jury_type, full: j.photo_url, thumb: j.photo_url, portrait: true,
-    }));
-    items = media.concat(juryItems);
   }
 
   // Structured award-winner display: award · track · year / primary name / secondary line
@@ -89,6 +75,94 @@
     return { award, group, track: m.competition_track || '', primary, secondary };
   }
 
+  // DB row → display item. Older rows without thumbnail/medium fall back to the full image URL.
+  function toItem(m) {
+    const id = m.media_type === 'video' ? ytId(m.video_url) : '';
+    return {
+      type: m.media_type, category: m.category, title: m.title || '', desc: m.description || '', year: m.edition_year,
+      featured: !!m.is_featured,
+      full: m.image_url || '', medium: m.medium_url || '', w: m.width || 0,
+      thumb: m.thumbnail_url || m.image_url || (id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : ''),
+      video: m.video_url || '', ytid: id,
+      winner: m.category === 'award-winners' && (m.award_id || m.award_name) ? winnerInfo(m) : null,
+    };
+  }
+  const juryItem = j => ({
+    type: 'photo', category: 'jury', title: j.name, desc: [j.designation, j.bio].filter(Boolean).join(' — '),
+    year: j.edition_year, juryType: j.jury_type, full: j.photo_url, thumb: j.photo_url, portrait: true,
+  });
+
+  // Small reference data (categories, awards, jury, winner facets) — loaded once
+  async function loadMeta() {
+    if (!window.supabase || typeof SUPA_URL === 'undefined') throw new Error('offline');
+    sb = window.supabase.createClient(SUPA_URL, SUPA_ANON);
+    const [catRes, juryRes, awRes, facRes] = await Promise.all([
+      sb.from('media_categories').select('key,label,sort_order,show_in_filter').order('sort_order'),
+      sb.from('jury_members').select('id,name,designation,bio,photo_url,edition_year,jury_type,display_order,show_in_gallery')
+        .order('edition_year', { ascending: false, nullsFirst: false }).order('display_order'),
+      sb.from('award_categories').select('id,key,name'),
+      sb.from('gallery_media').select('competition_track,award_id').eq('category', 'award-winners').limit(5000),
+    ]);
+    if (catRes.error) throw catRes.error;
+    categories = catRes.data || [];
+    (awRes && awRes.data || []).forEach(a => awardMap.set(String(a.id), a));
+    juryAll = (juryRes.data || []).map(j => Object.assign(j, { name: tidy(j.name), designation: tidy(j.designation), bio: tidy(j.bio) }));
+    previousJury = juryAll.filter(j => j.jury_type === 'previous');
+    const fac = (facRes && facRes.data) || [];
+    winnerFacets.tracks = [...new Set(fac.map(r => r.competition_track).filter(Boolean))];
+    const gs = new Set(fac.map(r => { const a = awardMap.get(String(r.award_id)); return a ? awardGroup(a.key, a.name) : 'other'; }));
+    winnerFacets.groups = GROUPS.filter(([g]) => gs.has(g));
+  }
+
+  // Server-side filtered, paginated query for the current filter
+  function pageQuery(from) {
+    let q = sb.from('gallery_media').select(COLS)
+      .order('is_featured', { ascending: false }).order('display_order').order('created_at').order('id');
+    if (active === 'photos') q = q.eq('media_type', 'photo');
+    else if (active === 'videos') q = q.eq('media_type', 'video');
+    else if (active !== 'all') q = q.eq('category', active);
+    if (active === 'award-winners') {
+      if (subTrack !== 'all') q = q.eq('competition_track', subTrack);
+      if (subGroup !== 'all') {
+        const ids = [...awardMap.values()].filter(a => awardGroup(a.key, a.name) === subGroup).map(a => a.id);
+        if (subGroup === 'other') q = q.or(ids.length ? `award_id.is.null,award_id.in.(${ids.join(',')})` : 'award_id.is.null');
+        else if (ids.length) q = q.in('award_id', ids);
+        else return null;
+      }
+    }
+    return q.range(from, from + PAGE); // PAGE + 1 rows → tells us whether more exist
+  }
+  // jury member photos join the end of All / Photos / Jury once the media list is exhausted
+  const wantsJury = () => active === 'all' || active === 'photos' || active === 'jury';
+
+  async function loadMore() {
+    if (loading || !hasMore) return;
+    loading = true; setMoreState();
+    const my = token;
+    const q = pageQuery(offset);
+    let rows = [];
+    if (q) {
+      const res = await q;
+      if (my !== token) return;                    // filter changed meanwhile — discard
+      if (res.error) { loading = false; hasMore = false; setMoreState(true); console.warn('Gallery page failed', res.error); return; }
+      rows = res.data || [];
+    }
+    if (my !== token) return;
+    const more = rows.length > PAGE;
+    const batch = rows.slice(0, PAGE).map(toItem);
+    offset += batch.length;
+    hasMore = more;
+    if (!hasMore && !juryDone && wantsJury()) {
+      juryDone = true;
+      batch.push(...juryAll.filter(j => j.show_in_gallery && j.photo_url).map(juryItem));
+    }
+    const start = view.length;
+    view.push(...batch);
+    appendCards(start);
+    loading = false; setMoreState();
+    if (lbPending) { const p = lbPending; lbPending = null; p(); }
+  }
+
   function filterKeys() {
     const keys = [['all', 'All'], ['photos', 'Photos'], ['videos', 'Videos']];
     categories.filter(c => c.show_in_filter).forEach(c => keys.push([c.key, c.label]));
@@ -97,35 +171,20 @@
     else if (!keys.some(k => k[0] === active)) keys.push([active, catLabel(active) || active]);
     return keys;
   }
-
   function renderFilters() {
     $('fgFilters').innerHTML = filterKeys().map(([k, l]) =>
       `<button type="button" role="tab" class="fg-chip${k === active ? ' is-active' : ''}" aria-selected="${k === active}" data-k="${esc(k)}">${esc(l)}</button>`).join('');
   }
-
-  function select(key) {
-    if (key === 'photos') return items.filter(i => i.type === 'photo');
-    if (key === 'videos') return items.filter(i => i.type === 'video');
-    if (key === 'all') return items;
-    const list = items.filter(i => i.category === key);
-    if (key !== 'award-winners') return list;
-    return list.filter(i => (subTrack === 'all' || (i.winner && i.winner.track === subTrack))
-      && (subGroup === 'all' || (i.winner ? i.winner.group : 'other') === subGroup));
-  }
-
   // Track / award-type chips — shown only when there is enough winner data to split
   function renderSubFilters() {
     let el = $('fgSubFilters');
     if (!el) { el = document.createElement('div'); el.id = 'fgSubFilters'; el.className = 'fg-subfilters'; $('fgFilters').after(el); }
     if (active !== 'award-winners') { el.hidden = true; el.innerHTML = ''; return; }
-    const winners = items.filter(i => i.category === 'award-winners');
-    const tracks = [...new Set(winners.map(i => i.winner && i.winner.track).filter(Boolean))];
-    const groups = GROUPS.filter(([g]) => winners.some(i => (i.winner ? i.winner.group : 'other') === g));
     const row = (name, cur, opts) => `<div class="fg-subrow" role="group" aria-label="${name}">${opts.map(([k, l]) =>
       `<button type="button" class="fg-subchip${k === cur ? ' is-active' : ''}" aria-pressed="${k === cur}" data-sub="${name}" data-k="${k}">${esc(l)}</button>`).join('')}</div>`;
     let html = '';
-    if (tracks.length > 1) html += row('track', subTrack, [['all', 'All tracks'], ...tracks.map(t => [t, TRACKS[t] || t])]);
-    if (groups.length > 1) html += row('award', subGroup, [['all', 'All awards'], ...groups]);
+    if (winnerFacets.tracks.length > 1) html += row('track', subTrack, [['all', 'All tracks'], ...winnerFacets.tracks.map(t => [t, TRACKS[t] || t])]);
+    if (winnerFacets.groups.length > 1) html += row('award', subGroup, [['all', 'All awards'], ...winnerFacets.groups]);
     el.innerHTML = html; el.hidden = !html;
   }
 
@@ -134,20 +193,21 @@
     return [catLabel(it.category), it.year].filter(Boolean).join(' · ');
   }
 
+  function imgTag(it, idx, alt) {
+    const eager = idx < EAGER;
+    const feat = it.featured && active === 'all';
+    // thumbnail in cards; offer the medium size only for dense screens / wide (featured) cards
+    const set = it.medium && it.thumb !== it.full ? ` srcset="${esc(it.thumb)} 800w, ${esc(it.medium)} 1280w" sizes="${feat ? FEAT_SIZES : CARD_SIZES}"` : '';
+    return `<img src="${esc(it.thumb)}"${set} alt="${esc(alt)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async"${idx < 2 ? ' fetchpriority="high"' : ''}${it.ytid ? ` data-ytid="${esc(it.ytid)}"` : ''}>`;
+  }
+
   function card(it, idx) {
-    const cls = ['fg-card', it.type === 'video' ? 'is-video' : '', it.portrait ? 'is-portrait' : '', it.featured && active === 'all' ? 'is-featured' : ''].join(' ').trim();
+    const cls = ['fg-card', it.type === 'video' ? 'is-video' : '', it.portrait ? 'is-portrait' : '', it.featured && active === 'all' ? 'is-featured' : '', it.winner ? 'is-winner' : ''].join(' ').replace(/\s+/g, ' ').trim();
     const meta = metaOf(it);
-    if (it.winner) {
-      return `<button type="button" class="${cls} is-winner" data-i="${idx}" aria-label="Open: ${esc(meta)} — ${esc(it.winner.primary)}">
-        <span class="fg-thumb"><img src="${esc(it.thumb)}" alt="${esc(it.winner.primary)}" loading="lazy" decoding="async"${it.ytid ? ` data-ytid="${esc(it.ytid)}"` : ''}>
-          ${it.type === 'video' ? `<span class="fg-play">${PLAY}</span>` : ''}</span>
-        <span class="fg-card-text"><span class="fg-card-meta">${esc(meta)}</span><span class="fg-card-title">${esc(it.winner.primary)}</span>${it.winner.secondary ? `<span class="fg-card-sub">${esc(it.winner.secondary)}</span>` : ''}</span>
-      </button>`;
-    }
-    return `<button type="button" class="${cls}" data-i="${idx}" aria-label="${it.type === 'video' ? 'Play' : 'Open'}: ${esc(it.title || meta)}">
-        <span class="fg-thumb"><img src="${esc(it.thumb)}" alt="${esc(it.title)}" loading="lazy" decoding="async"${it.ytid ? ` data-ytid="${esc(it.ytid)}"` : ''}>
-          ${it.type === 'video' ? `<span class="fg-play">${PLAY}</span>` : ''}</span>
-        <span class="fg-card-text">${meta ? `<span class="fg-card-meta">${esc(meta)}</span>` : ''}${it.title ? `<span class="fg-card-title">${esc(it.title)}</span>` : ''}</span>
+    const title = it.winner ? it.winner.primary : it.title;
+    return `<button type="button" class="${cls}" data-i="${idx}" aria-label="${it.type === 'video' ? 'Play' : 'Open'}: ${esc(it.winner ? meta + ' — ' + title : (title || meta))}">
+        <span class="fg-thumb">${imgTag(it, idx, title)}${it.type === 'video' ? `<span class="fg-play">${PLAY}</span>` : ''}</span>
+        <span class="fg-card-text">${meta ? `<span class="fg-card-meta">${esc(meta)}</span>` : ''}${title ? `<span class="fg-card-title">${esc(title)}</span>` : ''}${it.winner && it.winner.secondary ? `<span class="fg-card-sub">${esc(it.winner.secondary)}</span>` : ''}</span>
       </button>`;
   }
 
@@ -160,7 +220,7 @@
     groups.forEach((list, year) => {
       html += `<section class="fg-group"><h2 class="fg-group-title">${esc(year)}${year === 'Earlier' ? ' Editions' : ' Edition'}</h2><div class="fg-roster">` +
         list.map(j => {
-          const i = j.photo_url ? view.push({ type: 'photo', category: 'jury', title: j.name, desc: [j.designation, j.bio].filter(Boolean).join(' — '), year: j.edition_year, full: j.photo_url, thumb: j.photo_url }) - 1 : -1;
+          const i = j.photo_url ? view.push(juryItem(j)) - 1 : -1;
           return `<article class="fg-person">
             ${i >= 0 ? `<button type="button" class="fg-card is-portrait" data-i="${i}" aria-label="Open: ${esc(j.name)}"><span class="fg-thumb"><img src="${esc(j.photo_url)}" alt="${esc(j.name)}" loading="lazy" decoding="async"></span></button>` : '<span class="fg-thumb fg-thumb-empty" aria-hidden="true"></span>'}
             <h3>${esc(j.name)}</h3>${j.designation ? `<p class="fg-person-role">${esc(j.designation)}</p>` : ''}${j.bio ? `<p class="fg-person-bio">${esc(j.bio)}</p><button type="button" class="fg-bio-toggle" aria-expanded="false" hidden>Read full bio</button>` : ''}
@@ -168,31 +228,70 @@
         }).join('') + '</div></section>';
     });
     $('fgContent').innerHTML = html;
-    // show "Read full bio" only where the clamp actually hides text
     $('fgContent').querySelectorAll('.fg-person-bio').forEach(p => {
       const btn = p.nextElementSibling;
       if (btn && p.scrollHeight > p.clientHeight + 2) btn.hidden = false;
     });
   }
 
+  // Jury filter: grouped by current / edition (small set, so rendered in one go after all pages load)
+  function renderJuryGroups() {
+    if (!view.length) { $('fgContent').innerHTML = '<p class="fg-empty">Nothing here yet — new photographs and films will appear as they are added.</p>'; return; }
+    const groups = new Map();
+    view.forEach((it, i) => { const k = it.juryType === 'current' ? 'Current Jury' : (it.juryType === 'previous' ? (it.year ? it.year + ' Edition' : 'Previous Jury') : 'Jury Photographs'); if (!groups.has(k)) groups.set(k, []); groups.get(k).push([it, i]); });
+    $('fgContent').innerHTML = [...groups].map(([t, list]) =>
+      `<section class="fg-group"><h2 class="fg-group-title">${esc(t)}</h2><div class="fg-grid is-people">${list.map(([it, i]) => card(it, i)).join('')}</div></section>`).join('');
+  }
+
+  function appendCards(start) {
+    if (active === 'jury') { if (!hasMore) renderJuryGroups(); return; }
+    const grid = $('fgGrid');
+    if (!grid) return;
+    if (!view.length) { $('fgContent').innerHTML = '<p class="fg-empty">Nothing here yet — new photographs and films will appear as they are added.</p>'; return; }
+    grid.insertAdjacentHTML('beforeend', view.slice(start).map((it, k) => card(it, start + k)).join(''));
+    grid.querySelectorAll('img[data-ytid]:not([data-fb])').forEach(img => {
+      img.dataset.fb = 1;
+      img.addEventListener('error', () => { if (!img.dataset.f) { img.dataset.f = 1; img.src = `https://i.ytimg.com/vi/${img.dataset.ytid}/mqdefault.jpg`; } });
+    });
+  }
+
+  function setMoreState(failed) {
+    const btn = $('fgMore');
+    if (!btn) return;
+    btn.hidden = !hasMore && !failed;
+    btn.disabled = loading;
+    btn.textContent = loading ? 'Loading…' : failed ? 'Try again' : 'Load more';
+    if (failed) { btn.hidden = false; btn.onclick = () => { hasMore = true; loadMore(); }; }
+  }
+
+  // (re)start the feed for the current filter
+  function startFeed() {
+    token++;
+    view = []; offset = 0; hasMore = true; loading = false; juryDone = false;
+    if (active === 'jury') {
+      $('fgContent').innerHTML = '<p class="fg-empty">Loading…</p>';
+      // jury sets are small: pull every page, then render grouped
+      const my = token;
+      (async function all() { while (hasMore && my === token) { await loadMore(); } })();
+      return;
+    }
+    $('fgContent').innerHTML = `<div class="fg-grid" id="fgGrid"></div>
+      <div class="fg-more-wrap"><button type="button" class="fg-more" id="fgMore" hidden>Load more</button></div>
+      <div class="fg-sentinel" id="fgSentinel" aria-hidden="true"></div>`;
+    $('fgMore').addEventListener('click', loadMore);
+    if (io) io.disconnect();
+    if ('IntersectionObserver' in window) {
+      io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) loadMore(); }, { rootMargin: '900px 0px' });
+      io.observe($('fgSentinel'));
+    }
+    loadMore().then(() => { if (!view.length && !hasMore) $('fgContent').innerHTML = '<p class="fg-empty">Nothing here yet — new photographs and films will appear as they are added.</p>'; });
+  }
+
   function render() {
     renderFilters();
     renderSubFilters();
-    if (active === 'previous-jury') return renderRoster();
-    view = select(active);
-    if (!view.length) { $('fgContent').innerHTML = '<p class="fg-empty">Nothing here yet — new photographs and films will appear as they are added.</p>'; return; }
-    if (active === 'jury') {
-      // group jury photos: current jury first, then previous editions by year
-      const groups = new Map();
-      view.forEach((it, i) => { const k = it.juryType === 'current' ? 'Current Jury' : (it.year ? it.year + ' Edition' : 'Previous Jury'); if (!groups.has(k)) groups.set(k, []); groups.get(k).push([it, i]); });
-      $('fgContent').innerHTML = [...groups].map(([t, list]) =>
-        `<section class="fg-group"><h2 class="fg-group-title">${esc(t)}</h2><div class="fg-grid is-people">${list.map(([it, i]) => card(it, i)).join('')}</div></section>`).join('');
-    } else {
-      $('fgContent').innerHTML = `<div class="fg-grid">${view.map(card).join('')}</div>`;
-    }
-    $('fgContent').querySelectorAll('img[data-ytid]').forEach(img => img.addEventListener('error', () => {
-      if (!img.dataset.f) { img.dataset.f = 1; img.src = `https://i.ytimg.com/vi/${img.dataset.ytid}/mqdefault.jpg`; }
-    }, { once: false }));
+    if (active === 'previous-jury') { token++; if (io) io.disconnect(); return renderRoster(); }
+    startFeed();
   }
 
   function syncUrl() {
@@ -210,8 +309,16 @@
     if (push !== false) syncUrl();
   }
 
-  /* ---------- lightbox ---------- */
-  let lastFocus = null;
+  /* ---------- lightbox — full image only on demand ---------- */
+  let lastFocus = null, lbPending = null;
+  const fullSet = it => (it.medium ? `${it.medium} 1280w, ${it.full} ${it.w || 2200}w` : '');
+  function preload(it) {
+    if (!it || it.type !== 'photo' || it._pre) return;
+    it._pre = true;
+    const im = new Image();
+    if (it.medium) { im.sizes = LB_SIZES; im.srcset = fullSet(it); }
+    im.src = it.full || it.thumb;
+  }
   function openLb(i) {
     if (!view[i]) return;
     lbIndex = i;
@@ -220,15 +327,19 @@
     if (it.type === 'video') {
       media.innerHTML = it.ytid
         ? `<div class="fg-lb-video"><iframe src="https://www.youtube.com/embed/${esc(it.ytid)}?autoplay=1&rel=0" title="${esc(it.title)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`
-        : `<div class="fg-lb-video"><video src="${esc(it.video)}" controls autoplay playsinline></video></div>`;
+        : `<div class="fg-lb-video"><video src="${esc(it.video)}" controls autoplay playsinline preload="metadata"></video></div>`;
     } else {
-      media.innerHTML = `<img src="${esc(it.full || it.thumb)}" alt="${esc(it.title)}">`;
+      const set = it.medium ? ` srcset="${esc(fullSet(it))}" sizes="${LB_SIZES}"` : '';
+      media.innerHTML = `<img src="${esc(it.full || it.thumb)}"${set} alt="${esc(it.winner ? it.winner.primary : it.title)}" decoding="async">`;
     }
     $('fgLbMeta').textContent = metaOf(it);
     $('fgLbTitle').textContent = it.winner ? it.winner.primary : (it.title || '');
     $('fgLbDesc').textContent = it.winner ? [it.winner.secondary, it.desc && !/^winner \d{4}$/i.test(it.desc) ? it.desc : ''].filter(Boolean).join(' — ') : (it.desc || '');
-    const multi = view.length > 1;
+    const multi = view.length > 1 || hasMore;
     $('fgLbPrev').hidden = !multi; $('fgLbNext').hidden = !multi;
+    // neighbours only — never the whole library
+    preload(view[i + 1]); preload(view[i - 1]);
+    if (i >= view.length - 3 && hasMore) loadMore();
     const lb = $('fgLightbox');
     if (lb.hidden) { lastFocus = document.activeElement; lb.hidden = false; document.body.style.overflow = 'hidden'; $('fgLbClose').focus(); }
   }
@@ -236,9 +347,14 @@
     const lb = $('fgLightbox');
     if (lb.hidden) return;
     lb.hidden = true; $('fgLbMedia').innerHTML = ''; document.body.style.overflow = '';
-    lbIndex = -1; if (lastFocus) lastFocus.focus();
+    lbIndex = -1; lbPending = null; if (lastFocus) lastFocus.focus();
   }
-  const step = d => { if (lbIndex >= 0 && view.length) openLb((lbIndex + d + view.length) % view.length); };
+  function step(d) {
+    if (lbIndex < 0 || !view.length) return;
+    const n = lbIndex + d;
+    if (n >= view.length && (hasMore || loading)) { lbPending = () => openLb(n < view.length ? n : 0); if (!loading) loadMore(); return; }
+    openLb((n + view.length) % view.length);
+  }
 
   function bind() {
     $('fgFilters').addEventListener('click', e => { const b = e.target.closest('.fg-chip'); if (b) setFilter(b.dataset.k); });
@@ -270,11 +386,12 @@
 
   document.addEventListener('DOMContentLoaded', async () => {
     bind();
-    const q = new URLSearchParams(location.search).get('filter');
-    try { await load(); }
-    catch (e) { $('fgContent').innerHTML = '<p class="fg-empty">The gallery could not be loaded right now. Please try again shortly.</p>'; console.warn('Festival gallery load failed', e); return; }
     const qs = new URLSearchParams(location.search);
-    setFilter(q || 'all', false);
-    if (active === 'award-winners' && (qs.get('track') || qs.get('award'))) { subTrack = qs.get('track') || 'all'; subGroup = qs.get('award') || 'all'; render(); }
+    try { await loadMeta(); }
+    catch (e) { $('fgContent').innerHTML = '<p class="fg-empty">The gallery could not be loaded right now. Please try again shortly.</p>'; console.warn('Festival gallery load failed', e); return; }
+    const k = ALIASES[qs.get('filter')] || qs.get('filter') || 'all';
+    active = k;
+    if (active === 'award-winners') { subTrack = qs.get('track') || 'all'; subGroup = qs.get('award') || 'all'; }
+    render();
   });
 })();
