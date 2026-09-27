@@ -244,9 +244,7 @@
             document.getElementById('mainLogo').src = SITE_IMAGES.mainLogo;
             const imsLogo = document.getElementById('imsLogoImg');
             if (imsLogo) imsLogo.src = SITE_IMAGES.mainLogo;
-            document.getElementById('socialIconInstagram').src = SITE_IMAGES.socialInstagram;
-            document.getElementById('socialIconYoutube').src = SITE_IMAGES.socialYoutube;
-            document.getElementById('socialIconFacebook').src = SITE_IMAGES.socialFacebook;
+            // footer social icons are set by the shared footer (assets/js/site-chrome.js)
 
             document.getElementById('labelDeadlineDate').textContent = PORTAL_TIMELINES.deadlineLabelText;
             const ctaDl = document.getElementById('ctaDeadlineDate'); if (ctaDl) ctaDl.textContent = PORTAL_TIMELINES.deadlineLabelText;
@@ -392,16 +390,6 @@
             });
         });
 
-        function toggleMobileMenu() {
-            const nav = document.getElementById('mainNavbar');
-            if (nav) nav.classList.toggle('active');
-        }
-        // close the mobile menu after choosing a link
-        document.addEventListener('click', e => {
-            if (!e.target.closest('#mainNavbar a')) return;
-            const nav = document.getElementById('mainNavbar');
-            if (nav) nav.classList.remove('active');
-        });
 
         function toggleMoreDropdown(event) {
             event.stopPropagation();
@@ -1192,39 +1180,6 @@
             p.outerHTML = `<div class="ab-video-frame"><iframe src="https://www.youtube.com/embed/${p.dataset.ytid}?autoplay=1&rel=0" title="Video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
         });
 
-        /* ---------- Footer location: one map, two places (Google Maps embed — no API key) ---------- */
-        (function initFooterLocation() {
-            const q = t => encodeURIComponent(t);
-            const PLACES = {
-                venue: { kicker: 'Festival Venue', name: 'JAIN (Deemed-to-be University)', address: 'Knowledge Park, Nirmal Infopark<br>Kakkanad, Kochi – 682042<br>Kerala, India',
-                         query: 'JAIN (Deemed-to-be University) Kochi, Knowledge Park, Nirmal Infopark, Kakkanad, Kochi 682042', title: 'JAIN (Deemed-to-be University), Kochi Campus' },
-                hq:    { kicker: 'Headquarters', name: 'Angle Frames', address: '12/399, Krishnalayam, Thenhippalam<br>Malappuram, Kerala – 673636<br>India',
-                         query: 'Angle Frames, Krishnalayam, Thenhippalam, Malappuram, Kerala 673636', title: 'Angle Frames, Thenhippalam, Malappuram' },
-            };
-            const start = () => {
-                const tabs = [...document.querySelectorAll('.fl-tab')];
-                const map = document.getElementById('flMap'), place = document.getElementById('flPlace'), dir = document.getElementById('flDirections'), wrap = document.getElementById('flMapWrap');
-                if (!tabs.length || !map || !place || !dir) return;
-                const select = (key, focus) => {
-                    const p = PLACES[key]; if (!p) return;
-                    tabs.forEach(t => { const on = t.dataset.loc === key; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1; if (on && focus) t.focus(); });
-                    if (wrap) wrap.setAttribute('aria-labelledby', 'flTab-' + key);
-                    place.innerHTML = `<span class="fl-kicker">${p.kicker}</span><strong class="fl-name">${p.name}</strong><span class="fl-address">${p.address}</span>`;
-                    map.title = 'Map — ' + p.title;
-                    map.src = `https://maps.google.com/maps?q=${q(p.query)}&z=15&output=embed`;
-                    dir.href = `https://www.google.com/maps/dir/?api=1&destination=${q(p.query)}`;
-                };
-                tabs.forEach((t, i) => {
-                    t.addEventListener('click', () => select(t.dataset.loc));
-                    t.addEventListener('keydown', e => {
-                        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-                        e.preventDefault();
-                        select(tabs[(i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length].dataset.loc, true);
-                    });
-                });
-            };
-            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
-        })();
 
         let _abLastFocus = null;
         function openAboutDetail(key) {
@@ -2484,6 +2439,8 @@
             if (h === '#rules') { closeInfoModal(); toggleRulesModal(true); }
             else if (h === '#how-to-submit') openInfoModal('submit');
             else if (h === '#updates') openInfoModal('updates');
+            else if (h === '#guidelines') openInfoModal('guidelines');
+            else if (h === '#jury-panel') openInfoModal('jury');
             else if (h === '#faq') openInfoModal('faq');
             else if (h === '#prizes') openAwardDetails();
             else if (/^#about-[a-z0-9_-]+$/i.test(h)) openAboutDetail(h.slice(7));
