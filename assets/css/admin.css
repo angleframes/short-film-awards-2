@@ -2776,3 +2776,83 @@ html { scroll-padding-top: 130px; }
   .sksfa-admin .mg-checks { padding-top: 0; }
 }
 .sksfa-admin .jm-count { display: block; text-align: right; color: var(--text-3); font-size: 11.5px; margin-top: 4px; }
+
+/* ════════════════════════════════════════════════════════
+   ADMIN DROPDOWN (admin-dropdown.js) — replaces native <select> visuals
+════════════════════════════════════════════════════════ */
+.sksfa-admin select.ad-native { display: none !important; }
+.sksfa-admin .ad-select { position: relative; width: 100%; margin-bottom: 16px; }
+.sksfa-admin .mg-toolbar .ad-select { width: auto; min-width: 170px; margin-bottom: 0; }
+.sksfa-admin .ad-trigger {
+  width: 100%; height: 44px; padding: 0 12px 0 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: #1a1a1a; border: 1px solid rgba(255,255,255,0.12); border-radius: var(--r-ctl, 8px);
+  color: #e8e8e8; font: inherit; font-size: 13px; text-align: left; cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.sksfa-admin .mg-toolbar .ad-trigger { height: 34px; }
+.sksfa-admin .ad-trigger:hover { border-color: rgba(255,255,255,0.28); }
+.sksfa-admin .ad-trigger:focus-visible, .sksfa-admin .ad-select.is-open .ad-trigger { outline: none; border-color: rgba(255,255,255,0.55); box-shadow: 0 0 0 3px rgba(255,255,255,0.08); }
+.sksfa-admin .ad-trigger:disabled { opacity: 0.5; cursor: not-allowed; }
+.sksfa-admin .ad-trigger.is-placeholder .ad-value { color: #8a8a8a; }
+.sksfa-admin .ad-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sksfa-admin .ad-chevron { width: 16px; height: 16px; flex-shrink: 0; fill: none; stroke: #bdbdbd; stroke-width: 2; transition: transform 0.2s ease; }
+.sksfa-admin .ad-select.is-open .ad-chevron { transform: rotate(180deg); }
+.sksfa-admin .ad-pop {
+  position: absolute; left: 0; right: 0; top: calc(100% + 6px); z-index: 60;
+  background: #141416; border: 1px solid rgba(255,255,255,0.14); border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.55); padding: 6px; min-width: 200px;
+}
+.sksfa-admin .ad-pop.is-up { top: auto; bottom: calc(100% + 6px); }
+.sksfa-admin .ad-search {
+  width: 100%; height: 36px !important; margin: 0 0 6px !important; padding: 0 10px !important;
+  background: #0d0d0f !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 8px !important; font-size: 13px !important;
+}
+.sksfa-admin .ad-list { list-style: none; margin: 0; padding: 0; max-height: 260px; overflow-y: auto; outline: none; }
+.sksfa-admin .ad-opt {
+  padding: 9px 12px; border-radius: 8px; color: #d8d8d8; font-size: 13px; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.sksfa-admin .ad-opt.is-active { background: rgba(255,255,255,0.08); color: #fff; }
+.sksfa-admin .ad-opt.is-selected { color: #fff; font-weight: 600; }
+.sksfa-admin .ad-opt.is-selected::after { content: ''; width: 6px; height: 10px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-2px,-1px); flex-shrink: 0; }
+.sksfa-admin .ad-opt.is-disabled { opacity: 0.4; cursor: not-allowed; }
+.sksfa-admin .ad-empty { padding: 10px 12px; color: #8a8a8a; font-size: 13px; }
+
+/* ═══ Festival Gallery — Award Winner block ═══ */
+.sksfa-admin .mg-winner {
+  grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px;
+  padding: 16px 16px 4px; margin: 0 0 14px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.02);
+  animation: mgFadeIn 0.25s ease;
+}
+.sksfa-admin .mg-winner .is-full { grid-column: 1 / -1; }
+@keyframes mgFadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.sksfa-admin .mg-label { display: block; margin-bottom: 8px; font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: #bdbdbd; }
+.sksfa-admin .mg-seg { display: inline-flex; gap: 4px; padding: 4px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.12); border-radius: 999px; }
+.sksfa-admin .mg-seg label { margin: 0; cursor: pointer; text-transform: none; letter-spacing: 0; }
+.sksfa-admin .mg-seg input { position: absolute; opacity: 0; pointer-events: none; }
+.sksfa-admin .mg-seg span { display: inline-block; padding: 7px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; color: #bdbdbd; transition: background 0.2s, color 0.2s; }
+.sksfa-admin .mg-seg input:checked + span { background: #fff; color: #000; }
+.sksfa-admin .mg-seg input:focus-visible + span { outline: 2px solid #fff; outline-offset: 2px; }
+.sksfa-admin .mg-inline-check { display: inline-flex; align-items: center; gap: 8px; margin: -6px 0 12px; text-transform: none; letter-spacing: 0; font-size: 12.5px; color: #cfcfcf; }
+.sksfa-admin .mg-inline-check input { width: 15px; height: 15px; margin: 0; }
+.sksfa-admin .mg-inline-check small { color: var(--text-3); }
+.sksfa-admin input[readonly] { opacity: 0.8; cursor: default; }
+
+/* ═══ Preview window ═══ */
+.mg-pv { position: fixed; inset: 0; z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(4,4,5,0.92); }
+.mg-pv-box { position: relative; width: min(1000px, 100%); max-height: 100%; display: flex; flex-direction: column; gap: 12px; }
+.mg-pv-box > img { max-width: 100%; max-height: calc(100vh - 150px); object-fit: contain; border-radius: 8px; align-self: center; }
+.mg-pv-video { width: 100%; aspect-ratio: 16 / 9; }
+.mg-pv-video iframe, .mg-pv-video video { width: 100%; height: 100%; border: 0; border-radius: 8px; background: #000; }
+.mg-pv-cap { text-align: center; display: flex; flex-direction: column; gap: 4px; }
+.mg-pv-cap b { color: #fff; font-size: 14px; }
+.mg-pv-cap small { color: #9a9a9a; font-size: 12px; }
+.mg-pv-close { position: absolute; top: -8px; right: -8px; z-index: 2; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.25); background: #141416; color: #fff; font-size: 22px; line-height: 1; cursor: pointer; }
+.mg-pv-close:hover { background: #222; }
+
+@media (max-width: 760px) {
+  .sksfa-admin .mg-winner { grid-template-columns: 1fr; padding: 14px 12px 2px; }
+  .sksfa-admin .mg-toolbar .ad-select { flex: 1 1 150px; }
+  .mg-pv { padding: 56px 10px 16px; }
+  .mg-pv-close { top: -48px; right: 0; }
+}
