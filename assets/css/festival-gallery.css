@@ -122,8 +122,6 @@
 .fg-lb-nav[hidden] { display: none; }
 
 @media (max-width: 700px) {
-  .fg-nav a:not(.is-primary):not(:first-child) { display: none; }
-  .fg-nav a { padding: 9px 12px; font-size: 0.64rem; letter-spacing: 1.2px; }
   .fg-brand img { max-height: 34px; }
   .fg-filters {
     flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scrollbar-width: none;
@@ -142,11 +140,6 @@
   .fg-lb-nav.next { right: calc(50% - 56px); }
   .fg-lb-figure { padding-bottom: 64px; }
   .fg-lb-media img { max-height: calc(100svh - 260px); }
-}
-@media (max-width: 420px) {
-  .fg-nav a:not(.is-primary) { display: none; }   /* the logo already links home */
-  .fg-brand img { max-height: 30px; }
-  .fg-header { gap: 10px; }
 }
 @media (max-width: 360px) {
   .fg-grid { grid-template-columns: 1fr; }
@@ -179,4 +172,22 @@
 .fg-bio-toggle:hover { text-decoration-color: #fff; }
 @media (max-width: 700px) {
   .fg-roster { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto; }
+}
+
+/* ===== Header nav — About · Awards · Jury · Showcase · [Submit →] ===== */
+.fg-nav a.is-current { color: #fff; background: rgba(255,255,255,0.1); }
+.fg-nav a.is-primary { font-weight: 700; margin-left: 4px; }
+@media (max-width: 700px) {
+  /* phones: logo + Submit on the first row, the four links in a centred second row */
+  .fg-header { flex-wrap: wrap; row-gap: 8px; padding-top: 10px; padding-bottom: 8px; }
+  .fg-nav { display: contents; }
+  .fg-nav a { padding: 8px 10px; font-size: 0.64rem; letter-spacing: 1.2px; }
+  .fg-nav a:not(.is-primary) { order: 3; }
+  .fg-nav a.is-primary { order: 2; margin-left: auto; padding: 9px 14px; }
+  .fg-header::after { content: ''; order: 2; flex-basis: 100%; height: 0; }
+  .fg-nav a:not(.is-primary):first-child { margin-left: auto; }
+  .fg-nav a:not(.is-primary):nth-child(4) { margin-right: auto; }
+}
+@media (max-width: 360px) {
+  .fg-nav a:not(.is-primary) { padding: 8px 6px; letter-spacing: 0.8px; font-size: 0.6rem; }
 }
