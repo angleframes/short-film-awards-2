@@ -1787,7 +1787,7 @@
         function _showcasePhotoCard(p, opts) {
             return `<article class="pe-card${opts.wide ? ' is-wide' : ''}">
                 <button type="button" class="pe-media" data-action="${opts.action}" data-filter="${opts.filter || ''}" data-src="${_vidEsc(p.src)}" aria-label="${_vidEsc(opts.cta)}: ${_vidEsc(opts.title)}">
-                    <img src="${_vidEsc(opts.useThumb && p.thumb ? p.thumb : (p.display || p.src))}" alt="${_vidEsc(p.title || opts.title)}" loading="lazy" decoding="async">
+                    ${opts.mediaHtml || `<img src="${_vidEsc(opts.useThumb && p.thumb ? p.thumb : (p.display || p.src))}" alt="${_vidEsc(p.title || opts.title)}" loading="lazy" decoding="async">`}
                     <span class="pe-grain" aria-hidden="true"></span>
                 </button>
                 <div class="pe-body">
@@ -1858,6 +1858,48 @@
             return hit || null;
         }
 
+        /* ---------- Previous Edition media: winners collage + moments slideshow ---------- */
+        function _peCollageHtml(list) {
+            const tiles = list.slice(0, 4).map((p, i) => `<span class="pe-tile${i === 0 ? ' is-main' : ''}"><img src="${_vidEsc(i === 0 ? (p.display || p.src) : (p.thumb || p.src))}" alt="${_vidEsc(p.title || '')}" loading="lazy" decoding="async"></span>`).join('');
+            return `<span class="pe-collage n${Math.min(list.length, 4)}">${tiles}</span>`;
+        }
+        function _peSlidesHtml(list) {
+            // first slide loads normally; the rest carry data-src and load just before they are shown
+            const imgs = list.map((p, i) => `<img class="pe-slide${i === 0 ? ' is-active' : ''}" ${i === 0 ? 'src' : 'data-src'}="${_vidEsc(p.display || p.src)}" alt="${_vidEsc(p.title || '')}" loading="lazy" decoding="async">`).join('');
+            const dots = list.map((_, i) => `<i class="${i === 0 ? 'is-active' : ''}"></i>`).join('');
+            return `<span class="pe-slides" data-count="${list.length}">${imgs}<span class="pe-dots" aria-hidden="true">${dots}</span></span>`;
+        }
+        let _peSlideTimer = null;
+        function _peStartSlides(root) {
+            clearInterval(_peSlideTimer);
+            const box = root.querySelector('.pe-slides');
+            if (!box) return;
+            const slides = [...box.querySelectorAll('.pe-slide')], dots = [...box.querySelectorAll('.pe-dots i')];
+            const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+            let i = 0, paused = false, onScreen = false;
+            const load = el => { if (el && el.dataset.src) { el.src = el.dataset.src; el.removeAttribute('data-src'); } };
+            const show = n => {
+                load(slides[(n + 1) % slides.length]);                    // warm the next one
+                slides.forEach((s, k) => s.classList.toggle('is-active', k === n));
+                dots.forEach((d, k) => d.classList.toggle('is-active', k === n));
+                i = n;
+            };
+            const card = box.closest('.pe-card');
+            if (card && window.matchMedia && matchMedia('(hover: hover)').matches) {
+                card.addEventListener('mouseenter', () => { paused = true; });
+                card.addEventListener('mouseleave', () => { paused = false; });
+            }
+            if ('IntersectionObserver' in window) new IntersectionObserver(es => { onScreen = es.some(e => e.isIntersecting); if (onScreen) load(slides[1]); }, { rootMargin: '200px 0px' }).observe(box);
+            else onScreen = true;
+            if (reduce) return;                                            // respect reduced-motion: stay on the first photo
+            _peSlideTimer = setInterval(() => {
+                if (paused || !onScreen || document.hidden) return;
+                const next = slides[(i + 1) % slides.length];
+                if (next.dataset.src || !next.complete) { load(next); return; } // wait until the next photo is ready
+                show((i + 1) % slides.length);
+            }, 3800);
+        }
+
         function renderFestivalShowcase() {
             window._shownMedia = new Set();
             const photoKey = p => _mediaKey(p.src);
@@ -1879,11 +1921,17 @@
             const pe = document.getElementById('peGrid');
             if (pe) {
                 const cards = [];
-                const w = _takeUnique(winners, photoKey);
-                if (w) cards.push(_showcasePhotoCard(w, { kicker: 'Award Winners', title: 'Celebrating the Winners', action: 'gallery', filter: 'award-winners', cta: 'View Winners',
+                // Winners → structured collage (1 large + 2–3 small); falls back to one image
+                const collage = [];
+                for (let i = 0; i < 4; i++) { const x = _takeUnique(winners, photoKey); if (!x) break; collage.push(x); }
+                if (collage.length) cards.push(_showcasePhotoCard(collage[0], { kicker: 'Award Winners', title: 'Celebrating the Winners', action: 'gallery', filter: 'award-winners', cta: 'View Winners',
+                    mediaHtml: collage.length >= 3 ? _peCollageHtml(collage) : '',
                     desc: winners.slice(0, 3).map(x => _vidEsc(String(x.title || '').trim())).filter(Boolean).join('<br>') }));
-                const m = _takeUnique(moments, photoKey);
-                if (m) cards.push(_showcasePhotoCard(m, { kicker: 'Festival Moments', title: 'On Stage & In the Audience', action: 'gallery', filter: 'festival-moments', cta: 'View Moments',
+                // Festival Moments → slow cross-fade slideshow
+                const slides = [];
+                for (let i = 0; i < 6; i++) { const x = _takeUnique(moments, photoKey); if (!x) break; slides.push(x); }
+                if (slides.length) cards.push(_showcasePhotoCard(slides[0], { kicker: 'Festival Moments', title: 'On Stage & In the Audience', action: 'gallery', filter: 'festival-moments', cta: 'View Moments',
+                    mediaHtml: slides.length >= 2 ? _peSlidesHtml(slides) : '',
                     desc: 'Ceremony, stage and audience moments from the previous edition.' }));
                 const sv = _takeUnique(support, vidKey);
                 if (sv) cards.push(_showcaseVideoCard(sv, { kicker: 'Messages of Support', title: 'Words From Our Guests', action: 'gallery', filter: 'messages-of-support', cta: 'View Messages',
@@ -1892,6 +1940,7 @@
                 if (iv) cards.push(_showcaseVideoCard(iv, { kicker: 'Festival Highlights', title: 'Relive the Festival', action: 'gallery', filter: 'videos', cta: 'Watch Highlights',
                     desc: 'Highlights from the previous edition of the Sharankrishna Short Film Awards.' }));
                 pe.innerHTML = cards.join('');
+                _peStartSlides(pe);
                 const sec = document.getElementById('section-previous');
                 if (sec) sec.style.display = cards.length ? '' : 'none';
                 _showcaseBind(pe);
