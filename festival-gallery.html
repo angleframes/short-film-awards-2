@@ -63,19 +63,25 @@
     <script src="/assets/js/config.js?v=10"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="/assets/css/site.css?v=37">
-    <link rel="stylesheet" href="/assets/css/festival-gallery.css?v=7">
+    <link rel="stylesheet" href="/assets/css/festival-gallery.css?v=8">
 </head>
 <body class="fg-page">
-    <header class="fg-header">
-        <a class="fg-brand" href="/" aria-label="Sharankrishna Short Film Awards — Home"><img src="/assets/img/logo-377.webp" srcset="/assets/img/logo-189.webp 189w, /assets/img/logo-377.webp 377w, /assets/img/logo-566.webp 566w" sizes="176px" width="377" height="112" fetchpriority="high" alt="Sharankrishna Short Film Awards"></a>
-        <nav class="fg-nav" aria-label="Main">
-            <a href="/#section-story">About</a>
-            <a href="/#section-categories">Awards</a>
-            <a href="/#section-jury">Jury</a>
-            <a href="/festival-gallery" class="is-current" aria-current="page">Showcase</a>
-            <a href="/#section-registration" class="is-primary">Submit <span aria-hidden="true">&rarr;</span></a>
+    <!-- Same header as the homepage (site.css .site-header-wrapper / liquid-glass .navbar) -->
+    <div class="site-header-wrapper">
+        <a class="brand-logo-area" href="/" aria-label="Sharankrishna Short Film Awards — Home">
+            <img id="mainLogo" src="/assets/img/logo-377.webp" srcset="/assets/img/logo-189.webp 189w, /assets/img/logo-377.webp 377w, /assets/img/logo-566.webp 566w" sizes="176px" width="377" height="112" fetchpriority="high" alt="Sharankrishna Short Film Awards">
+        </a>
+
+        <button type="button" class="menu-toggle-btn" onclick="toggleMobileMenu()" aria-label="Toggle Navigation menu">☰</button>
+
+        <nav class="navbar" id="mainNavbar" aria-label="Main">
+            <a id="navStory" href="/#section-story">About</a>
+            <a id="navCategories" href="/#section-categories">Awards</a>
+            <a id="navJury" href="/#section-jury">Jury</a>
+            <a id="navShowcase" href="/festival-gallery" class="active" aria-current="page">Showcase</a>
+            <a id="navRegistration" class="nav-cta" href="/#section-registration">Submit <span aria-hidden="true">&rarr;</span></a>
         </nav>
-    </header>
+    </div>
 
     <main class="fg-main">
         <div class="fg-intro">
@@ -84,14 +90,14 @@
             <p class="fg-lead">Award winners, festival moments, jury, messages of support and highlights — every official photograph and film in one place.</p>
         </div>
 
+        <div class="fg-editions" id="fgEditions" role="group" aria-label="Edition" hidden></div>
         <div class="fg-filters" id="fgFilters" role="tablist" aria-label="Filter media"></div>
         <div id="fgContent" class="fg-content" aria-live="polite"><p class="fg-empty">Loading the gallery…</p></div>
     </main>
 
-    <footer class="fg-footer">
-        <a href="/">&larr; Back to the Sharankrishna Short Film Awards</a>
-        <span>&copy; 2026 Angle Frames Presents Sharankrishna Short Film Awards.</span>
-    </footer>
+    <!-- Same footer as the homepage — shared component -->
+    <div id="siteFooter"></div>
+    <script src="/assets/js/site-chrome.js?v=1"></script>
 
     <!-- Lightbox -->
     <div class="fg-lightbox" id="fgLightbox" role="dialog" aria-modal="true" aria-label="Media viewer" hidden>
@@ -109,6 +115,6 @@
     </div>
     <script src="/assets/js/youtube.js?v=1"></script>
 
-    <script src="/assets/js/festival-gallery.js?v=8"></script>
+    <script src="/assets/js/festival-gallery.js?v=9"></script>
 </body>
 </html>
