@@ -184,7 +184,7 @@
             try {
                 if (!window.supabase) return;
                 const SB = window.supabase.createClient(SUPA_URL, SUPA_ANON);
-                const [cfgRes, galRes, updRes, tmtRes, vcRes, acRes, abRes, juryRes] = await Promise.all([
+                const [cfgRes, galRes, updRes, tmtRes, vcRes, acRes, abRes, juryRes, gmRes] = await Promise.all([
                     SB.from('site_config').select('*').eq('id', 1).single(),
                     SB.from('gallery').select('*').order('sort_order').order('created_at', { ascending: false }),
                     SB.from('updates_feed').select('*').order('sort_order').order('created_at', { ascending: false }),
@@ -194,8 +194,12 @@
                     SB.from('about_sections').select('*').order('sort_order'),
                     // RLS returns only visible members (current ones also need is_active)
                     SB.from('jury_members').select('id,name,designation,bio,photo_url,edition_year,jury_type,display_order,instagram_url,imdb_url,website_url')
-                        .order('edition_year', { ascending: false, nullsFirst: false }).order('display_order').order('created_at')
+                        .order('edition_year', { ascending: false, nullsFirst: false }).order('display_order').order('created_at'),
+                    // master Festival Gallery rows — homepage picks varied photos from here (small, capped)
+                    SB.from('gallery_media').select('id,media_type,category,title,image_url,medium_url,thumbnail_url,award_name,winner_name,film_name,recipient_type,is_featured,display_order')
+                        .eq('media_type', 'photo').order('is_featured', { ascending: false }).order('display_order').order('created_at').limit(120)
                 ]);
+                if (gmRes && !gmRes.error && Array.isArray(gmRes.data)) window._mediaData = gmRes.data;
                 if (juryRes && !juryRes.error && Array.isArray(juryRes.data)) window._juryData = juryRes.data;
                 if (abRes && !abRes.error) applyAboutRows(abRes.data);
                 const cfg = cfgRes.data;
@@ -362,6 +366,7 @@
             initiateTimersEngine();
             generateDynamicCategories();
             renderAboutCards();
+            renderFestivalShowcase();   // runs first so the slideshow can avoid photos already featured
             renderGallery();
             initGalleryPicker();
             renderVideos();
@@ -369,7 +374,6 @@
             renderGuidelines();
             renderJuryPanel();
             renderJurySection();
-            renderFestivalShowcase();
             initScrollAnimations();
             textAnimateBlurInUp(document.getElementById('heroTitleAnimate'));
             // Init glow on all static .glow-card elements (dynamic ones call initCardGlow inline)
@@ -1318,6 +1322,11 @@
 
             // Filter to only photos that have a src
             _galleryPhotos = GALLERY_IMAGES.filter(p => p.src && p.src.trim() !== '');
+            // start on a photo not already featured higher up the page (keeps the admin's cyclic order)
+            if (window._shownMedia && window._shownMedia.size && typeof _mediaKey === 'function') {
+                const k = _galleryPhotos.findIndex(p => !window._shownMedia.has(_mediaKey(p.src)));
+                if (k > 0) _galleryPhotos = _galleryPhotos.slice(k).concat(_galleryPhotos.slice(0, k));
+            }
             if (!_galleryPhotos.length) return;
 
             _galleryInitialized = true;
@@ -1757,7 +1766,7 @@
         function _showcasePhotoCard(p, opts) {
             return `<article class="pe-card${opts.wide ? ' is-wide' : ''}">
                 <button type="button" class="pe-media" data-action="${opts.action}" data-filter="${opts.filter || ''}" data-src="${_vidEsc(p.src)}" aria-label="${_vidEsc(opts.cta)}: ${_vidEsc(opts.title)}">
-                    <img src="${_vidEsc(opts.useThumb && p.thumb ? p.thumb : p.src)}" alt="${_vidEsc(p.title || opts.title)}" loading="lazy" decoding="async">
+                    <img src="${_vidEsc(opts.useThumb && p.thumb ? p.thumb : (p.display || p.src))}" alt="${_vidEsc(p.title || opts.title)}" loading="lazy" decoding="async">
                     <span class="pe-grain" aria-hidden="true"></span>
                 </button>
                 <div class="pe-body">
@@ -1772,7 +1781,7 @@
             const id = _vidEsc(v.youtube_video_id);
             return `<article class="pe-card${opts.wide ? ' is-wide' : ''}">
                 <button type="button" class="pe-media is-video" data-action="${opts.action || 'play'}" data-filter="${opts.filter || ''}" data-ytid="${id}" data-group="${opts.group || ''}" aria-label="${_vidEsc(opts.cta)}: ${_vidEsc(opts.title)}">
-                    <img src="${_vidThumbSrc(id)}" alt="${_vidEsc(v.video_title || opts.title)}" loading="lazy" decoding="async" data-ytid="${id}" onerror="_vidThumbFallback(this)">
+                    <img src="${opts.altFrame ? `https://i.ytimg.com/vi/${id}/hq2.jpg` : _vidThumbSrc(id)}" alt="${_vidEsc(v.video_title || opts.title)}" loading="lazy" decoding="async" data-ytid="${id}" onerror="_vidThumbFallback(this)">
                     <span class="pe-grain" aria-hidden="true"></span>
                     <span class="pe-play" aria-hidden="true">${_PLAY_SVG}</span>
                 </button>
@@ -1817,26 +1826,49 @@
                 else if (a === 'gallery') location.href = '/festival-gallery' + (el.dataset.filter ? '?filter=' + encodeURIComponent(el.dataset.filter) : '');
             });
         }
+        /* ---------- media variety: each image appears once on the homepage where possible ---------- */
+        // key = the full-size image (thumb/medium/display variants of one photo share a key); videos by YouTube id
+        const _mediaKey = u => String(u || '').split('?')[0].replace(/^https?:\/\/[^/]+\//, '').replace(/^\/+/, '')
+            .replace(/_(disp|thumb)_/, '_').replace(/Gallery\/(display|thumbs)\//, 'Gallery/').replace(/-(full|md|th)\.webp$/, '.webp').toLowerCase();
+        window._shownMedia = window._shownMedia || new Set();
+        function _takeUnique(pool, keyOf) {
+            const hit = pool.find(x => !window._shownMedia.has(keyOf(x)));
+            if (hit) window._shownMedia.add(keyOf(hit));
+            return hit || null;
+        }
+
         function renderFestivalShowcase() {
-            const photos = (GALLERY_IMAGES || []).filter(p => p.src && p.src.trim() !== '');
+            window._shownMedia = new Set();
+            const photoKey = p => _mediaKey(p.src);
+            const vidKey = v => 'yt:' + v.youtube_video_id;
+            // photos: prefer the master Festival Gallery (more variety); fall back to the homepage slideshow set
+            const master = (window._mediaData || []).filter(m => m.image_url).map(m => ({
+                src: m.image_url, display: m.medium_url || m.image_url, thumb: m.thumbnail_url || m.image_url, category: m.category,
+                title: m.award_name ? `${m.award_name} — ${m.recipient_type === 'person' ? (m.winner_name || m.film_name) : (m.film_name || m.winner_name)}` : (m.title || ''),
+            }));
+            const legacy = (GALLERY_IMAGES || []).filter(p => p.src && p.src.trim() !== '').map(p => ({ src: p.src, display: p.src, thumb: p.thumb || p.src, category: p.category, title: p.title }));
+            const photos = master.length ? master : legacy;
             const winners = photos.filter(p => /winner/i.test(p.category || ''));
-            const moments = photos.filter(p => !/winner/i.test(p.category || ''));
+            const moments = photos.filter(p => !/winner|jury/i.test(p.category || ''));
             const vids = (window._testimonialsData || []).filter(v => v.active !== false && v.youtube_video_id);
             const inside = vids.filter(v => _vidGroupOf(v) === 'inside');
             const support = vids.filter(v => _vidGroupOf(v) === 'support');
-            const shortTitle = t => String(t || '').trim();
 
-            // Previous Edition
+            // Previous Edition — one representative visual per card
             const pe = document.getElementById('peGrid');
             if (pe) {
                 const cards = [];
-                if (winners.length) cards.push(_showcasePhotoCard(winners[0], { kicker: 'Award Winners', title: 'Celebrating the Winners', action: 'gallery', filter: 'award-winners', cta: 'View Winners',
-                    desc: winners.slice(0, 3).map(w => _vidEsc(shortTitle(w.title))).filter(Boolean).join('<br>') }));
-                if (moments.length) cards.push(_showcasePhotoCard(moments[0], { kicker: 'Festival Moments', title: 'On Stage & In the Audience', action: 'gallery', filter: 'festival-moments', cta: 'View Moments',
+                const w = _takeUnique(winners, photoKey);
+                if (w) cards.push(_showcasePhotoCard(w, { kicker: 'Award Winners', title: 'Celebrating the Winners', action: 'gallery', filter: 'award-winners', cta: 'View Winners',
+                    desc: winners.slice(0, 3).map(x => _vidEsc(String(x.title || '').trim())).filter(Boolean).join('<br>') }));
+                const m = _takeUnique(moments, photoKey);
+                if (m) cards.push(_showcasePhotoCard(m, { kicker: 'Festival Moments', title: 'On Stage & In the Audience', action: 'gallery', filter: 'festival-moments', cta: 'View Moments',
                     desc: 'Ceremony, stage and audience moments from the previous edition.' }));
-                if (support.length) cards.push(_showcaseVideoCard(support[0], { kicker: 'Messages of Support', title: 'Words From Our Guests', action: 'gallery', filter: 'messages-of-support', cta: 'View Messages',
+                const sv = _takeUnique(support, vidKey);
+                if (sv) cards.push(_showcaseVideoCard(sv, { kicker: 'Messages of Support', title: 'Words From Our Guests', action: 'gallery', filter: 'messages-of-support', cta: 'View Messages',
                     desc: 'Messages from guests, filmmakers and friends of the festival.' }));
-                if (inside.length) cards.push(_showcaseVideoCard(inside[0], { kicker: 'Festival Highlights', title: 'Relive the Festival', action: 'gallery', filter: 'videos', cta: 'Watch Highlights',
+                const iv = _takeUnique(inside, vidKey);
+                if (iv) cards.push(_showcaseVideoCard(iv, { kicker: 'Festival Highlights', title: 'Relive the Festival', action: 'gallery', filter: 'videos', cta: 'Watch Highlights',
                     desc: 'Highlights from the previous edition of the Sharankrishna Short Film Awards.' }));
                 pe.innerHTML = cards.join('');
                 const sec = document.getElementById('section-previous');
@@ -1844,16 +1876,23 @@
                 _showcaseBind(pe);
             }
 
-            // Festival Media categories
+            // Festival Media — prefer items not already shown above; a repeated video uses a different frame
             const mg = document.getElementById('mediaGrid');
             if (mg) {
                 const cards = [];
-                if (inside.length) cards.push(_showcaseVideoCard(inside[0], { kicker: inside.length > 1 ? inside.length + ' videos' : 'Video', title: MEDIA_GROUPS.inside, cta: 'Play',
-                    desc: 'The story of the festival — overview and presentation films.' }));
-                if (support.length) cards.push(_showcaseVideoCard(support[0], { kicker: support.length > 1 ? support.length + ' videos' : 'Video', title: MEDIA_GROUPS.support, cta: 'View All', action: 'videos', group: 'support',
-                    desc: 'Wishes and messages from guests, filmmakers and well-wishers.' }));
-                if (moments.length || winners.length) { const p = moments[0] || winners[0]; cards.push(_showcasePhotoCard(p, { kicker: photos.length + ' photographs', title: 'Festival Moments', action: 'photo', cta: 'View', useThumb: true,
-                    desc: 'Ceremony photographs, stage moments, audience and winners.' })); }
+                if (inside.length) {
+                    const iv2 = _takeUnique(inside, vidKey);
+                    cards.push(_showcaseVideoCard(iv2 || inside[0], { kicker: inside.length > 1 ? inside.length + ' videos' : 'Video', title: MEDIA_GROUPS.inside, cta: 'Play', altFrame: !iv2,
+                        desc: 'The story of the festival — overview and presentation films.' }));
+                }
+                if (support.length) {
+                    const sv2 = _takeUnique(support, vidKey);
+                    cards.push(_showcaseVideoCard(sv2 || support[0], { kicker: support.length > 1 ? support.length + ' videos' : 'Video', title: MEDIA_GROUPS.support, cta: 'View All', action: 'videos', group: 'support', altFrame: !sv2,
+                        desc: 'Wishes and messages from guests, filmmakers and well-wishers.' }));
+                }
+                const p2 = _takeUnique(moments, photoKey) || _takeUnique(winners, photoKey);
+                if (p2) cards.push(_showcasePhotoCard(p2, { kicker: photos.length + ' photographs', title: 'Festival Moments', action: 'gallery', filter: 'festival-moments', cta: 'View', useThumb: true,
+                    desc: 'Ceremony photographs, stage moments, audience and winners.' }));
                 mg.innerHTML = cards.join('');
                 const sec = document.getElementById('section-media');
                 if (sec) sec.style.display = cards.length ? '' : 'none';
