@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Festival Gallery — Sharankrishna Short Film Awards</title>
+    <meta name="description" content="Photographs and films from the Sharankrishna Short Film Awards — award winners, festival moments, jury, messages of support and highlights.">
+    <link rel="canonical" href="https://sharankrishnashortfilmawards.com/festival-gallery">
+    <meta property="og:title" content="Festival Gallery — Sharankrishna Short Film Awards">
+    <meta property="og:description" content="Award winners, festival moments, jury, messages of support and highlights.">
+    <meta property="og:url" content="https://sharankrishnashortfilmawards.com/festival-gallery">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://sharankrishnashortfilmawards.com/LOGO.webp">
+    <link rel="icon" type="image/png" href="/Favicon.png">
+    <link rel="preconnect" href="https://flwlbraeyyrofkhxnvwt.supabase.co">
+    <script src="/assets/js/config.js?v=8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="/assets/css/site.css?v=29">
+    <link rel="stylesheet" href="/assets/css/festival-gallery.css?v=1">
+</head>
+<body class="fg-page">
+    <header class="fg-header">
+        <a class="fg-brand" href="/" aria-label="Sharankrishna Short Film Awards — Home"><img src="/logo nav.png" alt="Sharankrishna Short Film Awards"></a>
+        <nav class="fg-nav" aria-label="Festival gallery">
+            <a href="/">Home</a>
+            <a href="/#section-jury">Jury</a>
+            <a href="/#section-registration" class="is-primary">Submit Your Film</a>
+        </nav>
+    </header>
+
+    <main class="fg-main">
+        <div class="fg-intro">
+            <span class="section-eyebrow">Sharankrishna Short Film Awards</span>
+            <h1 class="section-heading"><span class="shiny-text">Festival Gallery</span></h1>
+            <p class="fg-lead">Award winners, festival moments, jury, messages of support and highlights — every official photograph and film in one place.</p>
+        </div>
+
+        <div class="fg-filters" id="fgFilters" role="tablist" aria-label="Filter media"></div>
+        <div id="fgContent" class="fg-content" aria-live="polite"><p class="fg-empty">Loading the gallery…</p></div>
+    </main>
+
+    <footer class="fg-footer">
+        <a href="/">&larr; Back to the Sharankrishna Short Film Awards</a>
+        <span>&copy; 2026 Angle Frames Presents Sharankrishna Short Film Awards.</span>
+    </footer>
+
+    <!-- Lightbox -->
+    <div class="fg-lightbox" id="fgLightbox" role="dialog" aria-modal="true" aria-label="Media viewer" hidden>
+        <button type="button" class="fg-lb-close" id="fgLbClose" aria-label="Close">&times;</button>
+        <button type="button" class="fg-lb-nav prev" id="fgLbPrev" aria-label="Previous">&#8249;</button>
+        <figure class="fg-lb-figure">
+            <div class="fg-lb-media" id="fgLbMedia"></div>
+            <figcaption class="fg-lb-caption">
+                <span class="fg-lb-meta" id="fgLbMeta"></span>
+                <h2 class="fg-lb-title" id="fgLbTitle"></h2>
+                <p class="fg-lb-desc" id="fgLbDesc"></p>
+            </figcaption>
+        </figure>
+        <button type="button" class="fg-lb-nav next" id="fgLbNext" aria-label="Next">&#8250;</button>
+    </div>
+
+    <script src="/assets/js/festival-gallery.js?v=1"></script>
+</body>
+</html>
