@@ -62,10 +62,8 @@
     if (/screenplay|writer|cinematograph|edit|music|sound|art/.test(k)) return 'technical';
     return 'other';
   }
-  function ytId(url) {
-    const m = String(url || '').match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([\w-]{11})/i);
-    return m ? m[1] : (/^[\w-]{11}$/.test(url || '') ? url : '');
-  }
+  // shared helper (assets/js/youtube.js) — same parsing and thumbnails as the homepage and admin
+  const ytId = url => (window.SKYouTube ? SKYouTube.id(url) : null) || '';
   function catLabel(key) {
     if (key === 'jury') return 'Jury';
     const c = categories.find(x => x.key === key);
@@ -93,8 +91,8 @@
       id: m.id, type: m.media_type, category: m.category, title: m.title || '', desc: m.description || '', year: m.edition_year,
       featured: !!m.is_featured,
       full: m.image_url || '', medium: m.medium_url || '', w: m.width || 0,
-      // YouTube: use the 1280px preview (hqdefault is only 480px and looks soft in cards); falls back on error
-      thumb: id && (!m.thumbnail_url || /i\.ytimg\.com/.test(m.thumbnail_url)) ? `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`
+      // custom thumbnail first; YouTube videos otherwise get maxres → sd → hq automatically; else branded placeholder
+      thumb: m.media_type === 'video' ? (window.SKYouTube ? SKYouTube.thumbFor(m.thumbnail_url, m.video_url) : (m.thumbnail_url || ''))
            : (m.thumbnail_url || m.image_url || ''),
       video: m.video_url || '', ytid: id,
       winner: m.category === 'award-winners' && (m.award_id || m.award_name) ? winnerInfo(m) : null,
@@ -213,7 +211,7 @@
     const feat = it.featured && active === 'all';
     // thumbnail in cards; offer the medium size only for dense screens / wide (featured) cards
     const set = it.medium && it.thumb !== it.full ? ` srcset="${esc(it.thumb)} 960w, ${esc(it.medium)} 1280w" sizes="${feat ? FEAT_SIZES : CARD_SIZES}"` : '';
-    return `<img src="${esc(it.thumb)}"${set} alt="${esc(alt)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async"${idx < 2 ? ' fetchpriority="high"' : ''}${it.ytid ? ` data-ytid="${esc(it.ytid)}"` : ''}>`;
+    return `<img src="${esc(it.thumb)}"${set} alt="${esc(alt)}" loading="${eager ? 'eager' : 'lazy'}" decoding="async"${idx < 2 ? ' fetchpriority="high"' : ''}${it.ytid ? ` data-ytid="${esc(it.ytid)}"` : ''}${it.type === 'video' ? ' data-yt-fallback' : ''}>`;
   }
 
   function card(it, idx) {
@@ -264,13 +262,7 @@
     if (!grid) return;
     if (!view.length) { $('fgContent').innerHTML = '<p class="fg-empty">Nothing here yet — new photographs and films will appear as they are added.</p>'; return; }
     grid.insertAdjacentHTML('beforeend', view.slice(start).map((it, k) => card(it, start + k)).join(''));
-    grid.querySelectorAll('img[data-ytid]:not([data-fb])').forEach(img => {
-      img.dataset.fb = 1;
-      const fb = () => { if (!img.dataset.f) { img.dataset.f = 1; img.src = `https://i.ytimg.com/vi/${img.dataset.ytid}/hqdefault.jpg`; } };
-      img.addEventListener('error', fb);
-      // YouTube answers a missing 1280px preview with a 120px placeholder instead of an error
-      img.addEventListener('load', () => { if (img.naturalWidth && img.naturalWidth <= 120) fb(); });
-    });
+    // thumbnail fallbacks (maxres → sd → hq → placeholder) are handled globally by SKYouTube
   }
 
   function setMoreState(failed) {
