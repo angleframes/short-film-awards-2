@@ -54,8 +54,8 @@
   filter: grayscale(1); transition: filter 0.45s ease, transform 0.6s ease;
 }
 @media (hover: hover) and (pointer: fine) {
-  /* colour reveal only — no scale, so the photo is never resampled/softened on hover */
-  .fg-card:hover .fg-thumb img, .fg-card:focus-visible .fg-thumb img { filter: grayscale(0); }
+  /* colour reveal + subtle zoom (thumbnails are 960px / 1280px, so the zoom stays sharp) */
+  .fg-card:hover .fg-thumb img, .fg-card:focus-visible .fg-thumb img { filter: grayscale(0); transform: scale(1.03); }
 }
 .fg-play {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
@@ -228,5 +228,5 @@
 .fg-sentinel { height: 1px; }
 
 /* ===== Image fidelity: grayscale is the only treatment; nothing else touches the photo ===== */
-.fg-thumb img { transition: filter 0.45s ease; transform: none; }
+.fg-thumb img { transition: filter 0.45s ease, transform 0.6s ease; transform: translateZ(0); backface-visibility: hidden; }
 .fg-lb-media img { filter: none; opacity: 1; }
