@@ -15,6 +15,20 @@
   let categories = [];     // media_categories rows
   let previousJury = [];   // all visible previous jury (roster view)
   let active = 'all';
+  let subTrack = 'all', subGroup = 'all';   // extra filters inside Award Winners
+  let awardMap = new Map();                 // award_categories id → { key, name } (live names from Admin → Awards)
+  const TRACKS = { general: 'General', campus: 'Campus' };
+  const GROUPS = [['film', 'Best Film'], ['director', 'Director'], ['actor', 'Actor'], ['actress', 'Actress'], ['technical', 'Technical'], ['special', 'Special Jury'], ['other', 'Other Awards']];
+  function awardGroup(key, name) {
+    const k = String(key || name || '').toLowerCase();
+    if (/special/.test(k)) return 'special';
+    if (/short_film|campus_film|best short film|best campus film|best film/.test(k)) return 'film';
+    if (/director/.test(k) && !/music/.test(k)) return 'director';
+    if (/actress/.test(k)) return 'actress';
+    if (/actor/.test(k)) return 'actor';
+    if (/screenplay|writer|cinematograph|edit|music|sound|art/.test(k)) return 'technical';
+    return 'other';
+  }
   let view = [];           // items in the current filter (lightbox order)
   let lbIndex = -1;
 
@@ -31,12 +45,14 @@
   async function load() {
     if (!window.supabase || typeof SUPA_URL === 'undefined') throw new Error('offline');
     const sb = window.supabase.createClient(SUPA_URL, SUPA_ANON);
-    const [catRes, medRes, juryRes] = await Promise.all([
+    const [catRes, medRes, juryRes, awRes] = await Promise.all([
       sb.from('media_categories').select('*').order('sort_order'),
       sb.from('gallery_media').select('*').order('is_featured', { ascending: false }).order('display_order').order('created_at'),
       sb.from('jury_members').select('id,name,designation,bio,photo_url,edition_year,jury_type,display_order,show_in_gallery')
         .order('edition_year', { ascending: false, nullsFirst: false }).order('display_order'),
+      sb.from('award_categories').select('id,key,name'),
     ]);
+    (awRes && awRes.data || []).forEach(a => awardMap.set(String(a.id), a));
     if (medRes.error) throw medRes.error;
     categories = catRes.data || [];
     const media = (medRes.data || []).map(m => {
@@ -47,6 +63,7 @@
         full: m.image_url || '',
         thumb: m.thumbnail_url || m.image_url || (id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : ''),
         video: m.video_url || '', ytid: id,
+        winner: m.category === 'award-winners' && (m.award_id || m.award_name) ? winnerInfo(m) : null,
       };
     });
     const jury = (juryRes.data || []).map(j => Object.assign(j, { name: tidy(j.name), designation: tidy(j.designation), bio: tidy(j.bio) }));
@@ -56,6 +73,20 @@
       year: j.edition_year, juryType: j.jury_type, full: j.photo_url, thumb: j.photo_url, portrait: true,
     }));
     items = media.concat(juryItems);
+  }
+
+  // Structured award-winner display: award · track · year / primary name / secondary line
+  function winnerInfo(m) {
+    const a = awardMap.get(String(m.award_id)) || {};
+    const award = a.name || m.award_name || 'Award';
+    const group = awardGroup(a.key, award);
+    const film = tidy(m.film_name), person = tidy(m.winner_name);
+    const filmFirst = group === 'film' || (group === 'special' && m.recipient_type !== 'person');
+    const primary = filmFirst ? (film || person) : (person || film);
+    let secondary = '';
+    if (filmFirst && person && film) secondary = group === 'film' ? `Directed by ${person}` : person;
+    if (!filmFirst && person && film) secondary = `Film: ${film}`;
+    return { award, group, track: m.competition_track || '', primary, secondary };
   }
 
   function filterKeys() {
@@ -76,12 +107,43 @@
     if (key === 'photos') return items.filter(i => i.type === 'photo');
     if (key === 'videos') return items.filter(i => i.type === 'video');
     if (key === 'all') return items;
-    return items.filter(i => i.category === key);
+    const list = items.filter(i => i.category === key);
+    if (key !== 'award-winners') return list;
+    return list.filter(i => (subTrack === 'all' || (i.winner && i.winner.track === subTrack))
+      && (subGroup === 'all' || (i.winner ? i.winner.group : 'other') === subGroup));
+  }
+
+  // Track / award-type chips — shown only when there is enough winner data to split
+  function renderSubFilters() {
+    let el = $('fgSubFilters');
+    if (!el) { el = document.createElement('div'); el.id = 'fgSubFilters'; el.className = 'fg-subfilters'; $('fgFilters').after(el); }
+    if (active !== 'award-winners') { el.hidden = true; el.innerHTML = ''; return; }
+    const winners = items.filter(i => i.category === 'award-winners');
+    const tracks = [...new Set(winners.map(i => i.winner && i.winner.track).filter(Boolean))];
+    const groups = GROUPS.filter(([g]) => winners.some(i => (i.winner ? i.winner.group : 'other') === g));
+    const row = (name, cur, opts) => `<div class="fg-subrow" role="group" aria-label="${name}">${opts.map(([k, l]) =>
+      `<button type="button" class="fg-subchip${k === cur ? ' is-active' : ''}" aria-pressed="${k === cur}" data-sub="${name}" data-k="${k}">${esc(l)}</button>`).join('')}</div>`;
+    let html = '';
+    if (tracks.length > 1) html += row('track', subTrack, [['all', 'All tracks'], ...tracks.map(t => [t, TRACKS[t] || t])]);
+    if (groups.length > 1) html += row('award', subGroup, [['all', 'All awards'], ...groups]);
+    el.innerHTML = html; el.hidden = !html;
+  }
+
+  function metaOf(it) {
+    if (it.winner) return [it.winner.award, TRACKS[it.winner.track], it.year].filter(Boolean).join(' · ');
+    return [catLabel(it.category), it.year].filter(Boolean).join(' · ');
   }
 
   function card(it, idx) {
     const cls = ['fg-card', it.type === 'video' ? 'is-video' : '', it.portrait ? 'is-portrait' : '', it.featured && active === 'all' ? 'is-featured' : ''].join(' ').trim();
-    const meta = [catLabel(it.category), it.year].filter(Boolean).join(' · ');
+    const meta = metaOf(it);
+    if (it.winner) {
+      return `<button type="button" class="${cls} is-winner" data-i="${idx}" aria-label="Open: ${esc(meta)} — ${esc(it.winner.primary)}">
+        <span class="fg-thumb"><img src="${esc(it.thumb)}" alt="${esc(it.winner.primary)}" loading="lazy" decoding="async"${it.ytid ? ` data-ytid="${esc(it.ytid)}"` : ''}>
+          ${it.type === 'video' ? `<span class="fg-play">${PLAY}</span>` : ''}</span>
+        <span class="fg-card-text"><span class="fg-card-meta">${esc(meta)}</span><span class="fg-card-title">${esc(it.winner.primary)}</span>${it.winner.secondary ? `<span class="fg-card-sub">${esc(it.winner.secondary)}</span>` : ''}</span>
+      </button>`;
+    }
     return `<button type="button" class="${cls}" data-i="${idx}" aria-label="${it.type === 'video' ? 'Play' : 'Open'}: ${esc(it.title || meta)}">
         <span class="fg-thumb"><img src="${esc(it.thumb)}" alt="${esc(it.title)}" loading="lazy" decoding="async"${it.ytid ? ` data-ytid="${esc(it.ytid)}"` : ''}>
           ${it.type === 'video' ? `<span class="fg-play">${PLAY}</span>` : ''}</span>
@@ -115,6 +177,7 @@
 
   function render() {
     renderFilters();
+    renderSubFilters();
     if (active === 'previous-jury') return renderRoster();
     view = select(active);
     if (!view.length) { $('fgContent').innerHTML = '<p class="fg-empty">Nothing here yet — new photographs and films will appear as they are added.</p>'; return; }
@@ -132,13 +195,19 @@
     }, { once: false }));
   }
 
+  function syncUrl() {
+    const q = new URLSearchParams();
+    if (active !== 'all') q.set('filter', active);
+    if (active === 'award-winners' && subTrack !== 'all') q.set('track', subTrack);
+    if (active === 'award-winners' && subGroup !== 'all') q.set('award', subGroup);
+    history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q : ''));
+  }
   function setFilter(k, push) {
-    active = ALIASES[k] || k || 'all';
+    const next = ALIASES[k] || k || 'all';
+    if (next !== active) { subTrack = 'all'; subGroup = 'all'; }
+    active = next;
     render();
-    if (push !== false) {
-      const url = active === 'all' ? location.pathname : `${location.pathname}?filter=${encodeURIComponent(active)}`;
-      history.replaceState(null, '', url);
-    }
+    if (push !== false) syncUrl();
   }
 
   /* ---------- lightbox ---------- */
@@ -155,9 +224,9 @@
     } else {
       media.innerHTML = `<img src="${esc(it.full || it.thumb)}" alt="${esc(it.title)}">`;
     }
-    $('fgLbMeta').textContent = [catLabel(it.category), it.year].filter(Boolean).join(' · ');
-    $('fgLbTitle').textContent = it.title || '';
-    $('fgLbDesc').textContent = it.desc || '';
+    $('fgLbMeta').textContent = metaOf(it);
+    $('fgLbTitle').textContent = it.winner ? it.winner.primary : (it.title || '');
+    $('fgLbDesc').textContent = it.winner ? [it.winner.secondary, it.desc && !/^winner \d{4}$/i.test(it.desc) ? it.desc : ''].filter(Boolean).join(' — ') : (it.desc || '');
     const multi = view.length > 1;
     $('fgLbPrev').hidden = !multi; $('fgLbNext').hidden = !multi;
     const lb = $('fgLightbox');
@@ -173,6 +242,11 @@
 
   function bind() {
     $('fgFilters').addEventListener('click', e => { const b = e.target.closest('.fg-chip'); if (b) setFilter(b.dataset.k); });
+    document.addEventListener('click', e => {
+      const b = e.target.closest('.fg-subchip'); if (!b) return;
+      if (b.dataset.sub === 'track') subTrack = b.dataset.k; else subGroup = b.dataset.k;
+      render(); syncUrl();
+    });
     $('fgContent').addEventListener('click', e => {
       const t = e.target.closest('.fg-bio-toggle');
       if (t) { const open = t.previousElementSibling.classList.toggle('is-open'); t.setAttribute('aria-expanded', open); t.textContent = open ? 'Show less' : 'Read full bio'; return; }
@@ -199,6 +273,8 @@
     const q = new URLSearchParams(location.search).get('filter');
     try { await load(); }
     catch (e) { $('fgContent').innerHTML = '<p class="fg-empty">The gallery could not be loaded right now. Please try again shortly.</p>'; console.warn('Festival gallery load failed', e); return; }
+    const qs = new URLSearchParams(location.search);
     setFilter(q || 'all', false);
+    if (active === 'award-winners' && (qs.get('track') || qs.get('award'))) { subTrack = qs.get('track') || 'all'; subGroup = qs.get('award') || 'all'; render(); }
   });
 })();
