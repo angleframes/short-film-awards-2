@@ -197,7 +197,7 @@
                         .order('edition_year', { ascending: false, nullsFirst: false }).order('display_order').order('created_at'),
                     // master Festival Gallery rows — homepage picks varied photos from here (small, capped)
                     SB.from('gallery_media').select('id,media_type,category,title,image_url,medium_url,thumbnail_url,award_name,winner_name,film_name,recipient_type,is_featured,display_order')
-                        .eq('media_type', 'photo').order('is_featured', { ascending: false }).order('display_order').order('created_at').limit(120)
+                        .eq('media_type', 'photo').order('is_featured', { ascending: false }).order('display_order').order('created_at').limit(400)
                 ]);
                 if (gmRes && !gmRes.error && Array.isArray(gmRes.data)) window._mediaData = gmRes.data;
                 if (juryRes && !juryRes.error && Array.isArray(juryRes.data)) window._juryData = juryRes.data;
@@ -1182,6 +1182,40 @@
             p.outerHTML = `<div class="ab-video-frame"><iframe src="https://www.youtube.com/embed/${p.dataset.ytid}?autoplay=1&rel=0" title="Video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
         });
 
+        /* ---------- Footer location: one map, two places (Google Maps embed — no API key) ---------- */
+        (function initFooterLocation() {
+            const q = t => encodeURIComponent(t);
+            const PLACES = {
+                venue: { kicker: 'Festival Venue', name: 'JAIN (Deemed-to-be University)', address: 'Knowledge Park, Nirmal Infopark<br>Kakkanad, Kochi – 682042<br>Kerala, India',
+                         query: 'JAIN (Deemed-to-be University) Kochi, Knowledge Park, Nirmal Infopark, Kakkanad, Kochi 682042', title: 'JAIN (Deemed-to-be University), Kochi Campus' },
+                hq:    { kicker: 'Headquarters', name: 'Angle Frames', address: '12/399, Krishnalayam, Thenhippalam<br>Malappuram, Kerala – 673636<br>India',
+                         query: 'Angle Frames, Krishnalayam, Thenhippalam, Malappuram, Kerala 673636', title: 'Angle Frames, Thenhippalam, Malappuram' },
+            };
+            const start = () => {
+                const tabs = [...document.querySelectorAll('.fl-tab')];
+                const map = document.getElementById('flMap'), place = document.getElementById('flPlace'), dir = document.getElementById('flDirections'), wrap = document.getElementById('flMapWrap');
+                if (!tabs.length || !map || !place || !dir) return;
+                const select = (key, focus) => {
+                    const p = PLACES[key]; if (!p) return;
+                    tabs.forEach(t => { const on = t.dataset.loc === key; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1; if (on && focus) t.focus(); });
+                    if (wrap) wrap.setAttribute('aria-labelledby', 'flTab-' + key);
+                    place.innerHTML = `<span class="fl-kicker">${p.kicker}</span><strong class="fl-name">${p.name}</strong><span class="fl-address">${p.address}</span>`;
+                    map.title = 'Map — ' + p.title;
+                    map.src = `https://maps.google.com/maps?q=${q(p.query)}&z=15&output=embed`;
+                    dir.href = `https://www.google.com/maps/dir/?api=1&destination=${q(p.query)}`;
+                };
+                tabs.forEach((t, i) => {
+                    t.addEventListener('click', () => select(t.dataset.loc));
+                    t.addEventListener('keydown', e => {
+                        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+                        e.preventDefault();
+                        select(tabs[(i + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length].dataset.loc, true);
+                    });
+                });
+            };
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+        })();
+
         let _abLastFocus = null;
         function openAboutDetail(key) {
             const m = document.getElementById('aboutDetailModal');
@@ -1900,6 +1934,50 @@
             }, 3800);
         }
 
+        /* ---------- Festival Moments rotating collage (Watch & Relive) ----------
+           Photos are grouped in sets of three (1 large + 2 small). Sets cross-fade every 4.6s.
+           Only the visible set and the next one have their images loaded; later sets keep data-src. */
+        function _fmCollageHtml(list) {
+            const esc = _vidEsc;
+            const img = (p, load) => `<img ${load ? 'src' : 'data-src'}="${esc(p.thumb || p.display || p.src)}" alt="${esc(p.title || '')}" loading="lazy" decoding="async">`;
+            if (list.length === 2) return `<span class="fm-collage"><span class="fm-set is-active n2">${list.map(p => `<span class="fm-tile">${img(p, true)}</span>`).join('')}</span></span>`;
+            const sets = [];
+            for (let i = 0; i < list.length; i += 3) {
+                const grp = list.slice(i, i + 3);
+                while (grp.length < 3) grp.push(list[(i + grp.length) % list.length]);   // top up the last set by wrapping round
+                sets.push(grp);
+            }
+            return `<span class="fm-collage" data-sets="${sets.length}">${sets.map((grp, k) =>
+                `<span class="fm-set${k === 0 ? ' is-active' : ''}">${grp.map((p, j) => `<span class="fm-tile${j === 0 ? ' is-main' : ''}">${img(p, k <= 1)}</span>`).join('')}</span>`).join('')}</span>`;
+        }
+        let _fmTimer = null;
+        function _fmStartCollage(root) {
+            clearInterval(_fmTimer);
+            const box = root.querySelector('.fm-collage[data-sets]');
+            if (!box) return;
+            const sets = [...box.querySelectorAll('.fm-set')];
+            if (sets.length < 2) return;
+            const load = set => set && set.querySelectorAll('img[data-src]').forEach(im => { im.src = im.dataset.src; im.removeAttribute('data-src'); });
+            const ready = set => [...set.querySelectorAll('img')].every(im => !im.dataset.src && im.complete);
+            let i = 0, paused = false, onScreen = false;
+            const card = box.closest('.pe-card');
+            if (card && window.matchMedia && matchMedia('(hover: hover)').matches) {
+                card.addEventListener('mouseenter', () => { paused = true; });
+                card.addEventListener('mouseleave', () => { paused = false; });
+            }
+            if ('IntersectionObserver' in window) new IntersectionObserver(es => { onScreen = es.some(e => e.isIntersecting); }, { rootMargin: '200px 0px' }).observe(box);
+            else onScreen = true;
+            if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            _fmTimer = setInterval(() => {
+                if (paused || !onScreen || document.hidden) return;
+                const n = (i + 1) % sets.length;
+                if (!ready(sets[n])) { load(sets[n]); return; }          // wait for the next set to finish loading
+                sets[i].classList.remove('is-active'); sets[n].classList.add('is-active');
+                i = n;
+                load(sets[(i + 1) % sets.length]);                        // warm only the set after this one
+            }, 4600);
+        }
+
         function renderFestivalShowcase() {
             window._shownMedia = new Set();
             const photoKey = p => _mediaKey(p.src);
@@ -1960,10 +2038,16 @@
                     cards.push(_showcaseVideoCard(sv2 || support[0], { kicker: support.length > 1 ? support.length + ' videos' : 'Video', title: MEDIA_GROUPS.support, cta: 'View All', action: 'videos', group: 'support',
                         desc: 'Wishes and messages from guests, filmmakers and well-wishers.' }));
                 }
-                const p2 = _takeUnique(moments, photoKey) || _takeUnique(winners, photoKey);
-                if (p2) cards.push(_showcasePhotoCard(p2, { kicker: photos.length + ' photographs', title: 'Festival Moments', action: 'gallery', filter: 'festival-moments', cta: 'View', useThumb: true,
+                // Festival Moments — rotating 3-photo collage over every Festival Moments photo (count from live data)
+                let fm = photos.filter(p => p.category === 'festival-moments');
+                if (!fm.length) fm = moments;
+                const fresh = fm.filter(p => !window._shownMedia.has(photoKey(p)));
+                const fmOrdered = fresh.concat(fm.filter(p => window._shownMedia.has(photoKey(p))));   // unseen photos first
+                if (fmOrdered.length) cards.push(_showcasePhotoCard(fmOrdered[0], { kicker: fm.length + (fm.length === 1 ? ' photograph' : ' photographs'), title: 'Festival Moments', action: 'gallery', filter: 'festival-moments', cta: 'View', useThumb: true,
+                    mediaHtml: fmOrdered.length >= 2 ? _fmCollageHtml(fmOrdered) : '',
                     desc: 'Ceremony photographs, stage moments, audience and winners.' }));
                 mg.innerHTML = cards.join('');
+                _fmStartCollage(mg);
                 const sec = document.getElementById('section-media');
                 if (sec) sec.style.display = cards.length ? '' : 'none';
                 _showcaseBind(mg);
