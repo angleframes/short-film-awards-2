@@ -184,15 +184,19 @@
             try {
                 if (!window.supabase) return;
                 const SB = window.supabase.createClient(SUPA_URL, SUPA_ANON);
-                const [cfgRes, galRes, updRes, tmtRes, vcRes, acRes, abRes] = await Promise.all([
+                const [cfgRes, galRes, updRes, tmtRes, vcRes, acRes, abRes, juryRes] = await Promise.all([
                     SB.from('site_config').select('*').eq('id', 1).single(),
                     SB.from('gallery').select('*').order('sort_order').order('created_at', { ascending: false }),
                     SB.from('updates_feed').select('*').order('sort_order').order('created_at', { ascending: false }),
                     SB.from('testimonials').select('*').order('display_order').order('created_at'),
                     SB.from('video_categories').select('*').order('sort_order'),
                     SB.from('award_categories').select('*').eq('active', true).order('sort_order'),
-                    SB.from('about_sections').select('*').order('sort_order')
+                    SB.from('about_sections').select('*').order('sort_order'),
+                    // RLS returns only visible members (current ones also need is_active)
+                    SB.from('jury_members').select('id,name,designation,bio,photo_url,edition_year,jury_type,display_order,instagram_url,imdb_url,website_url')
+                        .order('edition_year', { ascending: false, nullsFirst: false }).order('display_order').order('created_at')
                 ]);
+                if (juryRes && !juryRes.error && Array.isArray(juryRes.data)) window._juryData = juryRes.data;
                 if (abRes && !abRes.error) applyAboutRows(abRes.data);
                 const cfg = cfgRes.data;
                 if (cfg) {
@@ -1746,7 +1750,7 @@
         /* ===== PREVIOUS EDITION + FESTIVAL MEDIA — built only from real gallery photos and videos ===== */
         function _showcasePhotoCard(p, opts) {
             return `<article class="pe-card${opts.wide ? ' is-wide' : ''}">
-                <button type="button" class="pe-media" data-action="${opts.action}" data-src="${_vidEsc(p.src)}" aria-label="${_vidEsc(opts.cta)}: ${_vidEsc(opts.title)}">
+                <button type="button" class="pe-media" data-action="${opts.action}" data-filter="${opts.filter || ''}" data-src="${_vidEsc(p.src)}" aria-label="${_vidEsc(opts.cta)}: ${_vidEsc(opts.title)}">
                     <img src="${_vidEsc(opts.useThumb && p.thumb ? p.thumb : p.src)}" alt="${_vidEsc(p.title || opts.title)}" loading="lazy" decoding="async">
                     <span class="pe-grain" aria-hidden="true"></span>
                 </button>
@@ -1754,14 +1758,14 @@
                     <span class="pe-kicker">${_vidEsc(opts.kicker)}</span>
                     <h3 class="pe-title">${_vidEsc(opts.title)}</h3>
                     ${opts.desc ? `<p class="pe-desc">${opts.desc}</p>` : ''}
-                    <button type="button" class="pe-link" data-action="${opts.action}" data-src="${_vidEsc(p.src)}">${_vidEsc(opts.cta)} <span aria-hidden="true">&rarr;</span></button>
+                    <button type="button" class="pe-link" data-action="${opts.action}" data-filter="${opts.filter || ''}" data-src="${_vidEsc(p.src)}">${_vidEsc(opts.cta)} <span aria-hidden="true">&rarr;</span></button>
                 </div>
             </article>`;
         }
         function _showcaseVideoCard(v, opts) {
             const id = _vidEsc(v.youtube_video_id);
             return `<article class="pe-card${opts.wide ? ' is-wide' : ''}">
-                <button type="button" class="pe-media is-video" data-action="${opts.action || 'play'}" data-ytid="${id}" data-group="${opts.group || ''}" aria-label="${_vidEsc(opts.cta)}: ${_vidEsc(opts.title)}">
+                <button type="button" class="pe-media is-video" data-action="${opts.action || 'play'}" data-filter="${opts.filter || ''}" data-ytid="${id}" data-group="${opts.group || ''}" aria-label="${_vidEsc(opts.cta)}: ${_vidEsc(opts.title)}">
                     <img src="${_vidThumbSrc(id)}" alt="${_vidEsc(v.video_title || opts.title)}" loading="lazy" decoding="async" data-ytid="${id}" onerror="_vidThumbFallback(this)">
                     <span class="pe-grain" aria-hidden="true"></span>
                     <span class="pe-play" aria-hidden="true">${_PLAY_SVG}</span>
@@ -1770,7 +1774,7 @@
                     <span class="pe-kicker">${_vidEsc(opts.kicker)}</span>
                     <h3 class="pe-title">${_vidEsc(opts.title)}</h3>
                     ${opts.desc ? `<p class="pe-desc">${opts.desc}</p>` : ''}
-                    <button type="button" class="pe-link" data-action="${opts.action || 'play'}" data-ytid="${id}" data-group="${opts.group || ''}">${_vidEsc(opts.cta)} <span aria-hidden="true">&rarr;</span></button>
+                    <button type="button" class="pe-link" data-action="${opts.action || 'play'}" data-filter="${opts.filter || ''}" data-ytid="${id}" data-group="${opts.group || ''}">${_vidEsc(opts.cta)} <span aria-hidden="true">&rarr;</span></button>
                 </div>
             </article>`;
         }
@@ -1804,6 +1808,7 @@
                 if (a === 'photo') _showcaseOpenPhoto(el.dataset.src);
                 else if (a === 'play' && el.dataset.ytid) _playYouTube(el.dataset.ytid); // modal wired once by renderVideos()
                 else if (a === 'videos') _showcaseShowVideos(el.dataset.group);
+                else if (a === 'gallery') location.href = '/festival-gallery' + (el.dataset.filter ? '?filter=' + encodeURIComponent(el.dataset.filter) : '');
             });
         }
         function renderFestivalShowcase() {
@@ -1819,13 +1824,13 @@
             const pe = document.getElementById('peGrid');
             if (pe) {
                 const cards = [];
-                if (winners.length) cards.push(_showcasePhotoCard(winners[0], { kicker: 'Award Winners', title: 'Celebrating the Winners', action: 'photo', cta: 'View Winners',
+                if (winners.length) cards.push(_showcasePhotoCard(winners[0], { kicker: 'Award Winners', title: 'Celebrating the Winners', action: 'gallery', filter: 'award-winners', cta: 'View Winners',
                     desc: winners.slice(0, 3).map(w => _vidEsc(shortTitle(w.title))).filter(Boolean).join('<br>') }));
-                if (moments.length) cards.push(_showcasePhotoCard(moments[0], { kicker: 'Festival Moments', title: 'On Stage & In the Audience', action: 'photo', cta: 'View Moments',
+                if (moments.length) cards.push(_showcasePhotoCard(moments[0], { kicker: 'Festival Moments', title: 'On Stage & In the Audience', action: 'gallery', filter: 'festival-moments', cta: 'View Moments',
                     desc: 'Ceremony, stage and audience moments from the previous edition.' }));
-                if (support.length) cards.push(_showcaseVideoCard(support[0], { kicker: 'Messages of Support', title: 'Words From Our Guests', cta: 'Play Message',
+                if (support.length) cards.push(_showcaseVideoCard(support[0], { kicker: 'Messages of Support', title: 'Words From Our Guests', action: 'gallery', filter: 'messages-of-support', cta: 'View Messages',
                     desc: 'Messages from guests, filmmakers and friends of the festival.' }));
-                if (inside.length) cards.push(_showcaseVideoCard(inside[0], { kicker: 'Festival Highlights', title: 'Relive the Festival', cta: 'Play Highlights',
+                if (inside.length) cards.push(_showcaseVideoCard(inside[0], { kicker: 'Festival Highlights', title: 'Relive the Festival', action: 'gallery', filter: 'videos', cta: 'Watch Highlights',
                     desc: 'Highlights from the previous edition of the Sharankrishna Short Film Awards.' }));
                 pe.innerHTML = cards.join('');
                 const sec = document.getElementById('section-previous');
@@ -1850,22 +1855,47 @@
             }
         }
 
-        /* ===== JURY — cards render from JURY_PANEL (config.js) once real members are added ===== */
+        /* ===== JURY — current + previous members from Admin → Jury (jury_members); config.js JURY_PANEL is only a fallback ===== */
+        function _juryCardHtml(m, opts) {
+            const role = m.designation || m.role || '';
+            const photo = m.photo_url || m.src || '';
+            const year = opts && opts.showYear && m.edition_year ? `<span class="jury-member-edition">${_vidEsc(m.edition_year)} Edition</span>` : '';
+            const links = [['instagram_url', 'Instagram'], ['imdb_url', 'IMDb'], ['website_url', 'Website']]
+                .filter(([k]) => /^https?:\/\//i.test(m[k] || ''))
+                .map(([k, l]) => `<a href="${_vidEsc(m[k])}" target="_blank" rel="noopener noreferrer">${l}</a>`).join('');
+            return `<article class="jury-member">
+                    <div class="jury-member-photo">${photo ? `<img src="${_vidEsc(photo)}" alt="${_vidEsc(m.name)}" loading="lazy" decoding="async">` : '<span class="jury-member-silhouette" aria-hidden="true"></span>'}</div>
+                    ${year}
+                    <h3 class="jury-member-name">${_vidEsc(m.name)}</h3>
+                    ${role ? `<p class="jury-member-role">${_vidEsc(role)}</p>` : ''}
+                    ${!(opts && opts.compact) && m.bio ? `<p class="jury-member-bio">${_vidEsc(m.bio)}</p>` : ''}
+                    ${!(opts && opts.compact) && links ? `<p class="jury-member-links">${links}</p>` : ''}
+                </article>`;
+        }
         function renderJurySection() {
             const grid = document.getElementById('juryShowcase');
             const soon = document.getElementById('juryComingSoon');
-            if (!grid) return;
-            const members = (typeof JURY_PANEL !== 'undefined' ? JURY_PANEL : [])
-                .filter(m => m && m.name && !/to be announced/i.test(m.name));
-            if (!members.length) { grid.hidden = true; if (soon) soon.hidden = false; return; }
-            grid.innerHTML = members.map(m => `<article class="jury-member">
-                    <div class="jury-member-photo">${m.src ? `<img src="${_vidEsc(m.src)}" alt="${_vidEsc(m.name)}" loading="lazy" decoding="async">` : '<span class="jury-member-silhouette" aria-hidden="true"></span>'}</div>
-                    <h3 class="jury-member-name">${_vidEsc(m.name)}</h3>
-                    ${m.role ? `<p class="jury-member-role">${_vidEsc(m.role)}</p>` : ''}
-                    ${m.bio ? `<p class="jury-member-bio">${_vidEsc(m.bio)}</p>` : ''}
-                </article>`).join('');
-            grid.hidden = false;
-            if (soon) soon.hidden = true;
+            const fromDb = Array.isArray(window._juryData);
+            let current = fromDb
+                ? window._juryData.filter(m => m.jury_type === 'current')
+                : (typeof JURY_PANEL !== 'undefined' ? JURY_PANEL : []).filter(m => m && m.name && !/to be announced/i.test(m.name));
+            if (grid) {
+                if (!current.length) { grid.hidden = true; if (soon) soon.hidden = false; }
+                else {
+                    current = current.slice().sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+                    grid.innerHTML = current.map(m => _juryCardHtml(m)).join('');
+                    grid.hidden = false;
+                    if (soon) soon.hidden = true;
+                }
+            }
+            // Previous Jury — hidden until at least one visible previous member exists
+            const prevSec = document.getElementById('section-previous-jury');
+            const prevGrid = document.getElementById('previousJuryGrid');
+            if (prevSec && prevGrid) {
+                const prev = fromDb ? window._juryData.filter(m => m.jury_type === 'previous') : [];
+                prevSec.hidden = !prev.length;
+                prevGrid.innerHTML = prev.slice(0, 8).map(m => _juryCardHtml(m, { compact: true, showYear: true })).join('');
+            }
         }
 
         function renderJuryPanel() {
