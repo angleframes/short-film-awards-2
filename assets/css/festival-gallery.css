@@ -323,12 +323,17 @@
   .fg-spin, .fg-skel .fg-thumb, .fg-skel-line { animation: none; }
 }
 
-/* Award dropdown — site scrollbar style (thin, translucent, no system track); tall enough that it rarely scrolls */
-.fg-dd-list {
-  max-height: min(480px, 60vh); overscroll-behavior: contain;
-  scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.2) transparent;
+/* Award dropdown — scrolls inside a compact panel with the site's own scroller (thin white-on-dark thumb, no system track).
+   Chrome/Safari: custom ::-webkit-scrollbar (always visible). Firefox: scrollbar-color only — setting it in Chrome would
+   switch off the custom styling, so it is limited to browsers without ::-webkit-scrollbar. */
+.fg-dd-list { max-height: 312px; overscroll-behavior: contain; padding-right: 4px; }
+.fg-dd-list::-webkit-scrollbar { width: 10px; }
+.fg-dd-list::-webkit-scrollbar-track { background: transparent; margin: 12px 0; }
+.fg-dd-list::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.22); border-radius: 10px;
+  border: 3px solid transparent; background-clip: padding-box;   /* thin 4px pill floating inside the panel */
 }
-.fg-dd-list::-webkit-scrollbar { width: 4px; }
-.fg-dd-list::-webkit-scrollbar-track { background: transparent; margin: 10px 0; }
-.fg-dd-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
-.fg-dd-list::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.35); }
+.fg-dd-list::-webkit-scrollbar-thumb:hover { background-color: rgba(255,255,255,0.4); }
+@supports not selector(::-webkit-scrollbar) {
+  .fg-dd-list { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.25) transparent; }
+}
