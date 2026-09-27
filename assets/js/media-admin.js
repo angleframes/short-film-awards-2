@@ -266,7 +266,7 @@ window.MediaAdmin = (function () {
   }
 
   /* ---------- image pipeline: validate → decode once → 3 WebP sizes → storage ---------- */
-  const SIZES = { full: [2200, 0.86], md: [1280, 0.84], th: [800, 0.82] };   // longest side (px), WebP quality
+  const SIZES = { full: [2200, 0.9], md: [1280, 0.88], th: [800, 0.85] };    // longest side (px), WebP quality — high enough to keep skin tones, stage light and certificate text clean
   const MAX_INPUT = 30 * 1024 * 1024;
   const OK_TYPES = { 'image/jpeg': 'jpeg', 'image/png': 'png', 'image/webp': 'webp' };
 
@@ -321,6 +321,12 @@ window.MediaAdmin = (function () {
     const out = { width: bmp.width, height: bmp.height };
     for (const key of sizes) {
       const [side, q] = SIZES[key];
+      // an already web-ready WebP is stored as-is for the full size — no second round of compression
+      if (key === 'full' && source.type === 'image/webp' && Math.max(bmp.width, bmp.height) <= side && source.size <= 1.5 * 1024 * 1024) {
+        out.full = await put(source, `${base}-full.webp`);
+        out.size = source.size;
+        continue;
+      }
       const enc = await encode(bmp, side, q);
       out[key] = await put(enc.blob, `${base}-${key}.webp`);
       if (key === 'full') { out.width = enc.width; out.height = enc.height; out.size = enc.blob.size; }
