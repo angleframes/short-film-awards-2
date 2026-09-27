@@ -392,6 +392,12 @@
             const nav = document.getElementById('mainNavbar');
             if (nav) nav.classList.toggle('active');
         }
+        // close the mobile menu after choosing a link
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#mainNavbar a')) return;
+            const nav = document.getElementById('mainNavbar');
+            if (nav) nav.classList.remove('active');
+        });
 
         function toggleMoreDropdown(event) {
             event.stopPropagation();
@@ -999,7 +1005,7 @@
 
             if (open) {
                 if (browserTitleEl) browserTitleEl.textContent = "Sharankrishna Short Film Awards 2026";
-                if (navRegLink) navRegLink.textContent = "Registration";
+                if (navRegLink) navRegLink.innerHTML = 'Submit <span aria-hidden="true">&rarr;</span>';
                 if (heroSubmitBtn) {
                     heroSubmitBtn.textContent = "Submit Your Film →";
                     heroSubmitBtn.style.background = "";
