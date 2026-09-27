@@ -106,7 +106,7 @@
     </script>
 
     <link rel="stylesheet" href="assets/css/ui-components.css">
-    <link rel="stylesheet" href="assets/css/site.css?v=36">
+    <link rel="stylesheet" href="assets/css/site.css?v=37">
 </head>
 <body>
 
@@ -1142,10 +1142,30 @@
 
             <div class="footer-col">
                 <h4>Headquarters</h4>
-                <a class="footer-static-text footer-address" href="https://share.google/ORlDFZSQ8va4x6Gyv" target="_blank" rel="noopener noreferrer" aria-label="Angle Frames headquarters on Google Maps">Angle Frames<br>12/399, Krishnalayam<br>Thenhippalam<br>Malappuram, Kerala – 673636</a>
-                <a class="map-link" href="https://share.google/ORlDFZSQ8va4x6Gyv" target="_blank" rel="noopener noreferrer">View on map <span aria-hidden="true">&#8599;</span></a>
+                <span class="footer-static-text">Angle Frames<br>12/399, Krishnalayam<br>Thenhippalam<br>Malappuram, Kerala – 673636</span>
             </div>
         </div>
+
+        <!-- Location — one map, two places (Google Maps embed, no API key) -->
+        <section class="footer-location" aria-labelledby="flHeading">
+            <div class="fl-info">
+                <h4 class="fl-eyebrow" id="flHeading">Location</h4>
+                <div class="fl-tabs" role="tablist" aria-label="Choose a location">
+                    <button type="button" role="tab" class="fl-tab is-active" id="flTab-venue" data-loc="venue" aria-selected="true" aria-controls="flMapWrap">Festival Venue</button>
+                    <button type="button" role="tab" class="fl-tab" id="flTab-hq" data-loc="hq" aria-selected="false" aria-controls="flMapWrap" tabindex="-1">Headquarters</button>
+                </div>
+                <div class="fl-place" id="flPlace" aria-live="polite">
+                    <span class="fl-kicker">Festival Venue</span>
+                    <strong class="fl-name">JAIN (Deemed-to-be University)</strong>
+                    <span class="fl-address">Knowledge Park, Nirmal Infopark<br>Kakkanad, Kochi – 682042<br>Kerala, India</span>
+                </div>
+                <a class="fl-directions" id="flDirections" href="https://www.google.com/maps/dir/?api=1&amp;destination=JAIN%20(Deemed-to-be%20University)%20Kochi%2C%20Knowledge%20Park%2C%20Nirmal%20Infopark%2C%20Kakkanad%2C%20Kochi%20682042" target="_blank" rel="noopener noreferrer">Get Directions <span aria-hidden="true">&rarr;</span></a>
+            </div>
+            <div class="fl-map" id="flMapWrap" role="tabpanel" aria-labelledby="flTab-venue">
+                <iframe id="flMap" title="Map — JAIN (Deemed-to-be University), Kochi Campus" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen
+                    src="https://maps.google.com/maps?q=JAIN%20(Deemed-to-be%20University)%20Kochi%2C%20Knowledge%20Park%2C%20Nirmal%20Infopark%2C%20Kakkanad%2C%20Kochi%20682042&amp;z=15&amp;output=embed"></iframe>
+            </div>
+        </section>
 
         <div class="footer-bottom-bar">
             <div class="footer-bottom-left">
@@ -1196,6 +1216,6 @@
     <script src="assets/js/ui-components.js"></script>
     <script src="assets/js/campus-proof.js?v=1"></script>
     <script src="assets/js/youtube.js?v=1"></script>
-    <script src="assets/js/site.js?v=31"></script>
+    <script src="assets/js/site.js?v=32"></script>
 </body>
 </html>
