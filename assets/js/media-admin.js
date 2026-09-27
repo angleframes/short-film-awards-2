@@ -41,14 +41,30 @@ window.MediaAdmin = (function () {
     return { kind: 'person', person: hit ? hit[1] : 'Winner name' };
   }
 
+  // Special Jury variants (admin gallery labels only — never added to award_categories / the public Awards section).
+  // Stored as the existing Special Jury award (award_id) + award_name "Special Jury — <award>", so filters stay unchanged.
+  const SJ_PREFIX = 'Special Jury — ';
+  const isSpecial = a => !!a && awardKind(a).kind === 'special';
+  const specialAward = () => awards.find(a => a.key === 'special_jury') || awards.find(isSpecial);
+  const sjBase = r => {
+    const a = awardOf(r.award_id), n = String(r.award_name || '');
+    if (!isSpecial(a) || !n.startsWith(SJ_PREFIX)) return null;
+    return awards.find(x => !isSpecial(x) && x.name === n.slice(SJ_PREFIX.length)) || null;
+  };
+  // name shown for a row: "Special Jury — Best Director", else the award's current name
+  const awardLabel = r => { const b = sjBase(r), a = awardOf(r.award_id); return b ? SJ_PREFIX + b.name : (a && a.name) || r.award_name || ''; };
+  // fields follow the underlying award (e.g. Special Jury — Best Director asks for the director's name)
+  const kindOf = r => { const b = sjBase(r), a = awardOf(r.award_id); return b ? awardKind(b) : a ? awardKind(a) : null; };
+  const awardSel = r => { const b = sjBase(r); return b ? 'sj:' + b.id : (r.award_id ? String(r.award_id) : ''); };
+
   // Auto title from structured winner data
   function winnerTitle(r) {
     const a = awardOf(r.award_id);
-    const name = (a && a.name) || r.award_name || 'Award';
+    const name = awardLabel(r) || 'Award';
     const track = TRACKS[r.competition_track] || '';
     const withTrack = track && !new RegExp(track, 'i').test(name) ? `${name} (${track})` : name;
     const film = (r.film_name || '').trim(), person = (r.winner_name || '').trim();
-    const kind = awardKind(a || { name }).kind;
+    const kind = (kindOf(r) || awardKind(a || { name })).kind;
     if (kind === 'film' || (kind === 'special' && r.recipient_type !== 'person')) return `${withTrack} — ${film || '…'}${person ? ` · ${kind === 'film' ? 'Dir. ' : ''}${person}` : ''}`;
     return `${withTrack} — ${person || '…'}${film ? ` · Film: ${film}` : ''}`;
   }
@@ -75,9 +91,13 @@ window.MediaAdmin = (function () {
 
   // Award Winner block: track → award → only the fields that award needs
   function winnerFieldsHtml(r) {
-    const a = awardOf(r.award_id);
-    const k = a ? awardKind(a) : null;
+    const k = kindOf(r), sel = awardSel(r), base = sjBase(r);
     const activeAwards = awards.filter(x => x.active !== false || String(x.id) === String(r.award_id));
+    const opt = (v, label) => `<option value="${v}" ${v === sel ? 'selected' : ''}>${esc(label)}</option>`;
+    const regular = activeAwards.filter(x => !isSpecial(x)), special = activeAwards.filter(isSpecial);
+    const sjVariants = specialAward() ? awards.filter(x => !isSpecial(x) && (x.active !== false || (base && base.id === x.id))) : [];
+    const awardOptions = `<optgroup label="Award Categories">${regular.map(x => opt(String(x.id), x.name)).join('')}</optgroup>` +
+      (sjVariants.length || special.length ? `<optgroup label="Special Jury">${sjVariants.map(x => opt('sj:' + x.id, SJ_PREFIX + x.name)).join('')}${special.map(x => opt(String(x.id), x.name)).join('')}</optgroup>` : '');
     let fields = '';
     if (k && k.kind === 'special') {
       const isPerson = r.recipient_type === 'person';
@@ -102,7 +122,7 @@ window.MediaAdmin = (function () {
         <div class="mg-field"><label for="mgTrack">${k && k.kind === 'special' ? 'Special Jury track' : 'Competition track'}</label>
           <select id="mgTrack"><option value="">Select track</option>${Object.entries(TRACKS).map(([v, l]) => `<option value="${v}" ${r.competition_track === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
         <div class="mg-field"><label for="mgAward">Award category</label>
-          <select id="mgAward"><option value="">Select award</option>${activeAwards.map(x => `<option value="${x.id}" ${String(x.id) === String(r.award_id) ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></div>
+          <select id="mgAward"><option value="">Select award</option>${awardOptions}</select></div>
         ${fields || (awards.length ? '<p class="muted-note is-full">Choose the award to see its winner fields.</p>' : '<p class="muted-note is-full">No award categories yet — add them in the Awards tab.</p>')}
       </div>`;
   }
@@ -165,7 +185,7 @@ window.MediaAdmin = (function () {
             <span class="mg-num">${String(i + 1).padStart(2, '0')}</span>
             <span class="mg-thumb">${thumbOf(r) ? `<img src="${esc(thumbOf(r))}" alt="" loading="lazy">` : ''}${r.media_type === 'video' ? '<span class="mg-play">▶</span>' : ''}</span>
             <span class="mg-info"><b>${esc(r.title || '(untitled)')}</b>
-              <small>${r.media_type === 'video' ? 'Video' : 'Photo'} · ${esc(catLabel(r.category))}${r.category === WINNERS && (r.award_id || r.award_name) ? ' · ' + esc((awardOf(r.award_id) || {}).name || r.award_name) + (TRACKS[r.competition_track] ? ' · ' + TRACKS[r.competition_track] : '') : ''}${r.edition_year ? ' · ' + esc(r.edition_year) : ''}${r.is_featured ? ' · Featured' : ''}${r.is_visible ? '' : ' · Hidden'}</small></span>
+              <small>${r.media_type === 'video' ? 'Video' : 'Photo'} · ${esc(catLabel(r.category))}${r.category === WINNERS && (r.award_id || r.award_name) ? ' · ' + esc(awardLabel(r)) + (TRACKS[r.competition_track] ? ' · ' + TRACKS[r.competition_track] : '') : ''}${r.edition_year ? ' · ' + esc(r.edition_year) : ''}${r.is_featured ? ' · Featured' : ''}${r.is_visible ? '' : ' · Hidden'}</small></span>
             <span class="mg-actions">
               <label class="mg-vis" title="Show on the website"><input type="checkbox" data-act="vis" ${r.is_visible ? 'checked' : ''}> Visible</label>
               <button type="button" class="btn-ghost btn-xs" data-act="up" ${i === 0 ? 'disabled' : ''} title="Move up">↑</button>
@@ -191,7 +211,11 @@ window.MediaAdmin = (function () {
     if (editing.category === WINNERS) {
       const tc = document.getElementById('mgTitleCustom'); if (tc) editing._customTitle = tc.checked;
       if (v('mgTrack') !== undefined) editing.competition_track = v('mgTrack') || null;
-      if (v('mgAward') !== undefined) editing.award_id = v('mgAward') ? +v('mgAward') : null;
+      if (v('mgAward') !== undefined) {
+        const sel = v('mgAward') || '', b = sel.startsWith('sj:') ? awardOf(sel.slice(3)) : null, sp = specialAward();
+        if (b && sp) { editing.award_id = sp.id; editing.award_name = SJ_PREFIX + b.name; }
+        else { editing.award_id = sel ? +sel : null; const a = awardOf(editing.award_id); editing.award_name = a ? a.name : null; }
+      }
       if (v('mgFilm') !== undefined) editing.film_name = (v('mgFilm') || '').trim();
       if (v('mgPerson') !== undefined) editing.winner_name = (v('mgPerson') || '').trim();
       const rc = document.querySelector('input[name="mgRecip"]:checked'); if (rc) editing.recipient_type = rc.value;
@@ -414,7 +438,7 @@ window.MediaAdmin = (function () {
     }
     const isWinner = r.category === WINNERS;
     if (isWinner) {
-      const a = awardOf(r.award_id), k = a ? awardKind(a) : null;
+      const a = awardOf(r.award_id), k = kindOf(r);
       if (!r.competition_track) return notify('Choose the competition track (General or Campus).', 'err');
       if (!a) return notify('Choose the award category.', 'err');
       const film = (r.film_name || '').trim(), person = (r.winner_name || '').trim();
@@ -425,7 +449,7 @@ window.MediaAdmin = (function () {
       if (k.kind === 'special' && r.recipient_type === 'person' && !person) return notify('Enter the recipient name.', 'err');
       if (!r._customTitle || !r.title) r.title = winnerTitle(r);
       r.recipient_type = k.kind === 'person' ? 'person' : k.kind === 'film' ? 'film' : (r.recipient_type || 'film');
-      r.award_name = a.name;
+      r.award_name = awardLabel(r);
     }
     const row = {
       award_id: isWinner ? r.award_id : null, award_name: isWinner ? r.award_name : null,
