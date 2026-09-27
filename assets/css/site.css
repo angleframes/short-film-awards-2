@@ -4507,3 +4507,33 @@
             .jury-member-name { font-size: 0.86rem; letter-spacing: 0.4px; }
             .jury-member-role { font-size: 0.76rem; }
         }
+
+        /* ===== MAIN NAV — About · Awards · Jury · Showcase · [Submit →] ===== */
+        a.brand-logo-area { text-decoration: none; }
+        .navbar a.nav-cta { color: #000; background: #fff; font-weight: 700; }
+        .navbar a.nav-cta span { transition: transform 0.25s ease; display: inline-block; }
+        .navbar a.nav-cta:hover { background: #e8e8e8; color: #000; }
+        .navbar a.nav-cta:hover span { transform: translateX(3px); }
+        .navbar a.nav-cta.active::after { display: none; }
+        @media (min-width: 769px) {
+            /* five links fit comfortably — undo the earlier tight spacing for the old nine-item bar */
+            .navbar, .site-header-wrapper .navbar { gap: 4px; padding: 0 6px; height: 50px; }
+            .navbar a, .navbar a { padding: 0 18px; font-size: 0.72rem; letter-spacing: 1.6px; height: 38px; }
+            .navbar a.nav-cta { margin-left: 6px; padding: 0 20px; }
+            .navbar a.nav-cta.active { background: #fff; color: #000; box-shadow: none; }
+        }
+        @media (min-width: 769px) and (max-width: 1240px) {
+            .site-header-wrapper { padding-left: 32px; padding-right: 32px; }
+            .site-header-wrapper .navbar { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); margin-left: 0; }
+        }
+        @media (min-width: 769px) and (max-width: 940px) {
+            .site-header-wrapper { padding-left: 20px; padding-right: 20px; }
+            .site-header-wrapper .brand-logo-area img { max-height: 38px; }
+            .site-header-wrapper .navbar { position: static; transform: none; margin-left: auto; }
+            .navbar a { padding: 0 12px; letter-spacing: 1.2px; font-size: 0.68rem; height: 36px; }
+        }
+        @media (max-width: 768px) {
+            /* mobile menu: same five items, Submit highlighted */
+            .navbar a.nav-cta { width: auto; align-self: stretch; margin: 12px 18px 14px; border-radius: 999px; text-align: center; justify-content: center; border-bottom: none; }
+            .navbar a.nav-cta, .navbar a.nav-cta:hover, .navbar a.nav-cta.active { background: #fff; color: #000; }
+        }
