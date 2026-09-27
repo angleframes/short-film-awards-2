@@ -27,15 +27,15 @@
 
             <div class="footer-col">
                 <h4>Resources</h4>
-                ${link('How To Submit', `onclick="openInfoModal('submit')"`, '/#how-to-submit')}
-                ${link('Festival Guidelines', `onclick="openInfoModal('guidelines')"`, '/#guidelines')}
+                <a href="/resources">How To Submit</a>
+                <a href="/resources?section=guidelines">Festival Guidelines</a>
                 ${link('Rules &amp; Guidelines', 'onclick="toggleRulesModal(true)"', '/#rules')}
-                ${link('Festival Updates', `onclick="openInfoModal('updates')"`, '/#updates')}
-                ${link('Jury Panel', `onclick="openInfoModal('jury')"`, '/#jury-panel')}
-                ${link('FAQ', `href="/#faq" onclick="openInfoModal('faq');return false;"`, '/#faq')}
-                ${link('Privacy Policy', `href="privacy.html" onclick="openInfoModal('privacy');return false;"`, '/privacy.html')}
-                ${link('Terms &amp; Conditions', `href="terms.html" onclick="openInfoModal('terms');return false;"`, '/terms.html')}
-                ${link('Refunds &amp; Cancellations', `href="refund.html" onclick="openInfoModal('refunds');return false;"`, '/refund.html')}
+                <a href="/resources?section=updates">Festival Updates</a>
+                <a href="/resources?section=jury">Jury Panel</a>
+                <a href="/resources?section=faq">FAQ</a>
+                <a href="/resources?section=privacy">Privacy Policy</a>
+                <a href="/resources?section=terms">Terms &amp; Conditions</a>
+                <a href="/resources?section=refunds">Refunds &amp; Cancellations</a>
             </div>
 
             <div class="footer-col">
