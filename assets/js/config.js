@@ -13,7 +13,7 @@
         };
 
         const SITE_IMAGES = {
-            mainLogo: "logo nav.png",
+            mainLogo: "assets/img/logo-377.webp",
             paymentQrCode: "angle.jpg",
             socialInstagram: "—Pngtree—instagram icon vector_8704817.png",
             socialYoutube: "—Pngtree—youtube social media 3d stereo_8704808.png",
