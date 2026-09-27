@@ -225,6 +225,10 @@ Sharankrishna was himself a B.Sc Information Technology graduate of JAIN (Deemed
         ];
 
         // Replace with confirmed jury members once finalized. Leave src empty to show a placeholder avatar.
+        // Fields: name, role (profession / designation), bio (short credentials, optional), src (photo URL, optional).
+        // While every name is "To Be Announced", the homepage Jury section shows "announced soon";
+        // as soon as a real name is added, it shows jury cards instead — e.g.
+        //   { name: "Full Name", role: "Film Director", bio: "Two-time State Award winner…", src: "Gallery/jury/name.webp" }
         const JURY_PANEL = [
             { name: "To Be Announced", role: "Jury Chair", src: "" },
             { name: "To Be Announced", role: "Filmmaking", src: "" },
