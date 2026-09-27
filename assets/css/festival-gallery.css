@@ -212,3 +212,16 @@
   .fg-subrow { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * clamp(16px, 4vw, 40px)); padding: 0 clamp(16px, 4vw, 40px); }
   .fg-subrow::-webkit-scrollbar { display: none; }
 }
+
+/* ===== Batched loading ===== */
+.fg-more-wrap { display: flex; justify-content: center; margin: 34px 0 0; }
+.fg-more {
+  font: inherit; cursor: pointer; padding: 12px 26px; border-radius: 999px;
+  font-size: 0.7rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+  color: #fff; background: transparent; border: 1px solid rgba(255,255,255,0.25);
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+.fg-more:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.5); }
+.fg-more:disabled { opacity: 0.6; cursor: default; }
+.fg-more[hidden] { display: none; }
+.fg-sentinel { height: 1px; }
