@@ -1472,16 +1472,12 @@
             return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         }
 
-        function _vidThumbSrc(videoId) {
-            return `https://i.ytimg.com/vi/${videoId}/maxresdefault.jpg`;
-        }
-
-        function _vidThumbFallback(img) {
-            const id = img.dataset.ytid;
-            if (!id) return;
-            if (img.dataset.fallback === '1') { img.src = `https://i.ytimg.com/vi/${id}/mqdefault.jpg`; img.dataset.fallback='done'; return; }
-            if (img.dataset.fallback !== 'done') { img.src = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`; img.dataset.fallback='1'; }
-        }
+        // Thumbnails come from the shared SKYouTube helper (assets/js/youtube.js): custom thumbnail first,
+        // else maxres → sd → hq automatically, else a branded placeholder — never a broken image.
+        const _YT = window.SKYouTube;
+        function _vidThumbSrc(videoId) { return _YT ? _YT.thumb(videoId) : `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`; }
+        function _vidThumbFor(v) { return _YT ? _YT.thumbFor(v.thumbnail_url, v.youtube_video_id || v.youtube_url) : _vidThumbSrc(v.youtube_video_id); }
+        function _vidThumbFallback(img) { if (_YT) _YT.next(img); }   // kept for any old inline handlers
 
         function _playYouTube(videoId) {
             const backdrop = document.getElementById('ytModalBackdrop');
@@ -1545,7 +1541,7 @@
             const dur  = v.duration || '';
             return `<div class="vid-card${isFeatured ? ' featured' : ''}" data-ytid="${vid}" data-catid="${v.category_id || ''}" role="button" tabindex="0" aria-label="Play: ${_vidEsc(v.video_title)}">
                 <div class="vid-card-thumb">
-                    <img src="${_vidThumbSrc(vid)}" alt="${_vidEsc(v.video_title)}" loading="${isFeatured ? 'eager' : 'lazy'}" decoding="async" data-ytid="${vid}" onerror="_vidThumbFallback(this)">
+                    <img src="${_vidEsc(_vidThumbFor(v))}" alt="${_vidEsc(v.video_title)}" loading="${isFeatured ? 'eager' : 'lazy'}" decoding="async" data-ytid="${vid}" data-yt-fallback>
                     <div class="vid-card-overlay">
                         <div class="vid-play-icon">${_PLAY_SVG}</div>
                     </div>
@@ -1781,7 +1777,7 @@
             const id = _vidEsc(v.youtube_video_id);
             return `<article class="pe-card${opts.wide ? ' is-wide' : ''}">
                 <button type="button" class="pe-media is-video" data-action="${opts.action || 'play'}" data-filter="${opts.filter || ''}" data-ytid="${id}" data-group="${opts.group || ''}" aria-label="${_vidEsc(opts.cta)}: ${_vidEsc(opts.title)}">
-                    <img src="${opts.altFrame ? `https://i.ytimg.com/vi/${id}/hq2.jpg` : _vidThumbSrc(id)}" alt="${_vidEsc(v.video_title || opts.title)}" loading="lazy" decoding="async" data-ytid="${id}" onerror="_vidThumbFallback(this)">
+                    <img src="${_vidEsc(_vidThumbFor(v))}" alt="${_vidEsc(v.video_title || opts.title)}" loading="lazy" decoding="async" data-ytid="${id}" data-yt-fallback>
                     <span class="pe-grain" aria-hidden="true"></span>
                     <span class="pe-play" aria-hidden="true">${_PLAY_SVG}</span>
                 </button>
@@ -1882,12 +1878,12 @@
                 const cards = [];
                 if (inside.length) {
                     const iv2 = _takeUnique(inside, vidKey);
-                    cards.push(_showcaseVideoCard(iv2 || inside[0], { kicker: inside.length > 1 ? inside.length + ' videos' : 'Video', title: MEDIA_GROUPS.inside, cta: 'Play', altFrame: !iv2,
+                    cards.push(_showcaseVideoCard(iv2 || inside[0], { kicker: inside.length > 1 ? inside.length + ' videos' : 'Video', title: MEDIA_GROUPS.inside, cta: 'Play',
                         desc: 'The story of the festival — overview and presentation films.' }));
                 }
                 if (support.length) {
                     const sv2 = _takeUnique(support, vidKey);
-                    cards.push(_showcaseVideoCard(sv2 || support[0], { kicker: support.length > 1 ? support.length + ' videos' : 'Video', title: MEDIA_GROUPS.support, cta: 'View All', action: 'videos', group: 'support', altFrame: !sv2,
+                    cards.push(_showcaseVideoCard(sv2 || support[0], { kicker: support.length > 1 ? support.length + ' videos' : 'Video', title: MEDIA_GROUPS.support, cta: 'View All', action: 'videos', group: 'support',
                         desc: 'Wishes and messages from guests, filmmakers and well-wishers.' }));
                 }
                 const p2 = _takeUnique(moments, photoKey) || _takeUnique(winners, photoKey);
