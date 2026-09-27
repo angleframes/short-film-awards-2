@@ -119,7 +119,9 @@ The emblem blends three layers into one continuous story. Anti-clockwise spiral 
                 cta: "Read His Story",
                 linkLabel: "Read the WordCamp Kerala tribute",
                 linkUrl: "https://kerala.wordcamp.org/2024/goodbye-sharan/",
-                body: `## Who He Was
+                body: `@video https://youtu.be/Bh0dk1Sw5fw | In Memory of Sharankrishna — His Story Lives On
+
+## Who He Was
 Sharankrishna V.P. — Sharan, to those who knew him — was a filmmaker, visual artist and designer from Thenhipalam in Malappuram. He studied at Thenhipalam AUP School and Chelari GVHSS, and graduated with a B.Sc in Information Technology from JAIN (Deemed-to-be University). He worked as a UI/UX designer at Midnay, and was the co-founder and CEO of Angle Frames.
 
 ## A Life in Stories
