@@ -1008,7 +1008,7 @@
             }
 
             if (open) {
-                if (browserTitleEl) browserTitleEl.textContent = "Sharankrishna Short Film Awards 2026";
+                if (browserTitleEl) browserTitleEl.textContent = "Sharankrishna Short Film Awards";
                 if (navRegLink) navRegLink.innerHTML = 'Submit <span aria-hidden="true">&rarr;</span>';
                 if (heroSubmitBtn) {
                     heroSubmitBtn.textContent = "Submit Your Film →";
@@ -1023,7 +1023,7 @@
                     formContainer.innerHTML = _originalRegCardHTML;
                 }
             } else {
-                if (browserTitleEl) browserTitleEl.textContent = "Entries Closed | Sharankrishna Short Film Awards";
+                if (browserTitleEl) browserTitleEl.textContent = "Sharankrishna Short Film Awards";   // brand title stays stable for search results
                 if (navRegLink) navRegLink.textContent = "Entries Closed";
                 if (heroSubmitBtn) {
                     heroSubmitBtn.textContent = "Registrations Closed";
@@ -1894,12 +1894,12 @@
 
         /* ---------- Previous Edition media: winners collage + moments slideshow ---------- */
         function _peCollageHtml(list) {
-            const tiles = list.slice(0, 4).map((p, i) => `<span class="pe-tile${i === 0 ? ' is-main' : ''}"><img src="${_vidEsc(i === 0 ? (p.display || p.src) : (p.thumb || p.src))}" alt="${_vidEsc(p.title || '')}" loading="lazy" decoding="async"></span>`).join('');
+            const tiles = list.slice(0, 4).map((p, i) => `<span class="pe-tile${i === 0 ? ' is-main' : ''}"><img src="${_vidEsc(i === 0 ? (p.display || p.src) : (p.thumb || p.src))}" alt="${_vidEsc(p.title || 'Sharankrishna award winners')}" loading="lazy" decoding="async"></span>`).join('');
             return `<span class="pe-collage n${Math.min(list.length, 4)}">${tiles}</span>`;
         }
         function _peSlidesHtml(list) {
             // first slide loads normally; the rest carry data-src and load just before they are shown
-            const imgs = list.map((p, i) => `<img class="pe-slide${i === 0 ? ' is-active' : ''}" ${i === 0 ? 'src' : 'data-src'}="${_vidEsc(p.display || p.src)}" alt="${_vidEsc(p.title || '')}" loading="lazy" decoding="async">`).join('');
+            const imgs = list.map((p, i) => `<img class="pe-slide${i === 0 ? ' is-active' : ''}" ${i === 0 ? 'src' : 'data-src'}="${_vidEsc(p.display || p.src)}" alt="${_vidEsc(p.title || 'Sharankrishna Short Film Awards ceremony')}" loading="lazy" decoding="async">`).join('');
             const dots = list.map((_, i) => `<i class="${i === 0 ? 'is-active' : ''}"></i>`).join('');
             return `<span class="pe-slides" data-count="${list.length}">${imgs}<span class="pe-dots" aria-hidden="true">${dots}</span></span>`;
         }
@@ -1939,7 +1939,7 @@
            Only the visible set and the next one have their images loaded; later sets keep data-src. */
         function _fmCollageHtml(list) {
             const esc = _vidEsc;
-            const img = (p, load) => `<img ${load ? 'src' : 'data-src'}="${esc(p.thumb || p.display || p.src)}" alt="${esc(p.title || '')}" loading="lazy" decoding="async">`;
+            const img = (p, load) => `<img ${load ? 'src' : 'data-src'}="${esc(p.thumb || p.display || p.src)}" alt="${esc(p.title || 'Sharankrishna Short Film Awards ceremony')}" loading="lazy" decoding="async">`;
             if (list.length === 2) return `<span class="fm-collage"><span class="fm-set is-active n2">${list.map(p => `<span class="fm-tile">${img(p, true)}</span>`).join('')}</span></span>`;
             const sets = [];
             for (let i = 0; i < list.length; i += 3) {
