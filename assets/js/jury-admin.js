@@ -55,7 +55,7 @@ window.JuryAdmin = (function () {
         <div class="mg-fields">
           <div class="mg-field is-full"><label for="jmName">Full name</label><input type="text" id="jmName" value="${esc(r.name)}" maxlength="120"></div>
           <div class="mg-field is-full"><label for="jmRole">Profession / designation</label><input type="text" id="jmRole" value="${esc(r.designation)}" maxlength="140" placeholder="e.g. Film Director"></div>
-          <div class="mg-field is-full"><label for="jmBio">Short bio / credentials</label><textarea id="jmBio" rows="3" maxlength="500">${esc(r.bio)}</textarea></div>
+          <div class="mg-field is-full"><label for="jmBio">Short bio / credentials</label><textarea id="jmBio" rows="5" maxlength="1500">${esc(r.bio)}</textarea><small class="jm-count" id="jmBioCount">${(r.bio || '').length} / 1500</small></div>
           <div class="mg-field"><label for="jmType">Jury</label><select id="jmType"><option value="current" ${cur ? 'selected' : ''}>Current jury</option><option value="previous" ${!cur ? 'selected' : ''}>Previous jury</option></select></div>
           <div class="mg-field"><label for="jmYear">Edition / year</label><input type="number" id="jmYear" min="2000" max="2100" value="${esc(r.edition_year || '')}" placeholder="e.g. 2026"></div>
           <div class="mg-field"><label for="jmOrder">Display order</label><input type="number" id="jmOrder" value="${esc(r.display_order || 0)}"></div>
@@ -140,6 +140,7 @@ window.JuryAdmin = (function () {
     on('jmSave', 'click', save);
     on('jmFile', 'change', e => upload(e.target));
     on('jmType', 'change', () => { readEditor(); render(); });
+    on('jmBio', 'input', e => { const c = document.getElementById('jmBioCount'); if (c) c.textContent = e.target.value.length + ' / 1500'; });
     on('jmRemovePhoto', 'click', () => { readEditor(); orphans.push(editing.photo_url); editing.photo_url = ''; render(); });
     root.querySelectorAll('.mg-row').forEach(row => row.addEventListener('click', e => {
       const b = e.target.closest('[data-act]'); if (!b) return;
