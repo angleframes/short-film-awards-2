@@ -3,7 +3,9 @@
    The native <select> stays in the DOM (hidden) and remains the source of truth:
    picking an option sets select.value and dispatches a bubbling "change" event,
    so existing code that reads select.value keeps working.
-   Keyboard: Enter / Space / ↓ open · ↑ ↓ move · Home / End · Enter select · Esc close · type to search. */
+   Keyboard: Enter / Space / ↓ open · ↑ ↓ move · Home / End · Enter select · Esc close · type to search.
+   Every plain <select> added inside the admin panel is upgraded automatically (MutationObserver);
+   add data-native to a <select> to opt out. Code that sets select.value directly keeps the label in sync. */
 window.AdminDropdown = (function () {
   'use strict';
 
@@ -121,8 +123,15 @@ window.AdminDropdown = (function () {
       else if (e.key === 'Tab') close(false);
     });
     if (search) search.addEventListener('input', renderList);
-    // external value changes (e.g. code sets select.value then dispatches change)
+    // keep the label in sync with external changes:
+    //  • code dispatching "change"   • code assigning select.value / selectedIndex   • options rebuilt via innerHTML
     select.addEventListener('change', syncLabel);
+    ['value', 'selectedIndex'].forEach(prop => {
+      const d = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, prop);
+      if (!d || !d.set) return;
+      Object.defineProperty(select, prop, { configurable: true, get() { return d.get.call(this); }, set(v) { d.set.call(this, v); syncLabel(); } });
+    });
+    new MutationObserver(syncLabel).observe(select, { childList: true, subtree: true, attributes: true, attributeFilter: ['disabled', 'selected'] });
 
     const api = { root, close, refresh: syncLabel };
     select._adEnhanced = api;
@@ -133,6 +142,20 @@ window.AdminDropdown = (function () {
   function enhanceAll(scope, opts) {
     (scope || document).querySelectorAll('select:not(.ad-native)').forEach(s => enhance(s, opts));
   }
+
+  // Auto-upgrade: any plain <select> that appears in the admin panel gets the styled dropdown
+  function autoEnhance() {
+    const scope = document.body;
+    if (!scope || !scope.classList.contains('sksfa-admin')) return;
+    const run = node => {
+      if (node.nodeType !== 1) return;
+      const list = node.tagName === 'SELECT' ? [node] : node.querySelectorAll ? node.querySelectorAll('select') : [];
+      list.forEach(s => { if (!s.multiple && !s.hasAttribute('data-native') && !s._adEnhanced) enhance(s); });
+    };
+    run(scope);
+    new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(run))).observe(scope, { childList: true, subtree: true });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', autoEnhance); else autoEnhance();
 
   return { enhance, enhanceAll };
 })();
