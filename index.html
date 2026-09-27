@@ -92,7 +92,7 @@
     </script>
 
     <link rel="stylesheet" href="assets/css/ui-components.css">
-    <link rel="stylesheet" href="assets/css/site.css?v=30">
+    <link rel="stylesheet" href="assets/css/site.css?v=31">
 </head>
 <body>
 
@@ -113,35 +113,18 @@
 
     <!-- FIXED HEADER -->
     <div class="site-header-wrapper">
-        <div class="brand-logo-area">
-            <img id="mainLogo" src="" alt="Angle Frames Logo">
-        </div>
+        <a class="brand-logo-area" href="#section-home" aria-label="Sharankrishna Short Film Awards — Home">
+            <img id="mainLogo" src="" alt="Sharankrishna Short Film Awards">
+        </a>
         
         <button type="button" class="menu-toggle-btn" onclick="toggleMobileMenu()" aria-label="Toggle Navigation menu">☰</button>
         
-        <nav class="navbar" id="mainNavbar">
-            <a id="navHome" class="active" href="#section-home">Home</a>
+        <nav class="navbar" id="mainNavbar" aria-label="Main">
             <a id="navStory" href="#section-story">About</a>
-            <a id="navCategories" href="#section-categories">Categories</a>
+            <a id="navCategories" href="#section-categories">Awards</a>
             <a id="navJury" href="#section-jury">Jury</a>
-            <a id="navGallery" href="#section-gallery">Gallery</a>
-            <a id="navVideos" href="#section-videos" style="display:none;">Videos</a>
-            <a id="navRegistration" href="#section-registration">Registration</a>
-            <a id="navContact" href="#section-contact">Contact Us</a>
-            <div class="nav-more-wrapper" id="navMoreWrapper">
-                <a href="javascript:void(0)" id="navMoreTrigger" aria-haspopup="true" onclick="toggleMoreDropdown(event)">More<span class="nav-caret" aria-hidden="true">&#9662;</span></a>
-                <div class="nav-more-dropdown" id="navMoreDropdown">
-                    <a id="navMoreVideos" onclick="location.href='#section-videos';closeMobileMenu&&closeMobileMenu();" style="display:none;">Videos</a>
-                    <a onclick="selectMoreItem('submit')">How To Submit</a>
-                    <a onclick="selectMoreItem('guidelines')">Festival Guidelines</a>
-                    <a onclick="selectMoreItem('updates')">Festival Updates</a>
-                    <a onclick="selectMoreItem('jury')">Jury Panel</a>
-                    <a href="/#faq" onclick="selectMoreItem('faq');return false;">FAQ</a>
-                    <a href="privacy.html" onclick="selectMoreItem('privacy');return false;">Privacy Policy</a>
-                    <a href="terms.html" onclick="selectMoreItem('terms');return false;">Terms &amp; Conditions</a>
-                    <a href="refund.html" onclick="selectMoreItem('refunds');return false;">Refunds &amp; Cancellations</a>
-                </div>
-            </div>
+            <a id="navShowcase" href="/festival-gallery">Showcase</a>
+            <a id="navRegistration" class="nav-cta" href="#section-registration">Submit <span aria-hidden="true">&rarr;</span></a>
         </nav>
     </div>
 
@@ -1139,6 +1122,7 @@
                 <a href="#section-story">About</a>
                 <a href="#section-categories">Categories</a>
                 <a href="#section-gallery">Gallery</a>
+                <a href="/festival-gallery">Showcase</a>
                 <a href="#section-contact">Contact</a>
             </div>
 
@@ -1146,6 +1130,7 @@
                 <h4>Resources</h4>
                 <a onclick="openInfoModal('submit')">How To Submit</a>
                 <a onclick="openInfoModal('guidelines')">Festival Guidelines</a>
+                <a onclick="toggleRulesModal(true)">Rules &amp; Guidelines</a>
                 <a onclick="openInfoModal('updates')">Festival Updates</a>
                 <a onclick="openInfoModal('jury')">Jury Panel</a>
                 <a href="/#faq" onclick="openInfoModal('faq');return false;">FAQ</a>
@@ -1215,6 +1200,6 @@
     </noscript>
     <script src="assets/js/ui-components.js"></script>
     <script src="assets/js/campus-proof.js?v=1"></script>
-    <script src="assets/js/site.js?v=26"></script>
+    <script src="assets/js/site.js?v=27"></script>
 </body>
 </html>
