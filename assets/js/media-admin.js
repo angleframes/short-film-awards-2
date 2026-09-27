@@ -266,7 +266,7 @@ window.MediaAdmin = (function () {
   }
 
   /* ---------- image pipeline: validate → decode once → 3 WebP sizes → storage ---------- */
-  const SIZES = { full: [2200, 0.9], md: [1280, 0.88], th: [800, 0.85] };    // longest side (px), WebP quality — high enough to keep skin tones, stage light and certificate text clean
+  const SIZES = { full: [2200, 0.9], md: [1280, 0.88], th: [960, 0.86] };    // longest side (px), WebP quality — high enough to keep skin tones, stage light and certificate text clean
   const MAX_INPUT = 30 * 1024 * 1024;
   const OK_TYPES = { 'image/jpeg': 'jpeg', 'image/png': 'png', 'image/webp': 'webp' };
 
