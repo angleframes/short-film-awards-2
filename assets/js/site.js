@@ -225,7 +225,7 @@
                     CATEGORY_ITEMS = acRes.data.map(c => ({
                         title: c.name.replace(/^(Best)\s+/i, '$1<br>').replace(/^(Special)\s+/i, '$1<br>').replace(/^(Campus)\s+/i, '$1<br>'),
                         emoji: '',
-                        image: 'assets/icons/' + c.key + '.png?v=7',
+                        image: 'assets/icons/' + c.key + '-320.webp',
                         icon_svg: c.icon_svg || '',
                         key: c.key
                     }));
@@ -319,7 +319,7 @@
                                         CATEGORY_ITEMS = acr.data.map(function(c) {
                                             return {
                                                 title: c.name.replace(/^(Best)\s+/i, '$1<br>').replace(/^(Special)\s+/i, '$1<br>').replace(/^(Campus)\s+/i, '$1<br>'),
-                                                emoji: '', image: 'assets/icons/' + c.key + '.png?v=7', icon_svg: c.icon_svg || '', key: c.key
+                                                emoji: '', image: 'assets/icons/' + c.key + '-320.webp', icon_svg: c.icon_svg || '', key: c.key
                                             };
                                         });
                                         window._awardCategoriesData = acr.data;
@@ -885,6 +885,16 @@
             categoryCarouselRestartTimer();
         }
 
+        // Award icons: small WebP (160 / 320 px) instead of the 1254 px PNG originals; falls back to the PNG
+        // for any award added later without a WebP icon. width/height match the CSS box so nothing shifts;
+        // one sizes value everywhere so the carousel and the "view all" grid reuse the same cached file.
+        function _catIconAttrs(src, box) {
+            const m = /^assets\/icons\/(.+)-320\.webp$/.exec(src || '');
+            if (!m) return `src="${src}" width="${box}" height="${box}"`;
+            return `src="${src}" srcset="assets/icons/${m[1]}-160.webp 160w, ${src} 320w" sizes="100px" width="${box}" height="${box}"` +
+                ` onerror="this.onerror=null;this.removeAttribute('srcset');this.src='assets/icons/${m[1]}.png?v=7'"`;
+        }
+
         function toggleAllCategoriesInline() {
             const grid = document.getElementById('allCategoriesGrid');
             const btn = document.getElementById('viewAllCategoriesBtn');
@@ -892,7 +902,7 @@
             if (!grid.dataset.built) {
                 grid.innerHTML = CATEGORY_ITEMS.map((item, idx) => `
                     <div class="category-grid-item">
-                        ${item.image ? `<div class="grid-item-img"><img src="${item.image}" alt="${item.title.replace('<br>',' ')}" loading="lazy"></div>` : item.icon_svg ? `<div class="grid-item-svg-icon">${item.icon_svg}</div>` : `<div class="grid-item-emoji">${item.emoji || ''}</div>`}
+                        ${item.image ? `<div class="grid-item-img"><img ${_catIconAttrs(item.image, 64)} alt="${item.title.replace('<br>',' ')}" loading="lazy" decoding="async"></div>` : item.icon_svg ? `<div class="grid-item-svg-icon">${item.icon_svg}</div>` : `<div class="grid-item-emoji">${item.emoji || ''}</div>`}
                         <h4 class="grid-item-title">${item.title.replace('<br>', ' ')}</h4>
                     </div>
                 `).join('');
@@ -926,7 +936,7 @@
 
                 let iconMarkup = '';
                 if (item.image && item.image.trim() !== '') {
-                    iconMarkup = `<div class="stack-card-media"><img src="${item.image}" alt="${item.title.replace('<br>', ' ')}" loading="lazy"></div>`;
+                    iconMarkup = `<div class="stack-card-media"><img ${_catIconAttrs(item.image, 100)} alt="${item.title.replace('<br>', ' ')}" loading="lazy" decoding="async"></div>`;
                 } else if (item.icon_svg && item.icon_svg.trim() !== '') {
                     iconMarkup = `<div class="stack-card-svg-icon">${item.icon_svg}</div>`;
                 } else if (item.emoji) {
