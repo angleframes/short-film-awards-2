@@ -2448,6 +2448,73 @@
         window.addEventListener('load', openModalFromHash);
         window.addEventListener('hashchange', openModalFromHash);
 
+        /* Section links (#section-jury, /#section-jury from other pages …) — land on the real section.
+           Sections above the target (About, Previous Edition, Awards, images) finish rendering after the browser has
+           already worked out where to scroll, which used to leave visitors ~3000px short (e.g. on "Celebrating the
+           Winners" instead of Jury). After arriving, the target is held in place while that late content settles;
+           any scroll, touch or key press from the visitor releases it immediately. */
+        (function initSectionAnchors() {
+            const isSection = id => /^section-[\w-]+$|^submitCta$/.test(id);
+            const HOLD_MS = 3500;
+            let hold = null;
+            const offsetOf = el => parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+            const yOf = el => Math.max(0, Math.round(el.getBoundingClientRect().top + window.scrollY - offsetOf(el)));
+            const INPUT = ['wheel', 'touchmove', 'keydown', 'mousedown'];
+            // immediate jump even though <html> has scroll-behavior: smooth (behavior:'instant' is missing in older Safari)
+            const jump = y => { const r = document.documentElement, prev = r.style.scrollBehavior; r.style.scrollBehavior = 'auto'; window.scrollTo(0, y); r.style.scrollBehavior = prev; };
+            function release() {
+                if (!hold) return;
+                hold.ro.disconnect(); clearTimeout(hold.timer); cancelAnimationFrame(hold.raf);
+                document.removeEventListener('load', hold.onLoad, true);
+                INPUT.forEach(t => window.removeEventListener(t, release, true));
+                hold = null;
+            }
+            function correct() {
+                if (!hold || !hold.arrived) return;
+                const d = hold.el.getBoundingClientRect().top - offsetOf(hold.el);
+                if (Math.abs(d) > 2) jump(yOf(hold.el));
+            }
+            function go(el, smooth) {
+                release();
+                hold = { el, arrived: !smooth, ro: new ResizeObserver(correct), onLoad: () => correct() };
+                if (smooth) window.scrollTo({ top: yOf(el), behavior: 'smooth' }); else jump(yOf(el));
+                const arrive = () => { if (!hold) return; hold.arrived = true; correct(); hold.timer = setTimeout(release, HOLD_MS); };
+                if (smooth) {
+                    // arrived once the smooth scroll has stopped moving for a few frames
+                    let last = -1, still = 0;
+                    const tick = () => { if (!hold) return; still = window.scrollY === last ? still + 1 : 0; last = window.scrollY; if (still >= 6) arrive(); else hold.raf = requestAnimationFrame(tick); };
+                    hold.raf = requestAnimationFrame(tick);
+                    setTimeout(() => { if (hold && !hold.arrived) arrive(); }, 1600);   // fallback (e.g. background tab)
+                } else arrive();
+                hold.ro.observe(document.body);
+                document.addEventListener('load', hold.onLoad, true);                    // late images
+                setTimeout(() => INPUT.forEach(t => window.addEventListener(t, release, { capture: true, passive: true })), 0);
+            }
+            // in-page links: <a href="#section-…">
+            document.addEventListener('click', e => {
+                const a = e.target.closest('a[href^="#"]');
+                if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                const id = a.getAttribute('href').slice(1), el = isSection(id) && document.getElementById(id);
+                if (!el) return;
+                e.preventDefault();
+                if (location.hash !== '#' + id) history.pushState(null, '', '#' + id);
+                go(el, !matchMedia('(prefers-reduced-motion: reduce)').matches);
+            });
+            // arriving from another page (/#section-jury): scroll once the page content is revealed
+            const initial = location.hash.slice(1);
+            if (isSection(initial) && document.getElementById(initial)) {
+                if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+                const run = () => { const el = document.getElementById(initial); if (el) go(el, false); };
+                if (document.body.classList.contains('cfg-ready')) run();
+                else {
+                    const mo = new MutationObserver(() => { if (document.body.classList.contains('cfg-ready')) { mo.disconnect(); run(); } });
+                    mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+                }
+            }
+            // back / forward between section hashes
+            window.addEventListener('popstate', () => { const id = location.hash.slice(1), el = isSection(id) && document.getElementById(id); if (el) go(el, false); });
+        })();
+
         if (window.CampusProof) {
             CampusProof.init({
                 selectId: 'category',
