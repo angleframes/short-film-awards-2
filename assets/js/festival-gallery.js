@@ -5,14 +5,14 @@
    Editions come from the edition_year the admin assigns (never the upload date); the list is built from the
    years present in the data plus the current edition, newest first, and filtered server-side.
 
-   Scales to large libraries: records are fetched from the database in pages of PAGE items, filtered
-   server-side (type / category / track / award), and more load automatically near the bottom.
+   Scales to large libraries: records are fetched from the database in batches of PAGE items (12 desktop / 8 phone),
+   filtered server-side (edition / type / category / track / award); "Load more" fetches the next batch only.
    Cards use the small thumbnail (srcset → medium on dense screens); the full image loads only in the
    lightbox, which also preloads just the previous and next photo. Videos show a poster until opened. */
 (function () {
   'use strict';
 
-  const PAGE = 18;                       // records per batch
+  const PAGE = window.matchMedia && matchMedia('(max-width: 700px)').matches ? 8 : 12;   // records per batch (first + each Load more)
   const EAGER = 4;                       // first visible cards load eagerly (LCP)
   const COLS = 'id,title,media_type,category,image_url,medium_url,thumbnail_url,video_url,description,edition_year,is_featured,' +
                'award_id,award_name,competition_track,winner_name,film_name,recipient_type,width,height';
@@ -32,7 +32,7 @@
   let juryAll = [];        // visible jury members (small list)
   let previousJury = [];
   let awardMap = new Map();// award_categories id → { key, name }
-  let winnerFacets = { tracks: [], groups: [] };
+  let winnerFacets = { tracks: [], awards: [] };
   let active = 'all';
   let edition = 'all';     // 'all' or a year string, e.g. '2025'
   let editions = [];       // years available, newest first
@@ -40,7 +40,7 @@
   // current edition = the year of this edition's submission deadline (config.js), else the newest year in the data
   const CURRENT = (() => { try { const y = new Date(PORTAL_TIMELINES.submissionDeadline).getFullYear(); return y > 2000 ? y : 0; } catch (e) { return 0; } })();
   const byEdition = y => edition === 'all' || String(y) === edition;
-  let subTrack = 'all', subGroup = 'all';
+  let subTrack = 'all', subGroup = 'all';   // subGroup: 'all' | award key (best_director…) | 'special' | legacy group (director, technical…)
   const TRACKS = { general: 'General', campus: 'Campus' };
   const GROUPS = [['film', 'Best Film'], ['director', 'Director'], ['actor', 'Actor'], ['actress', 'Actress'], ['technical', 'Technical'], ['special', 'Special Jury'], ['other', 'Other Awards']];
 
@@ -58,7 +58,6 @@
     return true;
   }
   let lbIndex = -1;
-  let io = null;
 
   function awardGroup(key, name) {
     const k = String(key || name || '').toLowerCase();
@@ -121,7 +120,7 @@
       sb.from('media_categories').select('key,label,sort_order,show_in_filter').order('sort_order'),
       sb.from('jury_members').select('id,name,designation,bio,photo_url,edition_year,jury_type,display_order,show_in_gallery')
         .order('edition_year', { ascending: false, nullsFirst: false }).order('display_order'),
-      sb.from('award_categories').select('id,key,name'),
+      sb.from('award_categories').select('id,key,name,sort_order'),
       sb.from('gallery_media').select('category,competition_track,award_id,edition_year').limit(5000),
     ]);
     if (catRes.error) throw catRes.error;
@@ -136,13 +135,23 @@
     if (CURRENT) years.add(CURRENT);
     editions = [...years].sort((a, b) => b - a).map(String);
   }
-  // track / award chips reflect only the winners of the selected edition
+  // track pills + award dropdown list only what exists for the selected edition (and track)
   function computeFacets() {
     const fac = facetRows.filter(r => byEdition(r.edition_year));
     winnerFacets.tracks = [...new Set(fac.map(r => r.competition_track).filter(Boolean))];
-    const gs = new Set(fac.map(r => { const a = awardMap.get(String(r.award_id)); return a ? awardGroup(a.key, a.name) : 'other'; }));
-    winnerFacets.groups = GROUPS.filter(([g]) => gs.has(g));
+    const inTrack = fac.filter(r => subTrack === 'all' || r.competition_track === subTrack);
+    const list = [], seenKey = new Set();
+    let special = false, other = false;
+    inTrack.map(r => awardMap.get(String(r.award_id))).sort((a, b) => ((a && a.sort_order) ?? 999) - ((b && b.sort_order) ?? 999)).forEach(a => {
+      if (!a) { other = true; return; }
+      if (awardGroup(a.key, a.name) === 'special') { special = true; return; }   // every Special Jury label → one option
+      if (!seenKey.has(a.key)) { seenKey.add(a.key); list.push([a.key, a.name]); }
+    });
+    if (special) list.push(['special', 'Special Jury']);
+    if (other) list.push(['other', 'Other Awards']);
+    winnerFacets.awards = list;
   }
+  const awardByKey = k => [...awardMap.values()].find(a => a.key === k);
 
   // Server-side filtered, paginated query for the current filter
   function pageQuery(from) {
@@ -154,7 +163,9 @@
     if (edition !== 'all') q = q.eq('edition_year', +edition);
     if (active === 'award-winners') {
       if (subTrack !== 'all') q = q.eq('competition_track', subTrack);
-      if (subGroup !== 'all') {
+      const one = subGroup !== 'special' && subGroup !== 'other' && awardByKey(subGroup);
+      if (one) q = q.eq('award_id', one.id);
+      else if (subGroup !== 'all') {
         const ids = [...awardMap.values()].filter(a => awardGroup(a.key, a.name) === subGroup).map(a => a.id);
         if (subGroup === 'other') q = q.or(ids.length ? `award_id.is.null,award_id.in.(${ids.join(',')})` : 'award_id.is.null');
         else if (ids.length) q = q.in('award_id', ids);
@@ -230,18 +241,29 @@
     if (!el) { el = document.createElement('div'); el.id = 'fgSubFilters'; el.className = 'fg-subfilters'; $('fgFilters').after(el); }
     if (active !== 'award-winners') { el.hidden = true; el.innerHTML = ''; return; }
     computeFacets();
-    const row = (name, cur, opts) => `<div class="fg-subrow" role="group" aria-label="${name}">${opts.map(([k, l]) =>
-      `<button type="button" class="fg-subchip${k === cur ? ' is-active' : ''}" aria-pressed="${k === cur}" data-sub="${name}" data-k="${k}">${esc(l)}</button>`).join('')}</div>`;
     let html = '';
-    if (winnerFacets.tracks.length > 1) html += row('track', subTrack, [['all', 'All tracks'], ...winnerFacets.tracks.map(t => [t, TRACKS[t] || t])]);
-    if (winnerFacets.groups.length > 1) html += row('award', subGroup, [['all', 'All awards'], ...winnerFacets.groups]);
+    if (winnerFacets.tracks.length > 1) {
+      const opts = [['all', 'All'], ...winnerFacets.tracks.map(t => [t, TRACKS[t] || t])];
+      html += `<div class="fg-sf-group"><span class="fg-sf-label" id="fgTrackLbl">Track</span><div class="fg-sf-pills" role="group" aria-labelledby="fgTrackLbl">${opts.map(([k, l]) =>
+        `<button type="button" class="fg-subchip${k === subTrack ? ' is-active' : ''}" aria-pressed="${k === subTrack}" data-sub="track" data-k="${esc(k)}">${esc(l)}</button>`).join('')}</div></div>`;
+    }
+    const aw = [['all', 'All awards'], ...winnerFacets.awards];
+    const cur = aw.find(([k]) => k === subGroup) || (subGroup !== 'all' ? [subGroup, (awardByKey(subGroup) || {}).name || (GROUPS.find(g => g[0] === subGroup) || [0, 'Selected award'])[1]] : aw[0]);
+    if (winnerFacets.awards.length > 1 || subGroup !== 'all') {
+      html += `<div class="fg-sf-group"><span class="fg-sf-label" id="fgAwardLbl">Award</span>
+        <div class="fg-dd" id="fgAwardDd">
+          <button type="button" class="fg-dd-btn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="fgAwardLbl fgAwardVal"><span id="fgAwardVal">${esc(cur[1])}</span><svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>
+          <ul class="fg-dd-list" role="listbox" aria-labelledby="fgAwardLbl" tabindex="-1" hidden>${aw.map(([k, l]) =>
+            `<li role="option" class="fg-dd-opt${k === cur[0] ? ' is-selected' : ''}" aria-selected="${k === cur[0]}" data-k="${esc(k)}">${esc(l)}</li>`).join('')}</ul>
+        </div></div>`;
+    }
     el.innerHTML = html; el.hidden = !html;
   }
 
-  function metaOf(it, noYear) {
-    const year = noYear ? '' : (it.year ? it.year + ' Edition' : '');
-    if (it.winner) return [it.winner.award, TRACKS[it.winner.track], year].filter(Boolean).join(' · ');
-    return [catLabel(it.category), year].filter(Boolean).join(' · ');
+  // one metadata line with a single year reference, e.g. "Best Director · General · 2025"
+  function metaOf(it) {
+    if (it.winner) return [it.winner.award, TRACKS[it.winner.track], it.year].filter(Boolean).join(' · ');
+    return [catLabel(it.category), it.year].filter(Boolean).join(' · ');
   }
 
   function imgTag(it, idx, alt) {
@@ -254,12 +276,11 @@
 
   function card(it, idx) {
     const cls = ['fg-card', it.type === 'video' ? 'is-video' : '', it.portrait ? 'is-portrait' : '', it.featured && active === 'all' ? 'is-featured' : '', it.winner ? 'is-winner' : ''].join(' ').replace(/\s+/g, ' ').trim();
-    const meta = metaOf(it, true);
+    const meta = metaOf(it);
     const title = it.winner ? it.winner.primary : it.title;
-    const ed = it.year ? `<span class="fg-card-edition">${esc(it.year)} Edition</span>` : '';
-    return `<button type="button" class="${cls}" data-i="${idx}" aria-label="${it.type === 'video' ? 'Play' : 'Open'}: ${esc((it.winner ? meta + ' — ' + title : (title || meta)) + (it.year ? ' (' + it.year + ' Edition)' : ''))}">
+    return `<button type="button" class="${cls}" data-i="${idx}" aria-label="${it.type === 'video' ? 'Play' : 'Open'}: ${esc(it.winner ? meta + ' — ' + title : (title || meta))}">
         <span class="fg-thumb">${imgTag(it, idx, title)}${it.type === 'video' ? `<span class="fg-play">${PLAY}</span>` : ''}</span>
-        <span class="fg-card-text">${meta ? `<span class="fg-card-meta">${esc(meta)}</span>` : ''}${ed}${title ? `<span class="fg-card-title">${esc(title)}</span>` : ''}${it.winner && it.winner.secondary ? `<span class="fg-card-sub">${esc(it.winner.secondary)}</span>` : ''}</span>
+        <span class="fg-card-text">${meta ? `<span class="fg-card-meta">${esc(meta)}</span>` : ''}${title ? `<span class="fg-card-title">${esc(title)}</span>` : ''}${it.winner && it.winner.secondary ? `<span class="fg-card-sub">${esc(it.winner.secondary)}</span>` : ''}</span>
       </button>`;
   }
 
@@ -296,10 +317,20 @@
       `<section class="fg-group"><h2 class="fg-group-title">${esc(t)}</h2><div class="fg-grid is-people">${list.map(([it, i]) => card(it, i)).join('')}</div></section>`).join('');
   }
 
+  // quiet placeholder cards while a batch is on its way
+  function skeletons(on) {
+    const grid = $('fgGrid');
+    if (!grid) return;
+    grid.querySelectorAll('.fg-skel').forEach(n => n.remove());
+    if (on) grid.insertAdjacentHTML('beforeend', Array.from({ length: Math.min(PAGE, view.length ? 4 : PAGE) },
+      () => '<span class="fg-card fg-skel" aria-hidden="true"><span class="fg-thumb"></span><span class="fg-card-text"><span class="fg-skel-line"></span><span class="fg-skel-line is-short"></span></span></span>').join(''));
+  }
+
   function appendCards(start) {
     if (active === 'jury') { if (!hasMore) renderJuryGroups(); return; }
     const grid = $('fgGrid');
     if (!grid) return;
+    skeletons(false);
     if (!view.length) { $('fgContent').innerHTML = emptyMsg(); return; }
     grid.insertAdjacentHTML('beforeend', view.slice(start).map((it, k) => card(it, start + k)).join(''));
     // thumbnail fallbacks (maxres → sd → hq → placeholder) are handled globally by SKYouTube
@@ -308,9 +339,11 @@
   function setMoreState(failed) {
     const btn = $('fgMore');
     if (!btn) return;
-    btn.hidden = !hasMore && !failed;
+    btn.hidden = (!hasMore && !failed) || (loading && !view.length);
     btn.disabled = loading;
-    btn.textContent = loading ? 'Loading…' : failed ? 'Try again' : 'Load more';
+    btn.setAttribute('aria-busy', loading);
+    btn.innerHTML = loading ? '<span class="fg-spin" aria-hidden="true"></span>Loading' : failed ? 'Try again' : 'Load more';
+    skeletons(loading && !failed);
     if (failed) { btn.hidden = false; btn.onclick = () => { hasMore = true; loadMore(); }; }
   }
 
@@ -326,14 +359,9 @@
       return;
     }
     $('fgContent').innerHTML = `<div class="fg-grid" id="fgGrid"></div>
-      <div class="fg-more-wrap"><button type="button" class="fg-more" id="fgMore" hidden>Load more</button></div>
-      <div class="fg-sentinel" id="fgSentinel" aria-hidden="true"></div>`;
+      <div class="fg-more-wrap"><button type="button" class="fg-more" id="fgMore" hidden>Load more</button></div>`;
     $('fgMore').addEventListener('click', loadMore);
-    if (io) io.disconnect();
-    if ('IntersectionObserver' in window) {
-      io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) loadMore(); }, { rootMargin: '900px 0px' });
-      io.observe($('fgSentinel'));
-    }
+    // one batch now; the next batch only when the visitor taps "Load more"
     loadMore().then(() => { if (!view.length && !hasMore) $('fgContent').innerHTML = emptyMsg(); });
   }
 
@@ -341,7 +369,7 @@
     renderEditions();
     renderFilters();
     renderSubFilters();
-    if (active === 'previous-jury') { token++; if (io) io.disconnect(); return renderRoster(); }
+    if (active === 'previous-jury') { token++; return renderRoster(); }
     startFeed();
   }
 
@@ -416,10 +444,36 @@
       render(); syncUrl();
     });
     document.addEventListener('click', e => {
-      const b = e.target.closest('.fg-subchip'); if (!b) return;
-      if (b.dataset.sub === 'track') subTrack = b.dataset.k; else subGroup = b.dataset.k;
+      const b = e.target.closest('.fg-subchip'); if (!b || b.dataset.k === subTrack) return;
+      subTrack = b.dataset.k;
       render(); syncUrl();
     });
+    // custom Award dropdown (no native <select>)
+    const dd = () => $('fgAwardDd');
+    const ddOpen = open => {
+      const d = dd(); if (!d) return;
+      const list = d.querySelector('.fg-dd-list'), btn = d.querySelector('.fg-dd-btn');
+      list.hidden = !open; btn.setAttribute('aria-expanded', open); d.classList.toggle('is-open', open);
+      if (open) { const sel = list.querySelector('.is-selected') || list.firstElementChild; list.querySelectorAll('.is-active').forEach(o => o.classList.remove('is-active')); sel.classList.add('is-active'); list.focus({ preventScroll: true }); sel.scrollIntoView({ block: 'nearest' }); }
+    };
+    const ddChoose = li => { ddOpen(false); if (!li || li.dataset.k === subGroup) return; subGroup = li.dataset.k; render(); syncUrl(); const b = dd() && dd().querySelector('.fg-dd-btn'); if (b) b.focus({ preventScroll: true }); };
+    document.addEventListener('click', e => {
+      const d = dd(); if (!d) return;
+      if (e.target.closest('.fg-dd-btn')) return ddOpen(d.querySelector('.fg-dd-list').hidden);
+      const li = e.target.closest('.fg-dd-opt'); if (li) return ddChoose(li);
+      if (!d.contains(e.target)) ddOpen(false);
+    });
+    document.addEventListener('keydown', e => {
+      const d = dd(); if (!d || !d.contains(document.activeElement)) return;
+      const list = d.querySelector('.fg-dd-list'), opts = [...list.children];
+      if (list.hidden) { if (['ArrowDown', 'ArrowUp'].includes(e.key) && e.target.closest('.fg-dd-btn')) { e.preventDefault(); ddOpen(true); } return; }
+      let i = opts.findIndex(o => o.classList.contains('is-active'));
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); i = Math.max(0, Math.min(opts.length - 1, i + (e.key === 'ArrowDown' ? 1 : -1))); opts.forEach((o, k) => o.classList.toggle('is-active', k === i)); opts[i].scrollIntoView({ block: 'nearest' }); }
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ddChoose(opts[i]); }
+      else if (e.key === 'Escape') { e.preventDefault(); ddOpen(false); d.querySelector('.fg-dd-btn').focus(); }
+      else if (e.key === 'Tab') ddOpen(false);
+    });
+    document.addEventListener('mouseover', e => { const li = e.target.closest('.fg-dd-opt'); if (li) li.parentElement.querySelectorAll('.fg-dd-opt').forEach(o => o.classList.toggle('is-active', o === li)); });
     $('fgContent').addEventListener('click', e => {
       const t = e.target.closest('.fg-bio-toggle');
       if (t) { const open = t.previousElementSibling.classList.toggle('is-open'); t.setAttribute('aria-expanded', open); t.textContent = open ? 'Show less' : 'Read full bio'; return; }
