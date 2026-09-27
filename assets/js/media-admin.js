@@ -69,6 +69,10 @@ window.MediaAdmin = (function () {
     return `${withTrack} — ${person || '…'}${film ? ` · Film: ${film}` : ''}`;
   }
 
+  // Suggested editions: every year already used in the gallery + the current year (newest first)
+  const editionYears = () => [...new Set([new Date().getFullYear(), ...items.map(x => +x.edition_year).filter(y => y > 2000)])].sort((a, b) => b - a);
+  const validYear = y => Number.isInteger(y) && y >= 2000 && y <= 2100;
+
   const storagePath = url => { const m = String(url || '').match(/\/storage\/v1\/object\/public\/gallery\/(.+)$/); return m ? decodeURIComponent(m[1].split('?')[0]) : ''; };
 
   async function load() {
@@ -151,7 +155,8 @@ window.MediaAdmin = (function () {
             ${isWinner ? `<label class="mg-inline-check"><input type="checkbox" id="mgTitleCustom" ${r._customTitle ? 'checked' : ''}> Edit title manually <small>(otherwise generated from the winner details)</small></label>` : ''}
           </div>
           ${isVideo ? `<div class="mg-field is-full"><label for="mgVideo">Video URL (YouTube)</label><input type="url" id="mgVideo" value="${esc(r.video_url || '')}" placeholder="https://www.youtube.com/watch?v=…"></div>` : ''}
-          <div class="mg-field"><label for="mgYear">Edition / year</label><input type="number" id="mgYear" min="2000" max="2100" value="${esc(r.edition_year || '')}" placeholder="e.g. 2025"></div>
+          <div class="mg-field"><label for="mgYear">Edition / year <span class="mg-req" aria-hidden="true">*</span></label><input type="text" id="mgYear" inputmode="numeric" maxlength="4" autocomplete="off" required aria-required="true" value="${esc(r.edition_year || '')}" placeholder="e.g. ${editionYears()[0]}">
+            <div class="mg-year-chips" role="group" aria-label="Suggested editions">${editionYears().map(y => `<button type="button" class="mg-year-chip${String(y) === String(r.edition_year) ? ' is-on' : ''}" data-year="${y}">${y}</button>`).join('')}</div></div>
           <div class="mg-field is-full"><label for="mgDesc">Description (optional)</label><textarea id="mgDesc" rows="3" maxlength="600">${esc(r.description || '')}</textarea></div>
           <div class="mg-field"><label for="mgOrder">Display order</label><input type="number" id="mgOrder" value="${esc(r.display_order || 0)}"></div>
           <div class="mg-field mg-checks"><label><input type="checkbox" id="mgVisible" ${r.is_visible !== false ? 'checked' : ''}> Visible</label><label><input type="checkbox" id="mgFeatured" ${r.is_featured ? 'checked' : ''}> Featured</label></div>
@@ -185,7 +190,7 @@ window.MediaAdmin = (function () {
             <span class="mg-num">${String(i + 1).padStart(2, '0')}</span>
             <span class="mg-thumb">${thumbOf(r) ? `<img src="${esc(thumbOf(r))}" alt="" loading="lazy">` : ''}${r.media_type === 'video' ? '<span class="mg-play">▶</span>' : ''}</span>
             <span class="mg-info"><b>${esc(r.title || '(untitled)')}</b>
-              <small>${r.media_type === 'video' ? 'Video' : 'Photo'} · ${esc(catLabel(r.category))}${r.category === WINNERS && (r.award_id || r.award_name) ? ' · ' + esc(awardLabel(r)) + (TRACKS[r.competition_track] ? ' · ' + TRACKS[r.competition_track] : '') : ''}${r.edition_year ? ' · ' + esc(r.edition_year) : ''}${r.is_featured ? ' · Featured' : ''}${r.is_visible ? '' : ' · Hidden'}</small></span>
+              <small>${r.media_type === 'video' ? 'Video' : 'Photo'} · ${esc(catLabel(r.category))}${r.category === WINNERS && (r.award_id || r.award_name) ? ' · ' + esc(awardLabel(r)) + (TRACKS[r.competition_track] ? ' · ' + TRACKS[r.competition_track] : '') : ''}${r.edition_year ? ' · ' + esc(r.edition_year) : ' · No edition'}${r.is_featured ? ' · Featured' : ''}${r.is_visible ? '' : ' · Hidden'}</small></span>
             <span class="mg-actions">
               <label class="mg-vis" title="Show on the website"><input type="checkbox" data-act="vis" ${r.is_visible ? 'checked' : ''}> Visible</label>
               <button type="button" class="btn-ghost btn-xs" data-act="up" ${i === 0 ? 'disabled' : ''} title="Move up">↑</button>
@@ -236,6 +241,11 @@ window.MediaAdmin = (function () {
     on('mgFCat', 'change', e => { fCat = e.target.value; render(); });
     on('mgFType', 'change', e => { fType = e.target.value; render(); });
     on('mgCancel', 'click', () => { editing = null; orphans = []; render(); });
+    // edition suggestions fill the year field; typing keeps digits only and highlights a matching suggestion
+    const yr = document.getElementById('mgYear');
+    const syncChips = () => document.querySelectorAll('.mg-year-chip').forEach(c => c.classList.toggle('is-on', c.dataset.year === yr.value));
+    document.querySelectorAll('.mg-year-chip').forEach(c => c.addEventListener('click', () => { yr.value = c.dataset.year; syncChips(); }));
+    on('mgYear', 'input', () => { yr.value = yr.value.replace(/\D/g, '').slice(0, 4); syncChips(); });
     on('mgSave', 'click', save);
     on('mgVideo', 'input', e => {
       if (!editing || editing.media_type !== 'video' || editing.thumbnail_url) return;   // custom thumbnail wins
@@ -432,6 +442,8 @@ window.MediaAdmin = (function () {
     readEditor();
     const r = editing;
     if (r.media_type === 'photo' && !r.image_url) return notify('Upload a photo first.', 'err');
+    // Edition / year decides where the item appears in the Showcase edition filter — required for new media and award winners
+    if (!validYear(r.edition_year) && (!r.id || r.category === WINNERS)) { const el = document.getElementById('mgYear'); if (el) el.focus(); return notify('Enter the edition / year (e.g. ' + editionYears()[0] + ').', 'err'); }
     if (r.media_type === 'video') {
       if (!/^https:\/\//i.test(r.video_url || '')) return notify('Enter the video link (https://…).', 'err');
       if (!ytId(r.video_url) && !/\.(mp4|webm)(\?|$)/i.test(r.video_url)) return notify('Use a YouTube link or a direct .mp4 / .webm link.', 'err');
