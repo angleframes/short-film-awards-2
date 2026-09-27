@@ -1435,13 +1435,11 @@
             else modal.classList.remove('active');
         }
 
-        // Tabbed info modal (How To Submit / Guidelines / Updates / Jury / Privacy)
-        function openInfoModal(tabId) {
-            const modal = document.getElementById('infoModal');
-            if (!modal) return;
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            switchInfoTab(tabId || 'submit');
+        // Festival Resources (How To Submit / Guidelines / Updates / Jury / FAQ / Privacy / Terms / Refunds)
+        // now live on their own page, /resources — every former popup trigger opens the matching section there.
+        function openInfoModal(tabId, replace) {
+            const url = '/resources' + (tabId && tabId !== 'submit' ? '?section=' + encodeURIComponent(tabId) : '');
+            if (replace) location.replace(url); else location.href = url;
         }
 
         function closeInfoModal() {
@@ -2437,11 +2435,11 @@
         function openModalFromHash() {
             var h = location.hash;
             if (h === '#rules') { closeInfoModal(); toggleRulesModal(true); }
-            else if (h === '#how-to-submit') openInfoModal('submit');
-            else if (h === '#updates') openInfoModal('updates');
-            else if (h === '#guidelines') openInfoModal('guidelines');
-            else if (h === '#jury-panel') openInfoModal('jury');
-            else if (h === '#faq') openInfoModal('faq');
+            else if (h === '#how-to-submit') openInfoModal('submit', true);
+            else if (h === '#updates') openInfoModal('updates', true);
+            else if (h === '#guidelines') openInfoModal('guidelines', true);
+            else if (h === '#jury-panel') openInfoModal('jury', true);
+            else if (h === '#faq') openInfoModal('faq', true);
             else if (h === '#prizes') openAwardDetails();
             else if (/^#about-[a-z0-9_-]+$/i.test(h)) openAboutDetail(h.slice(7));
         }
