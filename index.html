@@ -1171,94 +1171,9 @@
         </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
-    <div class="support-footer">
-        <div class="footer-columns">
-            <div class="footer-col">
-                <h4>Explore</h4>
-                <a href="#section-home">Home</a>
-                <a href="#section-story">About</a>
-                <a href="#section-categories">Categories</a>
-                <a href="/festival-gallery">Showcase</a>
-                <a href="#section-contact">Contact</a>
-            </div>
-
-            <div class="footer-col">
-                <h4>Resources</h4>
-                <a onclick="openInfoModal('submit')">How To Submit</a>
-                <a onclick="openInfoModal('guidelines')">Festival Guidelines</a>
-                <a onclick="toggleRulesModal(true)">Rules &amp; Guidelines</a>
-                <a onclick="openInfoModal('updates')">Festival Updates</a>
-                <a onclick="openInfoModal('jury')">Jury Panel</a>
-                <a href="/#faq" onclick="openInfoModal('faq');return false;">FAQ</a>
-                <a href="privacy.html" onclick="openInfoModal('privacy');return false;">Privacy Policy</a>
-                <a href="terms.html" onclick="openInfoModal('terms');return false;">Terms &amp; Conditions</a>
-                <a href="refund.html" onclick="openInfoModal('refunds');return false;">Refunds &amp; Cancellations</a>
-            </div>
-
-            <div class="footer-col">
-                <h4>Get in Touch</h4>
-                <a href="tel:+917902959564">+91 7902959564</a>
-                <a href="tel:+919745640896">+91 9745640896</a>
-                <a class="footer-email" href="mailto:sharankrishnashortfilmawards@gmail.com">sharankrishna<wbr>shortfilm<wbr>awards<wbr>@gmail.com</a>
-            </div>
-
-            <div class="footer-col">
-                <h4>Headquarters</h4>
-                <span class="footer-static-text">Angle Frames<br>12/399, Krishnalayam<br>Thenhippalam<br>Malappuram, Kerala – 673636</span>
-            </div>
-        </div>
-
-        <!-- Location — one map, two places (Google Maps embed, no API key) -->
-        <section class="footer-location" aria-labelledby="flHeading">
-            <div class="fl-info">
-                <h4 class="fl-eyebrow" id="flHeading">Location</h4>
-                <div class="fl-tabs" role="tablist" aria-label="Choose a location">
-                    <button type="button" role="tab" class="fl-tab is-active" id="flTab-venue" data-loc="venue" aria-selected="true" aria-controls="flMapWrap">Festival Venue</button>
-                    <button type="button" role="tab" class="fl-tab" id="flTab-hq" data-loc="hq" aria-selected="false" aria-controls="flMapWrap" tabindex="-1">Headquarters</button>
-                </div>
-                <div class="fl-place" id="flPlace" aria-live="polite">
-                    <span class="fl-kicker">Festival Venue</span>
-                    <strong class="fl-name">JAIN (Deemed-to-be University)</strong>
-                    <span class="fl-address">Knowledge Park, Nirmal Infopark<br>Kakkanad, Kochi – 682042<br>Kerala, India</span>
-                </div>
-                <a class="fl-directions" id="flDirections" href="https://www.google.com/maps/dir/?api=1&amp;destination=JAIN%20(Deemed-to-be%20University)%20Kochi%2C%20Knowledge%20Park%2C%20Nirmal%20Infopark%2C%20Kakkanad%2C%20Kochi%20682042" target="_blank" rel="noopener noreferrer">Get Directions <span aria-hidden="true">&rarr;</span></a>
-            </div>
-            <div class="fl-map" id="flMapWrap" role="tabpanel" aria-labelledby="flTab-venue">
-                <iframe id="flMap" title="Map — JAIN (Deemed-to-be University), Kochi Campus" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen
-                    src="https://maps.google.com/maps?q=JAIN%20(Deemed-to-be%20University)%20Kochi%2C%20Knowledge%20Park%2C%20Nirmal%20Infopark%2C%20Kakkanad%2C%20Kochi%20682042&amp;z=15&amp;output=embed"></iframe>
-            </div>
-        </section>
-
-        <div class="footer-bottom-bar">
-            <div class="footer-bottom-left">
-                <span class="footer-brand-mark">Sharankrishna Short Film Awards</span>
-                <p class="footer-presented">Presented by <strong>Angle Frames</strong><br>In Association With <strong>JAIN (Deemed-to-be University), Kochi Campus</strong></p>
-                <p class="footer-tagline">Honouring Creativity.<br>Recognising Talent.<br>Inspiring Filmmakers.</p>
-                <p>&copy; 2026 Angle Frames Presents Sharankrishna Short Film Awards. All Rights Reserved.</p>
-            </div>
-            <div class="social-links-grid footer-social-grid">
-                <a href="https://www.instagram.com/sharankrishna_shortfilm_awards/" target="_blank" class="social-link-icon-anchor" aria-label="Instagram">
-                    <span class="social-icon-bg"></span>
-                    <img id="socialIconInstagram" src="" alt="Instagram">
-                    <span class="social-icon-underline"></span>
-                    <span class="social-icon-tooltip">Instagram</span>
-                </a>
-                <a href="https://www.youtube.com/@ANGLEFRAMES" target="_blank" class="social-link-icon-anchor" aria-label="YouTube">
-                    <span class="social-icon-bg"></span>
-                    <img id="socialIconYoutube" src="" alt="YouTube">
-                    <span class="social-icon-underline"></span>
-                    <span class="social-icon-tooltip">YouTube</span>
-                </a>
-                <a href="https://www.facebook.com/share/1BRDQLmtVp/" target="_blank" class="social-link-icon-anchor" aria-label="Facebook">
-                    <span class="social-icon-bg"></span>
-                    <img id="socialIconFacebook" src="" alt="Facebook">
-                    <span class="social-icon-underline"></span>
-                    <span class="social-icon-tooltip">Facebook</span>
-                </a>
-            </div>
-        </div>
-    </div>
+    <!-- ===== FOOTER — shared component (assets/js/site-chrome.js), same footer on every page ===== -->
+    <div id="siteFooter" data-page="home"></div>
+    <script src="assets/js/site-chrome.js?v=1"></script>
 
     <!-- WhatsApp Enquiry Button (always visible) -->
     <a href="https://wa.me/919745640896?text=Hi%2C%20I%20have%20an%20enquiry%20about%20the%20Sharankrishna%20Short%20Film%20Awards."
@@ -1279,6 +1194,6 @@
     <script src="assets/js/ui-components.js"></script>
     <script src="assets/js/campus-proof.js?v=1"></script>
     <script src="assets/js/youtube.js?v=1"></script>
-    <script src="assets/js/site.js?v=34"></script>
+    <script src="assets/js/site.js?v=35"></script>
 </body>
 </html>
