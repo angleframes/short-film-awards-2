@@ -1096,10 +1096,26 @@
                 if (line.startsWith('## ')) { flushPara(); flushList(); html += '<h3>' + _abInline(line.slice(3)) + '</h3>'; return; }
                 if (line.startsWith('> ')) { flushPara(); flushList(); html += '<blockquote>' + _abInline(line.slice(2)) + '</blockquote>'; return; }
                 if (line.startsWith('- ')) { flushPara(); list.push(line.slice(2)); return; }
+                // "@video <YouTube link> | optional caption" → poster that plays inline on click
+                const vm = line.match(/^@video\s+(\S+)(?:\s*\|\s*(.+))?$/i);
+                if (vm) {
+                    flushPara(); flushList();
+                    const vid = window.SKYouTube ? SKYouTube.id(vm[1]) : null;
+                    if (vid) html += `<figure class="ab-video"><button type="button" class="ab-video-poster" data-ytid="${vid}" aria-label="Play video${vm[2] ? ': ' + _abEsc(vm[2]) : ''}">
+                        <img src="${SKYouTube.thumb(vid)}" alt="" loading="lazy" decoding="async" data-yt-fallback><span class="pe-play" aria-hidden="true"><svg viewBox="0 0 24 24" fill="white"><polygon points="6,4 20,12 6,20"/></svg></span></button>
+                        ${vm[2] ? `<figcaption>${_abInline(vm[2])}</figcaption>` : ''}</figure>`;
+                    return;
+                }
                 flushList(); para.push(line);
             });
             flushPara(); flushList();
             return html;
+        }
+
+        // first "@video" link in a chapter's story (used for the card's Watch button)
+        function _abVideoId(body) {
+            const m = String(body || '').match(/^\s*@video\s+(\S+)/im);
+            return m && window.SKYouTube ? SKYouTube.id(m[1]) : null;
         }
 
         function renderAboutCards() {
@@ -1120,7 +1136,10 @@
                         ${s.subtitle ? `<p class="about-chapter-sub">${_abEsc(s.subtitle)}</p>` : ''}
                         <span class="story-underline"></span>
                         <p>${_abInline(s.intro || '')}</p>
-                        ${s.body ? `<button type="button" class="about-chapter-cta" onclick="openAboutDetail('${_abEsc(s.key)}')" aria-haspopup="dialog">${_abEsc(s.cta || 'Know More')} <span aria-hidden="true">&rarr;</span></button>` : ''}
+                        ${s.body || _abVideoId(s.body) ? `<div class="about-chapter-actions">
+                            ${s.body ? `<button type="button" class="about-chapter-cta" onclick="openAboutDetail('${_abEsc(s.key)}')" aria-haspopup="dialog">${_abEsc(s.cta || 'Know More')} <span aria-hidden="true">&rarr;</span></button>` : ''}
+                            ${_abVideoId(s.body) ? `<button type="button" class="about-chapter-watch" onclick="_playYouTube('${_abVideoId(s.body)}')"><span class="about-watch-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="7,4.5 19.5,12 7,19.5"/></svg></span> Watch His Story</button>` : ''}
+                        </div>` : ''}
                     </div>
                     <div class="story-block-img${fit}"${bgStyle}>
                         ${s.image ? `<img src="${_abEsc(s.image)}" alt="${_abEsc(s.imageAlt || s.title || '')}" loading="lazy" decoding="async" onerror="this.parentElement.classList.add('no-img');this.style.display='none';">` : ''}
@@ -1156,6 +1175,12 @@
                 ${link && s.linkLabel ? `<div class="ab-actions"><a class="btn-award-details ab-link" href="${_abEsc(link)}"${external ? ' target="_blank" rel="noopener noreferrer"' : ''}${link === '#prizes' ? ' onclick="closeAboutDetail();setTimeout(openAwardDetails,380);return false;"' : ''}>${_abEsc(s.linkLabel)} <span aria-hidden="true">${external ? '&#8599;' : '&rarr;'}</span></a></div>` : ''}`;
             return true;
         }
+
+        document.addEventListener('click', e => {
+            const p = e.target.closest('.ab-video-poster');
+            if (!p || !/^[\w-]{11}$/.test(p.dataset.ytid || '')) return;
+            p.outerHTML = `<div class="ab-video-frame"><iframe src="https://www.youtube.com/embed/${p.dataset.ytid}?autoplay=1&rel=0" title="Video" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>`;
+        });
 
         let _abLastFocus = null;
         function openAboutDetail(key) {
