@@ -191,3 +191,24 @@
 @media (max-width: 360px) {
   .fg-nav a:not(.is-primary) { padding: 8px 6px; letter-spacing: 0.8px; font-size: 0.6rem; }
 }
+
+/* ===== Award Winners — structured cards + track / award filters ===== */
+.fg-card-sub { font-size: 0.8rem; line-height: 1.45; color: rgba(255,255,255,0.6); }
+.fg-card.is-winner .fg-card-title { font-size: 0.98rem; }
+.fg-subfilters { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: -14px auto 30px; }
+.fg-subfilters[hidden] { display: none; }
+.fg-subrow { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+.fg-subchip {
+  font: inherit; cursor: pointer; white-space: nowrap; background: none; border: 0;
+  padding: 6px 12px; border-radius: 999px;
+  font-size: 0.64rem; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase; color: rgba(255,255,255,0.5);
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.fg-subchip:hover { color: #fff; }
+.fg-subchip.is-active { color: #fff; background: rgba(255,255,255,0.1); }
+.fg-subchip:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (max-width: 700px) {
+  .fg-subfilters { margin: -10px 0 22px; align-items: stretch; }
+  .fg-subrow { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * clamp(16px, 4vw, 40px)); padding: 0 clamp(16px, 4vw, 40px); }
+  .fg-subrow::-webkit-scrollbar { display: none; }
+}
