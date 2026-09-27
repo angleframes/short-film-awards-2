@@ -2710,3 +2710,68 @@ html { scroll-padding-top: 130px; }
   .sksfa-admin .ab-grid, .sksfa-admin .ab-image-row { grid-template-columns: 1fr; }
   .sksfa-admin .ab-vis { display: none; }
 }
+
+/* ════════════════════════════════════════════════════════
+   FESTIVAL GALLERY + JURY MANAGEMENT (media-admin.js, jury-admin.js)
+════════════════════════════════════════════════════════ */
+.sksfa-admin .mg-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 16px; }
+.sksfa-admin .mg-toolbar select { width: auto; min-width: 150px; height: 34px; padding: 0 10px; }
+.sksfa-admin .mg-spacer { flex: 1; }
+.sksfa-admin .mg-list { display: grid; gap: 8px; }
+.sksfa-admin .mg-row { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); }
+.sksfa-admin .mg-row.is-hidden { opacity: 0.55; }
+.sksfa-admin .mg-num { font-size: 12px; font-weight: 700; color: var(--text-3); width: 22px; flex-shrink: 0; }
+.sksfa-admin .mg-thumb { position: relative; width: 72px; height: 48px; border-radius: 6px; overflow: hidden; background: #0c0c0c; border: 1px solid var(--line); flex-shrink: 0; }
+.sksfa-admin .mg-thumb.is-portrait { width: 44px; height: 55px; }
+.sksfa-admin .mg-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sksfa-admin .mg-play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; background: rgba(0,0,0,0.35); }
+.sksfa-admin .mg-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sksfa-admin .mg-info b { color: #eaeaea; font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sksfa-admin .mg-info small { color: var(--text-3); font-size: 12px; }
+.sksfa-admin .mg-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; }
+.sksfa-admin .mg-vis { display: inline-flex; align-items: center; gap: 6px; margin: 0 4px 0 0; text-transform: none; letter-spacing: 0; font-size: 12.5px; color: #d4d4d4; }
+.sksfa-admin .mg-vis input { width: 15px; height: 15px; margin: 0; }
+
+.sksfa-admin .mg-editor { border: 1px solid var(--line-strong); border-radius: 14px; background: var(--surface-2); padding: 18px; margin: 0 0 18px; }
+.sksfa-admin .mg-editor-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.sksfa-admin .mg-editor-head h3 { margin: 0; font-size: 15px; color: #fff; }
+.sksfa-admin .mg-type { display: flex; gap: 14px; }
+.sksfa-admin .mg-type label, .sksfa-admin .mg-checks label { display: inline-flex; align-items: center; gap: 6px; margin: 0; text-transform: none; letter-spacing: 0; font-size: 13px; color: #d4d4d4; }
+.sksfa-admin .mg-type input, .sksfa-admin .mg-checks input { width: 15px; height: 15px; margin: 0; }
+.sksfa-admin .mg-editor-grid { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 20px; }
+.sksfa-admin .mg-preview { border: 1px solid var(--line); border-radius: 10px; background: #0c0c0c; aspect-ratio: 3 / 2; display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--text-3); font-size: 12px; text-align: center; padding: 0; }
+.sksfa-admin .mg-preview.is-portrait { aspect-ratio: 4 / 5; }
+.sksfa-admin .mg-preview img { width: 100%; height: 100%; object-fit: cover; }
+.sksfa-admin .mg-preview-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 6px; }
+.sksfa-admin label.mg-upload { text-transform: none; letter-spacing: 0; display: inline-flex; align-items: center; cursor: pointer; margin: 0; }
+.sksfa-admin .mg-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; align-content: start; }
+.sksfa-admin .mg-field { min-width: 0; margin-bottom: 12px; }
+.sksfa-admin .mg-field.is-full { grid-column: 1 / -1; }
+.sksfa-admin .mg-checks { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; padding-top: 22px; }
+.sksfa-admin .mg-editor-foot { display: flex; gap: 10px; align-items: center; margin-top: 6px; }
+
+.sksfa-admin .mg-cats { margin-top: 22px; border-top: 1px solid var(--line); padding-top: 14px; }
+.sksfa-admin .mg-cats summary { cursor: pointer; color: #d4d4d4; font-size: 13px; font-weight: 600; }
+.sksfa-admin .mg-cat-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 8px; }
+.sksfa-admin .mg-cat-row input[type="text"] { max-width: 260px; }
+.sksfa-admin .mg-cat-row label { display: inline-flex; align-items: center; gap: 6px; margin: 0; text-transform: none; letter-spacing: 0; font-size: 12.5px; color: #d4d4d4; }
+.sksfa-admin .mg-cat-row label input { width: 15px; height: 15px; margin: 0; }
+.sksfa-admin .mg-cat-row code { color: var(--text-3); font-size: 11.5px; }
+
+.sksfa-admin .jm-tabs { display: inline-flex; gap: 4px; padding: 4px; margin: 0 0 16px; border: 1px solid var(--line); border-radius: 999px; }
+.sksfa-admin .jm-tab { font: inherit; cursor: pointer; border: 0; background: transparent; color: #bdbdbd; font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 999px; display: inline-flex; gap: 8px; align-items: center; }
+.sksfa-admin .jm-tab span { font-size: 11px; padding: 1px 7px; border-radius: 999px; background: rgba(255,255,255,0.08); }
+.sksfa-admin .jm-tab.is-active { background: #fff; color: #000; }
+.sksfa-admin .jm-tab.is-active span { background: rgba(0,0,0,0.1); }
+.sksfa-admin .jm-group { margin: 14px 0 4px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-3); }
+.sksfa-admin .jm-group:first-child { margin-top: 0; }
+
+@media (max-width: 760px) {
+  .sksfa-admin .mg-editor-grid { grid-template-columns: 1fr; }
+  .sksfa-admin .mg-preview-col { max-width: 280px; }
+  .sksfa-admin .mg-fields { grid-template-columns: 1fr; }
+  .sksfa-admin .mg-row { flex-wrap: wrap; }
+  .sksfa-admin .mg-info { flex-basis: calc(100% - 130px); }
+  .sksfa-admin .mg-actions { width: 100%; justify-content: flex-start; }
+  .sksfa-admin .mg-checks { padding-top: 0; }
+}
