@@ -3,7 +3,7 @@
          ⚙️  MASTER CONFIGURATION — Edit everything here
          All site content, images, dates, cards live in this block.
          ============================================================ -->
-    <script src="assets/js/config.js?v=7"></script>
+    <script src="assets/js/config.js?v=8"></script>
 
 <html lang="en">
 <head>
@@ -92,7 +92,7 @@
     </script>
 
     <link rel="stylesheet" href="assets/css/ui-components.css">
-    <link rel="stylesheet" href="assets/css/site.css?v=27">
+    <link rel="stylesheet" href="assets/css/site.css?v=28">
 </head>
 <body>
 
@@ -123,6 +123,7 @@
             <a id="navHome" class="active" href="#section-home">Home</a>
             <a id="navStory" href="#section-story">About</a>
             <a id="navCategories" href="#section-categories">Categories</a>
+            <a id="navJury" href="#section-jury">Jury</a>
             <a id="navGallery" href="#section-gallery">Gallery</a>
             <a id="navVideos" href="#section-videos" style="display:none;">Videos</a>
             <a id="navRegistration" href="#section-registration">Registration</a>
@@ -250,6 +251,16 @@
     </section>
 
 
+    <!-- ===== PREVIOUS EDITION ===== -->
+    <section id="section-previous" class="page-section ix-section pe-section">
+        <div class="section-inner">
+            <span class="section-eyebrow scroll-reveal">Previous Edition</span>
+            <h2 class="section-heading is-statement scroll-reveal delay-1"><span class="shiny-text">A Celebration of Stories, Talent &amp; Cinema</span></h2>
+            <!-- cards built by renderFestivalShowcase() from real gallery photos and festival videos -->
+            <div class="pe-grid" id="peGrid"></div>
+        </div>
+    </section>
+
     <!-- ===== WHY PARTICIPATE ===== -->
     <section id="section-why" class="page-section ix-section">
         <div class="section-inner">
@@ -280,31 +291,6 @@
                     <span class="ix-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20.5h18M5 20.5V9l7-5.5L19 9v11.5"/><path d="M9.5 20.5v-6h5v6"/></svg></span>
                     <h3 class="ix-card-title">Grand Awards Ceremony</h3>
                     <p class="ix-card-text">Selected winners are honoured at the official awards ceremony at JAIN (Deemed-to-be University), Kochi Campus.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ===== COMPETITION TRACKS ===== -->
-    <section id="section-tracks" class="page-section ix-section">
-        <div class="section-inner">
-            <span class="section-eyebrow scroll-reveal">Choose Your Category</span>
-            <h2 class="section-heading is-statement scroll-reveal delay-1"><span class="shiny-text">Two Platforms. One Celebration of Cinema.</span></h2>
-            <div class="ix-grid ix-grid-2 scroll-reveal-scale delay-2">
-                <div class="ix-card glow-card">
-                    <span class="edge-light"></span>
-                    <span class="ix-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="11" rx="1.5"/><path d="M3 9l1.5-4.5L20 3l1 4.2L3 9zM8.5 4l1.8 3.6M14 3.2l1.8 3.6"/></svg></span>
-                    <h3 class="ix-card-title">General Category</h3>
-                    <p class="ix-card-text">For independent filmmakers, production teams and creators from anywhere in the world. Whether you are an emerging filmmaker or an experienced creator, submit your original short film and compete for recognition across the official award categories.</p>
-                    <button type="button" class="contact-card-btn ix-btn" onclick="openAwardDetails()">Explore General Category <span aria-hidden="true">&rarr;</span></button>
-                </div>
-                <div class="ix-card glow-card">
-                    <span class="edge-light"></span>
-                    <span class="ix-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9L12 4.5 21.5 9 12 13.5 2.5 9z"/><path d="M6.5 11v4.5c0 1.4 2.5 3 5.5 3s5.5-1.6 5.5-3V11M21.5 9v5"/></svg></span>
-                    <h3 class="ix-card-title">Campus Category</h3>
-                    <p class="ix-card-text">Created specifically for student filmmakers. If you are currently studying at a recognised college or university, the Campus Category gives you an opportunity to showcase your filmmaking talent on a larger platform.</p>
-                    <p class="ix-card-note">Valid proof of current student status is required.</p>
-                    <button type="button" class="contact-card-btn ix-btn" onclick="openAwardDetails()">Explore Campus Category <span aria-hidden="true">&rarr;</span></button>
                 </div>
             </div>
         </div>
@@ -665,6 +651,48 @@
     </div><!-- /infoModal -->
 
 
+    <!-- ===== JURY ===== -->
+    <section id="section-jury" class="page-section ix-section jury-feature">
+        <div class="section-inner">
+            <span class="section-eyebrow scroll-reveal">The People Behind the Decisions</span>
+            <h2 class="section-heading scroll-reveal delay-1"><span class="shiny-text">Meet the Jury</span></h2>
+            <p class="jury-feature-lead scroll-reveal delay-2">Every submitted film deserves thoughtful evaluation.</p>
+            <p class="about-lead scroll-reveal delay-2">Entries to the Sharankrishna Short Film Awards will be evaluated by an official jury representing experience across cinema, storytelling and the creative industries.</p>
+            <!-- Jury cards: rendered from JURY_PANEL in assets/js/config.js (photo, name, role, bio) -->
+            <div class="jury-showcase" id="juryShowcase" hidden></div>
+            <div class="ix-jury jury-coming-soon scroll-reveal-scale delay-2" id="juryComingSoon">
+                <p class="ix-jury-note">The official jury panel will be announced soon.</p>
+                <p class="ix-jury-sub">Follow our festival updates and official social channels for the announcement.</p>
+                <span class="ix-badge">Jury Announcement Coming Soon</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== COMPETITION TRACKS ===== -->
+    <section id="section-tracks" class="page-section ix-section">
+        <div class="section-inner">
+            <span class="section-eyebrow scroll-reveal">Choose Your Category</span>
+            <h2 class="section-heading is-statement scroll-reveal delay-1"><span class="shiny-text">Two Platforms. One Celebration of Cinema.</span></h2>
+            <div class="ix-grid ix-grid-2 scroll-reveal-scale delay-2">
+                <div class="ix-card glow-card">
+                    <span class="edge-light"></span>
+                    <span class="ix-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="11" rx="1.5"/><path d="M3 9l1.5-4.5L20 3l1 4.2L3 9zM8.5 4l1.8 3.6M14 3.2l1.8 3.6"/></svg></span>
+                    <h3 class="ix-card-title">General Category</h3>
+                    <p class="ix-card-text">For independent filmmakers, production teams and creators from anywhere in the world. Whether you are an emerging filmmaker or an experienced creator, submit your original short film and compete for recognition across the official award categories.</p>
+                    <button type="button" class="contact-card-btn ix-btn" onclick="openAwardDetails()">Explore General Category <span aria-hidden="true">&rarr;</span></button>
+                </div>
+                <div class="ix-card glow-card">
+                    <span class="edge-light"></span>
+                    <span class="ix-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 9L12 4.5 21.5 9 12 13.5 2.5 9z"/><path d="M6.5 11v4.5c0 1.4 2.5 3 5.5 3s5.5-1.6 5.5-3V11M21.5 9v5"/></svg></span>
+                    <h3 class="ix-card-title">Campus Category</h3>
+                    <p class="ix-card-text">Created specifically for student filmmakers. If you are currently studying at a recognised college or university, the Campus Category gives you an opportunity to showcase your filmmaking talent on a larger platform.</p>
+                    <p class="ix-card-note">Valid proof of current student status is required.</p>
+                    <button type="button" class="contact-card-btn ix-btn" onclick="openAwardDetails()">Explore Campus Category <span aria-hidden="true">&rarr;</span></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== SUBMIT CTA (after categories) ===== -->
     <section class="submit-cta page-section" id="submitCta" aria-labelledby="submitCtaHeading">
         <div class="submit-cta__inner">
@@ -699,11 +727,20 @@
         </div>
     </section>
 
+    <!-- ===== FESTIVAL MEDIA (categories) ===== -->
+    <section id="section-media" class="page-section ix-section pe-section">
+        <div class="section-inner">
+            <span class="section-eyebrow scroll-reveal">Festival Media</span>
+            <h2 class="section-heading scroll-reveal delay-1"><span class="shiny-text">Watch &amp; Relive</span></h2>
+            <div class="pe-grid media-grid" id="mediaGrid"></div>
+        </div>
+    </section>
+
     <!-- ===== GALLERY SECTION ===== -->
     <!-- Gallery heading — outside the photo -->
     <div class="gallery-select-header">
         <span class="section-eyebrow">Memories &amp; Moments</span>
-        <h2 class="section-heading"><span class="shiny-text">Gallery</span></h2>
+        <h2 class="section-heading"><span class="shiny-text">Festival Moments</span></h2>
     </div>
 
     <section id="section-gallery" class="page-section gallery-select-wrap" data-selected="photo1">
@@ -778,20 +815,6 @@
             <div class="yt-modal-frame" id="ytModalFrame"></div>
         </div>
     </div>
-
-    <!-- ===== JURY ===== -->
-    <section id="section-jury" class="page-section ix-section">
-        <div class="section-inner">
-            <span class="section-eyebrow scroll-reveal">The People Behind the Decisions</span>
-            <h2 class="section-heading scroll-reveal delay-1"><span class="shiny-text">Meet the Jury</span></h2>
-            <p class="about-lead scroll-reveal delay-2"><strong>Every submitted film deserves thoughtful evaluation.</strong> Entries to the Sharankrishna Short Film Awards will be evaluated by an official jury representing experience across cinema, storytelling and the creative industries.</p>
-            <div class="ix-jury scroll-reveal-scale delay-2">
-                <p class="ix-jury-note">The official jury panel for the 2026 edition will be announced soon.</p>
-                <p class="ix-jury-sub">Follow our festival updates and official social channels for the announcement.</p>
-                <span class="ix-badge">Jury Announcement Coming Soon</span>
-            </div>
-        </div>
-    </section>
 
     <!-- ===== HOW TO ENTER ===== -->
     <section id="section-how" class="page-section ix-section">
@@ -1033,8 +1056,9 @@
                     <div id="successScreen" style="display:none;">
                         <div class="success-screen-inner">
                             <div class="success-icon">✓</div>
-                            <h2>Submission Complete</h2>
-                            <p style="color:rgba(255,255,255,0.8); margin: 15px 0 30px 0;">Your entry files and payment snapshot reference have been logged onto our core data ledger system.</p>
+                            <h2>Submission Successful</h2>
+                            <p style="color:rgba(255,255,255,0.8); margin: 15px 0 6px 0;">Your film has been successfully submitted and your payment has been confirmed.</p>
+                            <p style="color:rgba(255,255,255,0.55); margin: 0 0 30px 0; font-size:0.9rem;">A confirmation has been recorded for your entry.</p>
                             <button type="button" class="btn-wizard-action continue" style="max-width:220px; margin:0 auto;" onclick="resetPortalView()">Submit Another Entry</button>
                         </div>
                     </div>
@@ -1178,6 +1202,6 @@
     </noscript>
     <script src="assets/js/ui-components.js"></script>
     <script src="assets/js/campus-proof.js?v=1"></script>
-    <script src="assets/js/site.js?v=23"></script>
+    <script src="assets/js/site.js?v=24"></script>
 </body>
 </html>
