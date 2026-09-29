@@ -4698,3 +4698,25 @@
             .support-footer { padding-left: 5%; padding-right: 5%; }
             .footer-location { padding: 14px; }
         }
+
+/* ===== HERO TITLE — one H1, two-level hierarchy: SHARANKRISHNA (main) / SHORT FILM AWARDS (~50%) ===== */
+#section-home .hero-main-title {
+    display: flex; flex-direction: column; align-items: center; gap: 0.18em;
+    white-space: normal; line-height: 1; margin-bottom: 28px;
+}
+#section-home .hero-title-main {
+    display: block;
+    font-size: clamp(1.9rem, 8.6vw, 6.4rem);
+    font-weight: 800; line-height: 0.95; letter-spacing: 0.02em; text-transform: uppercase;
+}
+#section-home .hero-title-sub {
+    display: block;
+    font-size: clamp(0.95rem, 4.3vw, 3.2rem);          /* ≈ 50% of the main line at every width */
+    font-weight: 400; line-height: 1.1; letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.86);
+    padding-left: 0.2em;                                 /* balances the trailing letter-spacing so it stays optically centred */
+}
+@media (max-width: 480px) {
+    #section-home .hero-main-title { font-size: inherit; gap: 0.3em; margin-bottom: 22px; }
+    #section-home .hero-title-sub { letter-spacing: 0.16em; padding-left: 0.16em; }
+}
