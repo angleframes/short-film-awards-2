@@ -975,6 +975,7 @@
         // Snapshot the original wizard markup once, so we can restore it if reopened without a reload.
         let _originalRegCardHTML = null;
 
+        const HOME_TITLE = 'Sharankrishna Short Film Awards | Kerala Short Film Competition';
         function evaluateRegistrationGateState() {
             const browserTitleEl = document.getElementById('browserTabTitle');
             const navRegLink = document.getElementById('navRegistration');
@@ -1006,7 +1007,7 @@
             }
 
             if (open) {
-                if (browserTitleEl) browserTitleEl.textContent = "Sharankrishna Short Film Awards";
+                if (browserTitleEl) browserTitleEl.textContent = HOME_TITLE;
                 if (navRegLink) navRegLink.innerHTML = 'Submit <span aria-hidden="true">&rarr;</span>';
                 if (heroSubmitBtn) {
                     heroSubmitBtn.textContent = "Submit Your Film →";
@@ -1021,7 +1022,7 @@
                     formContainer.innerHTML = _originalRegCardHTML;
                 }
             } else {
-                if (browserTitleEl) browserTitleEl.textContent = "Sharankrishna Short Film Awards";   // brand title stays stable for search results
+                if (browserTitleEl) browserTitleEl.textContent = HOME_TITLE;   // one stable title for search results
                 if (navRegLink) navRegLink.textContent = "Entries Closed";
                 if (heroSubmitBtn) {
                     heroSubmitBtn.textContent = "Registrations Closed";
@@ -1435,10 +1436,11 @@
             else modal.classList.remove('active');
         }
 
-        // Festival Resources (How To Submit / Guidelines / Updates / Jury / FAQ / Privacy / Terms / Refunds)
-        // now live on their own page, /resources — every former popup trigger opens the matching section there.
+        // Festival Resources — one crawlable page per topic; every former popup trigger opens the matching page.
+        const RESOURCE_PAGES = { submit: '/how-to-submit', guidelines: '/guidelines', updates: '/festival-updates', jury: '/jury',
+            faq: '/faq', privacy: '/privacy.html', terms: '/terms.html', refunds: '/refund.html' };
         function openInfoModal(tabId, replace) {
-            const url = '/resources' + (tabId && tabId !== 'submit' ? '?section=' + encodeURIComponent(tabId) : '');
+            const url = RESOURCE_PAGES[tabId] || '/how-to-submit';
             if (replace) location.replace(url); else location.href = url;
         }
 
