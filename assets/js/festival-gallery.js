@@ -90,7 +90,7 @@
     let secondary = '';
     if (filmFirst && person && film) secondary = group === 'film' ? `Directed by ${person}` : person;
     if (!filmFirst && person && film) secondary = `Film: ${film}`;
-    return { award, group, track: m.competition_track || '', primary, secondary };
+    return { award, group, track: m.competition_track || '', primary, secondary, film, filmFirst };
   }
 
   // DB row → display item. Older rows without thumbnail/medium fall back to the full image URL.
@@ -266,6 +266,18 @@
     return [catLabel(it.category), it.year].filter(Boolean).join(' · ');
   }
 
+  // descriptive alt text from the item's real metadata (award, winner, film, category, edition) — never invented
+  function altOf(it) {
+    const ed = it.year ? ' ' + it.year : '';
+    if (it.winner) {
+      const w = it.winner, track = TRACKS[w.track] ? ` (${TRACKS[w.track]})` : '';
+      return `${w.award}${track}: ${w.primary || ''}${!w.filmFirst && w.film ? ', film ' + w.film : ''} — Sharankrishna Short Film Awards${ed}`;
+    }
+    if (it.category === 'jury') return `${it.title}, jury member — Sharankrishna Short Film Awards${ed}`;
+    const cat = catLabel(it.category);
+    return `${it.title || cat || 'Festival photograph'}${cat && it.title ? ' — ' + cat : ''}, Sharankrishna Short Film Awards${ed}`;
+  }
+
   function imgTag(it, idx, alt) {
     const eager = idx < EAGER;
     const feat = it.featured && active === 'all';
@@ -279,7 +291,7 @@
     const meta = metaOf(it);
     const title = it.winner ? it.winner.primary : it.title;
     return `<button type="button" class="${cls}" data-i="${idx}" aria-label="${it.type === 'video' ? 'Play' : 'Open'}: ${esc(it.winner ? meta + ' — ' + title : (title || meta))}">
-        <span class="fg-thumb">${imgTag(it, idx, title)}${it.type === 'video' ? `<span class="fg-play">${PLAY}</span>` : ''}</span>
+        <span class="fg-thumb">${imgTag(it, idx, altOf(it))}${it.type === 'video' ? `<span class="fg-play">${PLAY}</span>` : ''}</span>
         <span class="fg-card-text">${meta ? `<span class="fg-card-meta">${esc(meta)}</span>` : ''}${title ? `<span class="fg-card-title">${esc(title)}</span>` : ''}${it.winner && it.winner.secondary ? `<span class="fg-card-sub">${esc(it.winner.secondary)}</span>` : ''}</span>
       </button>`;
   }
@@ -410,7 +422,7 @@
         : `<div class="fg-lb-video"><video src="${esc(it.video)}" controls autoplay playsinline preload="metadata"></video></div>`;
     } else {
       const set = it.medium ? ` srcset="${esc(fullSet(it))}" sizes="${LB_SIZES}"` : '';
-      media.innerHTML = `<img src="${esc(it.full || it.thumb)}"${set} alt="${esc(it.winner ? it.winner.primary : it.title)}" decoding="async">`;
+      media.innerHTML = `<img src="${esc(it.full || it.thumb)}"${set} alt="${esc(altOf(it))}" decoding="async">`;
     }
     $('fgLbMeta').textContent = metaOf(it);
     $('fgLbTitle').textContent = it.winner ? it.winner.primary : (it.title || '');
