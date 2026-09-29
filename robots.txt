@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+# build tooling and content fragments for tools/build-pages.mjs — not pages
+Disallow: /tools/
 
 Sitemap: https://sharankrishnashortfilmawards.com/sitemap.xml
