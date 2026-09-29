@@ -21,21 +21,23 @@
                 ${link('Home', 'href="#section-home"', '/')}
                 ${link('About', 'href="#section-story"', '/#section-story')}
                 ${link('Categories', 'href="#section-categories"', '/#section-categories')}
+                <a href="/general-category">General Category</a>
+                <a href="/campus-category">Campus Category</a>
                 <a href="/festival-gallery">Showcase</a>
                 ${link('Contact', 'href="#section-contact"', '/#section-contact')}
             </div>
 
             <div class="footer-col">
                 <h4>Resources</h4>
-                <a href="/resources">How To Submit</a>
-                <a href="/resources?section=guidelines">Festival Guidelines</a>
-                ${link('Rules &amp; Guidelines', 'onclick="toggleRulesModal(true)"', '/#rules')}
-                <a href="/resources?section=updates">Festival Updates</a>
-                <a href="/resources?section=jury">Jury Panel</a>
-                <a href="/resources?section=faq">FAQ</a>
-                <a href="/resources?section=privacy">Privacy Policy</a>
-                <a href="/resources?section=terms">Terms &amp; Conditions</a>
-                <a href="/resources?section=refunds">Refunds &amp; Cancellations</a>
+                <a href="/how-to-submit">How To Submit</a>
+                <a href="/guidelines">Festival Guidelines</a>
+                <a href="/guidelines#submission-rules">Rules &amp; Guidelines</a>
+                <a href="/festival-updates">Festival Updates</a>
+                <a href="/jury">Jury Panel</a>
+                <a href="/faq">FAQ</a>
+                <a href="/privacy.html">Privacy Policy</a>
+                <a href="/terms.html">Terms &amp; Conditions</a>
+                <a href="/refund.html">Refunds &amp; Cancellations</a>
             </div>
 
             <div class="footer-col">
