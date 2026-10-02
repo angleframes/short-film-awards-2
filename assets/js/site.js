@@ -975,7 +975,7 @@
         // Snapshot the original wizard markup once, so we can restore it if reopened without a reload.
         let _originalRegCardHTML = null;
 
-        const HOME_TITLE = 'Sharankrishna Short Film Awards | Kerala Short Film Competition';
+        const HOME_TITLE = 'International Short Film Awards 2026 | Sharankrishna Short Film Awards';
         function evaluateRegistrationGateState() {
             const browserTitleEl = document.getElementById('browserTabTitle');
             const navRegLink = document.getElementById('navRegistration');
