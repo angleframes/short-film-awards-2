@@ -2128,6 +2128,13 @@
                     }
                 }
             });
+            // Runtime rule: up to 40 minutes (any positive duration); 40 is accepted, anything above is rejected
+            const dur = currentPanel.querySelector('#duration');
+            if (flag && dur && dur.value.trim()) {
+                const mins = Number(dur.value);
+                if (!(mins > 0)) { flag = false; UI.alert('Enter the film runtime in minutes.', 'warn'); dur.focus(); }
+                else if (mins > 40) { flag = false; UI.alert('Maximum allowed runtime is 40 minutes.', 'warn'); dur.focus(); }
+            }
             if (step === 2 && window.CampusProof) {
                 const campusMsg = CampusProof.check();
                 if (campusMsg) {
