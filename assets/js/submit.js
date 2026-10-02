@@ -71,6 +71,21 @@ function goStep(n) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// Runtime rule: up to 40 minutes (2400 s), any positive duration. Accepts "14", "14 min", "14.5", "14:30", "1:05:00", "40:00".
+const MAX_RUNTIME_SECONDS = 40 * 60;
+function runtimeSeconds(v) {
+  const t = String(v || '').trim().toLowerCase();
+  let m = t.match(/^(\d{1,2}):([0-5]\d):([0-5]\d)$/);                  // h:mm:ss
+  if (m) return +m[1] * 3600 + +m[2] * 60 + +m[3];
+  m = t.match(/^(\d{1,3}):([0-5]\d)$/);                                // mm:ss
+  if (m) return +m[1] * 60 + +m[2];
+  m = t.match(/^(\d+(?:\.\d+)?)\s*(h|hr|hrs|hour|hours|m|min|mins|minute|minutes|s|sec|secs|second|seconds)?\.?$/);
+  if (m) { const n = parseFloat(m[1]), u = m[2] || 'min'; return Math.round(n * (/^h/.test(u) ? 3600 : /^s/.test(u) ? 1 : 60)); }
+  m = t.match(/^(\d+)\s*(?:m|min|mins|minutes?)\s*(\d+)\s*(?:s|sec|secs|seconds?)$/);   // "14 min 30 sec"
+  if (m) return +m[1] * 60 + +m[2];
+  return null;
+}
+
 function nextStep(from) {
   if (from === 1) {
     const fields = ['applicantName','phone','email','city'];
@@ -80,6 +95,9 @@ function nextStep(from) {
   } else if (from === 2) {
     const fields = ['filmName','category','filmLink','duration'];
     if (fields.find(id => !req(id))) return UI.alert('Please fill in all required fields.', 'warn');
+    const secs = runtimeSeconds(req('duration'));
+    if (secs === null || secs <= 0) return UI.alert('Enter the film runtime in minutes, e.g. 14 or 14:30.', 'warn');
+    if (secs > MAX_RUNTIME_SECONDS) return UI.alert('Maximum allowed runtime is 40 minutes.', 'warn');
     const campusMsg = window.CampusProof ? CampusProof.check() : null;
     if (campusMsg) return UI.alert(campusMsg, 'warn');
     goStep(3);
