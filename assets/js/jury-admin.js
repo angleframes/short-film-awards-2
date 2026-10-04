@@ -17,19 +17,28 @@ window.JuryAdmin = (function () {
   const notify = (m, k) => (typeof window.toast === 'function' ? window.toast(m, k) : console.log(m));
   const slug = s => String(s || 'jury').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40) || 'jury';
   const storagePath = url => { const m = String(url || '').match(/\/storage\/v1\/object\/public\/gallery\/(.+)$/); return m ? decodeURIComponent(m[1].split('?')[0]) : ''; };
+  // Current festival edition (year of site_config.submission_deadline). An earlier edition's member is re-appointed to the
+  // current jury by setting current_edition — same row, photo and bio; jury_type/edition_year stay as the historical record.
+  let EDITION = new Date().getFullYear();
+  const isCur = m => m.jury_type === 'current' || Number(m.current_edition) === EDITION;
   const sortFn = (a, b) => ((b.edition_year || 0) - (a.edition_year || 0)) || ((a.display_order || 0) - (b.display_order || 0)) || String(a.created_at).localeCompare(String(b.created_at));
 
   async function load() {
     const root = document.getElementById('juryAdmin');
     if (!root || !sb) return;
     root.innerHTML = '<p class="muted-note">Loading…</p>';
-    const { data, error } = await sb.from('jury_members').select('*');
+    const [{ data, error }, cfg] = await Promise.all([
+      sb.from('jury_members').select('*'),
+      sb.from('site_config').select('submission_deadline').eq('id', 1).maybeSingle(),
+    ]);
+    const y = cfg && cfg.data && cfg.data.submission_deadline ? new Date(cfg.data.submission_deadline).getFullYear() : 0;
+    if (y > 2000) EDITION = y;
     if (error) { root.innerHTML = `<p class="muted-note">Jury storage isn't available (${esc(error.message)}).</p>`; return; }
     members = (data || []).sort(sortFn);
     render();
   }
 
-  const ofTab = () => members.filter(m => m.jury_type === tab).sort(sortFn);
+  const ofTab = () => members.filter(m => (tab === 'current' ? isCur(m) : m.jury_type === 'previous')).sort(sortFn);
 
   function groups() {
     const list = ofTab();
@@ -77,7 +86,11 @@ window.JuryAdmin = (function () {
   }
 
   function rowHtml(m, i, n) {
-    const flags = [m.is_visible ? '' : 'Hidden', m.jury_type === 'current' && !m.is_active ? 'Inactive' : '', m.show_in_gallery ? 'In gallery' : ''].filter(Boolean).join(' · ');
+    const reappointed = m.jury_type === 'previous' && isCur(m);
+    const flags = [m.is_visible ? '' : 'Hidden', m.jury_type === 'current' && !m.is_active ? 'Inactive' : '', m.show_in_gallery ? 'In gallery' : '',
+      reappointed ? (tab === 'current' ? `Also ${m.edition_year || 'previous'} jury` : `${EDITION} Jury`) : ''].filter(Boolean).join(' · ');
+    const promote = m.jury_type === 'previous'
+      ? `<button type="button" class="btn-ghost btn-xs${reappointed ? '' : ' jm-promote'}" data-act="promote">${reappointed ? `Remove from ${EDITION} Jury` : `Add to ${EDITION} Jury`}</button>` : '';
     return `<div class="mg-row${m.is_visible ? '' : ' is-hidden'}" data-id="${m.id}">
       <span class="mg-num">${String(i + 1).padStart(2, '0')}</span>
       <span class="mg-thumb is-portrait">${m.photo_url ? `<img src="${esc(m.photo_url)}" alt="" loading="lazy">` : ''}</span>
@@ -87,6 +100,7 @@ window.JuryAdmin = (function () {
         <label class="mg-vis"><input type="checkbox" data-act="gal" ${m.show_in_gallery ? 'checked' : ''}> In gallery</label>
         <button type="button" class="btn-ghost btn-xs" data-act="up" ${i === 0 ? 'disabled' : ''} title="Move up">↑</button>
         <button type="button" class="btn-ghost btn-xs" data-act="down" ${i === n - 1 ? 'disabled' : ''} title="Move down">↓</button>
+        ${promote}
         <button type="button" class="btn-ghost btn-xs" data-act="preview">Preview</button>
         <button type="button" class="btn-ghost btn-xs" data-act="edit">Edit</button>
         <button type="button" class="btn-ghost btn-xs btn-danger" data-act="del">Delete</button>
@@ -96,7 +110,7 @@ window.JuryAdmin = (function () {
 
   function render() {
     const root = document.getElementById('juryAdmin');
-    const nCur = members.filter(m => m.jury_type === 'current').length, nPrev = members.length - nCur;
+    const nCur = members.filter(isCur).length, nPrev = members.filter(m => m.jury_type === 'previous').length;
     const g = groups();
     root.innerHTML = `
       <div class="jm-tabs" role="tablist">
@@ -109,8 +123,8 @@ window.JuryAdmin = (function () {
         <a class="btn-ghost btn-sm" href="${SITE}/${tab === 'current' ? '#section-jury' : 'festival-gallery?filter=previous-jury'}" target="_blank" rel="noopener">View on website ↗</a>
       </div>
       <p class="muted-note">${tab === 'current'
-        ? 'While no visible, active current member exists, the homepage shows “Jury Announcement Coming Soon”.'
-        : 'Grouped by edition. The homepage Previous Jury section appears once a visible member exists.'}</p>
+        ? `The ${EDITION} jury shown on the website. Re-appoint an earlier edition's member from the Previous Jury tab (“Add to ${EDITION} Jury”) — their photo and bio are reused, nothing is copied. While no visible member is on the ${EDITION} jury, the homepage shows “Jury Announcement Coming Soon”.`
+        : `Grouped by edition — the historical record. “Add to ${EDITION} Jury” makes the same profile part of the ${EDITION} jury without changing this history; the homepage never shows a person twice.`}</p>
       ${editing ? editorHtml() : ''}
       <div class="mg-list">
         ${ofTab().length ? g.map(([title, list]) => `${title ? `<h4 class="jm-group">${esc(title)}</h4>` : ''}${list.map((m, i) => rowHtml(m, i, list.length)).join('')}`).join('')
@@ -151,7 +165,8 @@ window.JuryAdmin = (function () {
       else if (act === 'up' || act === 'down') move(m, act === 'up' ? -1 : 1);
       else if (act === 'edit') startEdit(Object.assign({}, m));
       else if (act === 'del') remove(m);
-      else if (act === 'preview') window.open(`${SITE}/${m.jury_type === 'current' ? '#section-jury' : 'festival-gallery?filter=previous-jury'}`, '_blank', 'noopener');
+      else if (act === 'promote') patch(m, { current_edition: isCur(m) ? null : EDITION });
+      else if (act === 'preview') window.open(`${SITE}/${isCur(m) ? '#section-jury' : 'festival-gallery?filter=previous-jury'}`, '_blank', 'noopener');
     }));
   }
 
