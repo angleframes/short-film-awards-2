@@ -2029,13 +2029,16 @@
             const links = [['instagram_url', 'Instagram'], ['imdb_url', 'IMDb'], ['website_url', 'Website']]
                 .filter(([k]) => /^https?:\/\//i.test(m[k] || ''))
                 .map(([k, l]) => `<a href="${_vidEsc(m[k])}" target="_blank" rel="noopener noreferrer">${l}</a>`).join('');
-            return `<article class="jury-member">
+            // cards with a database id open the full profile (assets/js/jury-profile.js)
+            const open = m.id != null ? ` data-jury-id="${_vidEsc(m.id)}" tabindex="0" role="button" aria-haspopup="dialog" aria-label="View profile: ${_vidEsc(m.name)}"` : '';
+            return `<article class="jury-member${open ? ' is-clickable' : ''}"${open}>
                     <div class="jury-member-photo">${photo ? `<img src="${_vidEsc(photo)}" alt="${_vidEsc(m.name)}" loading="lazy" decoding="async">` : '<span class="jury-member-silhouette" aria-hidden="true"></span>'}</div>
                     ${year}
                     <h3 class="jury-member-name">${_vidEsc(m.name)}</h3>
                     ${role ? `<p class="jury-member-role">${_vidEsc(role)}</p>` : ''}
                     ${!(opts && opts.compact) && m.bio ? `<p class="jury-member-bio">${_vidEsc(m.bio)}</p>` : ''}
                     ${!(opts && opts.compact) && links ? `<p class="jury-member-links">${links}</p>` : ''}
+                    ${open ? '<span class="jury-view-profile" aria-hidden="true">View Profile &rarr;</span>' : ''}
                 </article>`;
         }
         // Current edition = year of this edition's submission deadline. A profile serves on the current jury when it is a
@@ -2044,6 +2047,7 @@
         const JURY_EDITION = (() => { try { const y = new Date(PORTAL_TIMELINES.submissionDeadline).getFullYear(); return y > 2000 ? y : new Date().getFullYear(); } catch (e) { return new Date().getFullYear(); } })();
         const isCurrentJury = m => m.jury_type === 'current' || Number(m.current_edition) === JURY_EDITION;
         function renderJurySection() {
+            if (window.SKJury && Array.isArray(window._juryData)) SKJury.register(window._juryData);
             const grid = document.getElementById('juryShowcase');
             const soon = document.getElementById('juryComingSoon');
             const fromDb = Array.isArray(window._juryData);
