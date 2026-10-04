@@ -193,7 +193,7 @@
                     SB.from('award_categories').select('*').eq('active', true).order('sort_order'),
                     SB.from('about_sections').select('*').order('sort_order'),
                     // RLS returns only visible members (current ones also need is_active)
-                    SB.from('jury_members').select('id,name,designation,bio,photo_url,edition_year,jury_type,display_order,instagram_url,imdb_url,website_url')
+                    SB.from('jury_members').select('id,name,designation,bio,photo_url,edition_year,jury_type,current_edition,display_order,instagram_url,imdb_url,website_url')
                         .order('edition_year', { ascending: false, nullsFirst: false }).order('display_order').order('created_at'),
                     // master Festival Gallery rows — homepage picks varied photos from here (small, capped)
                     SB.from('gallery_media').select('id,media_type,category,title,image_url,medium_url,thumbnail_url,award_name,winner_name,film_name,recipient_type,is_featured,display_order')
@@ -2038,12 +2038,17 @@
                     ${!(opts && opts.compact) && links ? `<p class="jury-member-links">${links}</p>` : ''}
                 </article>`;
         }
+        // Current edition = year of this edition's submission deadline. A profile serves on the current jury when it is a
+        // 'current' member, or an earlier edition's member re-appointed via current_edition (same row, photo and bio —
+        // its own edition_year/jury_type stay as the historical record).
+        const JURY_EDITION = (() => { try { const y = new Date(PORTAL_TIMELINES.submissionDeadline).getFullYear(); return y > 2000 ? y : new Date().getFullYear(); } catch (e) { return new Date().getFullYear(); } })();
+        const isCurrentJury = m => m.jury_type === 'current' || Number(m.current_edition) === JURY_EDITION;
         function renderJurySection() {
             const grid = document.getElementById('juryShowcase');
             const soon = document.getElementById('juryComingSoon');
             const fromDb = Array.isArray(window._juryData);
             let current = fromDb
-                ? window._juryData.filter(m => m.jury_type === 'current')
+                ? window._juryData.filter(isCurrentJury)
                 : (typeof JURY_PANEL !== 'undefined' ? JURY_PANEL : []).filter(m => m && m.name && !/to be announced/i.test(m.name));
             if (grid) {
                 if (!current.length) { grid.hidden = true; if (soon) soon.hidden = false; }
@@ -2053,12 +2058,15 @@
                     grid.hidden = false;
                     if (soon) soon.hidden = true;
                 }
+                const curLabel = document.getElementById('currentJuryEdition');
+                if (curLabel) { curLabel.textContent = current.length ? JURY_EDITION + ' Jury' : ''; curLabel.hidden = !current.length; }
             }
             // Previous Jury — hidden until at least one visible previous member exists
             const prevSec = document.getElementById('section-previous-jury');
             const prevGrid = document.getElementById('previousJuryGrid');
             if (prevSec && prevGrid) {
-                const prev = (fromDb ? window._juryData.filter(m => m.jury_type === 'previous') : []).slice(0, 8);
+                // anyone already on the current jury is shown once, above — never again here
+                const prev = (fromDb ? window._juryData.filter(m => m.jury_type === 'previous' && !isCurrentJury(m)) : []).slice(0, 8);
                 prevSec.hidden = !prev.length;
                 // one edition → label it once above the grid; several → label each card
                 const years = [...new Set(prev.map(m => m.edition_year || ''))];
