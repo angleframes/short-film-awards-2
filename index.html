@@ -446,7 +446,8 @@
             <h2 class="section-heading scroll-reveal delay-1"><span class="shiny-text">Meet the Jury</span></h2>
             <p class="jury-feature-lead scroll-reveal delay-2">Every submitted film deserves thoughtful evaluation.</p>
             <p class="about-lead scroll-reveal delay-2">Entries to the Sharankrishna Short Film Awards will be evaluated by an official jury representing experience across cinema, storytelling and the creative industries.</p>
-            <!-- Jury cards: rendered from JURY_PANEL in assets/js/config.js (photo, name, role, bio) -->
+            <!-- Jury cards: Admin → Jury (jury_members) — current members and re-appointed earlier members; config.js JURY_PANEL is a fallback -->
+            <p class="jury-edition-label" id="currentJuryEdition" hidden></p>
             <div class="jury-showcase" id="juryShowcase" hidden></div>
             <div class="ix-jury jury-coming-soon scroll-reveal-scale delay-2" id="juryComingSoon">
                 <p class="ix-jury-note">The official jury panel will be announced soon.</p>
@@ -922,6 +923,6 @@
     <script src="assets/js/ui-components.js"></script>
     <script src="assets/js/campus-proof.js?v=1"></script>
     <script src="assets/js/youtube.js?v=1"></script>
-    <script src="assets/js/site.js?v=40"></script>
+    <script src="assets/js/site.js?v=41"></script>
 </body>
 </html>
