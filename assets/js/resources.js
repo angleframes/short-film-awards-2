@@ -36,8 +36,8 @@
     if (r && !r.error && Array.isArray(r.data) && r.data.length) upd.innerHTML = R.updatesHtml(r.data.map(u => ({ date: u.date_label || '', title: u.title || '', text: u.body || '' })));
   });
   const jury = $('juryPanelGrid');
-  if (jury) sb.from('jury_members').select('name,designation,bio,photo_url,edition_year,jury_type,current_edition,display_order')
+  if (jury) sb.from('jury_members').select('id,name,designation,bio,photo_url,edition_year,jury_type,current_edition,display_order,instagram_url,imdb_url,website_url')
     .order('edition_year', { ascending: false, nullsFirst: false }).order('display_order').then(r => {
-      if (r && !r.error && Array.isArray(r.data)) jury.innerHTML = R.juryHtml(r.data, jury.dataset.note || '', jury.dataset.edition);
+      if (r && !r.error && Array.isArray(r.data)) { if (window.SKJury) SKJury.register(r.data); jury.innerHTML = R.juryHtml(r.data, jury.dataset.note || '', jury.dataset.edition); }
     });
 })();
