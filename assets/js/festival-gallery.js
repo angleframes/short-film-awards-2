@@ -107,9 +107,12 @@
       winner: m.category === 'award-winners' && (m.award_id || m.award_name) ? winnerInfo(m) : null,
     };
   }
+  // an earlier edition's member re-appointed for the current edition (current_edition) counts as current jury
+  const isCurJury = j => j.jury_type === 'current' || (CURRENT && Number(j.current_edition) === CURRENT);
   const juryItem = j => ({
     type: 'photo', category: 'jury', title: j.name, desc: [j.designation, j.bio].filter(Boolean).join(' — '),
-    year: j.edition_year, juryType: j.jury_type, full: j.photo_url, thumb: j.photo_url, portrait: true,
+    year: isCurJury(j) ? (CURRENT || j.edition_year) : j.edition_year, juryType: isCurJury(j) ? 'current' : j.jury_type,
+    full: j.photo_url, thumb: j.photo_url, portrait: true,
   });
 
   // Small reference data (categories, awards, jury, winner facets) — loaded once
@@ -118,7 +121,7 @@
     sb = window.supabase.createClient(SUPA_URL, SUPA_ANON);
     const [catRes, juryRes, awRes, facRes] = await Promise.all([
       sb.from('media_categories').select('key,label,sort_order,show_in_filter').order('sort_order'),
-      sb.from('jury_members').select('id,name,designation,bio,photo_url,edition_year,jury_type,display_order,show_in_gallery')
+      sb.from('jury_members').select('id,name,designation,bio,photo_url,edition_year,jury_type,current_edition,display_order,show_in_gallery')
         .order('edition_year', { ascending: false, nullsFirst: false }).order('display_order'),
       sb.from('award_categories').select('id,key,name,sort_order'),
       sb.from('gallery_media').select('category,competition_track,award_id,edition_year').limit(5000),
@@ -197,7 +200,7 @@
     hasMore = more;
     if (!hasMore && !juryDone && wantsJury()) {
       juryDone = true;
-      batch.push(...juryAll.filter(j => j.show_in_gallery && j.photo_url && byEdition(j.edition_year)).map(juryItem).filter(isNew));
+      batch.push(...juryAll.filter(j => j.show_in_gallery && j.photo_url).map(juryItem).filter(it => byEdition(it.year)).filter(isNew));
     }
     const start = view.length;
     view.push(...batch);
