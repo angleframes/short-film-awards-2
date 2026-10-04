@@ -24,8 +24,9 @@ const tidy = t => String(t || '').replace(/\s+/g, ' ').trim();
 
 /* ---------- inputs ---------- */
 const cfg = {};
-vm.runInNewContext(read('assets/js/config.js') + ';__out.v={SUPA_URL,SUPA_ANON,GUIDELINES_ITEMS,UPDATES_FEED,JURY_PANEL};', { __out: cfg });
-const { SUPA_URL, SUPA_ANON, GUIDELINES_ITEMS, UPDATES_FEED, JURY_PANEL } = cfg.v;
+vm.runInNewContext(read('assets/js/config.js') + ';__out.v={SUPA_URL,SUPA_ANON,GUIDELINES_ITEMS,UPDATES_FEED,JURY_PANEL,PORTAL_TIMELINES};', { __out: cfg });
+const { SUPA_URL, SUPA_ANON, GUIDELINES_ITEMS, UPDATES_FEED, JURY_PANEL, PORTAL_TIMELINES } = cfg.v;
+const EDITION = new Date(PORTAL_TIMELINES.submissionDeadline).getFullYear();   // current festival edition
 const R = {}; vm.runInNewContext(read('assets/js/resources-render.js'), { window: R });
 const { guidelinesHtml, updatesHtml, juryHtml } = R.SKResources;
 
@@ -36,7 +37,7 @@ async function db(path) {
 }
 const [updatesDb, juryDb, awards, mediaCats, gallery] = await Promise.all([
   db('updates_feed?select=date_label,title,body,sort_order,created_at&order=sort_order.asc,created_at.desc'),
-  db('jury_members?select=name,designation,bio,photo_url,edition_year,jury_type,display_order&order=edition_year.desc.nullslast,display_order.asc'),
+  db('jury_members?select=name,designation,bio,photo_url,edition_year,jury_type,current_edition,display_order&order=edition_year.desc.nullslast,display_order.asc'),
   db('award_categories?select=id,key,name,active,sort_order&order=sort_order.asc'),
   db('media_categories?select=key,label&order=sort_order.asc'),
   db('gallery_media?select=id,title,media_type,category,image_url,medium_url,thumbnail_url,video_url,edition_year,is_featured,award_id,award_name,competition_track,winner_name,film_name,recipient_type&order=is_featured.desc,display_order.asc,created_at.asc,id.asc&limit=12'),
@@ -128,8 +129,8 @@ ${p.body}
     <div id="siteFooter"></div>
     <script src="/assets/js/site-chrome.js?v=3"></script>${p.live ? `
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-    <script src="/assets/js/resources-render.js?v=1" defer></script>` : ''}
-    <script src="/assets/js/resources.js?v=2" defer></script>
+    <script src="/assets/js/resources-render.js?v=2" defer></script>` : ''}
+    <script src="/assets/js/resources.js?v=3" defer></script>
 </body>
 </html>
 `;
@@ -175,7 +176,7 @@ const PAGES = [
   { ...RES, key: 'jury', path: '/jury', file: 'jury.html', h1: 'Jury Panel', lead: lead.jury, live: true,
     title: 'Jury | Sharankrishna International Short Film Awards 2026',
     desc: 'Meet the jury of Sharankrishna International Short Film Awards and discover the filmmakers and industry professionals evaluating the official entries.',
-    body: `<div id="juryPanelGrid" data-note="${esc(JURY_NOTE)}">${juryHtml(juryDb.length ? juryDb : JURY_PANEL, JURY_NOTE)}</div>` },
+    body: `<div id="juryPanelGrid" data-note="${esc(JURY_NOTE)}" data-edition="${EDITION}">${juryHtml(juryDb.length ? juryDb : JURY_PANEL, JURY_NOTE, EDITION)}</div>` },
   { ...RES, key: 'faq', path: '/faq', file: 'faq.html', h1: 'Frequently Asked Questions', lead: lead.faq, extraLd: [faqLd],
     title: 'FAQ | Sharankrishna International Short Film Awards 2026',
     desc: 'Find answers about eligibility, categories, runtime, entry fee, submissions, judging and the awards ceremony for Sharankrishna International Short Film Awards 2026.',
