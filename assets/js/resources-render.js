@@ -45,13 +45,14 @@
         <h3 class="rs-card-title">${esc(name)}</h3>${role ? `<p class="rs-juror-role">${esc(role)}</p>` : ''}${bio ? `<p class="rs-card-text rs-juror-bio">${esc(bio)}</p>` : ''}
       </article>`;
   }
-  // { current: [...], previous: [...] } → current panel (or the "being finalised" note) + previous editions
-  function juryHtml(members, note) {
+  // current jury (incl. earlier members re-appointed via current_edition) + an archive grouped by each member's own edition
+  function juryHtml(members, note, edition) {
     const real = (members || []).filter(m => m && tidy(m.name) && !/to be announced/i.test(m.name));
     const byOrder = (a, b) => (a.display_order || 0) - (b.display_order || 0);
-    const current = real.filter(m => (m.jury_type || 'current') === 'current').sort(byOrder);
+    const isCur = m => (m.jury_type || 'current') === 'current' || (edition && Number(m.current_edition) === Number(edition));
+    const current = real.filter(isCur).sort(byOrder);
     const previous = real.filter(m => m.jury_type === 'previous');
-    let html = '<section class="rs-group" aria-labelledby="rsJuryCurrent"><h2 class="rs-group-title" id="rsJuryCurrent">Current Edition</h2>';
+    let html = `<section class="rs-group" aria-labelledby="rsJuryCurrent"><h2 class="rs-group-title" id="rsJuryCurrent">${edition ? esc(edition) + ' Edition Jury' : 'Current Edition'}</h2>`;
     html += current.length ? `<div class="rs-grid rs-jury">${current.map(jurorHtml).join('')}</div>`
       : `<div class="rs-note"><p>${note}</p><a class="rs-link" href="/#section-jury">View the Jury section <span aria-hidden="true">&rarr;</span></a></div>`;
     html += '</section>';
