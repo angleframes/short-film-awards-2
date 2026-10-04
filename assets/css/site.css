@@ -4720,3 +4720,45 @@
     #section-home .hero-main-title { font-size: inherit; gap: 0.3em; margin-bottom: 22px; }
     #section-home .hero-title-sub { letter-spacing: 0.16em; padding-left: 0.16em; }
 }
+
+/* ===== JURY — clickable cards + profile popup (assets/js/jury-profile.js; shell = .ad-overlay / .ad-panel) ===== */
+.jury-member.is-clickable, .rs-juror.is-clickable { cursor: pointer; outline: none; }
+.jury-member.is-clickable .jury-member-photo { transition: border-color 0.3s ease; }
+.jury-member.is-clickable .jury-member-photo img { transition: transform 0.6s ease, filter 0.45s ease; }
+.jury-view-profile, .rs-view-profile {
+    display: inline-block; margin-top: 12px; font-size: 0.62rem; font-weight: 700; letter-spacing: 2.2px; text-transform: uppercase;
+    color: rgba(255,255,255,0.5); transition: color 0.25s ease;
+}
+@media (hover: hover) and (pointer: fine) {
+    .jury-member.is-clickable:hover .jury-member-photo { border-color: rgba(255,255,255,0.28); }
+    .jury-member.is-clickable:hover .jury-member-photo img { transform: scale(1.03); }
+    .jury-member.is-clickable:hover .jury-view-profile, .rs-juror.is-clickable:hover .rs-view-profile { color: #fff; }
+}
+.jury-member.is-clickable:focus-visible .jury-member-photo { outline: 2px solid #fff; outline-offset: 3px; }
+.rs-juror.is-clickable:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+.jp-overlay .ad-panel { width: min(980px, 100%); }
+.jp-body { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 40px; padding: 48px; align-items: start; }
+.jp-photo { aspect-ratio: 4 / 5; border-radius: 18px; overflow: hidden; background: #0d0d0f; border: 1px solid rgba(255,255,255,0.12); position: relative; position: sticky; top: 0; }
+.jp-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.jp-silhouette { position: absolute; inset: 0; background: radial-gradient(circle at 50% 38%, rgba(255,255,255,0.12) 0 17%, transparent 17.5%), radial-gradient(ellipse at 50% 100%, rgba(255,255,255,0.1) 0 38%, transparent 38.5%); }
+.jp-info { min-width: 0; padding-top: 8px; }
+.jp-edition { margin: 0 0 14px; font-size: 0.62rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+.jp-name { margin: 0 0 8px; font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 800; line-height: 1.1; letter-spacing: 0.5px; text-transform: uppercase; color: #fff; overflow-wrap: anywhere; }
+.jp-role { margin: 0 0 24px; font-size: 0.74rem; font-weight: 600; letter-spacing: 2.2px; text-transform: uppercase; color: rgba(255,255,255,0.6); line-height: 1.6; }
+.jp-bio { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 22px; }
+.jp-bio p { margin: 0 0 14px; font-size: 0.95rem; line-height: 1.8; color: rgba(255,255,255,0.75); }
+.jp-bio p:last-child { margin-bottom: 0; }
+.jp-links { margin: 26px 0 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.jp-links a {
+    display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 999px; text-decoration: none;
+    font-size: 0.66rem; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: #fff;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.16); transition: background 0.2s ease, border-color 0.2s ease;
+}
+.jp-links a:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.3); }
+.jp-links a:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (max-width: 760px) {
+    .jp-body { grid-template-columns: 1fr; gap: 22px; padding: 56px 20px 32px; }
+    .jp-photo { position: relative; max-width: 300px; width: 100%; margin: 0 auto; }
+    .jp-info { padding-top: 0; }
+}
