@@ -40,9 +40,10 @@
   // jury members as published in Admin → Jury (RLS returns visible members only)
   function jurorHtml(m) {
     const photo = m.photo_url || m.src || '', name = tidy(m.name), role = tidy(m.designation || m.role), bio = tidy(m.bio);
-    return `<article class="rs-card rs-juror">
+    const open = m.id != null ? ` data-jury-id="${esc(m.id)}" tabindex="0" role="button" aria-haspopup="dialog" aria-label="View profile: ${esc(name)}"` : '';
+    return `<article class="rs-card rs-juror${open ? ' is-clickable' : ''}"${open}>
         <div class="rs-juror-photo">${photo ? `<img src="${esc(photo)}" alt="${esc(name)}, jury member — Sharankrishna Short Film Awards${m.edition_year ? ' ' + esc(m.edition_year) : ''}" width="96" height="96" loading="lazy" decoding="async">` : '<span aria-hidden="true"></span>'}</div>
-        <h3 class="rs-card-title">${esc(name)}</h3>${role ? `<p class="rs-juror-role">${esc(role)}</p>` : ''}${bio ? `<p class="rs-card-text rs-juror-bio">${esc(bio)}</p>` : ''}
+        <h3 class="rs-card-title">${esc(name)}</h3>${role ? `<p class="rs-juror-role">${esc(role)}</p>` : ''}${bio ? `<p class="rs-card-text rs-juror-bio">${esc(bio)}</p>` : ''}${open ? '<span class="rs-view-profile" aria-hidden="true">View Profile &rarr;</span>' : ''}
       </article>`;
   }
   // current jury (incl. earlier members re-appointed via current_edition) + an archive grouped by each member's own edition
