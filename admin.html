@@ -7,12 +7,17 @@
 <title>Admin Panel | Sharankrishna Short Film Awards</title>
 <link rel="icon" type="image/png" href="Favicon.png">
 <link rel="apple-touch-icon" href="Favicon.png">
+<script>
+  // password-reset email link: remember it before supabase-js consumes the URL (assets/js/admin-recovery.js)
+  (function () { var h = new URLSearchParams(location.hash.replace(/^#/, ''));
+    window.__skRecovery = { recovery: h.get('type') === 'recovery', error: h.get('error_description') || (h.get('error') ? 'This link is invalid or has expired.' : '') }; })();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <link rel="stylesheet" href="assets/css/ui-components.css">
 <link rel="stylesheet" href="assets/css/admin.css?v=19">
-<link rel="stylesheet" href="assets/css/admin-theme.css?v=2">
+<link rel="stylesheet" href="assets/css/admin-theme.css?v=3">
 </head>
 <body class="sksfa-admin">
 
@@ -642,4 +647,5 @@
 <script src="assets/js/media-admin.js?v=8"></script>
 <script src="assets/js/jury-admin.js?v=3"></script>
 <script src="assets/js/admin.js?v=16"></script>
+<script src="assets/js/admin-recovery.js?v=1"></script>
 </html>
