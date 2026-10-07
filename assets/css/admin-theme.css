@@ -1,0 +1,188 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   SSFA Admin — "public site" theme (loaded after admin.css)
+   Same visual language as sharankrishnashortfilmawards.com: black/charcoal, liquid-glass
+   navigation, 18px hairline cards, white pill primary buttons, uppercase letter-spaced labels.
+   Pure CSS layer — no markup or behaviour changes. Remove the <link> to roll back.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+body.sksfa-admin {
+  --site-bg: #060608;
+  --glass: linear-gradient(180deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.025) 100%);
+  --glass-border: rgba(255,255,255,0.12);
+  --glass-hi: inset 0 1px 0 rgba(255,255,255,0.12);
+  --blur: blur(20px) saturate(140%);
+  --r-card: 18px;
+  --r-ctl: 12px;
+  --line: rgba(255,255,255,0.08);
+  --line-strong: rgba(255,255,255,0.14);
+  --surface: #0d0d0f;
+  --surface-2: #121215;
+  --text-2: rgba(255,255,255,0.64);
+  --text-3: rgba(255,255,255,0.42);
+  --side-w: 248px;
+  --top-h: 72px;
+  background: var(--site-bg);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+/* one soft spotlight, like the public site */
+body.sksfa-admin::before {
+  background:
+    radial-gradient(70% 50% at 50% -10%, rgba(255,255,255,0.06) 0%, transparent 70%),
+    var(--site-bg);
+}
+/* decorative vertical slogans + taglines — the public site keeps its chrome clean */
+body.sksfa-admin .sksfa-side-left, body.sksfa-admin .sksfa-side-right,
+body.sksfa-admin .sksfa-header-tagline, body.sksfa-admin .sksfa-nav-tagline { display: none !important; }
+
+/* ── Login — glass panel, same as the site's popups ── */
+body.sksfa-admin .sksfa-login-card {
+  max-width: 400px; padding: 44px 40px; border-radius: 22px;
+  background: radial-gradient(120% 60% at 50% 0%, rgba(255,255,255,0.06), transparent 60%), linear-gradient(180deg, #111115 0%, #0a0a0d 100%);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 40px 120px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+body.sksfa-admin .sksfa-login-card h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+body.sksfa-admin .sksfa-login-card .sub { letter-spacing: 2.4px; font-size: 0.62rem; color: var(--text-3); }
+
+/* ── Top bar — like the site header: logo left, controls right, glass ── */
+body.sksfa-admin .topbar {
+  background: rgba(6,6,8,0.72); border-bottom: 1px solid var(--line);
+  backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+}
+body.sksfa-admin .topbar-inner { height: var(--top-h); max-width: none; padding: 0 28px; gap: 12px; }
+body.sksfa-admin .sksfa-logo { height: 40px; border-right: 0; padding-right: 0; filter: none; }
+body.sksfa-admin .brand { font-size: 0.72rem; font-weight: 700; letter-spacing: 2.2px; text-transform: uppercase; color: #fff; }
+body.sksfa-admin .brand small { font-size: 0.56rem; letter-spacing: 2.6px; text-transform: uppercase; color: var(--text-3); }
+body.sksfa-admin .topbar .top-badge, body.sksfa-admin .topbar .top-btn, body.sksfa-admin .topbar .user-chip { height: 40px; }
+body.sksfa-admin .top-badge, body.sksfa-admin .top-btn, body.sksfa-admin .user-chip {
+  background: var(--glass); border: 1px solid var(--glass-border); box-shadow: var(--glass-hi);
+  backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+}
+body.sksfa-admin .top-badge, body.sksfa-admin .top-btn { font-size: 0.66rem; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; }
+
+/* ── Navigation — liquid-glass sidebar on desktop (the tab bar, restyled) ── */
+@media (min-width: 1100px) {
+  body.sksfa-admin .tab-bar {
+    position: fixed; top: var(--top-h); left: 0; bottom: 0; width: var(--side-w); z-index: 80;
+    background: rgba(8,8,10,0.6); border-bottom: 0; border-right: 1px solid var(--line);
+    backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
+  }
+  body.sksfa-admin .tab-bar-inner {
+    flex-direction: column; align-items: stretch; gap: 4px; height: 100%; max-width: none;
+    padding: 22px 14px 28px; overflow-x: hidden; overflow-y: auto;
+  }
+  body.sksfa-admin .tab-bar-inner::before {
+    content: 'Manage'; display: block; padding: 0 14px 10px;
+    font-size: 0.58rem; font-weight: 700; letter-spacing: 3.2px; text-transform: uppercase; color: var(--text-3);
+  }
+  body.sksfa-admin .tab-btn { width: 100%; justify-content: flex-start; height: 44px; padding: 0 14px; gap: 12px; border-radius: 12px; }
+  body.sksfa-admin .wrap { margin-left: var(--side-w); max-width: none; padding: 40px clamp(28px, 4vw, 56px) 72px; }
+  body.sksfa-admin .wrap > * { max-width: 1320px; }
+}
+body.sksfa-admin .tab-btn {
+  color: rgba(255,255,255,0.62); font-size: 0.7rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+  border: 1px solid transparent; transition: color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+body.sksfa-admin .tab-btn:hover { color: #fff; background: rgba(255,255,255,0.06); }
+body.sksfa-admin .tab-btn.active {
+  color: #fff; background: rgba(255,255,255,0.12); font-weight: 700;
+  border-color: rgba(255,255,255,0.1); box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 2px 10px rgba(0,0,0,0.25);
+}
+body.sksfa-admin .tab-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+body.sksfa-admin .tab-btn svg { opacity: 0.65; }
+body.sksfa-admin .tab-btn.active svg { opacity: 1; }
+/* tablets / phones: one glass pill strip under the top bar */
+@media (max-width: 1099px) {
+  body.sksfa-admin .tab-bar { top: var(--top-h); background: rgba(6,6,8,0.78); border-bottom: 1px solid var(--line); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur); }
+  body.sksfa-admin .tab-bar-inner { padding: 10px 16px; gap: 4px; }
+  body.sksfa-admin .tab-btn { height: 38px; border-radius: 999px; padding: 0 14px; }
+}
+@media (max-width: 768px) {
+  body.sksfa-admin { --top-h: 60px; }
+  body.sksfa-admin .topbar-inner { padding: 0 14px; }
+  body.sksfa-admin .tab-btn { font-size: 0.62rem; letter-spacing: 1.1px; padding: 0 12px; }
+}
+
+/* ── Page titles — site eyebrow + uppercase heading ── */
+body.sksfa-admin .sksfa-page-title { border-bottom: 0; margin-bottom: 32px; padding-bottom: 0; }
+body.sksfa-admin .sksfa-eyebrow { font-size: 0.62rem; letter-spacing: 4px; color: rgba(255,255,255,0.45); margin-bottom: 12px; }
+body.sksfa-admin .sksfa-h1 {
+  font-size: clamp(1.7rem, 3vw, 2.4rem); font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; line-height: 1.05;
+  background: linear-gradient(180deg, #fff 30%, rgba(255,255,255,0.72) 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+body.sksfa-admin .sksfa-page-desc { color: var(--text-2); font-size: 0.95rem; line-height: 1.7; }
+
+/* ── Cards & stats — Showcase card language ── */
+body.sksfa-admin .card {
+  border-radius: var(--r-card); border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.012) 100%), var(--surface);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+}
+body.sksfa-admin .card-head { border-bottom-color: var(--line); }
+body.sksfa-admin .card-head h2, body.sksfa-admin .card h2, body.sksfa-admin .card h3 { letter-spacing: 0.4px; }
+body.sksfa-admin .stat {
+  border-radius: var(--r-card); border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 100%), var(--surface);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); transition: border-color 0.3s ease;
+}
+body.sksfa-admin .stat:hover { border-color: rgba(255,255,255,0.2); }
+body.sksfa-admin .stat .k { font-size: 0.6rem; letter-spacing: 2.4px; text-transform: uppercase; color: var(--text-3); }
+body.sksfa-admin .stat .v { font-weight: 800; letter-spacing: -0.5px; }
+
+/* ── Buttons — white pill primary (site Submit), glass pill secondary ── */
+body.sksfa-admin .btn {
+  border-radius: 999px; background: #fff; color: #000; border: 0;
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; transition: background 0.25s ease;
+}
+body.sksfa-admin .btn:hover { background: #e8e8e8; }
+body.sksfa-admin .btn-ghost {
+  border-radius: 999px; background: var(--glass); border: 1px solid var(--glass-border); box-shadow: var(--glass-hi); color: #fff;
+  font-size: 0.64rem; font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase;
+}
+body.sksfa-admin .btn-ghost:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.24); }
+body.sksfa-admin .btn:focus-visible, body.sksfa-admin .btn-ghost:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+body.sksfa-admin .btn-danger { border-radius: 999px; }
+
+/* ── Form fields — dark glass ── */
+body.sksfa-admin input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+body.sksfa-admin select, body.sksfa-admin textarea {
+  border-radius: var(--r-ctl); background: rgba(255,255,255,0.035); border: 1px solid var(--line-strong); color: #fff;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+body.sksfa-admin input:focus, body.sksfa-admin select:focus, body.sksfa-admin textarea:focus {
+  border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.055); outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
+}
+body.sksfa-admin label { letter-spacing: 1.6px; }
+body.sksfa-admin .ad-trigger { border-radius: var(--r-ctl); }
+body.sksfa-admin .ad-pop { border-radius: 16px; background: rgba(16,16,19,0.94); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur); }
+
+/* ── Tables ── */
+body.sksfa-admin .tbl-wrap { border-radius: var(--r-card); border: 1px solid var(--line); overflow: hidden; }
+body.sksfa-admin th { font-size: 0.6rem; letter-spacing: 2.2px; text-transform: uppercase; color: var(--text-3); background: rgba(255,255,255,0.025); }
+body.sksfa-admin tbody tr { transition: background 0.2s ease; }
+body.sksfa-admin tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+/* ── Popups / modals — same panel as the site ── */
+body.sksfa-admin .modal-overlay { background: rgba(3,3,5,0.82); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+body.sksfa-admin .modal-box {
+  border-radius: 22px; border: 1px solid var(--line-strong);
+  background: radial-gradient(120% 60% at 50% 0%, rgba(255,255,255,0.06), transparent 60%), linear-gradient(180deg, #111115 0%, #0a0a0d 100%);
+  box-shadow: 0 40px 120px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* ── Small pills / tags / chips ── */
+body.sksfa-admin .tag, body.sksfa-admin .badge { border-radius: 999px; letter-spacing: 1.2px; }
+body.sksfa-admin .jm-tab, body.sksfa-admin .pay-tabs button { border-radius: 999px; }
+
+/* stats row: all counters on one line when there is room */
+body.sksfa-admin .stats { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+@media (max-width: 640px) { body.sksfa-admin .stats { grid-template-columns: 1fr 1fr; gap: 10px; } }
+
+/* phones: compact header controls so the logo never collides with them */
+@media (max-width: 640px) {
+  body.sksfa-admin .sksfa-brand-wrap { flex-shrink: 0; }
+  body.sksfa-admin .sksfa-logo { height: 30px; }
+  body.sksfa-admin .topbar-inner { gap: 6px; }
+  body.sksfa-admin .topbar .top-badge, body.sksfa-admin .topbar .top-btn, body.sksfa-admin .topbar .user-chip { height: 34px; }
+  body.sksfa-admin .top-badge { padding: 0 10px 0 9px; gap: 6px; font-size: 0.56rem; letter-spacing: 1px; max-width: 132px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+}
