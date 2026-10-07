@@ -257,3 +257,14 @@ body.sksfa-admin .muted-note { color: var(--text-3); font-size: 0.8rem; line-hei
 
 /* section heading inside cards */
 body.sksfa-admin .card-head h2, body.sksfa-admin .sksfa-card-head-left h2 { font-size: 1.05rem; font-weight: 700; color: #fff; }
+
+/* password reset panel (assets/js/admin-recovery.js) */
+body.sksfa-admin .sk-reset-overlay { position: fixed; inset: 0; z-index: 9000; background: rgba(3,3,5,0.86); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+body.sksfa-admin .sk-reset-card { display: flex; flex-direction: column; gap: 6px; text-align: left; }
+body.sksfa-admin .sk-reset-card h1 { text-align: center; margin: 0 0 4px; }
+body.sksfa-admin .sk-reset-card .sub { text-align: center; margin: 0 0 18px; }
+body.sksfa-admin .sk-reset-card input { width: 100%; box-sizing: border-box; margin-bottom: 10px; }
+body.sksfa-admin .sk-reset-card .btn { width: 100%; margin-top: 8px; }
+body.sksfa-admin .sk-reset-msg { min-height: 1.2em; margin: 2px 0 4px; font-size: 0.82rem; line-height: 1.5; color: var(--text-2); }
+body.sksfa-admin .sk-reset-msg.is-err { color: #ff8f86; }
+body.sksfa-admin .sk-reset-msg.is-ok { color: #8fe0a6; }
