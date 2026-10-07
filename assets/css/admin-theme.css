@@ -186,3 +186,74 @@ body.sksfa-admin .stats { grid-template-columns: repeat(auto-fit, minmax(160px, 
   body.sksfa-admin .topbar .top-badge, body.sksfa-admin .topbar .top-btn, body.sksfa-admin .topbar .user-chip { height: 34px; }
   body.sksfa-admin .top-badge { padding: 0 10px 0 9px; gap: 6px; font-size: 0.56rem; letter-spacing: 1px; max-width: 132px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 }
+
+/* ═════════════ Refinements (v2) ═════════════ */
+
+/* stray empty toast box bottom-right — only show while a message is up */
+body.sksfa-admin #toast:not(.show), body.sksfa-admin #toast:empty { opacity: 0 !important; visibility: hidden; pointer-events: none; }
+body.sksfa-admin #toast.show { border-radius: 14px; background: rgba(16,16,19,0.94); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur); }
+
+/* sidebar: soft focus ring instead of a hard white box after clicking */
+body.sksfa-admin .tab-btn:focus { outline: none; }
+body.sksfa-admin .tab-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px rgba(255,255,255,0.32); }
+body.sksfa-admin .tab-btn.active:focus-visible { box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 0 0 2px rgba(255,255,255,0.32); }
+
+/* checkboxes / radios: white instead of browser blue */
+body.sksfa-admin input[type="checkbox"], body.sksfa-admin input[type="radio"] { accent-color: #fff; width: 16px; height: 16px; cursor: pointer; }
+
+/* row action buttons (lists of jury, media, videos, categories): quieter, compact, consistent */
+body.sksfa-admin .btn-ghost.btn-sm, body.sksfa-admin .btn-ghost.btn-xs, body.sksfa-admin .btn-xs {
+  height: 32px; padding: 0 13px; gap: 6px; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.62rem; font-weight: 600; letter-spacing: 0.9px; text-transform: uppercase; white-space: nowrap;
+  color: rgba(255,255,255,0.82); background: rgba(255,255,255,0.03); box-shadow: none; border: 1px solid rgba(255,255,255,0.12);
+}
+body.sksfa-admin .btn-ghost.btn-sm:hover, body.sksfa-admin .btn-ghost.btn-xs:hover, body.sksfa-admin .btn-xs:hover { color: #fff; background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.26); }
+body.sksfa-admin .btn-xs[disabled], body.sksfa-admin .btn-sm[disabled] { opacity: 0.35; }
+/* icon-only arrows / small square actions stay circular */
+body.sksfa-admin [data-act="up"], body.sksfa-admin [data-act="down"] { width: 32px; padding: 0; border-radius: 50%; }
+/* destructive actions read as destructive */
+body.sksfa-admin [data-act="del"], body.sksfa-admin .btn-del, body.sksfa-admin button[onclick*="Delete"], body.sksfa-admin button[onclick*="delete"] {
+  color: #ff8f86 !important; border-color: rgba(229,83,75,0.32) !important; background: rgba(229,83,75,0.05) !important;
+}
+body.sksfa-admin [data-act="del"]:hover, body.sksfa-admin .btn-del:hover, body.sksfa-admin button[onclick*="Delete"]:hover, body.sksfa-admin button[onclick*="delete"]:hover {
+  color: #fff !important; background: rgba(229,83,75,0.22) !important; border-color: rgba(229,83,75,0.55) !important;
+}
+/* re-appoint toggle reads as the primary row action */
+body.sksfa-admin .jm-promote { color: #000 !important; background: #fff !important; border-color: #fff !important; }
+
+/* list rows: card language + room to breathe; actions wrap neatly on narrower widths */
+body.sksfa-admin .mg-row {
+  border-radius: 16px; border: 1px solid var(--line); background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.008)), var(--surface);
+  padding: 12px 16px; gap: 16px; transition: border-color 0.25s ease;
+}
+body.sksfa-admin .mg-row:hover { border-color: rgba(255,255,255,0.18); }
+body.sksfa-admin .mg-row + .mg-row { margin-top: 10px; }
+body.sksfa-admin .mg-num { font-size: 0.66rem; font-weight: 700; letter-spacing: 1.6px; color: var(--text-3); }
+body.sksfa-admin .mg-thumb { border-radius: 10px; overflow: hidden; }
+body.sksfa-admin .mg-info b { font-size: 0.95rem; font-weight: 600; color: #fff; }
+body.sksfa-admin .mg-info small { color: var(--text-3); font-size: 0.78rem; line-height: 1.5; }
+body.sksfa-admin .mg-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; }
+body.sksfa-admin .mg-vis { display: inline-flex; align-items: center; gap: 7px; font-size: 0.72rem; letter-spacing: 0.4px; text-transform: none; color: var(--text-2); margin-right: 6px; }
+/* actions sit on the right and wrap under the title only when the row is too narrow */
+body.sksfa-admin .mg-row { flex-wrap: wrap; }
+body.sksfa-admin .mg-info { flex: 1 1 240px; min-width: 0; }
+body.sksfa-admin .mg-actions { margin-left: auto; }
+
+/* videos list cards (testimonials etc.) */
+body.sksfa-admin .tmt-admin-card { border-radius: 16px; border-color: var(--line); background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.008)), var(--surface); }
+body.sksfa-admin .tmt-admin-thumb { border-radius: 12px; overflow: hidden; }
+body.sksfa-admin .tmt-admin-card .btn-ghost svg, body.sksfa-admin .mg-row .btn-ghost svg { width: 12px; height: 12px; }
+
+/* tab pills inside cards (Current/Previous jury, Paid/Not paid) */
+body.sksfa-admin .jm-tabs, body.sksfa-admin .pay-tabs {
+  padding: 4px; border-radius: 999px; background: var(--glass); border: 1px solid var(--glass-border); box-shadow: var(--glass-hi); display: inline-flex; gap: 2px;
+}
+body.sksfa-admin .jm-tab.is-active, body.sksfa-admin .pay-tabs button.active, body.sksfa-admin .pay-tabs .active {
+  background: rgba(255,255,255,0.14); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
+}
+
+/* long helper notes: calmer */
+body.sksfa-admin .muted-note { color: var(--text-3); font-size: 0.8rem; line-height: 1.65; max-width: 920px; }
+
+/* section heading inside cards */
+body.sksfa-admin .card-head h2, body.sksfa-admin .sksfa-card-head-left h2 { font-size: 1.05rem; font-weight: 700; color: #fff; }
