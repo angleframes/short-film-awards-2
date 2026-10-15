@@ -15,6 +15,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="assets/css/ui-components.css">
 <link rel="stylesheet" href="assets/css/submit.css?v=2">
+<link rel="stylesheet" href="assets/css/payment-ui.css?v=1">
 </head>
 <body class="sksfa-submit">
 
@@ -244,15 +245,8 @@
         <div class="step-panel" id="step5">
           <div class="card">
             <div class="card-title">Step 05 of 05</div>
-            <h2 class="sksfa-step-heading">Entry Fee Payment</h2>
-            <p class="sksfa-step-sub">Secure payment via Cashfree. Non-refundable.</p>
-            <div class="pay-box">
-              <div class="pay-fee">₹1,000</div>
-              <div class="pay-label">Non-refundable entry fee · INR</div>
-            </div>
-            <div id="payStatus" class="pay-status pending" style="display:none;"></div>
-            <button id="payBtn" class="btn-primary" style="margin-top:12px;" onclick="doPayment()">Pay ₹1,000 via Cashfree →</button>
-            <button id="retryBtn" class="btn-primary" style="margin-top:12px;display:none;" onclick="doPayment()">Retry Payment</button>
+            <h2 class="sksfa-step-heading">Complete your submission</h2>
+            <div id="skPayment"></div>
           </div>
           <div class="nav-row" style="margin-top:0;">
             <button class="btn-back" onclick="goStep(4)">← Back</button>
@@ -306,13 +300,7 @@
   </div><!-- /sForm -->
 
   <!-- ── SUCCESS ── -->
-  <div id="sSuccess" class="success-box" style="display:none;">
-    <span class="icon">🎬</span>
-    <h2>Entry Confirmed!</h2>
-    <p>Your film has been officially entered into the Sharankrishna Short Film Awards.<br><br>
-    A confirmation email with your invoice will be sent shortly.<br><br>
-    Keep your Order ID for reference: <span class="success-order" id="successOrderId"></span></p>
-  </div>
+  <div id="sSuccess" style="display:none;"></div>
 
 </div><!-- /container -->
 
@@ -354,5 +342,6 @@ function selectCategory(el) {
 
 <script src="assets/js/ui-components.js"></script>
 <script src="assets/js/campus-proof.js?v=1"></script>
-<script src="assets/js/submit.js?v=3"></script>
+<script src="assets/js/payment-ui.js?v=1"></script>
+<script src="assets/js/submit.js?v=4"></script>
 </html>
