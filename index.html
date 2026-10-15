@@ -158,7 +158,7 @@
     </script>
 
     <link rel="stylesheet" href="assets/css/ui-components.css">
-    <link rel="stylesheet" href="assets/css/site.css?v=39">
+    <link rel="stylesheet" href="assets/css/site.css?v=40">
     <link rel="stylesheet" href="assets/css/payment-ui.css?v=1">
 </head>
 <body>
@@ -654,7 +654,43 @@
                 <div class="portal-glass-card glow-card" id="registrationCardContent">
                     <span class="edge-light"></span>
                     <div id="activeFormContainer">
-                        <h2 class="portal-main-heading">Registration</h2>
+                        <div class="portal-layout">
+                            <aside class="portal-rail" aria-label="Entry essentials">
+                                <p class="portal-rail-eyebrow">Sharankrishna Short Film Awards 2026</p>
+                                <h3 class="portal-rail-title">Submit your film</h3>
+                                <p class="portal-rail-lead">Five short steps. Your entry is confirmed as soon as the entry fee is verified.</p>
+                                <dl class="portal-facts">
+                                    <div><dt>Entry fee</dt><dd>₹1,000<span>per film</span></dd></div>
+                                    <div><dt>Deadline</dt><dd id="portalDeadline">31 December 2026</dd></div>
+                                    <div><dt>Runtime</dt><dd>40 min<span>max, incl. credits</span></dd></div>
+                                </dl>
+                                <details class="portal-rail-more" id="portalRailMore">
+                                    <summary>Before you start</summary>
+                                    <div class="portal-rail-body">
+                                        <p class="portal-rail-label">Choose your track</p>
+                                        <ul class="portal-tracks">
+                                            <li><strong>General Track</strong><span>Open to filmmakers worldwide.</span></li>
+                                            <li><strong>Campus Track</strong><span>For current students. Upload a student ID or an institution letter (PDF or JPG, max 5 MB).</span></li>
+                                        </ul>
+                                        <p class="portal-rail-label">Keep ready</p>
+                                        <ul class="portal-checklist">
+                                            <li>A viewable YouTube or Google Drive link to your film</li>
+                                            <li>The film's runtime in minutes</li>
+                                            <li>Names of your key cast and crew</li>
+                                            <li>UPI, card or net banking for the ₹1,000 fee</li>
+                                        </ul>
+                                        <p class="portal-rail-note">Entering more than one film? Submit each film as a separate entry.</p>
+                                        <p class="portal-rail-label">Need help?</p>
+                                        <p class="portal-help">
+                                            <a href="https://wa.me/919745640896?text=Hi%2C%20I%20have%20a%20question%20about%20submitting%20my%20film." target="_blank" rel="noopener noreferrer">WhatsApp the festival team &rarr;</a>
+                                            <a href="mailto:sharankrishnashortfilmawards@gmail.com">sharankrishnashortfilmawards@gmail.com</a>
+                                        </p>
+                                    </div>
+                                </details>
+                            </aside>
+
+                            <div class="portal-main">
+                        <p class="portal-step-meta" id="portalStepMeta" aria-live="polite">Step 1 of 5 · Applicant Details</p>
 
                         <div class="step-pipeline-container">
                             <div class="step-pipeline-line">
@@ -686,13 +722,15 @@
                             
                             <div class="wizard-step-panel active" id="wizardStep1">
                                 <h3 class="wizard-step-subheading">Applicant Details</h3>
-                                <div class="form-group">
-                                    <label for="applicantName">Full Name *</label>
-                                    <input type="text" id="applicantName" placeholder="Enter your full name">
-                                </div>
-                                <div class="form-group">
-                                    <label for="email">Email Address *</label>
-                                    <input type="email" id="email" placeholder="Enter your email">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label for="applicantName">Full Name *</label>
+                                        <input type="text" id="applicantName" placeholder="Enter your full name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">Email Address *</label>
+                                        <input type="email" id="email" placeholder="Enter your email">
+                                    </div>
                                 </div>
                                 <div class="form-grid">
                                     <div class="form-group">
@@ -823,6 +861,8 @@
                             </div>
 
                         </form>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="successScreen" style="display:none;">
@@ -908,6 +948,6 @@
     <script src="assets/js/youtube.js?v=1"></script>
     <script src="assets/js/jury-profile.js?v=1"></script>
     <script src="assets/js/payment-ui.js?v=1"></script>
-    <script src="assets/js/site.js?v=43"></script>
+    <script src="assets/js/site.js?v=44"></script>
 </body>
 </html>
