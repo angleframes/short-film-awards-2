@@ -262,6 +262,7 @@
 
             evaluateRegistrationGateState();
             initPaymentUi();
+            initPortalRail();
 
             // Live sync: update registration gate instantly when admin changes it
             if (window.supabase) {
@@ -1022,6 +1023,7 @@
                 if (formContainer && _originalRegCardHTML !== null && document.getElementById('submissionForm') === null) {
                     formContainer.innerHTML = _originalRegCardHTML;
                     initPaymentUi();
+                    initPortalRail();
                 }
             } else {
                 if (browserTitleEl) browserTitleEl.textContent = HOME_TITLE;   // one stable title for search results
@@ -2125,6 +2127,8 @@
 
             if (stepNumber === 4) generateReviewSummary();
             if (stepNumber === 5 && window.SKPayment) SKPayment.refresh();
+            const meta = document.getElementById('portalStepMeta');
+            if (meta) meta.textContent = 'Step ' + stepNumber + ' of 5 · ' + PORTAL_STEP_NAMES[stepNumber - 1];
         }
 
         function validateStepInputs(step) {
@@ -2220,6 +2224,25 @@
             PAYMENT_FIELDS.forEach(id => { const el = document.getElementById(id); f[id] = el ? String(el.value || '').trim() : ''; });
             f.childArtist = f.childArtist || 'None';
             return f;
+        }
+
+        const PORTAL_STEP_NAMES = ['Applicant Details', 'Film Details', 'Cast & Crew', 'Review & Confirm', 'Payment'];
+
+        function initPortalRail() {
+            const dl = document.getElementById('portalDeadline');
+            if (dl) {
+                const d = new Date(PORTAL_TIMELINES.submissionDeadline);
+                dl.textContent = isNaN(d) ? PORTAL_TIMELINES.deadlineLabelText : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+            }
+            const more = document.getElementById('portalRailMore');
+            if (more) {
+                const wide = window.matchMedia('(min-width: 1100px)');
+                if (wide.matches) more.open = true;
+                if (!more.dataset.mq) {
+                    more.dataset.mq = '1';
+                    wide.addEventListener('change', (e) => { if (e.matches) more.open = true; });
+                }
+            }
         }
 
         function initPaymentUi() {
