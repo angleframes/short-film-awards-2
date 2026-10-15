@@ -261,6 +261,7 @@
             applySectionBackground('section-contact', SITE_IMAGES.sectionBgContact);
 
             evaluateRegistrationGateState();
+            initPaymentUi();
 
             // Live sync: update registration gate instantly when admin changes it
             if (window.supabase) {
@@ -1020,6 +1021,7 @@
                 // Restore the wizard if a previous closed-render had replaced it.
                 if (formContainer && _originalRegCardHTML !== null && document.getElementById('submissionForm') === null) {
                     formContainer.innerHTML = _originalRegCardHTML;
+                    initPaymentUi();
                 }
             } else {
                 if (browserTitleEl) browserTitleEl.textContent = HOME_TITLE;   // one stable title for search results
@@ -2122,6 +2124,7 @@
             }
 
             if (stepNumber === 4) generateReviewSummary();
+            if (stepNumber === 5 && window.SKPayment) SKPayment.refresh();
         }
 
         function validateStepInputs(step) {
@@ -2206,52 +2209,66 @@
         }
 
         /****************************************************************
-         * 💳 CASHFREE PAYMENT — secure flow
-         * Order creation + verification happen on the backend
-         * (Apps Script). The browser never sees the Cashfree secret.
+         * 💳 PAYMENT STEP — UI and flow live in assets/js/payment-ui.js (SKPayment).
+         * Order creation and verification stay server-side; the browser never sets payment status.
          *****************************************************************/
-        const paymentState = {
-            verified: false,      // true only after backend confirms PAID
-            orderId: null,        // Cashfree order id
-            cfPaymentId: null,    // Cashfree payment/reference id
-            amount: null,
-            currency: null,
-            paidAt: null,
-            paymentMethod: null,  // e.g. UPI, CARD, NETBANKING (from server)
-            inProgress: false     // guards against double-click / duplicate orders
-        };
+        const PAYMENT_FIELDS = ['applicantName', 'email', 'phone', 'city', 'filmName', 'category', 'filmLink', 'director',
+            'duration', 'producer', 'writer', 'cinematographer', 'editor', 'musicDirector', 'actor', 'actress', 'childArtist'];
 
-        function showPaymentStatus(kind, message) {
-            const box = document.getElementById('paymentStatusBox');
-            if (!box) return;
-            box.className = 'payment-status-box ' + (kind || '');
-            box.innerHTML = message; // message is composed from safe, backend/whitelisted strings only
-            box.style.display = 'block';
+        function paymentForm() {
+            const f = {};
+            PAYMENT_FIELDS.forEach(id => { const el = document.getElementById(id); f[id] = el ? String(el.value || '').trim() : ''; });
+            f.childArtist = f.childArtist || 'None';
+            return f;
         }
 
-        function setPayUiState(state) {
-            const payBtn = document.getElementById('payNowBtn');
-            const payLabel = document.getElementById('payNowBtnLabel');
-            const retryBtn = document.getElementById('paymentRetryBtn');
-
-            if (state === 'idle') {
-                payBtn.style.display = 'block';
-                payBtn.disabled = false;
-                payLabel.textContent = 'Pay ₹' + APP_CONFIG.registrationFee + ' Securely';
-                retryBtn.style.display = 'none';
-            } else if (state === 'processing') {
-                payBtn.style.display = 'block';
-                payBtn.disabled = true;
-                payLabel.textContent = 'Processing…';
-                retryBtn.style.display = 'none';
-            } else if (state === 'failed') {
-                payBtn.style.display = 'none';
-                retryBtn.style.display = 'block';
-                retryBtn.disabled = false;
-            } else if (state === 'paid') {
-                payBtn.style.display = 'none';
-                retryBtn.style.display = 'none';
-            }
+        function initPaymentUi() {
+            if (!window.SKPayment || !document.getElementById('skPayment')) return;
+            SKPayment.mount({
+                root: document.getElementById('skPayment'),
+                successRoot: document.getElementById('skPaymentSuccess'),
+                storageKey: 'sksfa_payment_home',
+                fee: APP_CONFIG.registrationFee,
+                cashfreeMode: APP_CONFIG.cashfreeMode,
+                backendCall: backendCall,
+                collect: () => {
+                    const campus = window.CampusProof ? CampusProof.payload() : {};
+                    const link = window._linkId ? { link_id: window._linkId } : {};
+                    return { form: paymentForm(), orderExtra: campus, saveExtra: Object.assign({}, link, campus), submitExtra: Object.assign({}, link, campus) };
+                },
+                getDetails: (snap) => {
+                    const f = snap || paymentForm();
+                    const cat = { General: 'General Track', Campus: 'Campus Track' }[f.category] || f.category;
+                    return { film: f.filmName, category: cat, applicant: f.applicantName, email: f.email };
+                },
+                validate: () => {
+                    if (!REGISTRATION_GATE.isOpen) return 'Registrations are currently closed.';
+                    if (!validateStepInputs(1) || !validateStepInputs(2) || !validateStepInputs(3)) return 'Please complete all details before paying.';
+                    return null;
+                },
+                restore: (snap) => {
+                    if (!snap) return;
+                    PAYMENT_FIELDS.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el && snap[id] != null) el.value = (id === 'childArtist' && snap[id] === 'None') ? '' : snap[id];
+                    });
+                    const cat = document.getElementById('category');
+                    if (cat) cat.dispatchEvent(new Event('change', { bubbles: true }));
+                },
+                showStep: () => {
+                    currentWizardStep = 5;
+                    goToWizardStep(5);
+                    const sec = document.getElementById('section-registration');
+                    if (sec) sec.scrollIntoView({ block: 'start' });
+                },
+                onBack: () => goToWizardStep(4),
+                onSuccess: () => {
+                    document.getElementById('activeFormContainer').style.display = 'none';
+                    document.getElementById('successScreen').style.display = 'block';
+                    document.getElementById('successScreen').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                },
+                onReset: () => location.reload()
+            });
         }
 
         function backendCall(payload) {
@@ -2266,190 +2283,13 @@
             }).then(res => res.json());
         }
 
-        async function startCashfreePayment() {
-            if (!REGISTRATION_GATE.isOpen) return;
-            if (paymentState.inProgress) return;      // prevent duplicate orders on double-click
-            if (paymentState.verified) return;         // already paid
-
-            // Make sure applicant + film details are filled before charging.
-            if (!validateStepInputs(1) || !validateStepInputs(2) || !validateStepInputs(3)) {
-                showPaymentStatus('is-error', 'Please complete all details before paying.');
-                return;
-            }
-            if (typeof Cashfree !== 'function') {
-                showPaymentStatus('is-error', 'Payment library failed to load. Check your connection and retry.');
-                setPayUiState('failed');
-                return;
-            }
-
-            paymentState.inProgress = true;
-            setPayUiState('processing');
-            showPaymentStatus('is-pending', 'Creating your secure payment order…');
-
-            try {
-                // NOTE: amount and currency are enforced server-side (1000 INR).
-                // Only send customer info needed for the Cashfree order.
-                const orderResp = await backendCall(Object.assign({
-                    action: 'createOrder',
-                    customerName: document.getElementById('applicantName').value.trim(),
-                    customerEmail: document.getElementById('email').value.trim(),
-                    customerPhone: document.getElementById('phone').value.trim(),
-                    category: document.getElementById('category').value
-                }, window.CampusProof ? CampusProof.payload() : {}));
-
-                if (!orderResp || orderResp.status !== 'success' || !orderResp.payment_session_id || !orderResp.order_id) {
-                    throw new Error(orderResp && orderResp.message ? orderResp.message : 'Could not create order.');
-                }
-
-                paymentState.orderId = orderResp.order_id;
-
-                // Pre-payment save: persist form data so webhook can finalize if browser closes.
-                try {
-                    const formSnapshot = {
-                        action: 'saveFormData',
-                        applicantName: document.getElementById('applicantName').value.trim(),
-                        email: document.getElementById('email').value.trim(),
-                        phone: document.getElementById('phone').value.trim(),
-                        city: document.getElementById('city').value.trim(),
-                        filmName: document.getElementById('filmName').value.trim(),
-                        category: document.getElementById('category').value,
-                        filmLink: document.getElementById('filmLink').value.trim(),
-                        director: document.getElementById('director').value.trim(),
-                        duration: document.getElementById('duration').value.trim(),
-                        producer: document.getElementById('producer').value.trim(),
-                        writer: document.getElementById('writer').value.trim(),
-                        cinematographer: document.getElementById('cinematographer').value.trim(),
-                        editor: document.getElementById('editor').value.trim(),
-                        musicDirector: document.getElementById('musicDirector').value.trim(),
-                        actor: document.getElementById('actor').value.trim(),
-                        actress: document.getElementById('actress').value.trim(),
-                        childArtist: document.getElementById('childArtist').value.trim() || 'None',
-                        cashfreeOrderId: orderResp.order_id
-                    };
-                    if (window._linkId) formSnapshot.link_id = window._linkId;
-                    if (window.CampusProof) Object.assign(formSnapshot, CampusProof.payload());
-                    await backendCall(formSnapshot);
-                } catch (saveErr) {
-                    console.warn('Pre-payment save failed (non-blocking):', saveErr);
-                }
-
-                const cashfree = Cashfree({ mode: APP_CONFIG.cashfreeMode });
-                showPaymentStatus('is-pending', 'Opening secure Cashfree checkout…');
-
-                const result = await cashfree.checkout({
-                    paymentSessionId: orderResp.payment_session_id,
-                    redirectTarget: '_modal'
-                });
-
-                // NOTE: never trust this result alone — always re-verify on the backend.
-                if (result && result.error) {
-                    showPaymentStatus('is-pending', 'Checkout closed. Verifying payment status…');
-                }
-
-                await verifyPaymentWithBackend();
-            } catch (err) {
-                showPaymentStatus('is-error', 'Payment could not be started: ' + escapeHtml(err.message || 'Unknown error') + '. Please try again.');
-                setPayUiState('failed');
-            } finally {
-                paymentState.inProgress = false;
-            }
-        }
-
-        async function verifyPaymentWithBackend() {
-            if (!paymentState.orderId) {
-                setPayUiState('failed');
-                return;
-            }
-            showPaymentStatus('is-pending', 'Verifying your payment with our server…');
-            try {
-                const resp = await backendCall({ action: 'verifyOrder', orderId: paymentState.orderId });
-
-                if (!resp || resp.status !== 'success') {
-                    throw new Error(resp && resp.message ? resp.message : 'Verification failed.');
-                }
-
-                const payStatus = (resp.order_status || '').toUpperCase();
-                if (payStatus === 'PAID') {
-                    paymentState.verified = true;
-                    paymentState.cfPaymentId = resp.cf_payment_id || null;
-                    paymentState.amount = resp.order_amount || APP_CONFIG.registrationFee;
-                    paymentState.currency = resp.order_currency || APP_CONFIG.currency;
-                    paymentState.paidAt = resp.paid_at || new Date().toISOString();
-                    paymentState.paymentMethod = resp.payment_method || null;
-                    showPaymentStatus('is-success', '✓ Payment received (₹' + escapeHtml(paymentState.amount) + '). Submitting your entry…');
-                    setPayUiState('paid');
-                    // Auto-submit after successful payment.
-                    await handleFinalSubmit();
-                } else if (payStatus === 'ACTIVE' || payStatus === 'PENDING') {
-                    showPaymentStatus('is-pending', 'Payment is still pending. If you completed it, wait a moment and press Retry to re-check.');
-                    setPayUiState('failed');
-                } else {
-                    // FAILED, EXPIRED, TERMINATED, USER_DROPPED, cancelled, etc.
-                    showPaymentStatus('is-error', 'Payment not completed (status: ' + escapeHtml(payStatus || 'unknown') + '). No charge confirmed — please try again.');
-                    setPayUiState('failed');
-                }
-            } catch (err) {
-                showPaymentStatus('is-error', 'Could not verify payment: ' + escapeHtml(err.message || 'network error') + '. Press Retry to check again.');
-                setPayUiState('failed');
-            }
-        }
-
-        async function handleFinalSubmit(event) {
+        // The wizard is a <form>; pressing Enter must never submit or reload it. Payment drives submission.
+        function handleFinalSubmit(event) {
             if (event) event.preventDefault();
-            if (!REGISTRATION_GATE.isOpen) return;
-
-            if (!paymentState.verified) {
-                UI.alert("Please complete and verify payment before submitting.", "warn");
-                goToWizardStep(5);
-                return;
-            }
-
-            const formData = {
-                action: 'handleSubmission',
-                applicantName: document.getElementById('applicantName').value,
-                phone: document.getElementById('phone').value,
-                email: document.getElementById('email').value,
-                city: document.getElementById('city').value,
-                filmName: document.getElementById('filmName').value,
-                category: document.getElementById('category').value,
-                filmLink: document.getElementById('filmLink').value,
-                director: document.getElementById('director').value,
-                duration: document.getElementById('duration').value,
-                producer: document.getElementById('producer').value,
-                writer: document.getElementById('writer').value,
-                cinematographer: document.getElementById('cinematographer').value,
-                editor: document.getElementById('editor').value,
-                musicDirector: document.getElementById('musicDirector').value,
-                actor: document.getElementById('actor').value,
-                actress: document.getElementById('actress').value,
-                childArtist: document.getElementById('childArtist').value || "None",
-                paymentStatus: "Paid",
-                cashfreeOrderId: paymentState.orderId,
-                cashfreePaymentId: paymentState.cfPaymentId,
-                amount: paymentState.amount,
-                currency: paymentState.currency,
-                paidAt: paymentState.paidAt,
-                paymentMethod: paymentState.paymentMethod
-            };
-            if (window._linkId) formData.link_id = window._linkId;
-            if (window.CampusProof) Object.assign(formData, CampusProof.payload());
-
-            try {
-                showPaymentStatus('is-pending', 'Submitting your film entry…');
-                const response = await backendCall(formData);
-                if (response.status === "success" || response.status === "already_registered") {
-                    document.getElementById('activeFormContainer').style.display = 'none';
-                    document.getElementById('successScreen').style.display = 'block';
-                } else {
-                    showPaymentStatus('is-error', 'Submission failed: ' + escapeHtml(response.message || 'Unknown error') + '. Your payment is safe — please retry.');
-                }
-            } catch (err) {
-                showPaymentStatus('is-error', 'Network error during submission. Your payment is safe — please retry or contact us.');
-            }
         }
 
         function resetPortalView() {
-            location.reload(); 
+            location.reload();
         }
 
         // Deep links (e.g. /#faq) into homepage modals
