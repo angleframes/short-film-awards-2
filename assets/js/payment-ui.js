@@ -329,6 +329,28 @@ window.SKPayment = (function () {
         o.onSuccess();
     }
 
+    // Waits for the page's own load/config reveal so a later scroll reset doesn't hide the result.
+    function pageSettled() {
+        return new Promise(function (done) {
+            var t0 = Date.now();
+            (function check() {
+                var ready = document.readyState === 'complete' &&
+                    (!document.querySelector('[class*="scroll-reveal"]') || document.body.classList.contains('cfg-ready') || Date.now() - t0 > 6000);
+                if (ready || Date.now() - t0 > 8000) setTimeout(done, 300); else setTimeout(check, 150);
+            })();
+        });
+    }
+    function bringIntoView(el) {
+        if (!el) return;
+        for (var p = el; p; p = p.parentElement) {
+            if (p.className && /scroll-reveal/.test(String(p.className))) p.classList.add('visible');
+        }
+        var root = document.documentElement, prev = root.style.scrollBehavior;
+        root.style.scrollBehavior = 'auto';
+        el.scrollIntoView({ block: 'center' });
+        root.style.scrollBehavior = prev;
+    }
+
     async function recoverReturnedOrder(orderId) {
         if (!/^SKSFA_\d{4}_\d+_\d{5}$/.test(orderId)) return;
         try { history.replaceState(null, '', location.pathname + location.hash); } catch (_) {}
@@ -340,7 +362,9 @@ window.SKPayment = (function () {
         if (r.status === 'success' && r.payment_status === 'Paid') {
             s.orderId = orderId; s.paid = true; s.finalized = true;
             store(null);
+            await pageSettled();
             showSuccess({ cashfreeOrderId: orderId, amount: r.order_amount || o.fee });
+            bringIntoView(o.successRoot);
             return;
         }
         if (r.status === 'success' && r.payment_status === 'unmatched') {
