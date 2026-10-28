@@ -329,6 +329,30 @@ window.SKPayment = (function () {
         o.onSuccess();
     }
 
+    async function recoverReturnedOrder(orderId) {
+        if (!/^SKSFA_\d{4}_\d+_\d{5}$/.test(orderId)) return;
+        try { history.replaceState(null, '', location.pathname + location.hash); } catch (_) {}
+        o.showStep();
+        viewBusy('Verifying your payment…', 'Confirming the payment status with our server.', 'Verifying payment…');
+        var r;
+        try { r = await api({ action: 'reconcileOrder', orderId: orderId }); }
+        catch (e) { r = { status: 'error', message: e.message }; }
+        if (r.status === 'success' && r.payment_status === 'Paid') {
+            s.orderId = orderId; s.paid = true; s.finalized = true;
+            store(null);
+            showSuccess({ cashfreeOrderId: orderId, amount: r.order_amount || o.fee });
+            return;
+        }
+        if (r.status === 'success' && r.payment_status === 'unmatched') {
+            setView({
+                state: { kind: 'pending', title: 'Payment received', text: 'We received your payment but could not match it to a submission automatically. Our team will contact you. Order ID: ' + orderId },
+                cta: null
+            });
+            return;
+        }
+        viewIdle();
+    }
+
     function reset() {
         store(null);
         s = { orderId: null, sessionId: null, formKey: null, snapshot: null, busy: false, paid: false, server: null, finalized: false };
@@ -347,6 +371,10 @@ window.SKPayment = (function () {
                 o.showStep();
                 els.details.innerHTML = detailsHtml(o.getDetails(rec.snapshot));
                 checkStatus(true);
+            } else if (urlOrder) {
+                // Returned from Cashfree in a fresh tab/browser (e.g. after a UPI app switch):
+                // no local state, so ask the server to reconcile the order it saved before checkout.
+                recoverReturnedOrder(urlOrder);
             }
         },
         // Called when the payment step becomes visible so the summary shows the latest form values.
