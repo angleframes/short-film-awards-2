@@ -301,6 +301,86 @@ async function loadEntries() {
   updatePaidCounters();
   _page = 1;
   applyFilters();
+  loadPaymentReviews();
+  autoReconcileUnpaid();
+}
+
+/* ═══════════════════════════════════════════════════════
+   PAYMENT RECONCILIATION — Cashfree is the source of truth.
+   The browser only asks the payment function to re-check an order;
+   the function marks an entry Paid only if Cashfree confirms ₹1,000 INR SUCCESS.
+════════════════════════════════════════════════════════ */
+const PAYMENT_FN = SUPABASE_URL + '/functions/v1/payment';
+const _verifying = new Set();
+
+async function reconcileOrder(orderId) {
+  const r = await fetch(PAYMENT_FN, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_ANON, 'apikey': SUPABASE_ANON },
+    body: JSON.stringify({ action: 'reconcileOrder', orderId })
+  });
+  return r.json();
+}
+
+async function verifyPayment(id) {
+  const row = _allEntries.find(r => r.id === id);
+  if (!row || !row.cashfree_order_id || _verifying.has(id)) return;
+  _verifying.add(id);
+  renderEntriesPage();
+  try {
+    const res = await reconcileOrder(row.cashfree_order_id);
+    if (res.status !== 'success') toast('Could not verify: ' + (res.message || 'error'), 'err');
+    else if (res.payment_status === 'Paid') toast('Payment verified with Cashfree — marked Paid', 'ok');
+    else toast('Cashfree status: ' + (res.order_status || 'not paid') + ' — entry left unpaid', 'info');
+  } catch (e) {
+    toast('Could not verify: ' + e.message, 'err');
+  }
+  _verifying.delete(id);
+  await loadEntries();
+}
+
+// Re-checks recent unpaid entries once per admin session, one at a time (Cashfree rate limits).
+let _autoReconciled = false;
+async function autoReconcileUnpaid() {
+  if (_autoReconciled) return;
+  _autoReconciled = true;
+  const since = Date.now() - 45 * 864e5;
+  const rows = _allEntries
+    .filter(r => !isPaidEntry(r) && r.cashfree_order_id && new Date(r.created_at).getTime() > since)
+    .slice(0, 25);
+  let fixed = 0;
+  for (const r of rows) {
+    try { const res = await reconcileOrder(r.cashfree_order_id); if (res.finalized) fixed++; } catch (e) {}
+    await new Promise(ok => setTimeout(ok, 400));
+  }
+  if (fixed) { toast(fixed + ' missed payment' + (fixed > 1 ? 's' : '') + ' verified with Cashfree and marked Paid', 'ok'); await loadEntries(); }
+}
+
+async function loadPaymentReviews() {
+  const box = document.getElementById('paymentReviews');
+  if (!box) return;
+  const { data, error } = await sb.from('payment_reviews').select('*').eq('resolved', false).order('created_at', { ascending: false });
+  if (error || !data || !data.length) { box.hidden = true; box.innerHTML = ''; return; }
+  const label = { paid_order_without_submission: 'Paid in Cashfree, no matching submission', possible_duplicate_payment: 'Possible duplicate payment for the same film' };
+  box.hidden = false;
+  box.innerHTML = `<div class="pr-head"><strong>Payments need review (${data.length})</strong><span>Verified with Cashfree — check and refund or link manually if needed.</span></div>` +
+    data.map(p => `<div class="pr-row">
+      <span>${esc(label[p.reason] || p.reason)}</span>
+      <span class="pr-mono">${esc(p.cashfree_order_id)}${p.entry_id ? ' · entry #' + p.entry_id : ''}</span>
+      <button class="btn-ghost btn-xs" onclick="resolvePaymentReview(${p.id})">Mark reviewed</button>
+    </div>`).join('');
+}
+
+async function resolvePaymentReview(id) {
+  const { error } = await sb.from('payment_reviews').update({ resolved: true, resolved_at: new Date().toISOString() }).eq('id', id);
+  if (error) return toast('Update failed: ' + error.message, 'err');
+  loadPaymentReviews();
+}
+
+function verifyBtnHtml(r) {
+  if (isPaidEntry(r) || !r.cashfree_order_id) return '';
+  const busy = _verifying.has(r.id);
+  return `<button class="btn-ghost btn-xs" ${busy ? 'disabled' : ''} onclick="verifyPayment(${r.id})">${busy ? 'Verifying…' : 'Verify Payment'}</button>`;
 }
 
 const isPaidEntry = r => (r.payment_status || '').toUpperCase() === 'PAID';
@@ -419,6 +499,7 @@ function renderEntriesPage() {
       <td>${payTag(r)}</td>
       <td>
         <button class="btn-ghost btn-xs" onclick="openDrawer(${gIdx})">View Details</button>
+        ${verifyBtnHtml(r)}
         ${window.Certs ? Certs.rowButtonsHtml(r) : ''}
         <button class="btn-ghost btn-xs btn-del" onclick="archiveEntry(${r.id}, '${esc(r.film_name||'')}', '${esc(r.applicant_name||'')}')">Delete</button>
       </td>
@@ -433,6 +514,7 @@ function renderEntriesPage() {
       <div class="ec-meta">${esc(r.applicant_name||'—')} · ${fmtDate(r.created_at)}</div>
       <div class="ec-row">${trackTag(r)} ${payTag(r)}
         <button class="btn-ghost btn-xs" style="margin-left:auto;" onclick="openDrawer(${gIdx})">View Details</button>
+        ${verifyBtnHtml(r)}
         ${window.Certs ? Certs.rowButtonsHtml(r) : ''}
         <button class="btn-ghost btn-xs btn-del" onclick="archiveEntry(${r.id}, '${esc(r.film_name||'')}', '${esc(r.applicant_name||'')}')">Delete</button>
       </div>
