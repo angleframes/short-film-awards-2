@@ -1,0 +1,84 @@
+/* Homepage "Co-Powered By" sponsors — black & white frame; logos keep their own colours. */
+.sponsors-section { padding: 56px 5% 64px; }
+.sponsors-section[hidden] { display: none !important; }
+.sponsors-inner { max-width: 1100px; margin: 0 auto; text-align: center; }
+.sponsors-heading {
+    margin: 0 0 28px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.sponsors-viewport { --sp-gap: 56px; --sp-h: 56px; overflow: hidden; display: flex; justify-content: center; }
+.sponsors-track { display: flex; flex: none; }
+.sponsors-set {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-gap);
+    flex: none;
+    width: max-content;
+}
+
+.sponsor-item { flex: none; display: flex; align-items: center; justify-content: center; height: calc(var(--sp-h) + 20px); }
+.sponsor-item img {
+    display: block;
+    height: var(--sp-h);
+    width: auto;
+    max-width: 220px;
+    object-fit: contain;
+    opacity: 0.92;
+    transition: opacity 0.25s ease;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+.sponsor-item:hover img { opacity: 1; }
+/* Optional light plate for dark logos (Admin → Sponsors) — keeps brand colours readable on black. */
+.sponsor-item.is-plate { padding: 10px 18px; border-radius: 12px; background: #f4f4f4; }
+.sponsor-item.is-plate img { height: calc(var(--sp-h) - 8px); opacity: 1; }
+
+/* Marquee: two or more identical sets slide left by exactly one set width, so the loop is seamless. */
+.sponsors-section.is-marquee .sponsors-viewport {
+    justify-content: flex-start;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+}
+.sponsors-section.is-marquee .sponsors-set { padding-right: var(--sp-gap); }
+.sponsors-section.is-marquee .sponsors-track {
+    animation: sponsors-marquee var(--sp-duration, 30s) linear infinite;
+    will-change: transform;
+}
+@keyframes sponsors-marquee {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(var(--sp-shift, -50%), 0, 0); }
+}
+@media (hover: hover) {
+    .sponsors-section.is-marquee .sponsors-viewport:hover .sponsors-track { animation-play-state: paused; }
+}
+
+/* Reduced motion and too many logos: a still row people can swipe. */
+.sponsors-section.is-scrollable .sponsors-viewport {
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    -webkit-overflow-scrolling: touch;
+}
+@media (prefers-reduced-motion: reduce) {
+    .sponsors-section.is-marquee .sponsors-track { animation: none; }
+}
+
+@media (max-width: 768px) {
+    .sponsors-section { padding: 40px 4% 48px; }
+    .sponsors-heading { margin-bottom: 22px; }
+    .sponsors-viewport { --sp-gap: 36px; --sp-h: 42px; }
+    .sponsor-item img { max-width: 160px; }
+}
+@media (max-width: 390px) {
+    .sponsors-viewport { --sp-gap: 28px; --sp-h: 36px; }
+    .sponsor-item img { max-width: 140px; }
+}
