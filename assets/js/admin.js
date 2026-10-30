@@ -167,6 +167,7 @@ function switchTab(name) {
   if (name === 'about' && window.AboutAdmin) AboutAdmin.load();
   if (name === 'festival' && window.MediaAdmin) MediaAdmin.load();
   if (name === 'jury' && window.JuryAdmin) JuryAdmin.load();
+  if (name === 'sponsors' && window.SponsorsAdmin) SponsorsAdmin.load();
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -192,6 +193,7 @@ async function gate() {
   if (window.AboutAdmin) AboutAdmin.init(sb);
   if (window.MediaAdmin) MediaAdmin.init(sb);
   if (window.JuryAdmin) JuryAdmin.init(sb);
+  if (window.SponsorsAdmin) SponsorsAdmin.init(sb);
   document.getElementById('whoami').textContent = session.user.email;
   document.getElementById('whoAvatar').textContent = (session.user.email || '?').charAt(0).toUpperCase();
   show('dash');
