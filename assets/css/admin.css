@@ -2868,3 +2868,9 @@ html { scroll-padding-top: 130px; }
 }
 .sksfa-admin .mg-year-chip:hover { color: #fff; border-color: rgba(255,255,255,0.35); }
 .sksfa-admin .mg-year-chip.is-on { color: #000; background: #fff; border-color: #fff; }
+
+/* Admin → Sponsors: logos are shown whole (contain), optionally on a light plate */
+.sksfa-admin .sp-thumb { width: 96px; height: 48px; padding: 6px; background: #0c0c0c; }
+.sksfa-admin .sp-thumb img, .sksfa-admin .sp-preview img { object-fit: contain; }
+.sksfa-admin .sp-preview { padding: 18px; }
+.sksfa-admin .sp-thumb.is-plate, .sksfa-admin .sp-preview.is-plate { background: #f4f4f4; }
