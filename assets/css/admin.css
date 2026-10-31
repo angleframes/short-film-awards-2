@@ -2874,3 +2874,25 @@ html { scroll-padding-top: 130px; }
 .sksfa-admin .sp-thumb img, .sksfa-admin .sp-preview img { object-fit: contain; }
 .sksfa-admin .sp-preview { padding: 18px; }
 .sksfa-admin .sp-thumb.is-plate, .sksfa-admin .sp-preview.is-plate { background: #f4f4f4; }
+
+/* Admin → Sponsors: logo adjust window */
+.sp-crop-overlay { position: fixed; inset: 0; z-index: 9000; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(0, 0, 0, 0.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.sp-crop { width: min(760px, 100%); max-height: calc(100vh - 32px); overflow: auto; border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.14); background: #111114; padding: 20px; color: #e6e6e6; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); }
+.sp-crop-head h3 { margin: 0 0 6px; font-size: 16px; color: #fff; }
+.sp-crop-head p { margin: 0 0 14px; font-size: 12.5px; line-height: 1.55; color: #9a9a9a; }
+.sp-crop-stage { display: flex; align-items: center; justify-content: center; min-height: 220px; padding: 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: #0c0c0e; background-image: linear-gradient(45deg, #17171a 25%, transparent 25%), linear-gradient(-45deg, #17171a 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #17171a 75%), linear-gradient(-45deg, transparent 75%, #17171a 75%);
+  background-size: 18px 18px; background-position: 0 0, 0 9px, 9px -9px, -9px 0; }
+.sp-crop-stage.is-plate { background-color: #f4f4f4; background-image: none; }
+.sp-crop-stage canvas { display: block; cursor: grab; touch-action: none; outline: 1px dashed rgba(255, 255, 255, 0.45); outline-offset: 0; }
+.sp-crop-stage.is-plate canvas { outline-color: rgba(0, 0, 0, 0.35); }
+.sp-crop-stage canvas:active { cursor: grabbing; }
+.sp-crop-controls { margin-top: 14px; display: grid; gap: 12px; }
+.sksfa-admin .sp-crop-size { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: #bdbdbd; }
+.sksfa-admin .sp-crop-size input[type="range"] { flex: 1 1 auto; width: auto; min-width: 0; height: 24px; padding: 0; margin: 0; border: 0; background: transparent; box-shadow: none; accent-color: #ffffff; }
+.sp-crop-size output { width: 46px; text-align: right; font-variant-numeric: tabular-nums; color: #fff; text-transform: none; letter-spacing: 0; }
+.sp-crop-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.sp-crop-shapes, .sp-crop-tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.sp-crop [aria-pressed="true"] { background: #ffffff; color: #000; border-color: #ffffff; }
+.sp-crop-foot { display: flex; gap: 10px; align-items: center; margin-top: 16px; }
+@media (max-width: 560px) { .sp-crop { padding: 16px; } .sp-crop-stage { min-height: 170px; padding: 10px; } }
