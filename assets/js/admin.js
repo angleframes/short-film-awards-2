@@ -168,6 +168,7 @@ function switchTab(name) {
   if (name === 'festival' && window.MediaAdmin) MediaAdmin.load();
   if (name === 'jury' && window.JuryAdmin) JuryAdmin.load();
   if (name === 'sponsors' && window.SponsorsAdmin) SponsorsAdmin.load();
+  if (name === 'receipts' && window.ReceiptsAdmin) ReceiptsAdmin.load();
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -194,6 +195,7 @@ async function gate() {
   if (window.MediaAdmin) MediaAdmin.init(sb);
   if (window.JuryAdmin) JuryAdmin.init(sb);
   if (window.SponsorsAdmin) SponsorsAdmin.init(sb);
+  if (window.ReceiptsAdmin) ReceiptsAdmin.init(sb);
   document.getElementById('whoami').textContent = session.user.email;
   document.getElementById('whoAvatar').textContent = (session.user.email || '?').charAt(0).toUpperCase();
   show('dash');
@@ -592,6 +594,12 @@ async function openDrawer(idx) {
 
   const pdfBtn = document.getElementById('entryModalPdfBtn');
   pdfBtn.onclick = () => exportSinglePdf(idx);
+  const rcBtn = document.getElementById('entryModalReceiptBtn');
+  if (rcBtn) {
+    const paid = !!(window.SKReceipt && window.ReceiptsAdmin && SKReceipt.fromEntry(r));
+    rcBtn.hidden = !paid;
+    rcBtn.onclick = paid ? () => ReceiptsAdmin.download(r, rcBtn) : null;
+  }
 
   document.getElementById('entryModalBody').innerHTML = `
     <div class="em-overview">
