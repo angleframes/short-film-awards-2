@@ -2896,3 +2896,13 @@ html { scroll-padding-top: 130px; }
 .sp-crop [aria-pressed="true"] { background: #ffffff; color: #000; border-color: #ffffff; }
 .sp-crop-foot { display: flex; gap: 10px; align-items: center; margin-top: 16px; }
 @media (max-width: 560px) { .sp-crop { padding: 16px; } .sp-crop-stage { min-height: 170px; padding: 10px; } }
+
+/* Admin → Payment Receipts */
+.sksfa-admin .rc-toolbar { align-items: center; }
+.sksfa-admin .rc-search { width: min(420px, 100%); height: 36px; margin: 0; }
+.sksfa-admin .rc-filter { display: flex; gap: 6px; }
+.sksfa-admin .rc-filter .is-active { background: #fff; color: #000; border-color: #fff; }
+.sksfa-admin .rc-count { margin: 0; }
+.sksfa-admin .rc-row .mg-info b { white-space: normal; }
+.sksfa-admin .rc-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; }
+@media (max-width: 640px) { .sksfa-admin .rc-row { flex-wrap: wrap; } .sksfa-admin .rc-row .mg-actions { width: 100%; justify-content: flex-start; } }
