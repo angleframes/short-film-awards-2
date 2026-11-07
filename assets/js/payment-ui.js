@@ -323,10 +323,41 @@ window.SKPayment = (function () {
             '    <div><dt>Order ID</dt><dd class="skp-mono">' + esc(p.cashfreeOrderId) + '</dd></div>' +
             '  </dl>' +
             (d.email ? '<p class="skp-success-note">A confirmation email will be sent to ' + esc(d.email) + '. Keep your Order ID for reference.</p>' : '') +
+            '  <button type="button" class="skp-secondary skp-receipt-btn" data-skp="receipt">Download payment receipt</button>' +
+            '  <p class="skp-receipt-msg" data-skp="receiptMsg" role="status" aria-live="polite"></p>' +
             '  <button type="button" class="skp-cta skp-success-cta" data-skp="again">Submit another film</button>' +
             '</div>';
         o.successRoot.querySelector('[data-skp=again]').addEventListener('click', function () { reset(); o.onReset(); });
+        var rb = o.successRoot.querySelector('[data-skp=receipt]');
+        rb.addEventListener('click', function () { downloadReceipt(p, rb); });
         o.onSuccess();
+    }
+
+    // Receipt is issued only after the server re-confirms with Cashfree that this order is PAID.
+    async function downloadReceipt(p, btn) {
+        var msg = o.successRoot.querySelector('[data-skp=receiptMsg]');
+        var say = function (t, err) { msg.textContent = t || ''; msg.classList.toggle('is-error', !!err); };
+        if (!window.SKReceipt) { say('The receipt tool did not load. Refresh the page and try again.', true); return; }
+        var label = btn.textContent;
+        btn.disabled = true; btn.textContent = 'Preparing receipt…'; say('');
+        try {
+            var r = await api({ action: 'verifyOrder', orderId: p.cashfreeOrderId });
+            if (r.status !== 'success' || String(r.order_status || '').toUpperCase() !== 'PAID') {
+                throw new Error('This payment could not be verified as paid, so a receipt cannot be issued yet.');
+            }
+            await SKReceipt.download({
+                orderId: p.cashfreeOrderId,
+                paymentRef: r.cf_payment_id || p.cashfreePaymentId,
+                name: p.applicantName, email: p.email, film: p.filmName, category: p.category,
+                amount: r.order_amount, currency: r.order_currency || 'INR',
+                method: r.payment_method, paidAt: r.paid_at
+            });
+            say('Receipt downloaded.');
+        } catch (e) {
+            say((e && e.message) || 'Could not create the receipt. Please try again.', true);
+        } finally {
+            btn.disabled = false; btn.textContent = label;
+        }
     }
 
     // Waits for the page's own load/config reveal so a later scroll reset doesn't hide the result.
