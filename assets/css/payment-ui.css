@@ -167,6 +167,10 @@
 .skp-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.8rem; }
 .skp-success p.skp-success-note { margin: 16px 0 0; font-size: 0.82rem; line-height: 1.55; color: rgba(255, 255, 255, 0.6); }
 .skp-success .skp-success-cta { max-width: 280px; margin: 22px auto 0; display: block; }
+.skp-success .skp-receipt-btn { max-width: 280px; margin: 22px auto 0; display: block; }
+.skp-success p.skp-receipt-msg { min-height: 1.1em; margin: 8px 0 0; font-size: 0.78rem; color: rgba(255, 255, 255, 0.6); }
+.skp-success p.skp-receipt-msg.is-error { color: #ff8a80; }
+.skp-success p.skp-receipt-msg + .skp-success-cta { margin-top: 12px; }
 
 @media (max-width: 420px) {
     .skp-card, .skp-summary { padding: 16px; }
