@@ -2327,3 +2327,53 @@ function _initAdminRealtime() {
    BOOTSTRAP
 ════════════════════════════════════════════════════════ */
 gate();
+/* ═══════════════════════════════════════════════════════
+   BACK BUTTON — phone back / swipe-back steps through the tabs you
+   visited and closes the entry popup, instead of leaving the admin.
+════════════════════════════════════════════════════════ */
+(function adminHistory() {
+  const valid = n => !!n && /^[a-z-]+$/.test(n) && !!document.getElementById('tab-' + n);
+  const current = () => { const b = document.querySelector('.tab-btn.active'); return (b && b.dataset.tab) || 'entries'; };
+  const modalOpen = () => !!document.getElementById('entryModalOverlay')?.classList.contains('open');
+  // Supabase password-recovery / auth links carry tokens in the hash — never rewrite those.
+  const authHash = () => /access_token|refresh_token|type=recovery|error=/.test(location.hash);
+  const baseSwitch = switchTab, baseClose = closeEntryModal, baseShow = show, baseOpen = openDrawer;
+  let replaying = false;
+
+  const go = name => { replaying = true; try { baseSwitch(name); } finally { replaying = false; } };
+
+  window.switchTab = function (name) {
+    const prev = current();
+    baseSwitch(name);
+    if (!replaying && name !== prev && !authHash()) history.pushState({ skTab: name }, '', '#' + name);
+  };
+
+  window.openDrawer = async function () {
+    const res = await baseOpen.apply(this, arguments);
+    if (modalOpen() && !(history.state && history.state.skModal) && !authHash()) {
+      history.pushState({ skTab: current(), skModal: true }, '', location.hash);
+    }
+    return res;
+  };
+
+  // ✕, overlay tap and Esc all route through here; with a history step, Back does the closing.
+  window.closeEntryModal = function () {
+    if (history.state && history.state.skModal && modalOpen()) history.back();
+    else baseClose();
+  };
+
+  window.addEventListener('popstate', e => {
+    if (modalOpen()) { baseClose(); return; }
+    const want = (e.state && e.state.skTab) || location.hash.slice(1) || 'entries';
+    if (valid(want) && want !== current()) go(want);
+  });
+
+  // After sign-in: open the tab named in the address (refresh / shared link), and anchor history there.
+  window.show = function (v) {
+    baseShow(v);
+    if (v !== 'dash' || authHash()) return;
+    const h = location.hash.slice(1);
+    if (valid(h) && h !== current()) go(h);
+    history.replaceState({ skTab: current() }, '', '#' + current());
+  };
+})();
