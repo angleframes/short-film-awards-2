@@ -161,6 +161,11 @@ function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + name).classList.add('active');
+  // phones/tablets: keep the active pill visible in the horizontally scrolling tab strip
+  const strip = document.querySelector('.tab-bar-inner'), cur = strip && strip.querySelector('.tab-btn.active');
+  if (strip && cur && strip.scrollWidth > strip.clientWidth + 4) {
+    strip.scrollTo({ left: Math.max(0, cur.offsetLeft - (strip.clientWidth - cur.offsetWidth) / 2), behavior: 'smooth' });
+  }
   if (name === 'awards') { refreshAwardsTab(); if (window.RecAdmin) (_awardCats.length ? Promise.resolve() : loadAwardCategories()).then(() => RecAdmin.load()); }
   if (name === 'videos') { loadVideoCategories(); loadTestimonials(); }
   if (name === 'certificates' && window.Certs) Certs.renderManagement();
