@@ -408,3 +408,69 @@ body.sksfa-admin .em-overview-value { font-size: 15px; color: #f2f2f2; }
   body.sksfa-admin .em-overview { grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); }
   body.sksfa-admin .em-overview-item { border-left: 0; background: #151515; }
 }
+
+/* ════════════════════════════════════════════════════════
+   WIDE SCREENS v1 (2026-11-10) — use the full width
+   Content stretches to the window; form + list tabs become two panes
+   (form left, sticky; list right). Below 1440px nothing changes.
+   ════════════════════════════════════════════════════════ */
+@media (min-width: 1100px) {
+  body.sksfa-admin .wrap > * { max-width: none; }
+  body.sksfa-admin .sksfa-page-desc { max-width: 900px; }
+}
+@media (min-width: 1440px) {
+  body.sksfa-admin #tab-links.active,
+  body.sksfa-admin #tab-updates.active,
+  body.sksfa-admin #tab-gallery.active,
+  body.sksfa-admin #tab-videos.active {
+    display: grid;
+    grid-template-columns: minmax(420px, 0.85fr) minmax(0, 1.25fr);
+    gap: 24px 28px;
+    align-items: start;
+  }
+  body.sksfa-admin #tab-links.active > .sksfa-page-title,
+  body.sksfa-admin #tab-updates.active > .sksfa-page-title,
+  body.sksfa-admin #tab-gallery.active > .sksfa-page-title,
+  body.sksfa-admin #tab-videos.active > .sksfa-page-title { grid-column: 1 / -1; }
+  body.sksfa-admin #tab-links.active > .card,
+  body.sksfa-admin #tab-updates.active > .card,
+  body.sksfa-admin #tab-gallery.active > .card,
+  body.sksfa-admin #tab-videos.active > .card { margin: 0; min-width: 0; }
+
+  /* form cards: one column of fields, stay in view while the list scrolls */
+  body.sksfa-admin #tab-links.active > .card:nth-child(2),
+  body.sksfa-admin #tab-updates.active > .card:nth-child(2) {
+    position: sticky; top: calc(var(--top-h, 76px) + 24px);
+  }
+  body.sksfa-admin #tab-links.active > .card:nth-child(2) .grid2,
+  body.sksfa-admin #tab-updates.active > .card:nth-child(2) .grid2,
+  body.sksfa-admin #tab-gallery.active > .card:nth-child(2) .grid2 { grid-template-columns: 1fr; }
+
+  /* gallery: upload + categories left, photo order right */
+  body.sksfa-admin #tab-gallery.active > .card:nth-child(2) { grid-column: 1; grid-row: 2; }
+  body.sksfa-admin #tab-gallery.active > .card:nth-child(4) { grid-column: 1; grid-row: 3; }
+  body.sksfa-admin #tab-gallery.active > .card:nth-child(3) { grid-column: 2; grid-row: 2 / span 2; }
+
+  /* videos: categories + add video left, video list right */
+  body.sksfa-admin #tab-videos.active > .card:nth-child(2) { grid-column: 1; grid-row: 2; }
+  body.sksfa-admin #tab-videos.active > .card:nth-child(3) { grid-column: 1; grid-row: 3; }
+  body.sksfa-admin #tab-videos.active > .card:nth-child(4) { grid-column: 2; grid-row: 2 / span 2; }
+}
+@media (min-width: 1600px) {
+  /* awards: category table left, prizes & recognition right */
+  body.sksfa-admin #tab-awards.active {
+    display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(460px, 1fr); gap: 24px 28px; align-items: start;
+  }
+  body.sksfa-admin #tab-awards.active > .sksfa-page-title { grid-column: 1 / -1; }
+  body.sksfa-admin #tab-awards.active > .card { margin: 0 !important; min-width: 0; }
+
+  /* simple lists: two rows side by side */
+  body.sksfa-admin #sponsorsAdmin .mg-list,
+  body.sksfa-admin #receiptsAdmin .mg-list,
+  body.sksfa-admin #tab-about .mg-list {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px;
+  }
+  body.sksfa-admin #sponsorsAdmin .mg-list > *,
+  body.sksfa-admin #receiptsAdmin .mg-list > *,
+  body.sksfa-admin #tab-about .mg-list > * { margin: 0; }
+}
