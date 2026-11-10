@@ -607,6 +607,8 @@ async function openDrawer(idx) {
   }
 
   document.getElementById('entryModalBody').innerHTML = `
+    <div class="em-layout">
+    <div class="em-main">
     <div class="em-overview">
       <div class="em-overview-item">
         <span class="em-overview-label">Entry ID</span>
@@ -675,12 +677,6 @@ async function openDrawer(idx) {
 
       ${campusProofSection(r)}
 
-      <div class="em-section em-full" id="emEvalSection">
-        ${evalSectionInner(r, evals)}
-      </div>
-
-      ${window.Certs ? `<div class="em-section em-full" id="emCertSection">${Certs.sectionHtml(r)}</div>` : ''}
-
       <div class="em-section">
         <div class="em-section-title">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 6h12" stroke="currentColor" stroke-width="1.2"/><path d="M4 9h2M8 9h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
@@ -704,6 +700,14 @@ async function openDrawer(idx) {
         ${row('Direct link', r.link_id ? '#' + esc(String(r.link_id)) : 'None (public form)')}
         ${row('Confirmation email', r.confirmation_sent ? '<span class="d-ok">Sent ✓</span>' : '<span class="d-warn">Not sent</span>')}
       </div>
+    </div>
+    </div>
+    <aside class="em-side">
+      <div class="em-section em-full" id="emEvalSection">
+        ${evalSectionInner(r, evals)}
+      </div>
+      ${window.Certs ? `<div class="em-section em-full" id="emCertSection">${Certs.sectionHtml(r)}</div>` : ''}
+    </aside>
     </div>
   `;
 
