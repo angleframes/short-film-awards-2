@@ -4867,3 +4867,33 @@
     .jp-photo { position: relative; max-width: 300px; width: 100%; margin: 0 auto; }
     .jp-info { padding-top: 0; }
 }
+
+/* ===== Wide screens: Rules & Guidelines and Prizes & Recognition use the space (desktop only) ===== */
+@media (min-width: 900px) {
+    #rulesModal .rules-modal-container { max-width: 980px; width: calc(100% - 64px); max-height: 86vh; padding: 40px 44px 44px; border-radius: 22px; }
+    #rulesModal .rules-modal-title { font-size: 1.4rem; letter-spacing: 1.6px; margin-bottom: 26px; padding-bottom: 16px; }
+    #rulesModal .rules-list-content { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    #rulesModal .rule-item-box { padding: 22px 24px; border-radius: 16px; }
+    #rulesModal .rule-item-box:last-child:nth-child(odd) { grid-column: 1 / -1; }
+    #rulesModal .rule-item-box h4 { font-size: 1rem; margin-bottom: 8px; letter-spacing: 0.2px; }
+    #rulesModal .rule-item-box p { font-size: 0.92rem; line-height: 1.65; color: rgba(255,255,255,0.72); }
+}
+@media (min-width: 1000px) {
+    #awardDetailsModal .ad-panel { width: min(1180px, calc(100% - 48px)); max-height: min(90vh, 1000px); }
+    #awardDetailsModal .ad-body {
+        padding: 56px 56px 44px;
+        display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: stretch;
+    }
+    #awardDetailsModal .ad-header, #awardDetailsModal .ad-footnote { grid-column: 1 / -1; }
+    #awardDetailsModal .ad-header { margin-bottom: 18px; }
+    #awardDetailsModal .ad-intro { max-width: 760px; }
+    #awardDetailsModal .ad-section {
+        grid-template-columns: 52px minmax(0, 1fr); align-content: start;
+        padding: 30px 30px 30px 24px; border-top: 0; border-radius: 18px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.012) 100%);
+    }
+    #awardDetailsModal .ad-section:last-of-type:nth-of-type(odd) { grid-column: 1 / -1; }
+    #awardDetailsModal .ad-lead, #awardDetailsModal .ad-text { max-width: none; }
+    #awardDetailsModal .ad-footnote { margin-top: 8px; }
+}
