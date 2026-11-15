@@ -152,6 +152,7 @@ const safe = v => v == null ? '' : String(v);
 const fmtDate = iso => { if (!iso) return '—'; const d = new Date(iso); return isNaN(d) ? '—' : d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); };
 const fmtDateTime = iso => { if (!iso) return '—'; const d = new Date(iso); return isNaN(d) ? '—' : d.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); };
 const toLocalInput = iso => { if (!iso) return ''; const d = new Date(iso); if (isNaN(d)) return ''; const p = n => String(n).padStart(2,'0'); return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; };
+const jsArg = v => esc(JSON.stringify(String(v == null ? '' : v)));
 const isUrl = s => { try { return /^https?:\/\//i.test(s) && !!new URL(s); } catch { return false; } };
 
 /* ═══════════════════════════════════════════════════════
@@ -510,7 +511,7 @@ function renderEntriesPage() {
         <button class="btn-ghost btn-xs" onclick="openDrawer(${gIdx})">View Details</button>
         ${verifyBtnHtml(r)}
         ${window.Certs ? Certs.rowButtonsHtml(r) : ''}
-        <button class="btn-ghost btn-xs btn-del" onclick="archiveEntry(${r.id}, '${esc(r.film_name||'')}', '${esc(r.applicant_name||'')}')">Delete</button>
+        <button class="btn-ghost btn-xs btn-del" onclick="archiveEntry(${Number(r.id)}, ${jsArg(r.film_name)}, ${jsArg(r.applicant_name)})">Delete</button>
       </td>
     </tr>`;
   }).join('');
@@ -525,7 +526,7 @@ function renderEntriesPage() {
         <button class="btn-ghost btn-xs" style="margin-left:auto;" onclick="openDrawer(${gIdx})">View Details</button>
         ${verifyBtnHtml(r)}
         ${window.Certs ? Certs.rowButtonsHtml(r) : ''}
-        <button class="btn-ghost btn-xs btn-del" onclick="archiveEntry(${r.id}, '${esc(r.film_name||'')}', '${esc(r.applicant_name||'')}')">Delete</button>
+        <button class="btn-ghost btn-xs btn-del" onclick="archiveEntry(${Number(r.id)}, ${jsArg(r.film_name)}, ${jsArg(r.applicant_name)})">Delete</button>
       </div>
     </div>`;
   }).join('');
@@ -582,7 +583,7 @@ async function openDrawer(idx) {
 
   const payStatusHtml = payTag(r);
   const copyable = v => v
-    ? `<span class="d-copy"><code>${esc(v)}</code><button type="button" class="copy-btn" onclick="copyText('${esc(v).replace(/'/g, "\\'")}', this)" aria-label="Copy">Copy</button></span>`
+    ? `<span class="d-copy"><code>${esc(v)}</code><button type="button" class="copy-btn" onclick="copyText(${jsArg(v)}, this)" aria-label="Copy">Copy</button></span>`
     : '—';
   const dur = String(r.duration || '').trim();
   const durationHtml = dur ? esc(/^\d+(\.\d+)?$/.test(dur) ? dur + ' min' : dur) : '—';
@@ -722,7 +723,7 @@ function campusProofSection(r) {
   const hasProof = UUID_RE.test(r.campus_proof_id || '');
   const body = hasProof
     ? `<div class="d-row"><span class="d-key">Status</span><span class="d-val"><span class="tag paid">Uploaded</span></span></div>
-       <div class="d-row"><span class="d-key">Document</span><span class="d-val"><button type="button" class="btn btn-sm" onclick="viewCampusProof('${r.campus_proof_id}')">View document ↗</button></span></div>
+       <div class="d-row"><span class="d-key">Document</span><span class="d-val"><button type="button" class="btn btn-sm" onclick="viewCampusProof(${jsArg(r.campus_proof_id)})">View document ↗</button></span></div>
        <div class="d-row"><span class="d-key">Access</span><span class="d-val" style="color:#888;font-size:12px;">Private · opens a secure link valid for 2 minutes</span></div>`
     : `<div class="d-row"><span class="d-key">Status</span><span class="d-val"><span class="tag failed">Missing</span></span></div>
        <div class="d-row"><span class="d-key">Note</span><span class="d-val" style="color:#888;font-size:12px;">No verification document is attached to this Campus entry. Contact the applicant before judging.</span></div>`;
@@ -779,41 +780,41 @@ function renderEvalSection(r, evals) {
     const subLabel = candidateName && candidateName !== r.film_name
       ? `<span class="eval-nominee">${esc(candidateName)}</span>` : '';
 
-    const cNameEsc = esc(candidateName).replace(/'/g,"\\'");
+    const cNameEsc = jsArg(candidateName);
     const isJury = cat.key === 'special_jury';
 
     let btns = '';
     if (currentStatus === 'not_reviewed') {
       if (isJury) {
         btns = `<div class="eval-btns">
-          <button class="eval-btn shortlist" onclick="setEval(${r.id},'${cat.key}','selected','${cNameEsc}','${cat.type}',this)">+ Select</button>
+          <button class="eval-btn shortlist" onclick="setEval(${r.id},'${cat.key}','selected',${cNameEsc},'${cat.type}',this)">+ Select</button>
         </div>`;
       } else {
         btns = `<div class="eval-btns">
-          <button class="eval-btn shortlist" onclick="setEval(${r.id},'${cat.key}','shortlisted','${cNameEsc}','${cat.type}',this)">+ Shortlist</button>
+          <button class="eval-btn shortlist" onclick="setEval(${r.id},'${cat.key}','shortlisted',${cNameEsc},'${cat.type}',this)">+ Shortlist</button>
         </div>`;
       }
     } else if (currentStatus === 'shortlisted') {
       btns = `<div class="eval-btns">
         <span class="eval-status-pill shortlisted">Shortlisted</span>
-        <button class="eval-btn winner" onclick="setEval(${r.id},'${cat.key}','winner','${cNameEsc}','${cat.type}',this)">→ Winner</button>
-        <button class="eval-btn remove" onclick="setEval(${r.id},'${cat.key}','not_reviewed','${cNameEsc}','${cat.type}',this)">× Remove</button>
+        <button class="eval-btn winner" onclick="setEval(${r.id},'${cat.key}','winner',${cNameEsc},'${cat.type}',this)">→ Winner</button>
+        <button class="eval-btn remove" onclick="setEval(${r.id},'${cat.key}','not_reviewed',${cNameEsc},'${cat.type}',this)">× Remove</button>
       </div>`;
     } else if (currentStatus === 'winner') {
       btns = `<div class="eval-btns">
         <span class="eval-status-pill winner">★ Winner</span>
-        <button class="eval-btn remove" onclick="setEval(${r.id},'${cat.key}','not_reviewed','${cNameEsc}','${cat.type}',this)">× Remove</button>
+        <button class="eval-btn remove" onclick="setEval(${r.id},'${cat.key}','not_reviewed',${cNameEsc},'${cat.type}',this)">× Remove</button>
       </div>`;
     } else if (currentStatus === 'selected') {
       btns = `<div class="eval-btns">
         <span class="eval-status-pill selected">Selected</span>
-        <button class="eval-btn remove" onclick="setEval(${r.id},'${cat.key}','not_reviewed','${cNameEsc}','${cat.type}',this)">× Remove</button>
+        <button class="eval-btn remove" onclick="setEval(${r.id},'${cat.key}','not_reviewed',${cNameEsc},'${cat.type}',this)">× Remove</button>
       </div>`;
     } else {
       // under_review or other legacy — show shortlist option
       btns = `<div class="eval-btns">
-        <button class="eval-btn shortlist" onclick="setEval(${r.id},'${cat.key}','shortlisted','${cNameEsc}','${cat.type}',this)">+ Shortlist</button>
-        <button class="eval-btn remove" onclick="setEval(${r.id},'${cat.key}','not_reviewed','${cNameEsc}','${cat.type}',this)">× Remove</button>
+        <button class="eval-btn shortlist" onclick="setEval(${r.id},'${cat.key}','shortlisted',${cNameEsc},'${cat.type}',this)">+ Shortlist</button>
+        <button class="eval-btn remove" onclick="setEval(${r.id},'${cat.key}','not_reviewed',${cNameEsc},'${cat.type}',this)">× Remove</button>
       </div>`;
     }
 
@@ -1187,7 +1188,9 @@ function exportEntriesCsv() {
     'payment_status','amount','currency','cashfree_order_id','cashfree_payment_id',
     'paid_at','payment_method','payment_verified_at','source','link_id'];
   const csv = [cols.join(',')].concat(data.map(r => cols.map(c => {
-    const v = r[c] == null ? '' : String(r[c]).replace(/"/g,'""');
+    let v = r[c] == null ? '' : String(r[c]);
+    if (/^[=+\-@\t\r]/.test(v)) v = "'" + v;   // stop Excel/Sheets treating submitted text as a formula
+    v = v.replace(/"/g,'""');
     return /[",\n]/.test(v) ? `"${v}"` : v;
   }).join(','))).join('\n');
   const blob = new Blob([csv], { type:'text/csv' });
@@ -1525,7 +1528,7 @@ function renderCategoryManager() {
     <div class="cat-row">
       <span class="cat-row-name">${esc(formatCatLabel(c))}</span>
       <span class="cat-row-slug">${esc(c)}</span>
-      <button class="btn-del" onclick="delGalCategory('${esc(c)}')">Remove</button>
+      <button class="btn-del" onclick="delGalCategory(${jsArg(c)})">Remove</button>
     </div>`).join('');
 }
 
@@ -1630,7 +1633,7 @@ async function loadGallery() {
         <button class="gri-btn" onclick="galMove(${g.id},'up')" title="Move up" ${i === 0 ? 'disabled' : ''}>▲</button>
         <button class="gri-btn" onclick="galMove(${g.id},'down')" title="Move down" ${i === _galleryData.length - 1 ? 'disabled' : ''}>▼</button>
         <button class="gri-btn" onclick="galMove(${g.id},'last')" title="Move to last" ${i === _galleryData.length - 1 ? 'disabled' : ''}>⇊</button>
-        <button class="gri-btn gri-btn-del" onclick="delGallery(${g.id},'${esc(g.src)}','${esc(g.thumb||'')}')">✕</button>
+        <button class="gri-btn gri-btn-del" onclick="delGallery(${Number(g.id)},${jsArg(g.src)},${jsArg(g.thumb)})">✕</button>
       </div>
     </div>`).join('');
   _attachGalDrag(box);
@@ -1857,8 +1860,8 @@ async function loadLinks() {
           <span class="badge ${status}">${statusLabel}</span>
         </div>
         <div class="link-card-actions">
-          <button class="btn-ghost btn-xs" onclick="copyLink('${esc(fullUrl)}')">Copy</button>
-          <button class="btn-ghost btn-xs" onclick="window.open('${esc(fullUrl)}','_blank')">Open ↗</button>
+          <button class="btn-ghost btn-xs" onclick="copyLink(${jsArg(fullUrl)})">Copy</button>
+          <button class="btn-ghost btn-xs" onclick="window.open(${jsArg(fullUrl)},'_blank','noopener')">Open ↗</button>
           ${status==='active'?`<button class="btn-del" onclick="revokeLink(${lk.id})">Revoke</button>`:''}
         </div>
       </div>
@@ -1932,7 +1935,7 @@ async function loadVideoCategories() {
             <span style="font-size:1.2rem;width:28px;text-align:center;">${esc(c.icon || '📁')}</span>
             <span style="flex:1;font-weight:500;">${esc(c.name)}</span>
             <span style="color:var(--mut);font-size:0.78rem;">Order: ${c.sort_order}</span>
-            <button class="btn-ghost btn-sm" onclick="vcRename(${c.id},'${esc(c.name).replace(/'/g,"\\'")}')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16.5 3.5l4 4L7 21H3v-4L16.5 3.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M13.5 6.5l4 4" stroke="currentColor" stroke-width="1.5"/></svg></button>
+            <button class="btn-ghost btn-sm" onclick="vcRename(${Number(c.id)},${jsArg(c.name)})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M16.5 3.5l4 4L7 21H3v-4L16.5 3.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M13.5 6.5l4 4" stroke="currentColor" stroke-width="1.5"/></svg></button>
             ${i > 0 ? `<button class="btn-ghost btn-sm" onclick="vcMove(${c.id},-1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M7 10l5-5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` : ''}
             ${i < data.length-1 ? `<button class="btn-ghost btn-sm" onclick="vcMove(${c.id},1)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M7 14l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` : ''}
             <button class="btn-ghost btn-sm" style="color:#e74c3c;" onclick="vcDelete(${c.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 13a2 2 0 002 2h8a2 2 0 002-2l1-13M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
