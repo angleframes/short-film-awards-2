@@ -67,7 +67,7 @@ window.AboutAdmin = (function () {
             <div class="ab-item-head">
               <span class="ab-item-num">${String(i + 1).padStart(2, '0')}</span>
               ${r.image_url ? `<img class="ab-item-thumb" src="${esc(absImg(r.image_url))}" alt="">` : '<span class="ab-item-thumb is-empty"></span>'}
-              <button type="button" class="ab-item-title" onclick="AboutAdmin.toggle('${esc(r.key)}')">
+              <button type="button" class="ab-item-title" onclick="AboutAdmin.toggle(${esc(JSON.stringify(String(r.key)))})">
                 <span>${esc(r.title || '(untitled)')}</span><small>${esc(r.kicker || '')}${r.visible ? '' : ' · hidden'}</small>
               </button>
               <div class="ab-item-actions">
@@ -93,7 +93,7 @@ window.AboutAdmin = (function () {
                       <option value="cover" ${r.image_fit !== 'contain' ? 'selected' : ''}>Photo — fill the frame</option>
                       <option value="contain" ${r.image_fit === 'contain' ? 'selected' : ''}>Logo — fit inside</option>
                     </select></div>
-                  <div class="ab-field is-full"><label class="btn-ghost btn-sm ab-upload">Upload image<input type="file" accept="image/*" hidden onchange="AboutAdmin.upload('${esc(r.key)}', this)"></label></div>
+                  <div class="ab-field is-full"><label class="btn-ghost btn-sm ab-upload">Upload image<input type="file" accept="image/*" hidden onchange="AboutAdmin.upload(${esc(JSON.stringify(String(r.key)))}, this)"></label></div>
                 </div>
               </div>
               <div class="ab-grid">
