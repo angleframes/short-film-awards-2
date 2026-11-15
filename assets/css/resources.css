@@ -148,3 +148,23 @@
 .rs-juror-role { font-size: 0.82rem; line-height: 1.5; color: rgba(255,255,255,0.6); margin: 0 0 10px; }
 .rs-juror-bio { text-align: left; font-size: 0.86rem; }
 #submission-rules { scroll-margin-top: 96px; }
+
+/* ===== Jury page: cards fill the row and stay centred (no empty right side), even heights ===== */
+#rsPane-jury .rs-group-title { text-align: center; }
+.rs-jury { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; align-items: stretch; }
+.rs-juror { display: flex; flex-direction: column; align-items: center; padding: 34px 30px 28px; }
+.rs-juror-photo { width: 128px; height: 128px; margin-bottom: 20px; }
+.rs-juror .rs-card-title { font-size: 1.08rem; text-align: center; }
+.rs-juror-role { text-align: center; max-width: 30ch; margin-bottom: 16px; }
+.rs-juror-bio { align-self: stretch; }
+.rs-juror.is-clickable .rs-juror-bio {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 7; overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent); mask-image: linear-gradient(180deg, #000 70%, transparent);
+}
+.rs-juror .rs-view-profile { margin-top: auto; padding-top: 18px; }
+@media (max-width: 768px) {
+  .rs-jury { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .rs-juror { padding: 20px 18px; }
+  .rs-juror-photo { width: 96px; height: 96px; margin-bottom: 16px; }
+}
+@media (max-width: 420px) { .rs-jury { grid-template-columns: 1fr; } }
