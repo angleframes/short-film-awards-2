@@ -1,0 +1,123 @@
+/* Sharankrishna form controls — loaded by the Admin Panel and the Event Budget pages.
+   Replaces the remaining operating-system chrome: date/time picker (sk-datepicker.js),
+   number spinners, checkboxes/radios, file buttons and scrollbars. Real inputs stay in place,
+   so keyboard, screen readers and existing JS keep working. Black & white only. */
+
+/* ── number inputs: no spinner arrows (typing / arrow keys still work) ── */
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button { -webkit-appearance: none; }
+
+/* ── scrollbars: slim thumb, no track, no arrow buttons; scrolling untouched ── */
+html, body, body * { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.18) transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track, ::-webkit-scrollbar-corner { background: transparent; }
+::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.16); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background-color: rgba(255,255,255,0.32); }
+
+/* ── checkbox & radio: drawn by us, still real inputs ── */
+body.sksfa-admin input[type="checkbox"], body.sksfa-admin input[type="radio"],
+body.bud input[type="checkbox"], body.bud input[type="radio"] {
+  -webkit-appearance: none; appearance: none; flex: none; width: 18px; height: 18px; margin: 0; cursor: pointer;
+  border: 1.5px solid rgba(255,255,255,0.4); border-radius: 5px; background: transparent; display: inline-grid; place-content: center;
+  transition: background 0.15s, border-color 0.15s; vertical-align: middle;
+}
+body.sksfa-admin input[type="radio"], body.bud input[type="radio"] { border-radius: 50%; }
+body.sksfa-admin input[type="checkbox"]::before, body.bud input[type="checkbox"]::before {
+  content: ''; width: 10px; height: 10px; transform: scale(0); transition: transform 0.12s;
+  background: #000; clip-path: polygon(14% 52%, 0 66%, 40% 100%, 100% 22%, 86% 8%, 38% 72%);
+}
+body.sksfa-admin input[type="radio"]::before, body.bud input[type="radio"]::before {
+  content: ''; width: 8px; height: 8px; border-radius: 50%; background: #000; transform: scale(0); transition: transform 0.12s;
+}
+body.sksfa-admin input[type="checkbox"]:checked, body.sksfa-admin input[type="radio"]:checked,
+body.bud input[type="checkbox"]:checked, body.bud input[type="radio"]:checked { background: #fff; border-color: #fff; }
+body.sksfa-admin input[type="checkbox"]:checked::before, body.sksfa-admin input[type="radio"]:checked::before,
+body.bud input[type="checkbox"]:checked::before, body.bud input[type="radio"]:checked::before { transform: scale(1); }
+body.sksfa-admin input[type="checkbox"]:hover:not(:disabled), body.sksfa-admin input[type="radio"]:hover:not(:disabled) { border-color: #fff; }
+body.sksfa-admin input[type="checkbox"]:focus-visible, body.sksfa-admin input[type="radio"]:focus-visible,
+body.bud input[type="checkbox"]:focus-visible, body.bud input[type="radio"]:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+body.sksfa-admin input[type="checkbox"]:disabled, body.sksfa-admin input[type="radio"]:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── file inputs: pill button instead of the system "Choose File" ── */
+body.sksfa-admin input[type="file"] { color: rgba(255,255,255,0.6); font-size: 0.82rem; max-width: 100%; }
+body.sksfa-admin input[type="file"]::file-selector-button {
+  margin-right: 12px; height: 36px; padding: 0 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.06); color: #fff; font: 600 0.74rem/1 inherit; letter-spacing: 0.4px; cursor: pointer; transition: background 0.2s, border-color 0.2s;
+}
+body.sksfa-admin input[type="file"]::file-selector-button:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.32); }
+
+/* ── date / date-time picker (assets/js/sk-datepicker.js) ── */
+.skd { position: relative; display: flex; align-items: center; width: 100%; min-width: 0; }
+.skd-native { position: absolute !important; width: 1px !important; height: 1px !important; opacity: 0 !important; pointer-events: none !important; border: 0 !important; padding: 0 !important; margin: 0 !important; clip: rect(0 0 0 0); }
+.skd-trigger {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 40px 0 14px; text-align: left;
+  border-radius: 12px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.035); color: #fff;
+  font: inherit; font-size: 0.9rem; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+}
+.skd-trigger:hover { border-color: rgba(255,255,255,0.3); }
+.skd-trigger:focus-visible, .skd-trigger[aria-expanded="true"] { outline: none; border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.055); box-shadow: 0 0 0 3px rgba(255,255,255,0.06); }
+.skd-trigger:disabled { opacity: 0.45; cursor: not-allowed; }
+.skd-trigger.is-empty .skd-val { color: rgba(255,255,255,0.38); }
+.skd-val { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.skd-ic { display: inline-flex; color: rgba(255,255,255,0.55); }
+.skd-ic svg { width: 17px; height: 17px; }
+.skd-clear { position: absolute; right: 6px; width: 32px; height: 32px; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; color: rgba(255,255,255,0.5); cursor: pointer; }
+.skd-clear:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.skd-clear:focus-visible { outline: 2px solid #fff; outline-offset: 0; }
+.skd-clear svg { width: 15px; height: 15px; }
+.skd-clear[hidden] { display: none; }
+
+.skd-panel {
+  position: fixed; z-index: 3000; width: 304px; padding: 14px; border-radius: 18px;
+  background: rgba(16,16,19,0.97); border: 1px solid rgba(255,255,255,0.14); box-shadow: 0 28px 70px rgba(0,0,0,0.65);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  opacity: 0; transform: translateY(-4px); transition: opacity 0.15s, transform 0.15s;
+}
+.skd-panel.in { opacity: 1; transform: none; }
+.skd-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.skd-title { font-weight: 700; font-size: 0.92rem; letter-spacing: 0.3px; }
+.skd-nav { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #fff; cursor: pointer; }
+.skd-nav:hover { background: rgba(255,255,255,0.08); }
+.skd-nav svg { width: 17px; height: 17px; }
+.skd-wd, .skd-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.skd-wd span { text-align: center; font-size: 0.64rem; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.4); font-weight: 700; padding: 6px 0; }
+.skd-grid { display: flex; flex-direction: column; gap: 2px; }
+.skd-day { aspect-ratio: 1; min-height: 36px; border: 0; border-radius: 50%; background: transparent; color: rgba(255,255,255,0.86); font: inherit; font-size: 0.86rem; font-variant-numeric: tabular-nums; cursor: pointer; transition: background 0.12s; }
+.skd-day:hover:not(:disabled) { background: rgba(255,255,255,0.1); }
+.skd-day.is-today { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.45); }
+.skd-day.is-sel { background: #fff; color: #000; font-weight: 700; }
+.skd-day:disabled { color: rgba(255,255,255,0.2); cursor: not-allowed; }
+.skd-day:focus-visible, .skd-nav:focus-visible, .skd-link:focus-visible, .skd-done:focus-visible, .skd-ampm button:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+.skd-time { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08); }
+.skd-time-l { font-size: 0.64rem; letter-spacing: 1.6px; text-transform: uppercase; font-weight: 700; color: rgba(255,255,255,0.45); margin-right: auto; }
+.skd-tbox { display: flex; align-items: center; gap: 4px; }
+.skd-tbox input { width: 44px; height: 40px; text-align: center; border-radius: 10px; border: 1px solid rgba(255,255,255,0.16); background: rgba(255,255,255,0.04); color: #fff; font: inherit; font-size: 0.95rem; font-variant-numeric: tabular-nums; outline: none; padding: 0; }
+.skd-tbox input:focus { border-color: rgba(255,255,255,0.5); }
+.skd-ampm { display: flex; padding: 3px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.12); }
+.skd-ampm button { height: 34px; padding: 0 12px; border: 0; border-radius: 999px; background: transparent; color: rgba(255,255,255,0.6); font: inherit; font-size: 0.76rem; font-weight: 700; cursor: pointer; }
+.skd-ampm button.is-on { background: #fff; color: #000; }
+.skd-foot { display: flex; align-items: center; gap: 6px; margin-top: 12px; }
+.skd-sp { flex: 1; }
+.skd-link { height: 36px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; color: rgba(255,255,255,0.75); font: inherit; font-size: 0.8rem; font-weight: 600; cursor: pointer; }
+.skd-link:hover { color: #fff; background: rgba(255,255,255,0.07); }
+.skd-done { height: 36px; padding: 0 18px; border: 0; border-radius: 999px; background: #fff; color: #000; font: inherit; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+.skd-backdrop { position: fixed; inset: 0; z-index: 2999; background: rgba(0,0,0,0.55); opacity: 0; transition: opacity 0.18s; }
+.skd-backdrop.in { opacity: 1; }
+.skd-sheet-head { display: flex; justify-content: center; padding: 2px 0 12px; font-size: 0.72rem; letter-spacing: 1.8px; text-transform: uppercase; color: rgba(255,255,255,0.6); }
+.skd-sheet-head::before { content: ''; position: absolute; top: 8px; left: 50%; width: 38px; height: 4px; margin-left: -19px; border-radius: 99px; background: rgba(255,255,255,0.22); }
+.skd-panel.is-sheet {
+  left: 0; right: 0; bottom: 0; top: auto; width: auto; max-width: 480px; margin: 0 auto; border-radius: 22px 22px 0 0;
+  padding: 22px 18px calc(16px + env(safe-area-inset-bottom)); transform: translateY(24px);
+}
+.skd-panel.is-sheet.in { transform: none; }
+.skd-panel.is-sheet .skd-day { min-height: 44px; font-size: 1rem; }
+.skd-panel.is-sheet .skd-link, .skd-panel.is-sheet .skd-done { height: 44px; }
+.skd-panel.is-sheet .skd-done { padding: 0 26px; }
+.skd-panel.is-sheet .skd-tbox input { font-size: 16px; height: 44px; }
+@media (prefers-reduced-motion: reduce) { .skd-panel, .skd-backdrop { transition: none; } }
