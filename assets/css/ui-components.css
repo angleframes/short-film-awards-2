@@ -718,3 +718,13 @@
     padding: 24px 20px 20px;
   }
 }
+
+/* ── native chrome clean-up (site + admin): no number spinners, slim page scrollbar ── */
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+html { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.18) transparent; }
+html::-webkit-scrollbar { width: 8px; height: 8px; }
+html::-webkit-scrollbar-track { background: transparent; }
+html::-webkit-scrollbar-button { display: none; }
+html::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.16); border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
