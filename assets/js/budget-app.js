@@ -111,6 +111,16 @@
   }
   var LOGO = '<img class="bud-logo" src="/assets/img/logo-377.webp" srcset="/assets/img/logo-189.webp 189w, /assets/img/logo-377.webp 377w, /assets/img/logo-566.webp 566w" sizes="150px" width="377" height="112" alt="Sharankrishna Short Film Awards">';
 
+  /* ───────── categories ───────── */
+  var CUSTOM = '__custom__';
+  // same rule as the database: trim, collapse inner spaces, drop control characters
+  function cleanCat(v) { return String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim(); }
+  function findCat(v) {
+    var k = cleanCat(v).toLowerCase();
+    for (var i = 0; i < S.categories.length; i++) if (cleanCat(S.categories[i].name).toLowerCase() === k) return S.categories[i].name;
+    return null;
+  }
+
   /* ───────── totals ───────── */
   function totals(list) {
     var t = 0, p = 0;
@@ -169,8 +179,9 @@
   function teardown() {
     if (S.channel) { try { sb.removeChannel(S.channel); } catch (e) {} S.channel = null; }
     S.shell = false;
+    closePop();
     document.querySelectorAll('.bud-ov').forEach(function (o) { o.remove(); });
-    document.body.classList.remove('bud-lock');
+    unlockScroll(true);
   }
   setInterval(function () { if (S.shell && !document.hidden) load(); }, 30000);
   setInterval(function () { if (S.shell) renderSync(); }, 15000);
@@ -259,7 +270,10 @@
   }
 
   function renderAll(prev) {
-    renderSub(); renderCards(); renderFilters(); renderList(prev); renderBreakdown(); renderTotalbar(); renderSync(); renderAccess();
+    renderSub(); renderCards(); renderBreakdown(); renderTotalbar(); renderSync(); renderAccess();
+    // a menu is open on a row / filter: don't rebuild the element under the user's finger — catch up on close
+    if (openPop && app.contains(openPop.anchor)) { S.pendingRender = true; S.pendingPrev = S.pendingPrev || prev; }
+    else { renderFilters(); renderList(prev || S.pendingPrev); S.pendingPrev = null; }
     var nb = document.getElementById('budNameBtn');
     if (nb) nb.innerHTML = icon('user') + '<span>' + esc(S.name || 'Add your name') + '</span>';
   }
@@ -295,7 +309,7 @@
         '<span><strong>Set an overall budget</strong><small>See if the event is under or over budget</small></span></button>';
     }
     var cards = document.getElementById('budCards');
-    cards.className = 'bud-cards n' + (alloc != null || isAdmin() ? 4 : 3) + (S.cardsShown ? '' : ' first');
+    cards.className = 'bud-cards n' + (alloc != null || isAdmin() ? 4 : 3) + (S.cardsShown || COARSE.matches ? '' : ' first');
     S.cardsShown = true;
     cards.innerHTML = html;
   }
@@ -303,19 +317,23 @@
     var t = totals();
     document.getElementById('budTotalbar').innerHTML =
       '<div class="bud-totalbar-in"><span class="bud-tb-label">Grand Total</span><strong class="bud-tb-val">' + inr(t.total) + '</strong>' +
-      '<span class="bud-tb-meta"><span>Paid <b>' + inr(t.paid) + '</b></span><span>Outstanding <b>' + inr(t.outstanding) + '</b></span></span></div>';
+      '<span class="bud-tb-meta"><span>Paid <b>' + inr(t.paid) + '</b></span><span>Outstanding <b>' + inr(t.outstanding) + '</b></span></span>' +
+      (canWrite() ? '<button type="button" class="bud-tb-add" data-act="add" aria-label="Add expense">' + icon('plus') + '</button>' : '') + '</div>';
   }
   function renderFilters() {
     var cats = S.categories.map(function (c) { return c.name; });
     S.items.forEach(function (i) { if (cats.indexOf(i.category) === -1) cats.push(i.category); });
     if (S.cat && cats.indexOf(S.cat) === -1) S.cat = '';
+    var key = cats.join('\u0001') + '|' + S.cat + '|' + S.status;
+    if (key === S.filterKey && document.querySelector('#budCatDd .bud-dd-btn')) return;
+    S.filterKey = key;
     dropdown(document.getElementById('budCatDd'), {
-      value: S.cat, placeholder: 'All categories', icon: 'filter', searchable: cats.length > 8,
+      value: S.cat, placeholder: 'All categories', icon: 'filter', searchable: cats.length > 8, label: 'Category filter',
       options: [{ value: '', label: 'All categories' }].concat(cats.map(function (c) { return { value: c, label: c }; })),
       onChange: function (v) { S.cat = v; renderList(); renderBreakdown(); }
     });
     dropdown(document.getElementById('budStatusDd'), {
-      value: S.status, placeholder: 'All statuses',
+      value: S.status, placeholder: 'All statuses', label: 'Payment status filter',
       options: [{ value: '', label: 'All statuses' }].concat(STATUS.map(function (s) { return { value: s[0], label: s[1] }; })),
       onChange: function (v) { S.status = v; renderList(); }
     });
@@ -337,7 +355,7 @@
       box.innerHTML = '<div class="bud-empty sm"><h3>No matching expenses</h3><p>Try another search or filter.</p><button type="button" class="bud-btn ghost" data-act="clear">Clear filters</button></div>';
       return;
     }
-    box.classList.toggle('first', !S.listShown); S.listShown = true;
+    box.classList.toggle('first', !S.listShown && !COARSE.matches); S.listShown = true;
     box.innerHTML = list.map(function (i) {
       var changed = prev && (prev[i.id] == null || prev[i.id] !== i.version);
       var meta = ['<span>' + esc(i.category) + '</span>'];
@@ -413,89 +431,183 @@
     renderAll();
   }
 
-  /* ───────── small UI kit: popover, dropdown, modal ───────── */
+  /* ───────── small UI kit: scroll lock, popover / bottom sheet, dropdown, modal ─────────
+     Phones (≤640px) get bottom sheets instead of anchored popovers, sized to the visual viewport
+     so the on-screen keyboard never covers inputs or the Save / Cancel buttons. */
+  var COARSE = window.matchMedia('(pointer: coarse)');
+  function sheetMode() { return window.matchMedia('(max-width: 640px)').matches; }
+  // iOS Safari ignores overflow:hidden on <body>; pin the body instead and restore the exact scroll spot
+  var lockN = 0, lockY = 0;
+  function lockScroll() {
+    if (lockN++ > 0) return;
+    lockY = window.scrollY || window.pageYOffset || 0;
+    var b = document.body.style;
+    b.position = 'fixed'; b.top = (-lockY) + 'px'; b.left = '0'; b.right = '0'; b.width = '100%';
+    document.body.classList.add('bud-lock');
+  }
+  function unlockScroll(all) {
+    if (!lockN) return;
+    lockN = all ? 0 : lockN - 1;
+    if (lockN) return;
+    var b = document.body.style;
+    b.position = b.top = b.left = b.right = b.width = '';
+    document.body.classList.remove('bud-lock');
+    window.scrollTo(0, lockY);
+  }
+  // keep overlays and sheets inside the *visible* viewport (mobile keyboard, browser bars)
+  function fitViewport() {
+    var vv = window.visualViewport;
+    var h = vv ? vv.height : window.innerHeight, top = vv ? vv.offsetTop : 0;
+    document.documentElement.style.setProperty('--bud-vvh', h + 'px');
+    document.querySelectorAll('.bud-ov').forEach(function (o) { o.style.top = top + 'px'; o.style.height = h + 'px'; });
+    document.querySelectorAll('.bud-pop.is-sheet').forEach(function (s) {
+      s.style.bottom = Math.max(0, window.innerHeight - h - top) + 'px';
+      s.style.maxHeight = Math.max(220, h - 48) + 'px';
+    });
+  }
+  if (window.visualViewport) { visualViewport.addEventListener('resize', fitViewport); visualViewport.addEventListener('scroll', fitViewport); }
+  window.addEventListener('orientationchange', function () { closePop(); setTimeout(fitViewport, 300); });
+
   var openPop = null;
-  function closePop() { if (openPop) { openPop.el.remove(); openPop.anchor.setAttribute('aria-expanded', 'false'); openPop = null; } }
-  document.addEventListener('mousedown', function (e) { if (openPop && !openPop.el.contains(e.target) && !openPop.anchor.contains(e.target)) closePop(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && openPop) { var a = openPop.anchor; closePop(); a.focus(); } });
-  window.addEventListener('resize', closePop);
+  function closePop(refocus) {
+    if (!openPop) return;
+    var p = openPop; openPop = null;
+    p.el.remove(); if (p.back) p.back.remove();
+    p.anchor.setAttribute('aria-expanded', 'false');
+    if (p.sheet) unlockScroll();
+    if (refocus && p.anchor.isConnected) p.anchor.focus({ preventScroll: true });
+    if (S.pendingRender) { S.pendingRender = false; if (S.shell) renderAll(); }
+  }
+  document.addEventListener('mousedown', function (e) { if (openPop && !openPop.sheet && !openPop.el.contains(e.target) && !openPop.anchor.contains(e.target)) closePop(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && openPop) { e.stopPropagation(); closePop(true); } }, true);
+  var lastW = window.innerWidth;
+  window.addEventListener('resize', function () {
+    if (openPop && !openPop.sheet && window.innerWidth !== lastW) closePop();   // keyboard opening ≠ real resize
+    lastW = window.innerWidth;
+  });
   function popover(anchor, html, opts) {
-    if (openPop && openPop.anchor === anchor) { closePop(); return null; }
+    opts = opts || {};
+    if (openPop && openPop.anchor === anchor) { closePop(true); return null; }
     closePop();
+    var sheet = sheetMode(), back = null;
     var el = document.createElement('div');
-    el.className = 'bud-pop ' + ((opts && opts.cls) || '');
-    el.innerHTML = html;
+    el.className = 'bud-pop ' + (opts.cls || '') + (sheet ? ' is-sheet' : '');
+    if (sheet) {
+      back = document.createElement('div');
+      back.className = 'bud-sheet-back';
+      back.addEventListener('click', function () { closePop(true); });
+      document.body.appendChild(back);
+      el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true');
+      el.innerHTML = '<div class="bud-sheet-head"><strong>' + esc(opts.title || '') + '</strong>' +
+        '<button type="button" class="bud-x sm" data-sheet-close aria-label="Close">' + icon('x') + '</button></div>' + html;
+      el.querySelector('[data-sheet-close]').onclick = function () { closePop(true); };
+      lockScroll();
+    } else el.innerHTML = html;
     document.body.appendChild(el);
-    var r = anchor.getBoundingClientRect(), w = Math.max(r.width, (opts && opts.minWidth) || 200);
-    el.style.minWidth = w + 'px';
-    var left = Math.min(Math.max(12, r.left), window.innerWidth - el.offsetWidth - 12);
-    var top = r.bottom + 6;
-    if (top + el.offsetHeight > window.innerHeight - 12 && r.top - el.offsetHeight - 6 > 12) top = r.top - el.offsetHeight - 6;
-    el.style.left = left + 'px'; el.style.top = Math.max(12, top) + 'px';
+    if (!sheet) {
+      var r = anchor.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight;
+      el.style.minWidth = Math.min(Math.max(r.width, opts.minWidth || 200), vw - 24) + 'px';
+      var left = Math.min(Math.max(12, r.left), vw - el.offsetWidth - 12);
+      var below = vh - r.bottom - 18, above = r.top - 18;
+      var list = el.querySelector('.bud-pop-list');
+      var up = el.offsetHeight > below && above > below;
+      var room = Math.max(160, up ? above : below);
+      if (list && el.offsetHeight > room) list.style.maxHeight = Math.max(120, room - (el.offsetHeight - list.offsetHeight)) + 'px';
+      el.style.left = left + 'px';
+      el.style.top = (up ? Math.max(12, r.top - 6 - el.offsetHeight) : r.bottom + 6) + 'px';
+    }
     anchor.setAttribute('aria-expanded', 'true');
-    openPop = { el: el, anchor: anchor };
-    requestAnimationFrame(function () { el.classList.add('in'); });
+    openPop = { el: el, anchor: anchor, back: back, sheet: sheet };
+    fitViewport();
+    requestAnimationFrame(function () { el.classList.add('in'); if (back) back.classList.add('in'); });
+    // arrow-key navigation through the options
+    el.addEventListener('keydown', function (e) {
+      var items = Array.prototype.slice.call(el.querySelectorAll('.bud-pop-item'));
+      if (!items.length) return;
+      var i = items.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); items[i < 0 ? 0 : Math.min(items.length - 1, i + 1)].focus(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); if (i <= 0) { var s = el.querySelector('input'); (s || items[0]).focus(); } else items[i - 1].focus(); }
+      else if (e.key === 'Home' && i >= 0) { e.preventDefault(); items[0].focus(); }
+      else if (e.key === 'End' && i >= 0) { e.preventDefault(); items[items.length - 1].focus(); }
+      else if (e.key === 'Tab') { closePop(); }
+    });
     return el;
   }
   function dropdown(host, o) {
     var cur = o.options.filter(function (x) { return x.value === o.value; })[0];
-    host.innerHTML = '<button type="button" class="bud-dd-btn' + (o.value ? ' is-set' : '') + '" aria-haspopup="listbox" aria-expanded="false">' +
+    host.innerHTML = '<button type="button" class="bud-dd-btn' + (o.value ? ' is-set' : '') + '" aria-haspopup="listbox" aria-expanded="false"' +
+      (o.label ? ' aria-label="' + esc(o.label) + ': ' + esc(cur ? cur.label : o.placeholder) + '"' : '') + '>' +
       (o.icon ? icon(o.icon) : '') + '<span>' + esc(cur ? cur.label : (o.value || o.placeholder)) + '</span>' + icon('chev', 'dd-chev') + '</button>';
     var btn = host.firstChild;
-    btn.onclick = function () {
+    function openList() {
       var pop = popover(btn,
-        (o.searchable || o.onCreate ? '<div class="bud-pop-search">' + icon('search') + '<input type="text" placeholder="' + (o.onCreate ? 'Search or add new' : 'Search') + '" maxlength="60"></div>' : '') +
-        '<div class="bud-pop-list" role="listbox"></div>', { minWidth: 220, cls: 'is-dd' });
+        (o.searchable ? '<div class="bud-pop-search">' + icon('search') + '<input type="text" placeholder="Search" maxlength="60" aria-label="Search options" autocomplete="off" enterkeyhint="go"></div>' : '') +
+        '<div class="bud-pop-list" role="listbox"' + (o.label ? ' aria-label="' + esc(o.label) + '"' : '') + '></div>', { minWidth: 240, cls: 'is-dd', title: o.label || o.placeholder });
       if (!pop) return;
-      var list = pop.querySelector('.bud-pop-list'), inp = pop.querySelector('input');
+      var list = pop.querySelector('.bud-pop-list'), inp = pop.querySelector('.bud-pop-search input');
       function draw() {
-        var q = inp ? inp.value.trim().toLowerCase() : '';
-        var opts = o.options.filter(function (x) { return !q || x.label.toLowerCase().indexOf(q) !== -1; });
+        var raw = inp ? inp.value.trim() : '', q = raw.toLowerCase();
+        var opts = o.options.filter(function (x) { return x.always || !q || x.label.toLowerCase().indexOf(q) !== -1; });
         var exact = o.options.some(function (x) { return x.label.toLowerCase() === q; });
         list.innerHTML = opts.map(function (x) {
-          return '<button type="button" role="option" class="bud-pop-item' + (x.value === o.value ? ' is-on' : '') + '" data-v="' + esc(x.value) + '">' +
-            '<span>' + esc(x.label) + '</span>' + (x.value === o.value ? icon('check') : '') + '</button>';
+          var on = x.value === o.value;
+          return '<button type="button" role="option" aria-selected="' + on + '" class="bud-pop-item' + (on ? ' is-on' : '') + (x.cls ? ' ' + x.cls : '') + '" data-v="' + esc(x.value) + '">' +
+            (x.icon ? icon(x.icon) : '') + '<span>' + esc(x.label) + '</span>' + (on ? icon('check') : '') + '</button>';
         }).join('') +
-          (o.onCreate && q && !exact ? '<button type="button" class="bud-pop-item is-new" data-new="1">' + icon('plus') + '<span>Add “' + esc(inp.value.trim()) + '”</span></button>' : '') +
+          (o.onCreate && q && !exact ? '<button type="button" class="bud-pop-item is-new" data-new="1">' + icon('plus') + '<span>Use “' + esc(raw) + '” as a new category</span></button>' : '') +
           (!opts.length && !(o.onCreate && q) ? '<div class="bud-pop-empty">No matches</div>' : '');
       }
       draw();
-      if (inp) { inp.addEventListener('input', draw); setTimeout(function () { inp.focus(); }, 30);
-        inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); var f = list.querySelector('.bud-pop-item'); if (f) f.click(); } }); }
+      if (inp) {
+        inp.addEventListener('input', draw);
+        if (!COARSE.matches) setTimeout(function () { inp.focus(); }, 30);   // phones: don't throw the keyboard up uninvited
+        inp.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') { e.preventDefault(); var f = list.querySelector('.bud-pop-item:not(.is-custom)') || list.querySelector('.bud-pop-item'); if (f) f.click(); }
+        });
+      } else {
+        var on = list.querySelector('.is-on') || list.querySelector('.bud-pop-item');
+        if (on && !COARSE.matches) setTimeout(function () { on.focus({ preventScroll: true }); }, 30);
+      }
+      var onEl = list.querySelector('.is-on'); if (onEl) onEl.scrollIntoView({ block: 'nearest' });
       list.addEventListener('click', function (e) {
         var it = e.target.closest('.bud-pop-item'); if (!it) return;
         if (it.getAttribute('data-new')) { var nv = inp.value.trim(); closePop(); o.onCreate(nv); return; }
-        var v = it.getAttribute('data-v'); closePop(); btn.focus();
-        if (v !== o.value) { o.value = v; o.onChange(v); dropdown(host, o); }
+        var v = it.getAttribute('data-v'); closePop(true);
+        if (v !== o.value) { o.value = v; dropdown(host, o); o.onChange(v); }
       });
-    };
-    return { set: function (v) { o.value = v; dropdown(host, o); } };
+    }
+    btn.onclick = openList;
+    btn.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); openList(); } });
+    return { set: function (v) { o.value = v; dropdown(host, o); }, button: btn };
   }
   function modal(opts) {
     closePop();
     var ov = document.createElement('div');
     ov.className = 'bud-ov';
-    ov.innerHTML = '<div class="bud-modal ' + (opts.cls || '') + '" role="dialog" aria-modal="true" aria-labelledby="budMt">' +
+    ov.innerHTML = '<div class="bud-modal ' + (opts.cls || '') + '" role="dialog" aria-modal="true" aria-labelledby="budMt" tabindex="-1">' +
       '<div class="bud-modal-head"><div><h2 id="budMt">' + esc(opts.title) + '</h2>' + (opts.sub ? '<p>' + opts.sub + '</p>' : '') + '</div>' +
       '<button type="button" class="bud-x" aria-label="Close">' + icon('x') + '</button></div>' +
       '<div class="bud-modal-body">' + opts.body + '</div>' + (opts.foot ? '<div class="bud-modal-foot">' + opts.foot + '</div>' : '') + '</div>';
     document.body.appendChild(ov);
-    document.body.classList.add('bud-lock');
-    var last = document.activeElement;
+    lockScroll();
+    fitViewport();
+    var last = document.activeElement, closed = false;
     requestAnimationFrame(function () { ov.classList.add('in'); });
     var m = { root: ov.querySelector('.bud-modal'), close: close, el: ov };
     function close(force) {
+      if (closed) return;
       if (!force && opts.beforeClose && opts.beforeClose() === false) return;
+      closed = true;
+      if (window.SKDate) SKDate.close(false);
       ov.classList.remove('in');
       document.removeEventListener('keydown', onKey);
-      setTimeout(function () { ov.remove(); if (!document.querySelector('.bud-ov')) document.body.classList.remove('bud-lock'); }, 180);
-      if (last && last.focus) try { last.focus(); } catch (e) {}
+      setTimeout(function () { ov.remove(); unlockScroll(); if (last && last.isConnected && last.focus) try { last.focus({ preventScroll: true }); } catch (e) {} }, 180);
       if (opts.onClose) opts.onClose();
     }
     function onKey(e) {
       if (e.key === 'Escape' && !openPop && document.querySelector('.bud-ov:last-of-type') === ov) close();
-      if (e.key === 'Tab') {
-        var f = Array.prototype.filter.call(m.root.querySelectorAll('button, [href], input, textarea, [tabindex]:not([tabindex="-1"])'), function (x) { return !x.disabled && x.offsetParent; });
+      if (e.key === 'Tab' && m.root.contains(document.activeElement)) {
+        var f = Array.prototype.filter.call(m.root.querySelectorAll('button, [href], input, textarea, summary, [tabindex]:not([tabindex="-1"])'), function (x) { return !x.disabled && x.offsetParent && x.tabIndex !== -1; });
         if (!f.length) return;
         if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
         else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
@@ -504,8 +616,17 @@
     document.addEventListener('keydown', onKey);
     ov.querySelector('.bud-x').onclick = function () { close(); };
     if (opts.backdropClose) ov.addEventListener('mousedown', function (e) { if (e.target === ov) close(); });
+    // phones: when the keyboard opens, bring the focused field into the visible part of the sheet
+    m.root.addEventListener('focusin', function (e) {
+      if (!COARSE.matches || !/^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+      setTimeout(function () { if (document.activeElement === e.target) e.target.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 320);
+    });
     if (opts.mount) opts.mount(m);
-    setTimeout(function () { var f = m.root.querySelector('[autofocus]') || m.root.querySelector('.bud-x'); if (f) f.focus(); }, 60);
+    if (window.SKDate) SKDate.enhanceAll(m.root);
+    setTimeout(function () {
+      var f = !COARSE.matches && m.root.querySelector('[autofocus]');
+      (f || m.root).focus({ preventScroll: true });
+    }, 60);
     return m;
   }
   async function confirmBox(msg, o) {
@@ -518,7 +639,7 @@
     if (!item) return;
     var pop = popover(anchor, '<div class="bud-pop-list">' + STATUS.map(function (s) {
       return '<button type="button" class="bud-pop-item' + (s[0] === item.status ? ' is-on' : '') + '" data-v="' + s[0] + '"><span class="bud-dot s-' + s[0] + '"></span><span>' + s[1] + '</span>' + (s[0] === item.status ? icon('check') : '') + '</button>';
-    }).join('') + '</div>', { minWidth: 190 });
+    }).join('') + '</div>', { minWidth: 190, title: 'Payment status' });
     if (!pop) return;
     pop.addEventListener('click', async function (e) {
       var it = e.target.closest('.bud-pop-item'); if (!it) return;
@@ -552,15 +673,19 @@
     var isNew = !item;
     var d = item ? Object.assign({}, item) : { title: '', category: S.cat || '', quantity: 1, unit_price: '', status: 'planned', amount_paid: 0, vendor: '', payment_date: '', notes: '' };
     if (preset) Object.assign(d, preset);
-    var reqId = isNew ? uuid() : null, version = item ? item.version : null, busy = false, file = null, dropReceipt = false, dirty = false;
+    var reqId = isNew ? uuid() : null, version = item ? item.version : null, busy = false, file = null, dropReceipt = false, dirty = false, askClose = null;
     var catOpts = function () {
-      return S.categories.map(function (c) { return { value: c.name, label: c.name }; });
+      return S.categories.map(function (c) { return { value: c.name, label: c.name }; })
+        .concat([{ value: CUSTOM, label: 'Others / Custom Category', cls: 'is-custom', icon: 'plus', always: true }]);
     };
     var body =
       '<div class="bud-form">' +
         '<div class="bud-conflict" hidden></div>' +
         '<label class="bud-field full"><span>Expense name</span><input name="title" maxlength="160" placeholder="e.g. LED wall for main stage" autofocus></label>' +
-        '<div class="bud-field full"><span>Category</span><div class="bud-dd wide" data-cat></div></div>' +
+        '<div class="bud-field full"><span id="budCatL">Category</span><div class="bud-dd wide" data-cat></div></div>' +
+        '<div class="bud-field full bud-custom" data-customrow hidden><label for="budCustomCat">Specify category name</label>' +
+          '<input id="budCustomCat" name="custom_cat" maxlength="60" placeholder="e.g. Special Guest Arrangements" autocomplete="off" autocapitalize="words" enterkeyhint="next">' +
+          '<p class="bud-hint" data-cathint aria-live="polite"></p></div>' +
         '<label class="bud-field"><span>Quantity</span><input name="quantity" inputmode="decimal" autocomplete="off"></label>' +
         '<label class="bud-field"><span>Unit price (₹)</span><input name="unit_price" inputmode="decimal" autocomplete="off" placeholder="0"></label>' +
         '<div class="bud-calc full"><span>Line total</span><strong data-total>₹0</strong><small data-calc></small></div>' +
@@ -584,9 +709,10 @@
 
     modal({
       title: isNew ? 'Add Expense' : 'Edit Expense', body: body, foot: foot, cls: 'is-form',
-      beforeClose: function () { return !busy; },
+      beforeClose: function () { if (busy) return false; if (dirty && askClose) { askClose(); return false; } return true; },
       mount: function (m) {
         var R = m.root, f = function (n) { return R.querySelector('[name="' + n + '"]'); };
+        askClose = tryClose;
         var err = R.querySelector('.bud-err'), saveBtn = R.querySelector('[data-save]');
         var catDd;
         function fill() {
@@ -595,20 +721,26 @@
           f('amount_paid').value = cents(d.amount_paid) ? String(Number(d.amount_paid)) : '';
           f('vendor').value = d.vendor || ''; f('payment_date').value = d.payment_date || ''; f('notes').value = d.notes || '';
           catDd = dropdown(R.querySelector('[data-cat]'), {
-            value: d.category, placeholder: 'Choose a category', searchable: true, options: catOpts(),
-            onChange: function (v) { d.category = v; dirty = true; },
-            onCreate: isAdmin() ? async function (name) {
-              try {
-                var r = await rpc('budget_admin_add_category', { p_budget: S.budget.id, p_name: name });
-                if (!r.ok) return showErr(errText(r));
-                if (S.categories.every(function (c) { return c.name !== r.category.name; })) S.categories.push(r.category);
-                d.category = r.category.name; dirty = true; fill(); renderFilters();
-              } catch (e) { showErr('Could not add the category.'); }
-            } : null
+            value: d.category, placeholder: 'Choose a category', searchable: true, options: catOpts(), label: 'Category',
+            onChange: function (v) { d.category = v; dirty = true; showErr(''); customMode(v === CUSTOM, true); },
+            // typed a name that isn't in the list → treat it as a custom category
+            onCreate: function (name) { d.category = CUSTOM; catDd.set(CUSTOM); f('custom_cat').value = cleanCat(name); dirty = true; customMode(true, true); }
           });
+          customMode(d.category === CUSTOM, false);
           setStatus(d.status, true); calc(); drawReceipt();
         }
         function showErr(t) { err.textContent = t; err.hidden = !t; }
+        function customMode(on, focus) {
+          R.querySelector('[data-customrow]').hidden = !on;
+          if (on) { catHint(); if (focus) setTimeout(function () { f('custom_cat').focus(); }, 60); }
+        }
+        function catHint() {
+          var h = R.querySelector('[data-cathint]'), v = cleanCat(f('custom_cat').value);
+          if (!v) { h.textContent = 'Saved as its own category and available for future expenses.'; h.className = 'bud-hint'; return; }
+          var hit = findCat(v);
+          h.textContent = hit ? 'Already exists — the expense will be filed under “' + hit + '”.' : '“' + v + '” will be added as a new category.';
+          h.className = 'bud-hint ' + (hit ? 'is-match' : 'is-new');
+        }
         function calc() {
           var q = f('quantity').value.trim(), p = f('unit_price').value.trim();
           var tot = lineTotal(q || 0, p || 0);
@@ -641,6 +773,7 @@
         R.addEventListener('input', function (e) {
           dirty = true; showErr('');
           if (e.target.name === 'quantity' || e.target.name === 'unit_price') calc();
+          if (e.target.name === 'custom_cat') catHint();
         });
         R.addEventListener('click', function (e) {
           var t = e.target.closest('button'); if (!t) return;
@@ -675,6 +808,14 @@
           var title = f('title').value.trim();
           if (!title) return { e: 'Enter an expense name.', at: 'title' };
           if (!d.category) return { e: 'Choose a category.' };
+          var category = d.category;
+          if (category === CUSTOM) {
+            var cc = cleanCat(f('custom_cat').value);
+            if (!cc) return { e: 'Specify the category name.', at: 'custom_cat' };
+            if (cc.length > 60) return { e: 'Category name can be up to 60 characters.', at: 'custom_cat' };
+            if (/^others?(\s*\/\s*custom( category)?)?$/i.test(cc)) return { e: 'Use a specific name, e.g. “Special Guest Arrangements”.', at: 'custom_cat' };
+            category = findCat(cc) || cc;
+          }
           if (!NUM.test(q) || Number(q) <= 0) return { e: 'Quantity must be a number above 0 (up to 2 decimals).', at: 'quantity' };
           if (!NUM.test(p)) return { e: 'Unit price must be a positive amount (up to 2 decimals).', at: 'unit_price' };
           var tot = lineTotal(q, p);
@@ -683,7 +824,7 @@
             if (cents(paid) >= cents(tot)) return { e: 'For a full payment choose “Paid”. Partly paid must be less than ' + inr(tot) + '.', at: 'amount_paid' };
           }
           return { v: {
-            title: title, category: d.category, quantity: q, unit_price: p, status: d.status,
+            title: title, category: category, quantity: q, unit_price: p, status: d.status,
             amount_paid: d.status === 'partially_paid' ? paid : d.status === 'paid' ? String(tot) : '0',
             vendor: f('vendor').value.trim(), payment_date: f('payment_date').value, notes: f('notes').value.trim()
           } };
@@ -843,12 +984,14 @@
         function draw() {
           R.querySelector('[data-list]').innerHTML = S.categories.map(function (c) {
             var u = used(c.name);
-            return '<li><span>' + esc(c.name) + '</span><span class="bud-muted sm">' + (u ? u + (u === 1 ? ' item' : ' items') : 'unused') + '</span>' +
+            return '<li data-cid="' + esc(c.id || '') + '"><span class="bud-cat-name">' + esc(c.name) + '</span><span class="bud-muted sm">' + (u ? u + (u === 1 ? ' item' : ' items') : 'unused') + '</span>' +
+              (c.id ? '<button type="button" class="bud-icon-btn" data-ren aria-label="Rename ' + esc(c.name) + '">' + icon('pencil') + '</button>' : '<span class="bud-icon-btn ph"></span>') +
               (!u && c.id ? '<button type="button" class="bud-icon-btn" data-rm="' + esc(c.id) + '" aria-label="Remove ' + esc(c.name) + '">' + icon('trash') + '</button>' : '<span class="bud-icon-btn ph"></span>') + '</li>';
           }).join('');
         }
         async function add() {
-          var inp = R.querySelector('[data-new]'), v = inp.value.trim(); if (!v) return;
+          var inp = R.querySelector('[data-new]'), v = cleanCat(inp.value); if (!v) return;
+          if (findCat(v)) { err.textContent = '“' + findCat(v) + '” already exists.'; err.hidden = false; return; }
           try {
             var r = await rpc('budget_admin_add_category', { p_budget: S.budget.id, p_name: v });
             if (!r.ok) { err.textContent = errText(r); err.hidden = false; return; }
@@ -859,6 +1002,30 @@
         R.querySelector('[data-add]').onclick = add;
         R.querySelector('[data-new]').addEventListener('keydown', function (e) { if (e.key === 'Enter') add(); });
         R.querySelector('[data-list]').addEventListener('click', async function (e) {
+          var rn = e.target.closest('[data-ren]');
+          if (rn) {   // inline rename
+            var li = rn.closest('li'), cid = li.getAttribute('data-cid'), cat = S.categories.filter(function (c) { return c.id === cid; })[0];
+            if (!cat) return;
+            li.innerHTML = '<input type="text" maxlength="60" class="bud-cat-edit" aria-label="New name for ' + esc(cat.name) + '">' +
+              '<button type="button" class="bud-btn primary sm" data-ren-ok>Save</button><button type="button" class="bud-btn ghost sm" data-ren-no>Cancel</button>';
+            var ci = li.querySelector('input'); ci.value = cat.name; ci.focus(); ci.select();
+            ci.addEventListener('keydown', function (k) { if (k.key === 'Enter') li.querySelector('[data-ren-ok]').click(); if (k.key === 'Escape') { k.stopPropagation(); draw(); } });
+            li.querySelector('[data-ren-no]').onclick = draw;
+            li.querySelector('[data-ren-ok]').onclick = async function () {
+              var nv = cleanCat(ci.value);
+              if (!nv || nv === cat.name) return draw();
+              var clash = findCat(nv);
+              if (clash && clash !== cat.name) { err.textContent = '“' + clash + '” already exists.'; err.hidden = false; return; }
+              try {
+                var r = await rpc('budget_admin_rename_category', { p_category: cid, p_name: nv });
+                if (!r.ok) { err.textContent = errText(r); err.hidden = false; return; }
+                S.items.forEach(function (it) { if (it.category === cat.name) it.category = r.name; });
+                if (S.cat === cat.name) S.cat = r.name;
+                cat.name = r.name; err.hidden = true; draw(); renderAll(); toast('Category renamed');
+              } catch (x) { err.textContent = 'Could not rename — check your connection.'; err.hidden = false; }
+            };
+            return;
+          }
           var b = e.target.closest('[data-rm]'); if (!b) return;
           var id = b.getAttribute('data-rm');
           try {
@@ -893,7 +1060,7 @@
             '<div class="bud-field full"><span>Expires</span><div class="bud-seg wrap" data-exp>' +
               [['', 'Never'], ['1', '24 hours'], ['7', '7 days'], ['30', '30 days'], ['date', 'Pick date']].map(function (x, i) {
                 return '<button type="button" data-e="' + x[0] + '"' + (i === 2 ? ' class="is-on"' : '') + '>' + x[1] + '</button>'; }).join('') +
-            '</div><input type="date" data-date hidden></div>' +
+            '</div><div class="bud-date-wrap" data-datebox hidden><input type="date" data-date aria-label="Expiry date"></div></div>' +
             '<label class="bud-field full"><span>Passcode <em>(optional)</em></span><input data-pass type="text" maxlength="40" autocomplete="off" placeholder="People must type this to open the link"></label>' +
           '</div>' +
           '<p class="bud-err" role="alert" hidden></p>' +
@@ -903,6 +1070,7 @@
         '<section class="bud-share-list"><div class="bud-panel-head"><h3>Active &amp; past links</h3><button type="button" class="bud-link danger" data-revoke-all hidden>Turn off all links</button></div><div data-links><p class="bud-muted sm">Loading…</p></div></section>',
       mount: function (m) {
         var R = m.root, role = 'editor', exp = '7', err = R.querySelector('.bud-err'), busy = false;
+        var td = new Date(Date.now() + 86400000); R.querySelector('[data-date]').min = td.getFullYear() + '-' + String(td.getMonth() + 1).padStart(2, '0') + '-' + String(td.getDate()).padStart(2, '0');
         R.querySelector('[data-role]').addEventListener('click', function (e) {
           var b = e.target.closest('[data-r]'); if (!b) return; role = b.getAttribute('data-r');
           R.querySelectorAll('[data-r]').forEach(function (x) { x.classList.toggle('is-on', x === b); });
@@ -910,7 +1078,8 @@
         R.querySelector('[data-exp]').addEventListener('click', function (e) {
           var b = e.target.closest('[data-e]'); if (!b) return; exp = b.getAttribute('data-e');
           R.querySelectorAll('[data-e]').forEach(function (x) { x.classList.toggle('is-on', x === b); });
-          var di = R.querySelector('[data-date]'); di.hidden = exp !== 'date'; if (exp === 'date') di.focus();
+          var box = R.querySelector('[data-datebox]'), di = R.querySelector('[data-date]'); box.hidden = exp !== 'date';
+          if (exp === 'date' && di._skd && !di.value) di._skd.open();
         });
         R.querySelector('[data-create]').onclick = async function () {
           if (busy) return;
@@ -1032,7 +1201,7 @@
                 'via <b>' + esc(a.link_label || 'share link') + '</b> <span class="bud-mini">' + esc(a.link_role || '') + ' link</span>';
             var what = {
               created: 'added', updated: 'edited', deleted: 'deleted', budget_updated: 'changed budget settings', category_added: 'added category',
-              category_removed: 'removed category', link_created: 'created a share link', link_updated: 'changed a share link', link_revoked: 'turned off a share link'
+              category_removed: 'removed category', category_renamed: 'renamed category', link_created: 'created a share link', link_updated: 'changed a share link', link_revoked: 'turned off a share link'
             }[a.action] || a.action;
             var detail = '', c = a.changes || {};
             if (a.action === 'updated' || a.action === 'budget_updated') {
@@ -1043,6 +1212,8 @@
               detail = '<li><span>Total</span><b>' + esc(inr(c.after.line_total)) + '</b> · ' + esc(c.after.category) + ' · ' + esc(STATUS_LABEL[c.after.status] || '') + '</li>';
             } else if (a.action === 'deleted' && c.before) {
               detail = '<li><span>Was</span>' + esc(inr(c.before.line_total)) + ' · ' + esc(c.before.category) + '</li>';
+            } else if (a.action === 'category_renamed') {
+              detail = '<li>' + esc(c.from || '') + ' → <b>' + esc(c.to || '') + '</b>' + (c.items ? ' · ' + c.items + ' expense' + (c.items === 1 ? '' : 's') : '') + '</li>';
             } else if (/^category_/.test(a.action)) {
               detail = '<li>' + esc(c.name || '') + '</li>';
             } else if (/^link_/.test(a.action)) {
@@ -1061,7 +1232,7 @@
   function exportMenu(anchor) {
     var pop = popover(anchor, '<div class="bud-pop-list">' +
       '<button type="button" class="bud-pop-item" data-x="pdf">' + icon('receipt') + '<span>PDF report</span></button>' +
-      '<button type="button" class="bud-pop-item" data-x="csv">' + icon('download') + '<span>CSV · all items</span></button></div>', { minWidth: 200 });
+      '<button type="button" class="bud-pop-item" data-x="csv">' + icon('download') + '<span>CSV · all items</span></button></div>', { minWidth: 200, title: 'Export' });
     if (!pop) return;
     pop.addEventListener('click', function (e) {
       var b = e.target.closest('[data-x]'); if (!b) return; closePop();
