@@ -4,14 +4,15 @@
 <script>/* never inside another site's frame */
 if (window.top !== window.self) { document.documentElement.style.display = 'none'; try { window.top.location = window.self.location.href; } catch (e) {} }</script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="theme-color" content="#060608">
 <title>Event Budget | Sharankrishna Short Film Awards</title>
 <link rel="icon" type="image/png" href="/Favicon.png">
 <link rel="stylesheet" href="/assets/css/ui-components.css">
-<link rel="stylesheet" href="/assets/css/budget.css?v=1">
+<link rel="stylesheet" href="/assets/css/sk-controls.css?v=1">
+<link rel="stylesheet" href="/assets/css/budget.css?v=2">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -19,6 +20,7 @@ if (window.top !== window.self) { document.documentElement.style.display = 'none
 <body class="bud" data-mode="admin">
 <main id="budApp"><div class="bud-gate"><p class="bud-muted">Loading…</p></div></main>
 <script src="/assets/js/ui-components.js"></script>
-<script src="/assets/js/budget-app.js?v=1"></script>
+<script src="/assets/js/sk-datepicker.js?v=1"></script>
+<script src="/assets/js/budget-app.js?v=2"></script>
 </body>
 </html>
